@@ -1,7 +1,17 @@
 div.home{
-  background: url('http://localhost:3000/img/Sono1.jpeg') no-repeat center;
-  background-size: 35rem;
+  /*background: url('http://localhost:3000/img/Sono1.jpeg') no-repeat center;
+  background-size: 35rem;*/
 
   height: 30rem;
   padding-top: 1rem;
+}
+
+div.home div {
+  width: 100%;
+  text-align: center;
+  margin-top: 7rem;
+}
+
+div.home div img {
+  width: 55rem;
 }

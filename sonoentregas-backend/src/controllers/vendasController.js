@@ -32,14 +32,14 @@ module.exports = {
     try {
       const { loja } = req.params
       
-      let { CODIGOVENDA, CODCLIENTE, NOMECLI, VALORPROD, DESCONTO, TOTALVENDA, EMISSAO, STATUS, ENDERECO, BAIRRO, CIDADE, ESTADO, PONTOREF, OBS, products, USER_ID, D_ENTREGA1 } = req.body
+      let { CODIGOVENDA, CODCLIENTE, NOMECLI, VALORPROD, DESCONTO, TOTALVENDA, EMISSAO, STATUS, ENDERECO, BAIRRO, CIDADE, ESTADO, PONTOREF, OBS, products, USER_ID, D_ENTREGA1, VENDEDOR } = req.body
 
       const D_ENVIO = getDate()
 
       if (!STATUS) {        
         STATUS = 'Enviado'
         
-        const valuesSales = `${CODIGOVENDA}, ${loja}, ${CODCLIENTE}, '${NOMECLI}', ${VALORPROD}, ${DESCONTO}, ${TOTALVENDA}, '${EMISSAO}', '${STATUS}', '${ENDERECO}', '${BAIRRO}', '${CIDADE}', '${ESTADO}', '${PONTOREF}', '${OBS}', ${USER_ID}, '${D_ENTREGA1}', '${D_ENVIO}'`
+        const valuesSales = `${CODIGOVENDA}, ${loja}, ${CODCLIENTE}, '${NOMECLI}', ${VALORPROD}, ${DESCONTO}, ${TOTALVENDA}, '${EMISSAO}', '${STATUS}', '${ENDERECO}', '${BAIRRO}', '${CIDADE}', '${ESTADO}', '${PONTOREF}', '${OBS}', ${USER_ID}, '${D_ENTREGA1}', '${D_ENVIO}', '${VENDEDOR}'`
         
         await Sales.creator(0, valuesSales)
         

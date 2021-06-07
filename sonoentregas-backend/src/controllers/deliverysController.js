@@ -99,7 +99,7 @@ module.exports = {
 
         var dEntrega
 
-        if (delivery.STATUS === 'Entregando') {
+        if (delivery.STATUS === 'Finalizada') {
           
           dEntrega =  `, D_ENTREGA2 = '${delivery.dateDelivery}'`
    

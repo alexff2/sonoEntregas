@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { 
   makeStyles,
@@ -18,6 +18,7 @@ import { KeyboardArrowDown, KeyboardArrowUp} from '@material-ui/icons'
 import { useSale } from '../../context/saleContext'
 import { useShop } from '../../context/shopContext'
 import getDate from '../../functions/getDates'
+import api from '../../services/api'
 
 const useStyles = makeStyles(theme =>({
   root: {
@@ -131,8 +132,12 @@ Row.propTypes = {
 
 export default function Sales() {
   const classes = useStyles()
-  const { sales } = useSale()
+  const { sales, setSales } = useSale()
   const { shop } = useShop()
+
+  useEffect(()=>{
+    api.get('sales').then( res => setSales(res.data))
+  },[setSales])
   return (
     <TableContainer component={Paper}>
       <Table aria-label="collapsible table">

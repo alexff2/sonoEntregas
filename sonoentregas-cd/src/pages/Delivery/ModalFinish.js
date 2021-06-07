@@ -24,15 +24,24 @@ import getDate from '../../functions/getDates'
 import { useCars } from '../../context/carsContext'
 import { useDrivers } from '../../context/driverContext'
 import { useDelivery } from '../../context/deliveryContext'
+import { useSale } from '../../context/saleContext'
 
 import api from '../../services/api'
 
 const useStyles = makeStyles(theme => ({
   //Style form select\
-  divFormControl:{
+  divHeader:{
     width: '100%',
     display: 'flex',
-    paddingBottom: theme.spacing(2)
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: '-20px'
+  },
+  divDateDelivery: {
+    width: '100%',
+    textAlign: 'center',
+    paddingBottom: '1rem'
   },
   //Style buttons
   btnActions: {
@@ -66,11 +75,12 @@ const useStyles = makeStyles(theme => ({
 export default function ModalFinish({ setOpen, selectDelivery }){
   //States
   const [ openCell, setOpenCell ] = useState()
-  const [ dateDelivery, setDateDelivery ] = useState([{ID_SALES: 0}])
+  const [ dateDelivery, setDateDelivery ] = useState(false)
   const [ sales, setSales ] = useState([{ID_SALES: 0}])
   const { cars } = useCars()
   const { drivers } = useDrivers()
   const { delivery, setDelivery } = useDelivery()
+  const stateSales = useSale()
 
   //Styes
   const classes = useStyles()
@@ -92,39 +102,51 @@ export default function ModalFinish({ setOpen, selectDelivery }){
     }
   }
   const finish = async () => {
-    const status = 'Finalizada'
-
-    selectDelivery.STATUS = status
-    selectDelivery['dateDelivery'] = dateDelivery
-
-    for( let j = 0; j < sales.length; j++){
-      for( let i = 0; i < selectDelivery.sales.length; i++){
-        if (sales[j].ID_SALES !== selectDelivery.sales[i].ID_SALES && selectDelivery.sales[i].STATUS !== 'Enviado') {
-          selectDelivery.sales[i].STATUS = status
-        } else {
-          selectDelivery.sales[i].STATUS = 'Enviado'
+    if(dateDelivery){
+      const status = 'Finalizada'
+  
+      selectDelivery.STATUS = status
+      selectDelivery['dateDelivery'] = dateDelivery
+  
+      for( let j = 0; j < sales.length; j++){
+        for( let i = 0; i < selectDelivery.sales.length; i++){
+          if (sales[j].ID_SALES !== selectDelivery.sales[i].ID_SALES && selectDelivery.sales[i].STATUS !== 'Enviado') {
+            selectDelivery.sales[i].STATUS = status
+          } else {
+            selectDelivery.sales[i].STATUS = 'Enviado'
+          }
         }
       }
-    }
-    
-    const { data } = await api.put(`deliverys/status/${selectDelivery.ID}`, selectDelivery)
+      
+      const { data } = await api.put(`deliverys/status/${selectDelivery.ID}`, selectDelivery)
 
-    setDelivery(delivery.map( item => item.ID === data.ID ? data : item))
-    setOpen(false)
+      if(data.ID){
+        const resp = await api.get('sales')
+        stateSales.setSales(resp.data)
+      }
+  
+      setDelivery(delivery.map( item => item.ID === data.ID ? data : item))
+      setOpen(false)
+    } else {
+      alert('Selecione a data de entrega')
+    }
   }
   //Component
   return(
     <form>
-      <h2>{selectDelivery.DESCRIPTION}</h2>
-
-      <div className={classes.divFormControl}>
-        <p>Motorista: <span>{descriptionDriver()}</span></p>
-        <p>Veículo: <span>{descriptionCar()}</span></p>
+      <div className={classes.divHeader}>
+        <h3>{selectDelivery.DESCRIPTION}</h3>
+        <p><span style={{fontWeight: 700}}>Motorista: </span>{descriptionDriver()}</p>
+        <p><span style={{fontWeight: 700}}>Veículo: </span> {descriptionCar()}</p>
       </div>
-      <input 
-        type="date"
-        onChange={e => setDateDelivery(e.target.value)}
-      />
+      <div className={classes.divDateDelivery}>
+        <span style={{fontWeight: 700}}>Data da Entrega: </span>
+        <input 
+          type="date"
+          required
+          onChange={e => setDateDelivery(e.target.value)}
+        />
+      </div>
 
       <TableContainer component={Paper}>
         <Table aria-label="collapsible table">

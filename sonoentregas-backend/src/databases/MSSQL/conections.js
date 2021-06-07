@@ -54,7 +54,6 @@ module.exports = [
     dialect: "mssql",
     dialectOptions: {
       options: { encrypt: false }
-    },
-    logging: false
+    }
   }
 ]
