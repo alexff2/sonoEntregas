@@ -1,0 +1,96 @@
+.box-btn-ico {
+  width: 10%;
+  text-align: center;
+}
+.box-btn-ico svg {
+  cursor: pointer;
+}
+
+.btn-user-inative {
+  padding: 0.4rem 0.5rem;
+  border-radius: 0.3rem;
+  position: relative;
+  transition: all 0.3s;
+  bottom: 0;
+}
+
+.btn-user-inative:hover {
+  bottom: 0.2rem;
+  cursor: pointer;
+  box-shadow: 0.1rem 0.1rem 0.2rem black;
+}
+
+/*Modal User ==============================*/
+#modal-create-users {
+  display: none;
+}
+#modal-create-users h2,
+#modal-update-users h2 {
+  width: 100%;
+  text-align: center;
+}
+
+#modal-create-users form,
+#modal-update-users form {
+  display: flex;
+  flex-direction: column;
+}
+
+#modal-create-users form .field-input,
+#modal-update-users form .field-input {
+  border: 0.2rem solid var(--text);
+  border-radius: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+#modal-update-users form .field-input-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: .5rem;
+}
+#modal-update-users form .field-input-checkbox p,
+#modal-update-users form .field-input-checkbox input,
+#modal-update-users form .field-input-checkbox label{
+  padding: .5rem;
+}
+#modal-create-users form input,
+#modal-update-users form input {
+  border-color: transparent;
+}
+
+.btn-modalUser {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+}
+
+.btn-modalUser div.cancel-modal,
+.btn-modalUser button {
+  padding: auto;
+  border-radius: 0.25rem;
+  width: 45%;
+  height: 2rem;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 1;
+  transition: all 0.3s;
+}
+.btn-modalUser div.cancel-modal:hover,
+.btn-modalUser button:hover {
+  opacity: 0.7;
+}
+
+.btn-modalUser div.cancel-modal {
+  border: 0.2rem solid var(--red);
+  color: var(--red);
+}
+.btn-modalUser button {
+  border: 0.25rem solid var(--green);
+  background-color: var(--green);
+  color: var(--white);
+}

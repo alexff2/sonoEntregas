@@ -1,0 +1,207 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+:root{
+  --blue-logo: #012C5F;
+  --white: #fff;
+  --gray: #f0f2f5;
+  --gray-line: #DCDDE0;
+  --text: #666666;
+  --texthighlight: #B3B9FF;
+  --black: #2E384D;
+  --red: #E83F5B;
+  --green: #4CD62B;
+  --blue: #5965E0;
+  --blue-dark: #363f5f;
+}
+
+@media(max-width: 1080px){
+  html {
+    font-size: 93.75%;
+  }
+}
+
+@media(max-width: 720px){
+  html {
+    font-size: 87.05%;
+  }
+}
+
+body {
+  color: var(--text);
+  background-color: var(--gray);
+}
+
+body, input, textarea, button, footer {
+  font: 400 1rem "inter", sans-serif;
+}
+
+button {
+  padding: 0.25rem;
+  margin-left: 0.25rem;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+main {
+  padding: 0 2rem;
+  margin-top: 8.6rem;
+}
+
+main div.container {
+  border-style: solid;
+  border-color: var(--gray-line);
+  border-radius: 0.5rem 0.5rem 0 0;
+
+  background-color: var(--gray);
+  margin-top: 9.6rem;
+}
+
+main div.container div.header-container {
+  background-color: var(--gray-line);
+  padding: 0.5rem 1rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+main div.container div.body-container {
+  padding: 1rem 1rem 3rem 1rem;
+}
+
+main div.footer-container{
+  height: 3rem;
+}
+
+/* Modal ========================*/
+.modal-overlaw {
+  background-color: rgba(0,0,0,0.7);
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal {
+  background-color: var(--gray);
+  padding: 2.4rem;
+  border-radius: 0.5rem;
+}
+
+.modal h2 {
+  margin-bottom: 1rem;
+}
+
+/*Tabs =====================*/
+
+table {
+  width: 100%;
+}
+
+td, th {
+  padding: 0.7rem 1rem;
+  text-align: start;
+}
+
+th {
+  background-color: var(--gray-line);
+}
+
+th:first-child {
+  border-radius: 0.5rem 0 0 0;
+
+}
+th:last-child {
+  border-radius: 0 0.5rem 0 0;
+}
+
+tbody tr {
+  background-color: rgba(230, 230, 230, 0.411);
+}
+
+tbody tr:hover {
+  background-color: var(--white);
+}
+
+tbody td {
+  color: var(--blue-dark);
+}
+
+/*Defaut styles ==============*/
+
+button {
+  cursor: pointer;
+}
+
+input {
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  border-color: var(--gray-line);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+select {
+  background-color: #354880;  /* Imagem de fundo (Seta) */
+  width: 100px; /* Tamanho do select, maior que o tamanho da div "div-select" */
+  height: 30px; /* altura do select, importante para que tenha a mesma altura em todo os navegadores */
+  font-family:Arial, Helvetica, sans-serif; /* Fonte do Select */ 
+  font-size: 16px; /* Tamanho da Fonte */
+  color:#fff; /* Cor da Fonte */
+  text-indent: 0.01px; /* Remove seta padrão do FireFox */
+  text-overflow: "";  /* Remove seta padrão do FireFox */
+  margin: 0 5px 0 5px;
+  border-radius: 0.25rem;
+  padding: 3px 5px 3px 5px;
+}
+
+.circle-add {
+  width: 4rem;
+  height: 4rem;
+  font-size: 2rem;
+  padding: 0.25rem;
+  border-radius: 50%;
+  border-color: transparent;
+  box-shadow: none;
+  background-color: var(--green);
+  color: var(--white);
+
+  position: fixed;
+  right: 3rem;
+  bottom: 3rem;
+
+  opacity: 1;
+  transition: all 0.3s;
+}
+.circle-add:hover {
+  opacity: 0.7;
+  bottom: 3.2rem;
+}
+
+.red {
+  color: var(--red);
+}
+
+.green {
+  color: var(--green);
+}

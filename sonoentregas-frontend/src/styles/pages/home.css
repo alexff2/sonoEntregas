@@ -1,0 +1,7 @@
+div.home{
+  background: url('http://localhost:3000/img/Sono1.jpeg') no-repeat center;
+  background-size: 35rem;
+
+  height: 30rem;
+  padding-top: 1rem;
+}

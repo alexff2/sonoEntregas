@@ -1,0 +1,8 @@
+#Pasta com arquivos auxiliares
+/auxiliar
+
+# Banco de dados SQL local
+/Database/Base
+
+# Ignores do backend
+/sonoentregas-backend/node_modules

@@ -1,0 +1,84 @@
+/*Modal sales ===========================*/
+div.sales-head {
+  margin-bottom: 0.5rem;
+
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+}
+
+div.sales-field {
+  display: flex;
+  flex-direction: column;
+}
+
+div.sales-field div span {
+  font-weight: 600;
+  margin-right: 0.25rem;
+}
+div.sales-field div input {
+  font-size: 0.5rem;
+}
+div.sales-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+div.sales-buttons button {
+  font-size: 0.7rem;
+  width: 4rem;
+  height: 4rem;
+  background-color: var(--green);
+  color: var(--white);
+  padding: 0.3rem;
+  border-color: transparent;
+  border-radius: 50%;
+
+  opacity: 1;
+  transition: 0.3s;
+}
+
+div.sales-buttons button:hover{
+  opacity: 0.6;
+}
+
+div.sales-buttons button:first-child {
+  margin-right: 0.5rem;
+  background-color: transparent;
+  border: 0.15rem solid var(--red);
+  color: var(--red);
+}
+/*TABLE MODAL ==================================*/
+
+table.tab-modal-product {
+  border-spacing: 0 0.5rem;
+  color: #969cb3;
+}
+
+table.tab-modal-product td, 
+table.tab-modal-product th {
+  background-color: white;
+  padding: 1rem 2rem;
+  font-weight: normal;
+}
+
+table.tab-modal-product th:first-child,
+table.tab-modal-product td:first-child {
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+table.tab-modal-product th:last-child,
+table.tab-modal-product td:last-child {
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+table.tab-modal-product tbody tr {
+  opacity: 0.6;
+}
+
+table.tab-modal-product tbody tr:hover {
+  opacity: 1;
+}
+
+table.tab-modal-product td {
+  color: var(--blue-dark);
+}
