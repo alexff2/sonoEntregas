@@ -9,6 +9,7 @@ import DeliveryProvider from './context/deliveryContext'
 import SaleProvider from './context/saleContext'
 import CarsProvider from './context/carsContext'
 import DriverProvider from './context/driverContext'
+import AssistantProvider from './context/assistantContext'
 import UsersProvider from './context/usersContext'
 // import ProductProvider from './context/productContext'
 
@@ -38,18 +39,20 @@ const Routes = () => {
       <ShopProvider>
         <UsersProvider>
         <DeliveryProvider>
-          <SaleProvider>
-            <Route path="/" exact component={RedirectHome} />
-            <Route path="/app/home" exact component={Home} />
-            <CarsProvider>
-              <Route path="/app/transports" exact component={Cars} />
-              <DriverProvider>
-                <Route path="/app/delivery" exact component={Delivery} />
-                <Route path="/app/users" exact component={Users} />
-                <Route path="/app/products" exact component={Products} />
-              </DriverProvider>
-            </CarsProvider>
-          </SaleProvider>
+          <AssistantProvider>
+            <SaleProvider>
+              <Route path="/" exact component={RedirectHome} />
+              <Route path="/app/home" exact component={Home} />
+              <CarsProvider>
+                <Route path="/app/transports" exact component={Cars} />
+                <DriverProvider>
+                  <Route path="/app/delivery" exact component={Delivery} />
+                  <Route path="/app/users" exact component={Users} />
+                  <Route path="/app/products" exact component={Products} />
+                </DriverProvider>
+              </CarsProvider>
+            </SaleProvider>
+          </AssistantProvider>
         </DeliveryProvider>
       </UsersProvider>
       </ShopProvider>

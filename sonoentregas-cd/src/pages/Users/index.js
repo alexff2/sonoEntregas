@@ -13,7 +13,8 @@ import {
 } from '@material-ui/core'
 import { Add, Delete, Edit } from '@material-ui/icons'
 import { useDrivers } from '../../context/driverContext'
-import {useUsers} from '../../context/usersContext'
+import { useAssistants } from '../../context/assistantContext'
+import { useUsers } from '../../context/usersContext'
 import Modal from '../../components/Modal'
 import ModalUsers from './ModalUsers'
 
@@ -37,6 +38,7 @@ export default function Users() {
   const [ openUpdateUser, setOpenUpdateUser ] = useState(false)
   const [ userUpdate, setUserUpdate ] = useState()
   const { drivers, setDrivers } = useDrivers()
+  const { assistants, setAssistants } = useAssistants()
   const { users, setUsers } = useUsers()
   const classes = useStyles()
 
@@ -44,8 +46,9 @@ export default function Users() {
   const deleteUser = async (cod, cargo) => {
     try {
       await api.delete(`users/${cod}`)
-      cargo === 'User' ? setUsers(users.filter(item => item.ID !== cod))
-      : setDrivers(drivers.filter(item => item.ID !== cod))
+      if(cargo === 'User') setUsers(users.filter(item => item.ID !== cod))
+      if(cargo === 'Driver') setDrivers(drivers.filter(item => item.ID !== cod))
+      if(cargo === 'Assistant') setAssistants(assistants.filter(item => item.ID !== cod))
     } catch (error) {
       alert(error)
     }
@@ -87,6 +90,17 @@ export default function Users() {
                 <TableCell>
                   <Edit onClick={() => updateUser(driver, 'Driver')}/>
                   <Delete onClick={() => deleteUser(driver.ID, 'Driver')}/>
+                </TableCell>
+              </TableRow>
+            ))}
+            {assistants.map( assistant => (
+            <TableRow key={assistant.ID}>
+                <TableCell>{assistant.ID}</TableCell>
+                <TableCell>{assistant.DESCRIPTION}</TableCell>
+                <TableCell>Auxiliar</TableCell>
+                <TableCell>
+                  <Edit onClick={() => updateUser(assistant, 'Assistant')}/>
+                  <Delete onClick={() => deleteUser(assistant.ID, 'Assistant')}/>
                 </TableCell>
               </TableRow>
             ))}

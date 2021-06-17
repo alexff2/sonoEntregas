@@ -13,6 +13,7 @@ import { ButtonCancel, ButtonSucess } from '../../components/Buttons'
 //context
 import { useCars } from '../../context/carsContext'
 import { useDrivers } from '../../context/driverContext'
+import { useAssistants } from '../../context/assistantContext'
 import { useDelivery } from '../../context/deliveryContext'
 import { useSale } from '../../context/saleContext'
 
@@ -27,7 +28,7 @@ const useStyles = makeStyles(theme => ({
     paddingBottom: theme.spacing(2)
   },
   formControl:{
-    width: '49%'
+    width: '30%'
   },
   //Style buttons
   btnActions: {
@@ -43,9 +44,11 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
   const [ description, setDescription ] = useState()
   const [ codCar, setCodCar ] = useState()
   const [ codDriver, setCodDriver ] = useState()
+  const [ codAssistant, setCodAssistant ] = useState()
   const [ sales, setSales ] = useState([])
   const { cars } = useCars()
   const { drivers } = useDrivers()
+  const { assistants } = useAssistants()
   const { delivery, setDelivery } = useDelivery()
   const contextSales = useSale()
 
@@ -57,6 +60,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
     setDescription(selectDelivery.DESCRIPTION)
     setCodCar(selectDelivery.ID_CAR)
     setCodDriver(selectDelivery.ID_DRIVER)
+    setCodAssistant(selectDelivery.ID_ASSISTANT)
     selectDelivery ? setSales(selectDelivery.sales) : setSales([])
   }, [selectDelivery])
 
@@ -64,7 +68,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
   const createDelivery = async () => {
     //back irá retortar data.... Por enquanto roda:
     const data = {
-      description, codCar, codDriver, sales, status: 'Em lançamento'
+      description, codCar, codDriver, codAssistant, sales, status: 'Em lançamento'
     }
 
     const { data: dataDelivery } = await api.post('deliverys', data)
@@ -81,7 +85,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
   }
   const updateDelivery = async () => {
     try {
-      const data = { description, codCar, codDriver }
+      const data = { description, codCar, codDriver, codAssistant }
 
       const { data: dataDelivery } = await api.put(`deliverys/${selectDelivery.ID}`, data)
       
@@ -127,6 +131,24 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
               <em>None</em>
             </MenuItem>
             {drivers.map( item => (
+              <MenuItem key={item.ID} value={item.ID}>{item.DESCRIPTION}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        
+        <FormControl variant="outlined" className={classes.formControl}>
+          <InputLabel id="assistantLabel">Auxiliar</InputLabel>
+          <Select
+            labelId="assistantLabel"
+            label="Auxiliar"
+            id="assistant"
+            defaultValue={selectDelivery ? selectDelivery.ID_ASSISTANT : 0}
+            onChange={(e) => setCodAssistant(e.target.value)}
+          >
+            <MenuItem value={0}>
+              <em>None</em>
+            </MenuItem>
+            {assistants.map( item => (
               <MenuItem key={item.ID} value={item.ID}>{item.DESCRIPTION}</MenuItem>
             ))}
           </Select>

@@ -1,6 +1,25 @@
-import { Box, makeStyles, InputBase, fade, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, Paper, Button, Select, MenuItem, FormControl, InputLabel } from "@material-ui/core"
-import SearchIcon from '@material-ui/icons/Search'
 import React, { useState } from "react"
+import { 
+  Box, 
+  makeStyles, 
+  InputBase, 
+  fade, 
+  Table, 
+  TableContainer, 
+  TableHead, 
+  TableRow, 
+  TableCell,
+  TableBody, 
+  Paper, 
+  Button, 
+  Select, 
+  MenuItem, 
+  FormControl, 
+  InputLabel 
+} from "@material-ui/core"
+import SearchIcon from '@material-ui/icons/Search'
+
+import api from '../../services/api'
 
 const useStyles = makeStyles(theme => ({
   barHeader: {
@@ -57,11 +76,25 @@ const useStyles = makeStyles(theme => ({
 }))
 
 export default function Product() {
-  const [ products, setProducts ] = useState()
+  const [ products, setProducts ] = useState([])
+  const [ search, setSearch ] = useState()
+  const [ typeSeach, setTypeSeach ] = useState('NOME')
   const classes = useStyles()
-  const teste = () => {
-    console.log(products)
+  
+  const searchProduct = async () => {
+    try {
+      if (search !== '') {
+        const { data } = await api.get(`products/${typeSeach}/${search}`)
+        setProducts(data)
+      } else {
+        setProducts([])
+      }
+    } catch (e) {
+      alert(e)
+      setProducts([])
+    }
   }
+
   return(
     <Box>
       <Box className={classes.barHeader}>
@@ -72,10 +105,11 @@ export default function Product() {
           label="Tipo"
           labelId="fieldSeach"
           className={classes.fieldSeach}
+          onChange={e => setTypeSeach(e.target.value)}
           defaultValue={0}
         >
-          <MenuItem value={0}>Descrição</MenuItem>
-          <MenuItem value={1}>Código</MenuItem>
+          <MenuItem value={'NOME'}>Descrição</MenuItem>
+          <MenuItem value={'COD_ORIGINAL'}>Código</MenuItem>
         </Select>
       </FormControl>
 
@@ -90,11 +124,11 @@ export default function Product() {
               input: classes.inputInput,
             }}
             inputProps={{ 'aria-label': 'search' }}
-            onChange={e => setProducts(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
           />
         </div>
 
-        <Button className={classes.btnSearch} onClick={teste}>Pesquisar</Button>
+        <Button className={classes.btnSearch} onClick={searchProduct}>Pesquisar</Button>
 
       </Box>
 
@@ -110,13 +144,15 @@ export default function Product() {
             </TableRow>
           </TableHead>
           <TableBody>
-            <TableRow>
-              <TableCell>1</TableCell>
-              <TableCell>Cama doida</TableCell>
-              <TableCell align="right">5</TableCell>
-              <TableCell align="right">2</TableCell>
-              <TableCell align="right">3</TableCell>
+            {products.map( product => (
+            <TableRow key={product.COD_ORIGINAL}>
+              <TableCell>{product.COD_ORIGINAL}</TableCell>
+              <TableCell>{product.NOME}</TableCell>
+              <TableCell align="right">{product.EST_ATUAL}</TableCell>
+              <TableCell align="right">{product.EST_RESERVA}</TableCell>
+              <TableCell align="right">{product.EST_DISPONIVEL}</TableCell>
             </TableRow>
+            ))}
 
           </TableBody>
         </Table>

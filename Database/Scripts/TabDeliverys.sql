@@ -15,6 +15,7 @@ CREATE TABLE [dbo].[DELIVERYS](
 	[ID] [float] NOT NULL,
 	[DESCRIPTION] [varchar](30) NOT NULL,
 	[ID_CAR] [float] NOT NULL,
+	[ID_ASSISTANT] [float] NOT NULL,
 	[ID_DRIVER] [float] NOT NULL,
 	[STATUS] [varchar](15) NOT NULL,
 	[OBS] [varchar](80) NULL,

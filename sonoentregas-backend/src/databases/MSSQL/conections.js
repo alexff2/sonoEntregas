@@ -44,5 +44,16 @@ module.exports = [
       options: { encrypt: false }
     },
     logging: false
+  },
+  {
+    database: "SONO_TESTE", 
+    username: "SUPERSCERG", 
+    password: "S35SUP5RSRG",
+    host: "localhost",
+    port: 1433,
+    dialect: "mssql",
+    dialectOptions: {
+      options: { encrypt: false }
+    }
   }
 ]

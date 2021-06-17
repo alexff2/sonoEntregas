@@ -22,6 +22,7 @@ import ModalFinish from './ModalFinish'
 import { useDelivery } from '../../context/deliveryContext'
 import { useCars } from '../../context/carsContext'
 import { useDrivers } from '../../context/driverContext'
+import { useAssistants } from '../../context/assistantContext'
 import { useSale } from '../../context/saleContext'
 
 import api from '../../services/api'
@@ -89,6 +90,7 @@ export default function Delivery() {
   const { delivery, setDelivery } = useDelivery()
   const { cars } = useCars()
   const { drivers } = useDrivers()
+  const { assistants } = useAssistants()
   const { setSales } = useSale()
 
   //Styles
@@ -121,6 +123,10 @@ export default function Delivery() {
   const descriptionDriver = codDriver => {
     const driver = drivers.filter(item => item.ID === codDriver)
     return driver[0].DESCRIPTION
+  }
+  const descriptionAssistants = codAssistant => {
+    const assistant = assistants.filter(item => item.ID === codAssistant)
+    return assistant[0].DESCRIPTION
   }
 
   //Functions
@@ -155,7 +161,7 @@ export default function Delivery() {
         <Table aria-label="custumezed table">
           <TableHead>
             <TableRow>
-            {['Código', 'Descrição', 'Motorista', 'Veículo', 'Status', '', ''].map((value, index) => (
+            {['Código', 'Descrição', 'Motorista', 'Auxiliar', 'Veículo', 'Status', '', ''].map((value, index) => (
               <TableCell className={classes.head} key={index}>{value}</TableCell>
             ))}
             </TableRow>
@@ -164,9 +170,10 @@ export default function Delivery() {
           {delivery.map( item => (
             <TableRow key={item.ID} className={classes.body}>
               <TableCell width={'5%'}>{item.ID}</TableCell>
-              <TableCell width={'30%'}>{item.DESCRIPTION}</TableCell>
-              <TableCell width={'17%'}>{descriptionDriver(item.ID_DRIVER)}</TableCell>
-              <TableCell width={'18%'}>{descriptionCar(item.ID_CAR)}</TableCell>
+              <TableCell width={'24%'}>{item.DESCRIPTION}</TableCell>
+              <TableCell width={'13%'}>{descriptionDriver(item.ID_DRIVER)}</TableCell>
+              <TableCell width={'13%'}>{descriptionAssistants(item.ID_ASSISTANT)}</TableCell>
+              <TableCell width={'15%'}>{descriptionCar(item.ID_CAR)}</TableCell>
               <TableCell width={'15%'}>
                 <div style={StyleStatus(item.STATUS)} >{item.STATUS}</div>
               </TableCell>

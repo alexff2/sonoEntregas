@@ -11,6 +11,7 @@ const vendasController = require('./controllers/vendasController')
 const salesController = require('./controllers/salesController')
 const carsController = require('./controllers/carsController')
 const deliverysController = require('./controllers/deliverysController')
+const homeController = require('./controllers/homeController')
 
 //Routes
 //Conections
@@ -41,5 +42,7 @@ routes.post('/deliverys', deliverysController.create)
 routes.put('/deliverys/:id', deliverysController.update)
 routes.delete('/deliverys/:id', deliverysController.delete)
 routes.put('/deliverys/status/:id', deliverysController.updateSatus)
+//Home
+routes.get('/home', homeController.index)
 
 module.exports = routes

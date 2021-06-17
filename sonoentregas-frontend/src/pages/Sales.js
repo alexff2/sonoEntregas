@@ -34,6 +34,7 @@ export default function Vendas(){
   const [ modal, setModal ] = useState([])
   const [ childrenAlertModal, setChildrenAlertModal ] = useState('Vazio')
   const [ sales, setSales ] = useState([])
+  const [ orcParc, setOrcParc ] = useState([])
   const [ productSales, setProductSales ] = useState([])
   const [ sendProduct, setSendProduct ] = useState([])
   const [ emissao, setEmissao ] = useState()
@@ -68,7 +69,9 @@ export default function Vendas(){
     try {
       const { data } = await api.get(`${cod}/vendas/${item.CODIGOVENDA}`)
       
-      setProductSales(data)
+      setProductSales(data.products)
+
+      setOrcParc(data.orcparc)
       
       setModal([item])
     } catch (error) {
@@ -84,6 +87,7 @@ export default function Vendas(){
     if (e.target.className === 'modal-overlaw' || e.target.className === 'cancel-modal') {
       setModal([])
       setSendProduct([])
+      setOrcParc([])
     }
   }
 
@@ -101,7 +105,8 @@ export default function Vendas(){
         sale["products"] = sendProduct
         sale.USER_ID = USER_ID
         sale.D_ENTREGA1 = dateEDelivery
-        
+        sale.orcParc = orcParc
+
         const { data } = await api.post(`${cod}/vendas/submit`, sale)
         
         sale.STATUS = data

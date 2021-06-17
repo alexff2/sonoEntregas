@@ -23,6 +23,7 @@ CREATE TABLE [dbo].[SALES](
 	[EMISSAO] [datetime] NOT NULL,
 	[STATUS] [varchar](15) NOT NULL,
 	[ENDERECO] [varchar](60) NULL,
+	[NUMERO] [varchar](50) NULL,
 	[BAIRRO] [varchar](40) NULL,
 	[CIDADE] [varchar](25) NULL,
 	[ESTADO] [char](2) NULL,
@@ -33,6 +34,9 @@ CREATE TABLE [dbo].[SALES](
 	[D_ENTREGA1] [datetime] NOT NULL,
 	[D_ENVIO] [datetime] NOT NULL,
 	[VENDEDOR] [varchar](30) NOT NULL,
+	[FONE] [varchar](15) NULL,
+	[CGC_CNPJ] [varchar](19) NULL,
+	[INS_RG] [varchar](18) NULL,
  CONSTRAINT [PK_SALES] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC
@@ -43,5 +47,4 @@ GO
 
 SET ANSI_PADDING OFF
 GO
-
 

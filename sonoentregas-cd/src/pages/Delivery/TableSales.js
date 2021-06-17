@@ -46,12 +46,79 @@ const useStyles = makeStyles( theme =>({
   }
 }))
 
+function Row({sendSales, classes, sale, selectSales}){
+  const [open, setOpen] = useState(false)
+  return(
+    <React.Fragment key={sale.ID_SALES}>
+      <TableRow className={classes.root}>
+          <TableCell>
+            <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+              {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+            </IconButton>
+          </TableCell>
+          <TableCell component="th" scope="row">
+            {sale.ID_SALES}
+          </TableCell>
+          <TableCell>{sale.NOMECLI}</TableCell>
+          <TableCell>{sale.BAIRRO}
+          </TableCell>
+          <TableCell align="right">{getDate(sale.D_ENTREGA1)}</TableCell>
+          <TableCell align="right">
+            {selectSales ? null : 
+            <Checkbox
+              onChange={(e) => sendSales(e, sale)}
+            />
+            }
+          </TableCell>
+        </TableRow>
+  
+      <TableRow>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <Box margin={1}>
+              <Typography variant="h6" gutterBottom component="div">
+                Produtos
+              </Typography>
+              <Table size="small" aria-label="purchases">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Código</TableCell>
+                    <TableCell>Descrição</TableCell>
+                    <TableCell>Quantidade</TableCell>
+                    <TableCell align="right">Valor (R$)</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {sale.products.map((produto) => (
+                    <TableRow key={produto.CODPRODUTO}>
+                      <TableCell component="th" scope="row">
+                        {produto.CODPRODUTO}
+                      </TableCell>
+                      <TableCell>{produto.DESCRICAO}</TableCell>
+                      <TableCell>{produto.QUANTIDADE}</TableCell>
+                      <TableCell align="right">{
+                        Intl
+                          .NumberFormat('pt-br',{style: 'currency', currency: 'BRL'})
+                          .format(produto.NVTOTAL)
+                      }</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Box>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </React.Fragment>
+    
+  )
+}
+
 export default function TableSales({ 
   selectSales,
   sales,
   setSales
 }){
-  const [open, setOpen] = useState(false)
   const [currentSales, setCurrentSales] = useState([])
   const classes = useStyles()
   const { sales: salesFull } = useSale()
@@ -90,68 +157,8 @@ export default function TableSales({
           </TableHead>
           
           <TableBody className={classes.tableBody}>
-            {currentSales.map((sale) => (
-              <React.Fragment key={sale.ID_SALES}>
-                <TableRow className={classes.root}>
-                  <TableCell>
-                    <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
-                      {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-                    </IconButton>
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {sale.ID_SALES}
-                  </TableCell>
-                  <TableCell>{sale.NOMECLI}</TableCell>
-                  <TableCell>{sale.BAIRRO}
-                  </TableCell>
-                  <TableCell align="right">{getDate(sale.D_ENTREGA1)}</TableCell>
-                  <TableCell align="right">
-                    {selectSales ? null : 
-                    <Checkbox
-                      onChange={(e) => sendSales(e, sale)}
-                    />
-                    }
-                  </TableCell>
-                </TableRow>
-          
-                <TableRow>
-                  <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-                    <Collapse in={open} timeout="auto" unmountOnExit>
-                      <Box margin={1}>
-                        <Typography variant="h6" gutterBottom component="div">
-                          Produtos
-                        </Typography>
-                        <Table size="small" aria-label="purchases">
-                          <TableHead>
-                            <TableRow>
-                              <TableCell>Código</TableCell>
-                              <TableCell>Descrição</TableCell>
-                              <TableCell>Quantidade</TableCell>
-                              <TableCell align="right">Valor (R$)</TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {sale.products.map((produto) => (
-                              <TableRow key={produto.CODPRODUTO}>
-                                <TableCell component="th" scope="row">
-                                  {produto.CODPRODUTO}
-                                </TableCell>
-                                <TableCell>{produto.DESCRICAO}</TableCell>
-                                <TableCell>{produto.QUANTIDADE}</TableCell>
-                                <TableCell align="right">{
-                                  Intl
-                                    .NumberFormat('pt-br',{style: 'currency', currency: 'BRL'})
-                                    .format(produto.NVTOTAL)
-                                }</TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </Box>
-                    </Collapse>
-                  </TableCell>
-                </TableRow>
-              </React.Fragment>
+            {currentSales.map( sale => (
+              <Row sendSales={sendSales} classes={classes} sale={sale} selectSales={selectSales}/>
             ))}
           </TableBody>
         

@@ -28,16 +28,16 @@ module.exports = {
   },
   async create( req, res ){
     try {
-      const { description, codCar, codDriver, sales, status } = req.body
+      const { description, codCar, codDriver, codAssistant,sales, status } = req.body
 
-      const valuesDelivery = `'${description}', ${codCar}, ${codDriver}, '${status}'`
+      const valuesDelivery = `'${description}', ${codCar}, ${codDriver}, ${codAssistant}, '${status}'`
       
       const dataDelivery = await Deliverys.creator(0, valuesDelivery)
       
       await sales.forEach( async sale => {
         var { ID_SALES, CODLOJA } = sale
         
-        var valueSale = `${dataDelivery.ID}, ${CODLOJA}, '${ID_SALES}'`
+        var valueSale = `${dataDelivery.ID}, ${CODLOJA}, ${ID_SALES}`
         
         await DeliverySales.creatorNotReturn(0, valueSale, true)
 
@@ -58,9 +58,9 @@ module.exports = {
   async update( req, res ) {
     try {
       const { id } = req.params
-      const { description, codCar, codDriver } = req.body
+      const { description, codCar, codDriver, codAssistant } = req.body
 
-      const script = `DESCRIPTION = '${description}', ID_CAR = ${codCar}, ID_DRIVER = ${codDriver}`
+      const script = `DESCRIPTION = '${description}', ID_CAR = ${codCar}, ID_DRIVER = ${codDriver}, ID_ASSISTANT = ${codAssistant}`
       
       const delivery = await Deliverys.update(0, script, id)
 

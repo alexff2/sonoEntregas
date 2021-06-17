@@ -23,6 +23,7 @@ import getDate from '../../functions/getDates'
 //context
 import { useCars } from '../../context/carsContext'
 import { useDrivers } from '../../context/driverContext'
+import { useAssistants } from '../../context/assistantContext'
 import { useDelivery } from '../../context/deliveryContext'
 import { useSale } from '../../context/saleContext'
 
@@ -79,6 +80,7 @@ export default function ModalFinish({ setOpen, selectDelivery }){
   const [ sales, setSales ] = useState([{ID_SALES: 0}])
   const { cars } = useCars()
   const { drivers } = useDrivers()
+  const { assistants } = useAssistants()
   const { delivery, setDelivery } = useDelivery()
   const stateSales = useSale()
 
@@ -93,6 +95,10 @@ export default function ModalFinish({ setOpen, selectDelivery }){
   const descriptionDriver = () => {
     const driver = drivers.filter(driver => driver.ID === selectDelivery.ID_DRIVER)
     return driver[0].DESCRIPTION
+  }
+  const descriptionAssistants = () => {
+    const assistant = assistants.filter(assistant => assistant.ID === selectDelivery.ID_ASSISTANT)
+    return assistant[0].DESCRIPTION
   }
   const sendSales = (e, sale) => {
     if (e.target.checked){
@@ -137,6 +143,7 @@ export default function ModalFinish({ setOpen, selectDelivery }){
       <div className={classes.divHeader}>
         <h3>{selectDelivery.DESCRIPTION}</h3>
         <p><span style={{fontWeight: 700}}>Motorista: </span>{descriptionDriver()}</p>
+        <p><span style={{fontWeight: 700}}>Auxiliar: </span> {descriptionAssistants()}</p>
         <p><span style={{fontWeight: 700}}>Veículo: </span> {descriptionCar()}</p>
       </div>
       <div className={classes.divDateDelivery}>

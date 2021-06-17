@@ -11,6 +11,7 @@ import {
 import { ButtonCancel, ButtonSucess } from '../../components/Buttons'
 import { useUsers } from '../../context/usersContext'
 import { useDrivers } from '../../context/driverContext'
+import { useAssistants } from '../../context/assistantContext'
 import validateFields from '../../functions/validateFields'
 
 import api from '../../services/api'
@@ -37,6 +38,7 @@ export default function ModalUsers({ selectUser, setOpen }) {
   const [ office, setOffice ] = useState()
   const { users, setUsers } = useUsers()
   const { drivers, setDrivers } = useDrivers()
+  const { assistants, setAssistants } = useAssistants()
 
   const classes = useStyles()
 
@@ -60,11 +62,9 @@ export default function ModalUsers({ selectUser, setOpen }) {
 
         console.log(office)
 
-        if (office === 'User') {
-          setUsers([ ...users, data ])
-        } else {
-          setDrivers([ ...drivers, data ])
-        }
+        if (office === 'User') setUsers([ ...users, data ])
+        if (office === 'Driver') setDrivers([ ...drivers, data ])
+        if (office === 'Assistant') setAssistants([ ...assistants, data ])
 
         setOpen(false)
       } catch (error) {
@@ -76,7 +76,6 @@ export default function ModalUsers({ selectUser, setOpen }) {
   }
 
   const updateUser = async () => {
-    //back irá retortar data.... Por enquanto roda:
     if (validateFields([name, office])) {
       try {
         const { data } = await api.put(`users/${selectUser.ID}`,{
@@ -86,11 +85,10 @@ export default function ModalUsers({ selectUser, setOpen }) {
           office,
           password: '0'
         })
-        if (office === 'User') {
-          setUsers(users.map( item => item.ID === selectUser.ID ? data : item))
-        } else {
-          setDrivers(drivers.map( item => item.ID === selectUser.ID ? data : item))
-        }
+        if (office === 'User') setUsers(users.map( item => item.ID === selectUser.ID ? data : item))
+        if (office === 'Driver') setDrivers(drivers.map( item => item.ID === selectUser.ID ? data : item))
+        if (office === 'Assistant') setAssistants(assistants.map( item => item.ID === selectUser.ID ? data : item))
+        
         setOpen(false)
       } catch (error) {
         alert(`Erro retornado: ${error}. Entre em contato com administrador do sistema`)
@@ -129,6 +127,9 @@ export default function ModalUsers({ selectUser, setOpen }) {
               </MenuItem>
               <MenuItem value={'Driver'}>
                 <em>Motorista</em>
+              </MenuItem>
+              <MenuItem value={'Assistant'}>
+                <em>Auxiliar</em>
               </MenuItem>
             </Select>
           </FormControl>

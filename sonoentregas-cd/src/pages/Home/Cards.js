@@ -1,35 +1,13 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Box,
   Grid,
   Paper,
   Typography,
   makeStyles
-} from '@material-ui/core';
-import { Assignment, ShoppingCart } from '@material-ui/icons';
-
-const itens = [
-  {
-    icon: ShoppingCart,
-    value: 2,
-    title: 'Vendas Pendentes',
-  },
-  {
-    icon: Assignment,
-    value: 2,
-    title: 'Entregas Abertas',
-  },
-  {
-    icon: Assignment,
-    value: 2,
-    title: 'Entregas Finalizadas',
-  },
-  {
-    icon: Assignment,
-    value: 2,
-    title: 'Total de entregas',
-  }
-]
+} from '@material-ui/core'
+import { Assignment, ShoppingCart } from '@material-ui/icons'
+import api from '../../services/api'
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -84,7 +62,39 @@ const Item = ({classes, title, icon: Icon, value}) => (
 )
 
 export default function Home(){
+  const [ itens, setItens ] = useState([])
   const classes = useStyles()
+
+  useEffect(()=>{
+    api
+      .get('/home')
+      .then(resp => {
+        setItens([
+          {
+            icon: ShoppingCart,
+            value: resp.data.salesPending,
+            title: 'Vendas Pendentes',
+          },
+          {
+            icon: Assignment,
+            value: resp.data.OnReleaseSales,
+            title: 'Vendas em processo',
+          },
+          {
+            icon: Assignment,
+            value: resp.data.OnReleaseDev,
+            title: 'Entregas em lançamento',
+          },
+          {
+            icon: Assignment,
+            value: resp.data.delivering,
+            title: 'Entregas em deslocamento',
+          }
+        ])
+      })
+      .catch(e => console.log(e))
+  },[])
+
   return(
     <Grid container spacing={5}>
       
