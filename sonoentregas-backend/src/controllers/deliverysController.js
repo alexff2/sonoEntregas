@@ -73,16 +73,16 @@ module.exports = {
     try {
       const { id } = req.params
       
-      await Deliverys.deleteNotReturn(0, id)
-
       const deliverySales = await DeliverySales.findSome(0, `ID_DELIVERY = ${id}`)
       
       for (let i = 0; i < deliverySales.length; i++) {
-        await Deliverys._query(0, `UPDATE SALES SET STATUS = 'Enviado' WHERE ID_SALES = ${deliverySales[i].ID_SALE} AND CODLOJA = ${deliverySales[i].CODLOJA}`)
-        
         await Deliverys._query(deliverySales[i].CODLOJA, `UPDATE NVENDA2 SET STATUS = 'Enviado' WHERE CODIGOVENDA = ${deliverySales[i].ID_SALE}`)
+        
+        await Deliverys._query(0, `UPDATE SALES SET STATUS = 'Enviado' WHERE ID_SALES = ${deliverySales[i].ID_SALE} AND CODLOJA = ${deliverySales[i].CODLOJA}`)
       }
-
+      
+      await Deliverys.deleteNotReturn(0, id)
+      
       await DeliverySales.deleteNotReturn(0, id, 'ID_DELIVERY')
 
       res.json({delete: true})

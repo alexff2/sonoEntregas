@@ -46,6 +46,18 @@ module.exports = [
     logging: false
   },
   {
+    database: "SONO_RIO_ANIL", 
+    username: "SUPERSCERG", 
+    password: "S35SUP5RSRG",
+    host: "174.200.203.252",
+    port: 1433,
+    dialect: "mssql",
+    dialectOptions: {
+      options: { encrypt: false }
+    },
+    logging: false
+  },
+  {
     database: "SONO_TESTE", 
     username: "SUPERSCERG", 
     password: "S35SUP5RSRG",
