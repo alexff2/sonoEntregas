@@ -1,8 +1,9 @@
-import React, { useState, Fragment } from "react"
+import React, { useEffect, useState, Fragment } from "react"
 import {
   Box,
   Button,
   Fab,
+  fade,
   makeStyles,
   Paper,
   Table,
@@ -10,7 +11,11 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TableRow
+  TableRow,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from "@material-ui/core"
 import { Add, Delete, Edit } from "@material-ui/icons"
 
@@ -40,9 +45,18 @@ const useStyle = makeStyles(theme => ({
     }
   },
   btnAdd: {
-    position: 'absolute',
+    position: 'fixed',
     bottom: '1.5rem',
     right: '1.5rem'
+  },
+  fieldSeach: {
+    color: fade(theme.palette.common.white, 0.55),
+    height: '2rem',
+    width: theme.spacing(20),
+    marginRight: theme.spacing(2),
+  },
+  label: {
+    color: fade(theme.palette.common.white, 0.55)
   },
   paper: {
     backgroundColor: theme.palette.background.paper,
@@ -81,17 +95,22 @@ function BtnStatus({ selectDelivery, delivery, setDelivery, finishDelivery }){
 
 export default function Delivery() {
   //Modals Open States
-  const [open, setOpen] = useState(false)
-  const [openUpdateDelivery, setOpenUpdateDelivery] = useState(false)
-  const [openFinish, setOpenFinish] = useState(false)
+  const [ open, setOpen ] = useState(false)
+  const [ openUpdateDelivery, setOpenUpdateDelivery ] = useState(false)
+  const [ openFinish, setOpenFinish ] = useState(false)
+  const [ currentDeliv, setCurrentDeliv ] = useState([])
 
   //States
-  const [deliveryUpdate, setDeliveryUpdate] = useState({})
+  const [ deliveryUpdate, setDeliveryUpdate ] = useState({})
   const { delivery, setDelivery } = useDelivery()
   const { cars } = useCars()
   const { drivers } = useDrivers()
   const { assistants } = useAssistants()
   const { setSales } = useSale()
+
+  useEffect(()=>{
+    setCurrentDeliv(delivery.filter( deliv => deliv.STATUS !== 'Finalizada'))
+  },[delivery])
 
   //Styles
   const classes = useStyle()
@@ -135,6 +154,7 @@ export default function Delivery() {
       const { data } = await api.delete(`deliverys/${cod}`)
 
       setDelivery(delivery.filter(item => item.ID !== cod))
+      setCurrentDeliv(delivery.filter(item => item.ID !== cod))
 
       if (data.delete) {
         const { data: dataSales } = await api.get('sales')
@@ -154,6 +174,11 @@ export default function Delivery() {
     setOpenFinish(true)
   }
 
+  const seachDeliv = tipo => {
+    tipo === 0 ? setCurrentDeliv(delivery)
+    : api.get('deliverys/Finalizada').then(resp => setCurrentDeliv(resp.data))
+  }
+
   return (
     <Box>
 
@@ -161,13 +186,30 @@ export default function Delivery() {
         <Table aria-label="custumezed table">
           <TableHead>
             <TableRow>
-            {['Código', 'Descrição', 'Motorista', 'Auxiliar', 'Veículo', 'Status', '', ''].map((value, index) => (
+            {['Código', 'Descrição', 'Motorista', 'Auxiliar', 'Veículo', 'Status'].map((value, index) => (
               <TableCell className={classes.head} key={index}>{value}</TableCell>
             ))}
+              <TableCell style={{paddingTop: 0, paddingBottom: 0}} colSpan={2} className={classes.head}>
+                <FormControl variant="outlined">
+                  <InputLabel id="fieldSeach" className={classes.label}>Entregas</InputLabel>
+                  <Select
+                    label="Entregas"
+                    labelId="fieldSeach"
+                    className={classes.fieldSeach}
+                    defaultValue={0}
+                    onChange={e => seachDeliv(e.target.value)}
+                  >
+                    <MenuItem value={0}>Abertas</MenuItem>
+                    <MenuItem value={1}>Finalizadas</MenuItem>
+                  </Select>
+                </FormControl>
+              </TableCell>
+            
             </TableRow>
           </TableHead>
+          
           <TableBody>
-          {delivery.map( item => (
+          {currentDeliv.map( item => (
             <TableRow key={item.ID} className={classes.body}>
               <TableCell width={'5%'}>{item.ID}</TableCell>
               <TableCell width={'24%'}>{item.DESCRIPTION}</TableCell>
@@ -212,7 +254,12 @@ export default function Delivery() {
         setOpen={setOpen}
         title="Lançar Entrega"
       >
-        <ModalDelivery setOpen={setOpen} selectDelivery={false} />
+        <ModalDelivery
+          setOpen={setOpen}
+          selectDelivery={false}
+          currentDeliv={currentDeliv}
+          setCurrentDeliv={setCurrentDeliv}
+        />
       </Modal>
 
       <Modal 
@@ -220,7 +267,12 @@ export default function Delivery() {
         setOpen={setOpenUpdateDelivery}
         title="Editar Entrega"
       >
-        <ModalDelivery setOpen={setOpenUpdateDelivery} selectDelivery={deliveryUpdate} />
+        <ModalDelivery 
+          setOpen={setOpenUpdateDelivery} 
+          selectDelivery={deliveryUpdate} 
+          currentDeliv={currentDeliv}
+          setCurrentDeliv={setCurrentDeliv}
+        />
       </Modal>
 
       <Modal
@@ -228,7 +280,12 @@ export default function Delivery() {
         setOpen={setOpenFinish}
         title={"Finalizar Entrega"}
       >
-        <ModalFinish setOpen={setOpenFinish} selectDelivery={deliveryUpdate}/>
+        <ModalFinish 
+          setOpen={setOpenFinish}
+          selectDelivery={deliveryUpdate}
+          currentDeliv={currentDeliv}
+          setCurrentDeliv={setCurrentDeliv}
+        />
       </Modal>
 
     </Box>

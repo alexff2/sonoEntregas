@@ -18,6 +18,7 @@ import Delivery from './pages/Delivery'
 import Cars from './pages/Cars'
 import Users from './pages/Users'
 import Products from './pages/Product'
+import SalesFinish from './pages/SalesFinish'
 //import Error from './pages/Error'
 
 const useStyles = makeStyles((theme) => ({
@@ -49,6 +50,7 @@ const Routes = () => {
                   <Route path="/app/delivery" exact component={Delivery} />
                   <Route path="/app/users" exact component={Users} />
                   <Route path="/app/products" exact component={Products} />
+                  <Route path="/app/salesfinish" exact component={SalesFinish} />
                 </DriverProvider>
               </CarsProvider>
             </SaleProvider>

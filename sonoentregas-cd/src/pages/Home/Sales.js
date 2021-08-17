@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { 
   makeStyles,
@@ -15,9 +15,14 @@ import {
   Paper
 } from '@material-ui/core'
 import { KeyboardArrowDown, KeyboardArrowUp} from '@material-ui/icons'
+
 import { useSale } from '../../context/saleContext'
 import { useShop } from '../../context/shopContext'
+
+import EnhancedTableHead from '../../components/EnhancedTableHead'
+
 import getDate from '../../functions/getDates'
+import { getComparator, stableSort } from '../../functions/orderTable'
 import api from '../../services/api'
 
 const useStyles = makeStyles(theme =>({
@@ -45,10 +50,12 @@ const useStyles = makeStyles(theme =>({
 
 function Row({ row, shop, classes }) {
   const [open, setOpen] = React.useState(false)
+
   const setShops = codShop => {
     const shopCurrent = shop[codShop]
     return shopCurrent.database
   }
+  
   return (
     <React.Fragment>
       <TableRow className={classes.root}>
@@ -57,15 +64,9 @@ function Row({ row, shop, classes }) {
             {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
           </IconButton>
         </TableCell>
-        <TableCell component="th" scope="row">
-          {row.ID_SALES}
-        </TableCell>
+        <TableCell component="th" scope="row">{row.ID_SALES}</TableCell>
         <TableCell>{row.NOMECLI}</TableCell>
-        <TableCell align="right"> {
-          Intl
-            .NumberFormat('pt-br',{style: 'currency', currency: 'BRL'}) 
-            .format(row.TOTAL)
-        }</TableCell>
+        <TableCell align="right">{row.BAIRRO}</TableCell>
         <TableCell align="right">{getDate(row.D_ENTREGA1)}</TableCell>
         <TableCell align="right">{setShops(row.CODLOJA)}</TableCell>
       </TableRow>
@@ -116,7 +117,7 @@ Row.propTypes = {
   row: PropTypes.shape({
     ID_SALES: PropTypes.number.isRequired,
     NOMECLI: PropTypes.string.isRequired,
-    TOTAL: PropTypes.number.isRequired,
+    BAIRRO: PropTypes.string.isRequired,
     products: PropTypes.arrayOf(
       PropTypes.shape({
         CODPRODUTO: PropTypes.number.isRequired,
@@ -131,6 +132,9 @@ Row.propTypes = {
 }
 
 export default function Sales() {
+  const [ order, setOrder ] = useState('asc')
+  const [ orderBy, setOrderBy ] = useState('idSales')
+
   const classes = useStyles()
   const { sales, setSales } = useSale()
   const { shop } = useShop()
@@ -138,21 +142,35 @@ export default function Sales() {
   useEffect(()=>{
     api.get('sales').then( res => setSales(res.data))
   },[setSales])
+
+  const handleRequestSort = (event, property) => {
+    const isAsc = orderBy === property && order === 'asc'
+    setOrder(isAsc ? 'desc' : 'asc')
+    setOrderBy(property)
+  }
+
+  const headCell = [
+    { id: '', numeric: false, disablePadding: false, label: '', class: {} },
+    { id: 'ID_SALES', numeric: false, disablePadding: false, label: 'Nº Venda', class: classes.tableHeadCellStart },
+    { id: 'NOMECLI', numeric: false, disablePadding: false, label: 'Nome do Cliente', class: classes.tableHeadCellStart },
+    { id: 'BAIRRO', numeric: true, disablePadding: false, label: 'Bairro', class: classes.tableHeadCell },
+    { id: 'D_ENTREGA1', numeric: true, disablePadding: false, label: 'Data Entrega', class: classes.tableHeadCell },
+    { id: 'CODLOJA', numeric: true, disablePadding: false, label: 'Loja', class: classes.tableHeadCell },
+  ]
+
   return (
     <TableContainer component={Paper}>
       <Table aria-label="collapsible table">
-        <TableHead>
-          <TableRow className={classes.tableHead}>
-            <TableCell />
-            <TableCell className={classes.tableHeadCellStart}>Nº Venda</TableCell>
-            <TableCell className={classes.tableHeadCellStart}>Nome do Cliente</TableCell>
-            <TableCell className={classes.tableHeadCell}>Valor Total (R$)</TableCell>
-            <TableCell className={classes.tableHeadCell}>Data Entrega</TableCell>
-            <TableCell className={classes.tableHeadCell}>Loja</TableCell>
-          </TableRow>
-        </TableHead>
+        <EnhancedTableHead
+          order={order}
+          orderBy={orderBy}
+          onRequestSort={handleRequestSort}
+          headCells={headCell}
+          classe={classes}
+        />
         <TableBody>
-          {sales.map( row => (
+          {stableSort(sales, getComparator(order, orderBy))
+            .map( row => (
             <Row key={row.ID} row={row} shop={shop} classes={classes}/>
           ))}
         </TableBody>

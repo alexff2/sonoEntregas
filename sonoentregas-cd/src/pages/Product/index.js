@@ -106,7 +106,7 @@ export default function Product() {
           labelId="fieldSeach"
           className={classes.fieldSeach}
           onChange={e => setTypeSeach(e.target.value)}
-          defaultValue={0}
+          defaultValue={'NOME'}
         >
           <MenuItem value={'NOME'}>Descrição</MenuItem>
           <MenuItem value={'COD_ORIGINAL'}>Código</MenuItem>
@@ -157,6 +157,7 @@ export default function Product() {
           </TableBody>
         </Table>
       </TableContainer>
+      
 
     </Box>
   )

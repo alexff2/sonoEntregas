@@ -18,7 +18,13 @@ import { KeyboardArrowDown, KeyboardArrowUp} from '@material-ui/icons'
 
 //Context
 import { useSale } from '../../context/saleContext';
+
+//Components
+import EnhancedTableHead from '../../components/EnhancedTableHead'
+
+//Functions
 import getDate from '../../functions/getDates'
+import { getComparator, stableSort } from '../../functions/orderTable'
 
 const useStyles = makeStyles( theme =>({
   root: {
@@ -119,6 +125,8 @@ export default function TableSales({
   sales,
   setSales
 }){
+  const [ order, setOrder ] = useState('asc')
+  const [ orderBy, setOrderBy ] = useState('idSales')
   const [currentSales, setCurrentSales] = useState([])
   const classes = useStyles()
   const { sales: salesFull } = useSale()
@@ -142,22 +150,35 @@ export default function TableSales({
     }
   }
 
+  const handleRequestSort = (event, property) => {
+    const isAsc = orderBy === property && order === 'asc'
+    setOrder(isAsc ? 'desc' : 'asc')
+    setOrderBy(property)
+  }
+
+  const headCell = [
+    { id: '', numeric: false, disablePadding: false, label: '', class: {} },
+    { id: 'ID_SALES', numeric: false, disablePadding: false, label: 'Nº Venda', class: classes.tableHeadCellStart },
+    { id: 'NOMECLI', numeric: false, disablePadding: false, label: 'Nome do Cliente', class: classes.tableHeadCellStart },
+    { id: 'BAIRRO', numeric: false, disablePadding: false, label: 'Bairro', class: classes.tableHeadCellStart },
+    { id: 'D_ENTREGA1', numeric: true, disablePadding: false, label: 'Data Entrega', class: classes.tableHeadCell },
+    { íd: '', numeric: true, disablePadding: false, label: '', class: classes.tableHeadCell },
+  ]
+
   return(
     <TableContainer component={Paper}>
         <Table aria-label="collapsible table">
-          <TableHead>
-            <TableRow className={classes.tableHead}>
-              <TableCell />
-              <TableCell className={classes.tableHeadCellStart}>Nº Venda</TableCell>
-              <TableCell className={classes.tableHeadCellStart}>Nome do Cliente</TableCell>
-              <TableCell className={classes.tableHeadCellStart}>Bairro</TableCell>
-              <TableCell className={classes.tableHeadCell}>Data Entrega</TableCell>
-              <TableCell className={classes.tableHeadCell}></TableCell>
-            </TableRow>
-          </TableHead>
+          <EnhancedTableHead
+            order={order}
+            orderBy={orderBy}
+            onRequestSort={handleRequestSort}
+            headCells={headCell}
+            classe={classes}
+          />
           
           <TableBody className={classes.tableBody}>
-            {currentSales.map( sale => (
+            {stableSort(currentSales, getComparator(order, orderBy))
+              .map( sale => (
               <Row sendSales={sendSales} classes={classes} sale={sale} selectSales={selectSales}/>
             ))}
           </TableBody>

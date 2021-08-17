@@ -39,13 +39,14 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-export default function ModalDelivery({ setOpen, selectDelivery }){
+export default function ModalDelivery({ setOpen, selectDelivery, setCurrentDeliv, currentDeliv }){
   //States
   const [ description, setDescription ] = useState()
   const [ codCar, setCodCar ] = useState()
   const [ codDriver, setCodDriver ] = useState()
   const [ codAssistant, setCodAssistant ] = useState()
   const [ sales, setSales ] = useState([])
+
   const { cars } = useCars()
   const { drivers } = useDrivers()
   const { assistants } = useAssistants()
@@ -74,6 +75,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
     const { data: dataDelivery } = await api.post('deliverys', data)
     
     setDelivery([...delivery, dataDelivery])
+    setCurrentDeliv([...currentDeliv, dataDelivery])
     
     if (dataDelivery.ID) {
       const { data: dataSales } = await api.get('sales')
@@ -92,6 +94,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
       dataDelivery['sales'] = sales
       
       setDelivery(delivery.map( item => item.ID === selectDelivery.ID ? dataDelivery : item))
+      setCurrentDeliv(currentDeliv.map( item => item.ID === selectDelivery.ID ? dataDelivery : item))
       
       setOpen(false)
     } catch (e) {

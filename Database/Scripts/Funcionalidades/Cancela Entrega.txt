@@ -1,0 +1,37 @@
+-------LOJA
+declare @numvenda int
+set @numvenda = 127053
+
+--select STATUS, * from nvenda2 where codigovenda = @numvenda
+
+--select STATUS, * from nvendi2 where numvenda = @numvenda
+
+update PRODLOJAS set EST_ATUAL = EST_ATUAL - A.QUANTIDADE, EST_LOJA = EST_LOJA - A.QUANTIDADE
+from nvendi2 a 
+inner join prodlojas b on a.codproduto = b.codigo
+where a.numvenda = @numvenda
+and b.codloja = 1
+and a.STATUS IS NOT NULL
+
+update nvenda2 set status = NULL where codigovenda = @numvenda
+update nvendi2 set status = NULL where NUMVENDA = @numvenda
+
+select STATUS, a.descricao, a.QUANTIDADE, b.EST_ATUAL, B.EST_LOJA
+from nvendi2 a 
+inner join prodlojas b on a.codproduto = b.codigo
+where a.numvenda = @numvenda
+and b.codloja = 1
+and a.STATUS IS NOT NULL
+
+------- CD
+declare @idSales int, @codloja int
+set @idSales = 127053 set @codloja = 2
+
+delete sales where id_sales = @idSales and CODLOJA = @codloja
+delete SALES_PROD  where id_sales = @idSales and CODLOJA = @codloja
+delete ORCPARC where id_sales = @idSales and CODLOJA = @codloja
+
+select * from sales where id_sales = @idSales and CODLOJA = @codloja
+select * from SALES_PROD  where id_sales = @idSales and CODLOJA = @codloja
+select * from ORCPARC where id_sales = @idSales and CODLOJA = @codloja
+

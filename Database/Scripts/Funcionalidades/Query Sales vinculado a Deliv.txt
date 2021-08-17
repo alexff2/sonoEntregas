@@ -1,0 +1,5 @@
+select c.STATUS, b.* from DELIVERYS_SALES a
+inner join SALES b on a.ID_SALE = b.ID_SALES
+inner join DELIVERYS c on a.ID_DELIVERY = c.ID
+where a.ID_DELIVERY = 7
+and a.CODLOJA = b.CODLOJA

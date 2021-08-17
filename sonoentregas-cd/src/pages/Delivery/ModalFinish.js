@@ -73,11 +73,12 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-export default function ModalFinish({ setOpen, selectDelivery }){
+export default function ModalFinish({ setOpen, selectDelivery, currentDeliv, setCurrentDeliv}){
   //States
   const [ openCell, setOpenCell ] = useState()
   const [ dateDelivery, setDateDelivery ] = useState(false)
   const [ sales, setSales ] = useState([{ID_SALES: 0}])
+
   const { cars } = useCars()
   const { drivers } = useDrivers()
   const { assistants } = useAssistants()
@@ -132,6 +133,7 @@ export default function ModalFinish({ setOpen, selectDelivery }){
       }
   
       setDelivery(delivery.map( item => item.ID === data.ID ? data : item))
+      setCurrentDeliv(currentDeliv.filter( deliv => deliv.ID !== data.ID ))
       setOpen(false)
     } else {
       alert('Selecione a data de entrega')

@@ -13,7 +13,7 @@ const useStyles = makeStyles( theme => ({
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3),
     width: 'min(95vw, 700px)',
-    height: 'calc(100vh - 100px)',
+    maxHeight: 'calc(100vh - 100px)',
     overflow: 'scroll'
   }
 }))

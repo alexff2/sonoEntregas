@@ -8,7 +8,10 @@ const Produtos = require('../models/Produtos')
 module.exports = {
   async index( req, res ){
     try {
-      const deliverys = await Deliverys.findAll(0)
+      const { status } = req.params
+      var where
+      status === 'Finalizada' ? where = "STATUS = 'Finalizada'" : where = "STATUS <> 'Finalizada'"
+      const deliverys = await Deliverys.findSome(0, where)
   
       for (let i = 0; i < deliverys.length; i++) {
         var sales = await ViewDeliverySales.findSome(0, `ID_DELIVERY = ${deliverys[i].ID}`)
@@ -107,9 +110,9 @@ module.exports = {
           dEntrega = ''
         }
         
-        await Deliverys._query(0, `UPDATE SALES SET STATUS = '${delivery.sales[i].STATUS}' ${dEntrega} WHERE ID_SALES = ${delivery.sales[i].ID_SALES} AND CODLOJA = ${delivery.sales[i].CODLOJA}`)
-        
         await Deliverys._query(delivery.sales[i].CODLOJA, `UPDATE NVENDA2 SET STATUS = '${delivery.sales[i].STATUS}' WHERE CODIGOVENDA = ${delivery.sales[i].ID_SALES}`)
+        
+        await Deliverys._query(0, `UPDATE SALES SET STATUS = '${delivery.sales[i].STATUS}' ${dEntrega} WHERE ID_SALES = ${delivery.sales[i].ID_SALES} AND CODLOJA = ${delivery.sales[i].CODLOJA}`)
         
         if (delivery.sales[i].STATUS === 'Finalizada') {
           for (let j = 0; j < delivery.sales[i].products.length; j++) {

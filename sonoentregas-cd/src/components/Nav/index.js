@@ -1,7 +1,7 @@
 //Module import
 import React from 'react'
 import { Box, Divider, Drawer, List, makeStyles } from '@material-ui/core'
-import { Assignment, Dashboard, LocalShipping, People } from '@material-ui/icons'
+import { Assignment, Dashboard, LocalShipping, People, ShoppingCart } from '@material-ui/icons'
 
 //files import
 import NavItem from './NavItem'
@@ -24,6 +24,11 @@ const itens = [
     title: 'Transportes',
     href: '/app/transports',
     icon: LocalShipping
+  },
+  {
+    title: 'Finalizadas',
+    href: '/app/salesfinish',
+    icon: ShoppingCart
   },
   {
     title: 'Produtos',

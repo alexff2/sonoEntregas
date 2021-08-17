@@ -57,7 +57,7 @@ export default function Vendas(){
       .catch( erro => {
         console.log(erro)
 
-        setChildrenAlertModal(`Não foi possível conectar com servidor, entre em contato com admnistrador`)
+        setChildrenAlertModal(`Não foi possível conectar com servidor, entre em contato com BRUNO`)
 
         document.querySelector("#modal-over-alert").style.display = 'flex'
         
@@ -77,10 +77,6 @@ export default function Vendas(){
     } catch (error) {
       alert(error)
     }
-  }
-
-  const busca = () => {
-    setEmissao(date)
   }
 
   const closeModal = e => {
@@ -121,7 +117,7 @@ export default function Vendas(){
     } catch (error) {
       console.log(error)
 
-      setChildrenAlertModal('Erro ao enviar venda, entre em contato com ADM')
+      setChildrenAlertModal('Erro ao enviar venda, entre em contato com ALEXANDRE')
 
       openMOdalAlert()
     }
@@ -134,7 +130,7 @@ export default function Vendas(){
         <h2>VENDAS DO DIA</h2>
         <div>
           <input type="date" onChange={e => setDate(e.target.value)}/>
-          <button onClick={busca}>Buscar</button>
+          <button onClick={() => setEmissao(date)}>Buscar</button>
         </div>
       </div>
       <span id="load-sales"></span>
