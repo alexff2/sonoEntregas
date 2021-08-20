@@ -26,7 +26,7 @@ module.exports = [
     database: "SONO_JP1", 
     username: "SUPERSCERG", 
     password: "S35SUP5RSRG",
-    host: "174.200.201.12",
+    host: "174.200.205.251",
     port: 1433,
     dialect: "mssql",
     dialectOptions: {
