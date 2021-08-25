@@ -15,7 +15,7 @@ CREATE TABLE [dbo].[SALES_PROD](
 	[ID_SALES] [float] NOT NULL,
 	[CODLOJA] [float] NOT NULL,
 	[CODPRODUTO] [float] NOT NULL,
-	[COD_ORIGINAL] [varchar](20) NOT NULL,
+	[COD_ORIGINAL] [varchar](20) COLLATE SQL_Latin1_General_CP850_CI_AI NOT NULL,
 	[DESCRICAO] [varchar](50) NOT NULL,
 	[QUANTIDADE] [float] NOT NULL,
 	[UNITARIO1] [float] NOT NULL,

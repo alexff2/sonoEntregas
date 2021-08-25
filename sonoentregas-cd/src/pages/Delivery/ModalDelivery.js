@@ -45,7 +45,7 @@ export default function ModalDelivery({ setOpen, selectDelivery, setCurrentDeliv
   const [ codCar, setCodCar ] = useState()
   const [ codDriver, setCodDriver ] = useState()
   const [ codAssistant, setCodAssistant ] = useState()
-  const [ sales, setSales ] = useState([])
+  const [ salesProd, setSalesProd ] = useState([])
 
   const { cars } = useCars()
   const { drivers } = useDrivers()
@@ -62,14 +62,13 @@ export default function ModalDelivery({ setOpen, selectDelivery, setCurrentDeliv
     setCodCar(selectDelivery.ID_CAR)
     setCodDriver(selectDelivery.ID_DRIVER)
     setCodAssistant(selectDelivery.ID_ASSISTANT)
-    selectDelivery ? setSales(selectDelivery.sales) : setSales([])
   }, [selectDelivery])
 
   //Functions Outher
   const createDelivery = async () => {
-    //back irá retortar data.... Por enquanto roda:
+
     const data = {
-      description, codCar, codDriver, codAssistant, sales, status: 'Em lançamento'
+      description, codCar, codDriver, codAssistant, salesProd, status: 'Em lançamento'
     }
 
     const { data: dataDelivery } = await api.post('deliverys', data)
@@ -78,7 +77,7 @@ export default function ModalDelivery({ setOpen, selectDelivery, setCurrentDeliv
     setCurrentDeliv([...currentDeliv, dataDelivery])
     
     if (dataDelivery.ID) {
-      const { data: dataSales } = await api.get('sales')
+      const { data: dataSales } = await api.get('sales/false/false/Enviado')
 
       contextSales.setSales(dataSales)
     }
@@ -91,7 +90,7 @@ export default function ModalDelivery({ setOpen, selectDelivery, setCurrentDeliv
 
       const { data: dataDelivery } = await api.put(`deliverys/${selectDelivery.ID}`, data)
       
-      dataDelivery['sales'] = sales
+      dataDelivery['sales'] = selectDelivery.sales //VERIFICAR CONSULTA CONTEXTDELIVERY
       
       setDelivery(delivery.map( item => item.ID === selectDelivery.ID ? dataDelivery : item))
       setCurrentDeliv(currentDeliv.map( item => item.ID === selectDelivery.ID ? dataDelivery : item))
@@ -106,6 +105,7 @@ export default function ModalDelivery({ setOpen, selectDelivery, setCurrentDeliv
   //Component
   return(
     <form>
+      <button type="button" onClick={() => console.log(salesProd)}>Teste</button>
       <TextField
         id="description"
         label="Descrição"
@@ -178,8 +178,8 @@ export default function ModalDelivery({ setOpen, selectDelivery, setCurrentDeliv
 
       <TableSales 
         selectSales={selectDelivery ? selectDelivery.sales : false} 
-        setSales={setSales}
-        sales={sales}
+        setSalesProd={setSalesProd}
+        salesProd={salesProd}
       />
       <div className={classes.btnActions}>
         <ButtonSucess 

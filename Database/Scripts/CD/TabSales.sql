@@ -1,7 +1,7 @@
 USE [SONOENTREGAS]
 GO
 
-/****** Object:  Table [dbo].[SALES]    Script Date: 03/06/2021 00:53:42 ******/
+/****** Object:  Table [dbo].[SALES]    Script Date: 19/08/2021 11:40:11 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -35,8 +35,10 @@ CREATE TABLE [dbo].[SALES](
 	[D_ENVIO] [datetime] NOT NULL,
 	[VENDEDOR] [varchar](30) NOT NULL,
 	[FONE] [varchar](15) NULL,
-	[CGC_CNPJ] [varchar](19) NULL,
+	[CGC_CPF] [varchar](19) NULL,
 	[INS_RG] [varchar](18) NULL,
+	[FAX] [varchar](15) NULL,
+	[O_V] [char](1) NULL,
  CONSTRAINT [PK_SALES] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC
@@ -47,4 +49,5 @@ GO
 
 SET ANSI_PADDING OFF
 GO
+
 

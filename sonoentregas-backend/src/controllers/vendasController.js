@@ -43,7 +43,7 @@ module.exports = {
       if (!STATUS) {        
         STATUS = 'Enviado'
         
-        const valuesSales = `${CODIGOVENDA}, ${loja}, ${CODCLIENTE}, '${NOMECLI}', ${VALORPROD}, ${DESCONTO}, ${TOTALVENDA}, '${EMISSAO}', '${STATUS}', '${ENDERECO}', '${NUMERO}', '${BAIRRO}', '${CIDADE}', '${ESTADO}', '${PONTOREF}', '${OBS}', NULL, ${USER_ID}, '${D_ENTREGA1}', '${D_ENVIO}', '${VENDEDOR}', '${FONE}', '${CGC_CPF}', '${INS_RG}', '${FAX}', '${O_V}'`
+        const valuesSales = `${CODIGOVENDA}, ${loja}, ${CODCLIENTE}, '${NOMECLI}', ${VALORPROD}, ${DESCONTO}, ${TOTALVENDA}, '${EMISSAO}', 'Aberta', '${ENDERECO}', '${NUMERO}', '${BAIRRO}', '${CIDADE}', '${ESTADO}', '${PONTOREF}', '${OBS}', NULL, ${USER_ID}, '${D_ENTREGA1}', '${D_ENVIO}', '${VENDEDOR}', '${FONE}', '${CGC_CPF}', '${INS_RG}', '${FAX}', '${O_V}'`
 
         await Sales.creator(0, valuesSales)
 
@@ -58,7 +58,7 @@ module.exports = {
         await products.forEach( async prod => {
           var { NUMVENDA, CODPRODUTO, COD_ORIGINAL, DESCRICAO, QUANTIDADE, UNITARIO1, DESCONTO, NVTOTAL } = prod
 
-          var valueProd = `${NUMVENDA}, ${loja}, ${CODPRODUTO}, '${COD_ORIGINAL}', '${DESCRICAO}', ${QUANTIDADE}, ${UNITARIO1}, ${DESCONTO}, ${NVTOTAL}`
+          var valueProd = `${NUMVENDA}, ${loja}, ${CODPRODUTO}, '${COD_ORIGINAL}', '${DESCRICAO}', ${QUANTIDADE}, ${UNITARIO1}, ${DESCONTO}, ${NVTOTAL}, '${STATUS}'`
 
           await SalesProd.creator(0, valueProd, true)
 
@@ -66,10 +66,10 @@ module.exports = {
             await Sales._query(loja, `UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL + ${QUANTIDADE}, EST_LOJA = EST_LOJA + ${QUANTIDADE} WHERE CODIGO = ${CODPRODUTO} AND CODLOJA = 1`)
           }
 
-          await Sales._query(loja, `UPDATE NVENDI2 SET STATUS = 'Enviado' WHERE NUMVENDA = ${CODIGOVENDA} AND CODPRODUTO = ${CODPRODUTO}`)
+          await Sales._query(loja, `UPDATE NVENDI2 SET STATUS = '${STATUS}' WHERE NUMVENDA = ${CODIGOVENDA} AND CODPRODUTO = ${CODPRODUTO}`)
         })
 
-        await Sales._query(loja, `UPDATE NVENDA2 SET STATUS = 'Enviado' WHERE CODIGOVENDA = ${CODIGOVENDA}`)
+        await Sales._query(loja, `UPDATE NVENDA2 SET STATUS = '${STATUS}' WHERE CODIGOVENDA = ${CODIGOVENDA}`)
         
         return res.json(STATUS)
       } else {

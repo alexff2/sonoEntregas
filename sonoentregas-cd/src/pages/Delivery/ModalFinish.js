@@ -73,9 +73,74 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
+const Row = ({ sale,sendSales, classes }) => {
+  const [ openCell, setOpenCell ] = useState()
+  return(
+    <React.Fragment key={sale.ID_SALES}>
+      <TableRow className={classes.root}>
+        <TableCell>
+          <IconButton aria-label="expand row" size="small" onClick={() => setOpenCell(!openCell)}>
+            {openCell ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+          </IconButton>
+        </TableCell>
+        <TableCell component="th" scope="row">
+          {sale.ID_SALES}
+        </TableCell>
+        <TableCell>{sale.NOMECLI}</TableCell>
+        <TableCell align="right">{
+          Intl
+          .NumberFormat('pt-br',{style: 'currency', currency: 'BRL'})
+          .format(sale.TOTAL)
+        }</TableCell>
+        <TableCell align="right">{getDate(sale.EMISSAO)}</TableCell>
+        <TableCell align="right">
+          <Checkbox onChange={e => sendSales(e, sale)}/>
+        </TableCell>
+      </TableRow>
+
+      <TableRow>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+          <Collapse in={openCell} timeout="auto" unmountOnExit>
+            <Box margin={1}>
+              <Typography variant="h6" gutterBottom component="div">
+                Produtos
+              </Typography>
+              <Table size="small" aria-label="purchases">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Código</TableCell>
+                    <TableCell>Descrição</TableCell>
+                    <TableCell>Quantidade</TableCell>
+                    <TableCell align="right">Valor (R$)</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {sale.products.map((produto) => (
+                    <TableRow key={produto.CODPRODUTO}>
+                      <TableCell component="th" scope="row">
+                        {produto.CODPRODUTO}
+                      </TableCell>
+                      <TableCell>{produto.DESCRICAO}</TableCell>
+                      <TableCell>{produto.QUANTIDADE}</TableCell>
+                      <TableCell align="right">{
+                        Intl
+                          .NumberFormat('pt-br',{style: 'currency', currency: 'BRL'})
+                          .format(produto.NVTOTAL)
+                      }</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Box>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </React.Fragment>
+  )
+}
+
 export default function ModalFinish({ setOpen, selectDelivery, currentDeliv, setCurrentDeliv}){
   //States
-  const [ openCell, setOpenCell ] = useState()
   const [ dateDelivery, setDateDelivery ] = useState(false)
   const [ sales, setSales ] = useState([{ID_SALES: 0}])
 
@@ -108,6 +173,7 @@ export default function ModalFinish({ setOpen, selectDelivery, currentDeliv, set
       setSales(sales.filter( item => item.ID_SALES !== sale.ID_SALES ))
     }
   }
+
   const finish = async () => {
     if(dateDelivery){
       const status = 'Finalizada'
@@ -128,7 +194,7 @@ export default function ModalFinish({ setOpen, selectDelivery, currentDeliv, set
       const { data } = await api.put(`deliverys/status/${selectDelivery.ID}`, selectDelivery)
 
       if(data.ID){
-        const resp = await api.get('sales')
+        const resp = await api.get('sales/false/false/Enviado')
         stateSales.setSales(resp.data)
       }
   
@@ -172,66 +238,7 @@ export default function ModalFinish({ setOpen, selectDelivery, currentDeliv, set
 
           <TableBody>
             {selectDelivery.sales.map(sale => (
-              <React.Fragment key={sale.ID_SALES}>
-                <TableRow className={classes.root}>
-                  <TableCell>
-                    <IconButton aria-label="expand row" size="small" onClick={() => setOpenCell(!openCell)}>
-                      {openCell ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-                    </IconButton>
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {sale.ID_SALES}
-                  </TableCell>
-                  <TableCell>{sale.NOMECLI}</TableCell>
-                  <TableCell align="right">{
-                    Intl
-                    .NumberFormat('pt-br',{style: 'currency', currency: 'BRL'})
-                    .format(sale.TOTAL)
-                  }</TableCell>
-                  <TableCell align="right">{getDate(sale.EMISSAO)}</TableCell>
-                  <TableCell align="right">
-                    <Checkbox onChange={e => sendSales(e, sale)}/>
-                  </TableCell>
-                </TableRow>
-          
-                <TableRow>
-                  <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-                    <Collapse in={openCell} timeout="auto" unmountOnExit>
-                      <Box margin={1}>
-                        <Typography variant="h6" gutterBottom component="div">
-                          Produtos
-                        </Typography>
-                        <Table size="small" aria-label="purchases">
-                          <TableHead>
-                            <TableRow>
-                              <TableCell>Código</TableCell>
-                              <TableCell>Descrição</TableCell>
-                              <TableCell>Quantidade</TableCell>
-                              <TableCell align="right">Valor (R$)</TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {sale.products.map((produto) => (
-                              <TableRow key={produto.CODPRODUTO}>
-                                <TableCell component="th" scope="row">
-                                  {produto.CODPRODUTO}
-                                </TableCell>
-                                <TableCell>{produto.DESCRICAO}</TableCell>
-                                <TableCell>{produto.QUANTIDADE}</TableCell>
-                                <TableCell align="right">{
-                                  Intl
-                                    .NumberFormat('pt-br',{style: 'currency', currency: 'BRL'})
-                                    .format(produto.NVTOTAL)
-                                }</TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </Box>
-                    </Collapse>
-                  </TableCell>
-                </TableRow>
-              </React.Fragment>
+              <Row sale={sale} sendSales={sendSales} classes={classes}/>
             ))}
           </TableBody>
         </Table>

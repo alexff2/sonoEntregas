@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { 
   makeStyles,
@@ -23,7 +23,6 @@ import EnhancedTableHead from '../../components/EnhancedTableHead'
 
 import getDate from '../../functions/getDates'
 import { getComparator, stableSort } from '../../functions/orderTable'
-import api from '../../services/api'
 
 const useStyles = makeStyles(theme =>({
   root: {
@@ -136,12 +135,8 @@ export default function Sales() {
   const [ orderBy, setOrderBy ] = useState('idSales')
 
   const classes = useStyles()
-  const { sales, setSales } = useSale()
+  const { sales } = useSale()
   const { shop } = useShop()
-
-  useEffect(()=>{
-    api.get('sales').then( res => setSales(res.data))
-  },[setSales])
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc'

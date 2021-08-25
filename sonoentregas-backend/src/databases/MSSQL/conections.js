@@ -4,7 +4,7 @@ module.exports = [
     database: "SONOENTREGAS", 
     username: "SUPERSCERG", 
     password: "S35SUP5RSRG",
-    host: "174.200.200.41",
+    host: "localhost",
     port: 1433,
     dialect: "mssql",
     dialectOptions: {

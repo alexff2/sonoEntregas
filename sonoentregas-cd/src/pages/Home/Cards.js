@@ -9,6 +9,8 @@ import {
 import { Assignment, ShoppingCart } from '@material-ui/icons'
 import api from '../../services/api'
 
+import { useSale } from '../../context/saleContext'
+
 const useStyles = makeStyles((theme) => ({
   card: {
     height: '100%',
@@ -38,9 +40,18 @@ const useStyles = makeStyles((theme) => ({
   text: {}
 }));
 
-const Item = ({classes, title, icon: Icon, value}) => (
+const Item = ({classes, title, icon: Icon, value, seachHome}) => {
+  const { setSales }  = useSale()
+  
+  const seachSales = async () => {
+    const { data } = await api.get('sales/false/false/Aberta')
+    setSales(data)
+    seachHome()
+  }
+  
+  return (
   <Grid item lg={3} sm={6} xl={3} xs={12}>
-    <Paper className={classes.card}>
+    <Paper className={classes.card} onClick={seachSales}>
       <Box className={classes.boxContent}>
       {Icon && (
         <Icon
@@ -59,13 +70,17 @@ const Item = ({classes, title, icon: Icon, value}) => (
       </Box>
     </Paper>
   </Grid>
-)
+)}
 
 export default function Home(){
   const [ itens, setItens ] = useState([])
   const classes = useStyles()
 
   useEffect(()=>{
+    seachHome()
+  },[])
+
+  const seachHome = () => {
     api
       .get('/home')
       .then(resp => {
@@ -93,7 +108,7 @@ export default function Home(){
         ])
       })
       .catch(e => console.log(e))
-  },[])
+  }
 
   return(
     <Grid container spacing={5}>
@@ -105,6 +120,7 @@ export default function Home(){
           title={item.title}
           icon={item.icon}
           value={item.value}
+          seachHome={seachHome}
         />
       ))}
     

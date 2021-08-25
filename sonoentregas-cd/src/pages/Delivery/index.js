@@ -157,7 +157,7 @@ export default function Delivery() {
       setCurrentDeliv(delivery.filter(item => item.ID !== cod))
 
       if (data.delete) {
-        const { data: dataSales } = await api.get('sales')
+        const { data: dataSales } = await api.get('sales/false/false/Enviado')
         setSales(dataSales)
       }      
     } catch (error) {
