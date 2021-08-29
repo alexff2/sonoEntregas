@@ -3,10 +3,9 @@ const ProdVenda = require('../models/ProdVenda')
 const Sales = require('../models/Sales')
 const SalesProd = require('../models/SalesProd')
 const OrcParc = require('../models/OrcParc')
-const OrcParcLoja = require('../models/ViewOrcParcLoja')
+const ViewOrcParcLoja = require('../models/ViewOrcParcLoja')
 
 const getDate = require('../functions/getDate')
-const ViewOrcParcLoja = require('../models/ViewOrcParcLoja')
 
 module.exports = {
   async vendasSce(req, res) {

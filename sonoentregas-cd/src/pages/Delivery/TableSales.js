@@ -47,9 +47,23 @@ const useStyles = makeStyles( theme =>({
   }
 }))
 
+const CheckProd = ({ sendSalesProd, selectSales, produto }) => {
+  if (selectSales) {
+    return null
+  } else if (produto.STATUS !== 'Enviado') {
+    return <div>{produto.STATUS}</div>
+  } else {
+    return (
+      <Checkbox
+       onChange={(e) => sendSalesProd(e, produto)}
+      />
+    )
+  }
+}
+
 function Row({sendSalesProd, classes, sale, selectSales}){
   return(
-    <React.Fragment key={sale.ID_SALES}>
+    <React.Fragment>
       <TableRow className={classes.root}>
         <TableCell component="th" scope="row">
           {sale.ID_SALES}
@@ -71,8 +85,9 @@ function Row({sendSalesProd, classes, sale, selectSales}){
                 <TableRow>
                   <TableCell>Código</TableCell>
                   <TableCell>Descrição</TableCell>
-                  <TableCell>Quantidade</TableCell>
-                  <TableCell align="right">Valor (R$)</TableCell>
+                  <TableCell>Qtd. Tot.</TableCell>
+                  <TableCell>Qtd. Entregue</TableCell>
+                  <TableCell align="right">Qtd</TableCell>
                   <TableCell></TableCell>
                 </TableRow>
               </TableHead>
@@ -84,17 +99,14 @@ function Row({sendSalesProd, classes, sale, selectSales}){
                     </TableCell>
                     <TableCell>{produto.DESCRICAO}</TableCell>
                     <TableCell>{produto.QUANTIDADE}</TableCell>
-                    <TableCell align="right">{
-                      Intl
-                        .NumberFormat('pt-br',{style: 'currency', currency: 'BRL'})
-                        .format(produto.NVTOTAL)
-                    }</TableCell>
+                    <TableCell>0</TableCell>
+                    <TableCell>{produto.QUANTIDADE}</TableCell>
                     <TableCell align="right">
-                      {selectSales ? null : 
-                      <Checkbox
-                        onChange={(e) => sendSalesProd(e, produto)}
+                      <CheckProd 
+                        sendSalesProd={sendSalesProd} 
+                        selectSales={selectSales}
+                        produto={produto}
                       />
-                      }
                     </TableCell>
                   </TableRow>
                 ))}
@@ -132,7 +144,15 @@ export default function TableSales({
     if (e.target.checked){
       setSalesProd([...salesProd, saleProd])
     } else {
-      setSalesProd(salesProd.filter( item => item.ID_SALES !== saleProd.ID_SALES && item.CODPRODUTO !== saleProd.CODPRODUTO))
+      setSalesProd(salesProd.filter( item => {
+        if (item.ID_SALES !== saleProd.ID_SALES) {
+          return true
+        } else if (item.COD_ORIGINAL !== saleProd.COD_ORIGINAL) {
+          return true
+        } else {
+          return false
+        }
+      }))
     }
   }
 
@@ -163,7 +183,7 @@ export default function TableSales({
           <TableBody className={classes.tableBody}>
             {stableSort(currentSales, getComparator(order, orderBy))
               .map( sale => (
-              <Row sendSalesProd={sendSalesProd} classes={classes} sale={sale} selectSales={selectSales}/>
+              <Row  key={sale.ID_SALES} sendSalesProd={sendSalesProd} classes={classes} sale={sale} selectSales={selectSales}/>
             ))}
           </TableBody>
         

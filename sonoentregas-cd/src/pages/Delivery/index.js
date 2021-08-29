@@ -72,8 +72,10 @@ function BtnStatus({ selectDelivery, delivery, setDelivery, finishDelivery }){
     if (status === 'Entregando') {
       selectDelivery.STATUS = status
       
-      for( let index = 0; index < selectDelivery.sales.length; index++){
-        selectDelivery.sales[index].STATUS = status
+      for( let i = 0; i < selectDelivery.sales.length; i++){
+        for( let j = 0; j < selectDelivery.sales[i].products.length; j++){
+          selectDelivery.sales[i].products[j].STATUS = status
+        }
       }
       
       const { data } = await api.put(`deliverys/status/${selectDelivery.ID}`, selectDelivery)
@@ -157,7 +159,7 @@ export default function Delivery() {
       setCurrentDeliv(delivery.filter(item => item.ID !== cod))
 
       if (data.delete) {
-        const { data: dataSales } = await api.get('sales/false/false/Enviado')
+        const { data: dataSales } = await api.get('sales/false/false/Aberta')
         setSales(dataSales)
       }      
     } catch (error) {

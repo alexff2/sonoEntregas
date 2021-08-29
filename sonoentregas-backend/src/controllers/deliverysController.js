@@ -1,9 +1,12 @@
 const Deliverys = require('../models/Deliverys')
-const DeliverySales = require('../models/DeliverySales')
-const ViewDeliverySales = require('../models/ViewDeliverySales')
+const DeliveryProd = require('../models/DeliveryProd')
 const Sales = require('../models/Sales')
 const SalesProd = require('../models/SalesProd')
 const Produtos = require('../models/Produtos')
+
+const DevService = require('../services/DevService')
+
+const getDate = require('../functions/getDate')
 
 module.exports = {
   async index( req, res ){
@@ -12,48 +15,46 @@ module.exports = {
       var where
       status === 'Finalizada' ? where = "STATUS = 'Finalizada'" : where = "STATUS <> 'Finalizada'"
       const deliverys = await Deliverys.findSome(0, where)
-  
-      for (let i = 0; i < deliverys.length; i++) {
-        var sales = await ViewDeliverySales.findSome(0, `ID_DELIVERY = ${deliverys[i].ID}`)
+      
+      const dataDeliverys = await DevService.findDev(deliverys)
 
-        for (let j = 0; j < sales.length; j++) {
-          var products = await SalesProd.findSome(0, `ID_SALES = ${sales[j].ID_SALES} AND CODLOJA = ${sales[j].CODLOJA}`)
-          sales[j]['products'] = products
-        }
-
-        deliverys[i]['sales'] = sales 
-      }
-
-      res.json(deliverys)
+      console.log('Depois')
+      return res.json(dataDeliverys)
     } catch (error) {
       res.status(400).json(error)
     }
   },
   async create( req, res ){
     try {
-      const { description, codCar, codDriver, codAssistant,sales, status } = req.body
+      const { description, codCar, codDriver, codAssistant, salesProd, status } = req.body
 
       const valuesDelivery = `'${description}', ${codCar}, ${codDriver}, ${codAssistant}, '${status}'`
+
+      const dataTime = getDate()
       
       const dataDelivery = await Deliverys.creator(0, valuesDelivery)
       
-      await sales.forEach( async sale => {
-        var { ID_SALES, CODLOJA } = sale
+      await salesProd.forEach( async produto => {
+        var { ID_SALES, CODLOJA, COD_ORIGINAL } = produto
         
-        var valueSale = `${dataDelivery.ID}, ${CODLOJA}, ${ID_SALES}`
+        var valueProd = `${dataDelivery.ID}, ${ID_SALES}, ${CODLOJA}, '${COD_ORIGINAL}', '${dataTime}', NULL, NULL, 0`
         
-        await DeliverySales.creatorNotReturn(0, valueSale, true)
+        await DeliveryProd.creatorNotReturn(0, valueProd, true)
 
-        await Sales.updateNotReturn(0, `STATUS = 'Em lançamento'`, ID_SALES, 'ID_SALES')
+        await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = '${status}' WHERE ID_SALES = ${ID_SALES} AND COD_ORIGINAL = '${COD_ORIGINAL}'`)
         
-        sale.STATUS = 'Em lançamento'
-        
-        await Deliverys._query(CODLOJA, `UPDATE NVENDA2 SET STATUS = 'Em lançamento' WHERE CODIGOVENDA = ${ID_SALES}`)
+        produto.STATUS = 'Em lançamento'
+
+        const prod = await SalesProd.findSome(0, `ID_SALES = ${ID_SALES} and STATUS = 'Enviado'`)
+
+        if (prod.length === 0) {
+          await Sales.updateNotReturn(0, `STATUS = 'Fechada'`, ID_SALES, 'ID_SALES')
+        }
       })
       
-      dataDelivery['sales'] = sales
+      const dataDeliverys = await DevService.findDev([dataDelivery])
       
-      return res.json(dataDelivery)
+      return res.json(dataDeliverys[0])
     } catch (error) {
       res.status(400).json(error)
     }
@@ -76,17 +77,17 @@ module.exports = {
     try {
       const { id } = req.params
       
-      const deliverySales = await DeliverySales.findSome(0, `ID_DELIVERY = ${id}`)
+      const deliveryProd = await DeliveryProd.findSome(0, `ID_DELIVERY = ${id}`)
       
-      for (let i = 0; i < deliverySales.length; i++) {
-        await Deliverys._query(deliverySales[i].CODLOJA, `UPDATE NVENDA2 SET STATUS = 'Enviado' WHERE CODIGOVENDA = ${deliverySales[i].ID_SALE}`)
+      for (let i = 0; i < deliveryProd.length; i++) {
+        await Deliverys._query(0, `UPDATE SALES SET STATUS = 'Aberta' WHERE ID_SALES = ${deliveryProd[i].ID_SALE} AND CODLOJA = ${deliveryProd[i].CODLOJA}`)
         
-        await Deliverys._query(0, `UPDATE SALES SET STATUS = 'Enviado' WHERE ID_SALES = ${deliverySales[i].ID_SALE} AND CODLOJA = ${deliverySales[i].CODLOJA}`)
+        await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = 'Enviado' WHERE ID_SALES = ${deliveryProd[i].ID_SALE} AND CODLOJA = ${deliveryProd[i].CODLOJA} AND COD_ORIGINAL = '${deliveryProd[i].COD_ORIGINAL}'`)
       }
       
       await Deliverys.deleteNotReturn(0, id)
       
-      await DeliverySales.deleteNotReturn(0, id, 'ID_DELIVERY')
+      await DeliveryProd.deleteNotReturn(0, id, 'ID_DELIVERY')
 
       res.json({delete: true})
     } catch (error) {
@@ -98,33 +99,38 @@ module.exports = {
     const delivery = req.body
 
     try {
+      const dataTime = getDate()
+
       for (let i = 0; i < delivery.sales.length; i++) {
+        for (let j = 0; j < delivery.sales[i].products.length; j++) {
 
-        var dEntrega
+          await Deliverys._query(0, `UPDATE SALES_PROD SET STATUS = '${delivery.sales[i].products[j].STATUS}' WHERE ID_SALES = ${delivery.sales[i].ID_SALES} AND CODLOJA = ${delivery.sales[i].CODLOJA} AND COD_ORIGINAL = '${delivery.sales[i].products[j].COD_ORIGINAL}'`)
 
-        if (delivery.STATUS === 'Finalizada') {
-          
-          dEntrega =  `, D_ENTREGA2 = '${delivery.dateDelivery}'`
-   
-        } else {
-          dEntrega = ''
-        }
-        
-        await Deliverys._query(delivery.sales[i].CODLOJA, `UPDATE NVENDA2 SET STATUS = '${delivery.sales[i].STATUS}' WHERE CODIGOVENDA = ${delivery.sales[i].ID_SALES}`)
-        
-        await Deliverys._query(0, `UPDATE SALES SET STATUS = '${delivery.sales[i].STATUS}' ${dEntrega} WHERE ID_SALES = ${delivery.sales[i].ID_SALES} AND CODLOJA = ${delivery.sales[i].CODLOJA}`)
-        
-        if (delivery.sales[i].STATUS === 'Finalizada') {
-          for (let j = 0; j < delivery.sales[i].products.length; j++) {
+          if (delivery.sales[i].products[j].STATUS === 'Entregando') {
+
+            await Deliverys._query(0, `UPDATE DELIVERYS_PROD SET D_DELIVERING = '${dataTime}' WHERE ID_SALE = ${delivery.sales[i].ID_SALES} AND CODLOJA = ${delivery.sales[i].CODLOJA} AND COD_ORIGINAL = '${delivery.sales[i].products[j].COD_ORIGINAL}'`)
+
+          } else if (delivery.sales[i].products[j].STATUS === 'Finalizada') {
+
+            await Deliverys._query(0, `UPDATE DELIVERYS_PROD SET D_DELIVERED = '${delivery.dateDelivery}' WHERE ID_SALE = ${delivery.sales[i].ID_SALES} AND CODLOJA = ${delivery.sales[i].CODLOJA} AND COD_ORIGINAL = '${delivery.sales[i].products[j].COD_ORIGINAL}'`)
+            
             var qtd = delivery.sales[i].products[j].QUANTIDADE
+
             var cod = delivery.sales[i].products[j].COD_ORIGINAL
+
             await Produtos._query(1,`UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL - ${qtd}, EST_LOJA = EST_LOJA - ${qtd} FROM PRODLOJAS A INNER JOIN PRODUTOS B ON A.CODIGO = B.CODIGO WHERE A.CODLOJA = 1 AND B.ALTERNATI = '${cod}'`)
+
+          } else if (delivery.sales[i].products[j].STATUS === 'Enviado') {
+
+            await Deliverys._query(0, `UPDATE DELIVERYS_PROD SET DELIVERED = 1, D_DELIVERED = '${delivery.dateDelivery}' WHERE ID_SALE = ${delivery.sales[i].ID_SALES} AND CODLOJA = ${delivery.sales[i].CODLOJA} AND COD_ORIGINAL = '${delivery.sales[i].products[j].COD_ORIGINAL}'`)
+
+            await Sales.updateNotReturn(0, `STATUS = 'Aberta'`, delivery.sales[i].ID_SALES, 'ID_SALES')
           }
         }
       }
-      
+
       await Deliverys.updateNotReturn(0, `STATUS = '${delivery.STATUS}'`, id)
-      
+
       res.json(delivery)
     } catch (e) {
       res.status(400).json(e)

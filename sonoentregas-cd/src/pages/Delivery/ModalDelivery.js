@@ -72,25 +72,27 @@ export default function ModalDelivery({ setOpen, selectDelivery, setCurrentDeliv
     }
 
     const { data: dataDelivery } = await api.post('deliverys', data)
+    console.log(dataDelivery)
     
     setDelivery([...delivery, dataDelivery])
     setCurrentDeliv([...currentDeliv, dataDelivery])
     
     if (dataDelivery.ID) {
-      const { data: dataSales } = await api.get('sales/false/false/Enviado')
+      const { data: dataSales } = await api.get('sales/false/false/Aberta')
 
       contextSales.setSales(dataSales)
     }
     
     setOpen(false)
   }
+
   const updateDelivery = async () => {
     try {
       const data = { description, codCar, codDriver, codAssistant }
 
       const { data: dataDelivery } = await api.put(`deliverys/${selectDelivery.ID}`, data)
       
-      dataDelivery['sales'] = selectDelivery.sales //VERIFICAR CONSULTA CONTEXTDELIVERY
+      dataDelivery['sales'] = selectDelivery.sales
       
       setDelivery(delivery.map( item => item.ID === selectDelivery.ID ? dataDelivery : item))
       setCurrentDeliv(currentDeliv.map( item => item.ID === selectDelivery.ID ? dataDelivery : item))
@@ -181,6 +183,7 @@ export default function ModalDelivery({ setOpen, selectDelivery, setCurrentDeliv
         setSalesProd={setSalesProd}
         salesProd={salesProd}
       />
+
       <div className={classes.btnActions}>
         <ButtonSucess 
           children={selectDelivery ? "Editar" : "Lançar"}
