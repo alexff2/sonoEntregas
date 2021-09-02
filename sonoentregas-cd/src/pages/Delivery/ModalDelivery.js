@@ -66,24 +66,29 @@ export default function ModalDelivery({ setOpen, selectDelivery, setCurrentDeliv
 
   //Functions Outher
   const createDelivery = async () => {
+    try {
 
-    const data = {
-      description, codCar, codDriver, codAssistant, salesProd, status: 'Em lançamento'
+      const data = {
+        description, codCar, codDriver, codAssistant, salesProd, status: 'Em lançamento'
+      }
+
+      const { data: dataDelivery } = await api.post('deliverys', data)
+
+      setDelivery([...delivery, dataDelivery])
+      setCurrentDeliv([...currentDeliv, dataDelivery])
+
+      if (dataDelivery.ID) {
+        const { data: dataSales } = await api.get('sales/false/false/Aberta')
+  
+        contextSales.setSales(dataSales)
+      }
+
+      setOpen(false)
+
+    } catch (error) {
+      alert('Erro ao cadastar Entrega, entre em contato com ADM')
+      console.log(error)
     }
-
-    const { data: dataDelivery } = await api.post('deliverys', data)
-    console.log(dataDelivery)
-    
-    setDelivery([...delivery, dataDelivery])
-    setCurrentDeliv([...currentDeliv, dataDelivery])
-    
-    if (dataDelivery.ID) {
-      const { data: dataSales } = await api.get('sales/false/false/Aberta')
-
-      contextSales.setSales(dataSales)
-    }
-    
-    setOpen(false)
   }
 
   const updateDelivery = async () => {
@@ -107,7 +112,6 @@ export default function ModalDelivery({ setOpen, selectDelivery, setCurrentDeliv
   //Component
   return(
     <form>
-      <button type="button" onClick={() => console.log(salesProd)}>Teste</button>
       <TextField
         id="description"
         label="Descrição"

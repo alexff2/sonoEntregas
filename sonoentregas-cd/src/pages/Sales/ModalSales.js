@@ -34,7 +34,7 @@ export default function ModalSales({sale}){
   const classes = useStyles()
 
   useEffect(() =>{
-    api.get(`sales/detals/${sale.ID_SALES}/${sale.CODLOJA}/Finalizada`)
+    api.get(`sales/detals/${sale.ID_SALES}/${sale.CODLOJA}/Fechada`)
       .then( resp => {
         setSelectDelivery(resp.data[0])
 

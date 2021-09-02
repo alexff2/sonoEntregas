@@ -2,6 +2,7 @@ const { QueryTypes } = require('sequelize')
 
 const Sales = require('../models/Sales')
 const SalesProd = require('../models/SalesProd')
+const ViewSalesProd = require('../models/ViewSalesProd')
 
 module.exports = {
   async index( req, res ){
@@ -11,15 +12,15 @@ module.exports = {
       var sales
 
       if (typesearch === 'NOMECLI') {
-        sales = await Sales.findSome(0, `${typesearch} LIKE '${search}%' and STATUS = '${status}'`)
+        sales = await Sales.findSome(0, `${typesearch} LIKE '${search}%'`)
       } else if (typesearch === 'false') {
         sales = await Sales.findSome(0, `STATUS = '${status}'`)
       } else {
-        sales = await Sales.findSome(0, `${typesearch} = '${search}' and STATUS = '${status}'`)
+        sales = await Sales.findSome(0, `${typesearch} = '${search}'`)
       }
       
       for (let i = 0; i < sales.length; i++) {
-        var products = await SalesProd.findSome(0, `ID_SALES = ${sales[i].ID_SALES} AND CODLOJA = ${sales[i].CODLOJA}`)
+        var products = await ViewSalesProd.findSome(0, `ID_SALES = ${sales[i].ID_SALES} AND CODLOJA = ${sales[i].CODLOJA}`)
         sales[i]["products"] = products
       }
       

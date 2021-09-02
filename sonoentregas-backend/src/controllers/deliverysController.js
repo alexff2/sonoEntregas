@@ -35,13 +35,17 @@ module.exports = {
       const dataDelivery = await Deliverys.creator(0, valuesDelivery)
       
       await salesProd.forEach( async produto => {
-        var { ID_SALES, CODLOJA, COD_ORIGINAL } = produto
+        var { ID_SALES, CODLOJA, COD_ORIGINAL, QUANTIDADE, QTD_DELIV, qtdDeliv } = produto
+
+        var qtd = qtdDeliv === 0 ? (QUANTIDADE - QTD_DELIV) : qtdDeliv
         
-        var valueProd = `${dataDelivery.ID}, ${ID_SALES}, ${CODLOJA}, '${COD_ORIGINAL}', '${dataTime}', NULL, NULL, 0`
+        var valueProd = `${dataDelivery.ID}, ${ID_SALES}, ${CODLOJA}, ${qtd}, '${COD_ORIGINAL}', '${dataTime}', NULL, NULL, 0`
         
         await DeliveryProd.creatorNotReturn(0, valueProd, true)
 
-        await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = '${status}' WHERE ID_SALES = ${ID_SALES} AND COD_ORIGINAL = '${COD_ORIGINAL}'`)
+        if ((QUANTIDADE - QTD_DELIV) == qtdDeliv || qtdDeliv === 0) {
+          await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = '${status}' WHERE ID_SALES = ${ID_SALES} AND COD_ORIGINAL = '${COD_ORIGINAL}'`)
+        }
         
         produto.STATUS = 'Em lançamento'
 
@@ -103,28 +107,30 @@ module.exports = {
 
       for (let i = 0; i < delivery.sales.length; i++) {
         for (let j = 0; j < delivery.sales[i].products.length; j++) {
+          
+          var qtd = delivery.sales[i].products[j].QUANTIDADE
+          var cod = delivery.sales[i].products[j].COD_ORIGINAL
+          var status = delivery.sales[i].products[j].STATUS
+          var codLoja = delivery.sales[i].CODLOJA
+          var idSales = delivery.sales[i].ID_SALES
 
-          await Deliverys._query(0, `UPDATE SALES_PROD SET STATUS = '${delivery.sales[i].products[j].STATUS}' WHERE ID_SALES = ${delivery.sales[i].ID_SALES} AND CODLOJA = ${delivery.sales[i].CODLOJA} AND COD_ORIGINAL = '${delivery.sales[i].products[j].COD_ORIGINAL}'`)
+          await Deliverys._query(0, `UPDATE SALES_PROD SET STATUS = '${status}' WHERE ID_SALES = ${idSales} AND CODLOJA = ${codLoja} AND COD_ORIGINAL = '${cod}'`)
 
-          if (delivery.sales[i].products[j].STATUS === 'Entregando') {
+          if (status === 'Entregando') {
 
-            await Deliverys._query(0, `UPDATE DELIVERYS_PROD SET D_DELIVERING = '${dataTime}' WHERE ID_SALE = ${delivery.sales[i].ID_SALES} AND CODLOJA = ${delivery.sales[i].CODLOJA} AND COD_ORIGINAL = '${delivery.sales[i].products[j].COD_ORIGINAL}'`)
+            await Deliverys._query(0, `UPDATE DELIVERYS_PROD SET D_DELIVERING = '${dataTime}' WHERE ID_DELIVERY = ${id} AND ID_SALE = ${idSales} AND CODLOJA = ${codLoja} AND COD_ORIGINAL = '${cod}'`)
 
-          } else if (delivery.sales[i].products[j].STATUS === 'Finalizada') {
+          } else if (status === 'Finalizada') {
 
-            await Deliverys._query(0, `UPDATE DELIVERYS_PROD SET D_DELIVERED = '${delivery.dateDelivery}' WHERE ID_SALE = ${delivery.sales[i].ID_SALES} AND CODLOJA = ${delivery.sales[i].CODLOJA} AND COD_ORIGINAL = '${delivery.sales[i].products[j].COD_ORIGINAL}'`)
-            
-            var qtd = delivery.sales[i].products[j].QUANTIDADE
-
-            var cod = delivery.sales[i].products[j].COD_ORIGINAL
+            await Deliverys._query(0, `UPDATE DELIVERYS_PROD SET D_DELIVERED = '${delivery.dateDelivery}' WHERE ID_DELIVERY = ${id} AND ID_SALE = ${idSales} AND CODLOJA = ${codLoja} AND COD_ORIGINAL = '${cod}'`)
 
             await Produtos._query(1,`UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL - ${qtd}, EST_LOJA = EST_LOJA - ${qtd} FROM PRODLOJAS A INNER JOIN PRODUTOS B ON A.CODIGO = B.CODIGO WHERE A.CODLOJA = 1 AND B.ALTERNATI = '${cod}'`)
 
-          } else if (delivery.sales[i].products[j].STATUS === 'Enviado') {
+          } else if (status === 'Enviado') {
 
-            await Deliverys._query(0, `UPDATE DELIVERYS_PROD SET DELIVERED = 1, D_DELIVERED = '${delivery.dateDelivery}' WHERE ID_SALE = ${delivery.sales[i].ID_SALES} AND CODLOJA = ${delivery.sales[i].CODLOJA} AND COD_ORIGINAL = '${delivery.sales[i].products[j].COD_ORIGINAL}'`)
+            await Deliverys._query(0, `UPDATE DELIVERYS_PROD SET DELIVERED = 1, D_DELIVERED = '${delivery.dateDelivery}' WHERE ID_DELIVERY = ${id} AND ID_SALE = ${idSales} AND CODLOJA = ${codLoja} AND COD_ORIGINAL = '${cod}'`)
 
-            await Sales.updateNotReturn(0, `STATUS = 'Aberta'`, delivery.sales[i].ID_SALES, 'ID_SALES')
+            await Sales.updateNotReturn(0, `STATUS = 'Aberta'`, idSales, 'ID_SALES')
           }
         }
       }

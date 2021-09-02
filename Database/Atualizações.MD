@@ -35,6 +35,11 @@ INNER JOIN SALES C ON A.ID_SALE = C.ID_SALES AND A.CODLOJA = B.CODLOJA
 Alterar ViewDevSales
 Criar ViweDeliProd
 
+UPDATE DELIVERYS_PROD SET QTD_DELIV = B.QUANTIDADE
+FROM DELIVERYS_PROD A
+INNER JOIN SALES_PROD B ON A.ID_SALE = B.ID_SALES AND A.COD_ORIGINAL = B.COD_ORIGINAL
+WHERE A.DELIVERED = 0
+
 ================================================================================
 
 # Procedimentos de atualização do banco de dados em produção #

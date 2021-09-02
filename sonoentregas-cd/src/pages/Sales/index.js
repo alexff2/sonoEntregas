@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { 
   Box, 
   makeStyles, 
@@ -102,7 +102,7 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-export default function Product() {
+export default function Sales() {
   const [ order, setOrder ] = useState('asc')
   const [ orderBy, setOrderBy ] = useState('idSales')
   const [ sales, setSalesFinish ] = useState([])
@@ -117,7 +117,7 @@ export default function Product() {
   const searchSales = async () => {
     try {
       if (search !== '') {
-        const { data } = await api.get(`sales/${typeSeach}/${search}/finalizada`)
+        const { data } = await api.get(`sales/${typeSeach}/${search}/null`)
         setSalesFinish(data)
       } else {
         setSalesFinish([])

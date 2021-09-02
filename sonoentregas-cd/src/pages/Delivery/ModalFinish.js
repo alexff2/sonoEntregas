@@ -95,7 +95,7 @@ const Row = ({ sale, sendSalesProd, classes }) => {
                 <TableRow>
                   <TableCell>Código</TableCell>
                   <TableCell>Descrição</TableCell>
-                  <TableCell>Quantidade</TableCell>
+                  <TableCell>Qtd. Entrega</TableCell>
                   <TableCell align="right">Valor (R$)</TableCell>
                 </TableRow>
               </TableHead>
@@ -106,7 +106,7 @@ const Row = ({ sale, sendSalesProd, classes }) => {
                       {produto.CODPRODUTO}
                     </TableCell>
                     <TableCell>{produto.DESCRICAO}</TableCell>
-                    <TableCell>{produto.QUANTIDADE}</TableCell>
+                    <TableCell>{produto.QTD_DELIV}</TableCell>
                     <TableCell align="right">{
                       Intl
                         .NumberFormat('pt-br',{style: 'currency', currency: 'BRL'})

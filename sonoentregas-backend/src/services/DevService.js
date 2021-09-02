@@ -8,7 +8,7 @@ module.exports = {
       
       for (let j = 0; j < sales.length; j++) {
         var products = await ViewDeliveryProd.findSome(0, `ID_DELIVERY = ${sales[j].ID_DELIVERY} AND ID_SALES = ${sales[j].ID_SALES} AND CODLOJA = ${sales[j].CODLOJA}`)
-        //console.log(products)
+
         sales[j]['products'] = products
       }
 

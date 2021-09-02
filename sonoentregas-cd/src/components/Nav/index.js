@@ -26,8 +26,8 @@ const itens = [
     icon: LocalShipping
   },
   {
-    title: 'Finalizadas',
-    href: '/app/salesfinish',
+    title: 'Vendas',
+    href: '/app/sales',
     icon: ShoppingCart
   },
   {

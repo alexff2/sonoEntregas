@@ -44,19 +44,38 @@ const useStyles = makeStyles( theme =>({
   },
   tableBody: {
     overflow: 'scroll'
+  },
+  numberImput: {
+    width: 40
   }
 }))
 
-const CheckProd = ({ sendSalesProd, selectSales, produto }) => {
+const CheckProd = ({ sendSalesProd, selectSales, produto, classes }) => {
+  const [ qtdDeliv, setQtdDeliv ] = useState(0)
+
   if (selectSales) {
     return null
   } else if (produto.STATUS !== 'Enviado') {
     return <div>{produto.STATUS}</div>
   } else {
     return (
-      <Checkbox
-       onChange={(e) => sendSalesProd(e, produto)}
-      />
+      <>
+        <TableCell>
+          <input 
+            type="number" 
+            className={classes.numberImput}
+            defaultValue={produto.QUANTIDADE - produto.QTD_DELIV}
+            max={produto.QUANTIDADE - produto.QTD_DELIV}
+            min={1}
+            onChange={e => setQtdDeliv(e.target.value)}
+          />
+        </TableCell>
+        <TableCell align="right">
+          <Checkbox
+            onChange={(e) => sendSalesProd(e, produto, qtdDeliv)}
+          />
+        </TableCell>
+      </>
     )
   }
 }
@@ -87,7 +106,8 @@ function Row({sendSalesProd, classes, sale, selectSales}){
                   <TableCell>Descrição</TableCell>
                   <TableCell>Qtd. Tot.</TableCell>
                   <TableCell>Qtd. Entregue</TableCell>
-                  <TableCell align="right">Qtd</TableCell>
+                  {selectSales ? null : <TableCell align="right">Qtd</TableCell>}
+                  
                   <TableCell></TableCell>
                 </TableRow>
               </TableHead>
@@ -99,15 +119,15 @@ function Row({sendSalesProd, classes, sale, selectSales}){
                     </TableCell>
                     <TableCell>{produto.DESCRICAO}</TableCell>
                     <TableCell>{produto.QUANTIDADE}</TableCell>
-                    <TableCell>0</TableCell>
-                    <TableCell>{produto.QUANTIDADE}</TableCell>
-                    <TableCell align="right">
-                      <CheckProd 
-                        sendSalesProd={sendSalesProd} 
-                        selectSales={selectSales}
-                        produto={produto}
-                      />
-                    </TableCell>
+                    <TableCell>{produto.QTD_DELIV}</TableCell>
+                    
+                    <CheckProd 
+                      sendSalesProd={sendSalesProd} 
+                      selectSales={selectSales}
+                      produto={produto}
+                      classes={classes}
+                    />
+                    
                   </TableRow>
                 ))}
               </TableBody>
@@ -140,8 +160,10 @@ export default function TableSales({
   },[selectSales, salesFull])
 
   //Functions
-  const sendSalesProd = (e, saleProd) => {
+  const sendSalesProd = (e, saleProd, qtdDeliv) => {
+
     if (e.target.checked){
+      saleProd['qtdDeliv'] = qtdDeliv
       setSalesProd([...salesProd, saleProd])
     } else {
       setSalesProd(salesProd.filter( item => {

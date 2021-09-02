@@ -145,7 +145,7 @@ export default function Sales() {
   }
 
   const headCell = [
-    { id: '', numeric: false, disablePadding: false, label: '', class: {} },
+    { id: '', numeric: false, disablePadding: false, label: '', class: classes.tableHeadCellStart },
     { id: 'ID_SALES', numeric: false, disablePadding: false, label: 'Nº Venda', class: classes.tableHeadCellStart },
     { id: 'NOMECLI', numeric: false, disablePadding: false, label: 'Nome do Cliente', class: classes.tableHeadCellStart },
     { id: 'BAIRRO', numeric: true, disablePadding: false, label: 'Bairro', class: classes.tableHeadCell },
