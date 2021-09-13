@@ -31,8 +31,7 @@ routes.get('/:loja/vendas/:numvenda', vendasController.vendasSceProd)
 routes.post('/:loja/vendas/submit', vendasController.submitSale)
 //Sales Sono Delivery
 routes.get('/sales/:typesearch/:search/:status', salesController.index)
-routes.get('/sales/detals/:idsales/:codloja/:status', salesController.findSalesDetails)
-routes.get('/salesProdct/:idSale/:codloja', salesController.findProductSale)
+routes.get('/salesProdct/:idSale/:codloja/:codproduto', salesController.findProductDetals)
 //Cars
 routes.get('/cars', carsController.index)
 routes.post('/cars', carsController.create)

@@ -28,18 +28,33 @@ import api from '../../services/api'
 
 const useStyles = makeStyles(theme => ({
   //Style form select\
+  titleModalFinish: {
+    width: '100%',
+    textAlign: 'Center',
+    marginTop: -30
+  },
   divHeader:{
     width: '100%',
     display: 'flex',
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: '-20px'
-  },
-  divDateDelivery: {
-    width: '100%',
-    textAlign: 'center',
-    paddingBottom: '1rem'
+    marginTop: -20,
+    marginBottom: 15,
+    '& > div': {
+      width: '50%',
+      '& > p' : {
+        marginBottom: 2,
+        marginTop: 2,
+        '& > span' : {
+          fontWeight: 700
+        }
+      },
+      '& > div' : {
+        marginBottom: 2,
+        '& > span' : {
+          fontWeight: 700
+        }
+      }
+    }
   },
   //Style buttons
   btnActions: {
@@ -211,20 +226,24 @@ export default function ModalFinish({ setOpen, selectDelivery, currentDeliv, set
   //Component
   return(
     <form>
-      <button type="button" onClick={()=>console.log(selectDelivery.sales)}>Teste</button>
-      <div className={classes.divHeader}>
-        <h3>{selectDelivery.DESCRIPTION}</h3>
-        <p><span style={{fontWeight: 700}}>Motorista: </span>{descriptionDriver()}</p>
-        <p><span style={{fontWeight: 700}}>Auxiliar: </span> {descriptionAssistants()}</p>
-        <p><span style={{fontWeight: 700}}>Veículo: </span> {descriptionCar()}</p>
-      </div>
-      <div className={classes.divDateDelivery}>
-        <span style={{fontWeight: 700}}>Data da Entrega: </span>
-        <input 
-          type="date"
-          required
-          onChange={e => setDateDelivery(e.target.value)}
-        />
+      <h3 className={classes.titleModalFinish}>{selectDelivery.DESCRIPTION}</h3>
+      <div className={classes.divHeader}>    
+        <div>
+          <p><span>Motorista: </span>{descriptionDriver()}</p>
+          <p><span>Auxiliar: </span> {descriptionAssistants()}</p>
+        </div>
+
+        <div>
+          <p><span>Veículo: </span> {descriptionCar()}</p>
+          <div>
+            <span>Data da Entrega: </span>
+            <input 
+              type="date"
+              required
+              onChange={e => setDateDelivery(e.target.value)}
+            />
+          </div>
+        </div>
       </div>
 
       <TableContainer component={Paper}>

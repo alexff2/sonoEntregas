@@ -52,6 +52,7 @@ const useStyles = makeStyles( theme =>({
 
 const CheckProd = ({ sendSalesProd, selectSales, produto, classes }) => {
   const [ qtdDeliv, setQtdDeliv ] = useState(0)
+  const [ inputNumber, setInputNumber ] = useState(false)
 
   if (selectSales) {
     return null
@@ -68,11 +69,12 @@ const CheckProd = ({ sendSalesProd, selectSales, produto, classes }) => {
             max={produto.QUANTIDADE - produto.QTD_DELIV}
             min={1}
             onChange={e => setQtdDeliv(e.target.value)}
+            disabled={inputNumber}
           />
         </TableCell>
         <TableCell align="right">
           <Checkbox
-            onChange={(e) => sendSalesProd(e, produto, qtdDeliv)}
+            onChange={(e) => sendSalesProd(e, produto, qtdDeliv, setInputNumber)}
           />
         </TableCell>
       </>
@@ -160,12 +162,16 @@ export default function TableSales({
   },[selectSales, salesFull])
 
   //Functions
-  const sendSalesProd = (e, saleProd, qtdDeliv) => {
-
+  const sendSalesProd = (e, saleProd, qtdDeliv, setInputNumber) => {
     if (e.target.checked){
+      setInputNumber(true)
+
       saleProd['qtdDeliv'] = qtdDeliv
+
       setSalesProd([...salesProd, saleProd])
     } else {
+      setInputNumber(false)
+
       setSalesProd(salesProd.filter( item => {
         if (item.ID_SALES !== saleProd.ID_SALES) {
           return true

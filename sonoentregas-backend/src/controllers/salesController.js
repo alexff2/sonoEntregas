@@ -1,8 +1,7 @@
-const { QueryTypes } = require('sequelize')
-
 const Sales = require('../models/Sales')
-const SalesProd = require('../models/SalesProd')
 const ViewSalesProd = require('../models/ViewSalesProd')
+const ViewDeliveryProd = require('../models/ViewDeliveryProd')
+const ViewDeliverys = require('../models/ViewDeliverys')
 
 module.exports = {
   async index( req, res ){
@@ -15,6 +14,20 @@ module.exports = {
         sales = await Sales.findSome(0, `${typesearch} LIKE '${search}%'`)
       } else if (typesearch === 'false') {
         sales = await Sales.findSome(0, `STATUS = '${status}'`)
+      } else if (typesearch === 'D_DELIVERED') {
+        const salesProd = await Sales._query(0, `SELECT ID_SALE FROM DELIVERYS_PROD WHERE ${typesearch} = '${search}'`)
+
+        var idSale = ''
+
+        for (let i = 0; i < salesProd[0].length; i++){
+          if ( i === 0 ){
+            idSale+= salesProd[0][i].ID_SALE
+          } else {
+            idSale+= `, ${salesProd[0][i].ID_SALE}`
+          }
+        }
+
+        sales = await Sales.findSome(0, `ID_SALES IN (${idSale})`)
       } else {
         sales = await Sales.findSome(0, `${typesearch} = '${search}'`)
       }
@@ -29,18 +42,25 @@ module.exports = {
       return res.status(400).json(error)
     }
   },
-  async findSalesDetails(req, res){
-    const { idsales, codloja, status } = req.params
-    
-    const detals = await Sales._query(0, `select b.* from DELIVERYS_SALES a inner join DELIVERYS b on a.ID_DELIVERY = b.ID where a.ID_SALE = ${idsales} and a.CODLOJA = ${codloja} and STATUS = '${status}'`, QueryTypes.SELECT)
-    
-    return res.json(detals)
-  },
-  async findProductSale(req, res){
-    const { idSale, codloja } = req.params
+  async findProductDetals(req, res){
+    try {
+      const { idSale, codloja, codproduto } = req.params
+  
+      const products = await ViewDeliveryProd.findSome(0, `ID_SALES = ${idSale} AND CODLOJA = ${codloja} AND CODPRODUTO = ${codproduto} AND DELIVERED = 0`)
 
-    var products = await SalesProd.findSome(0, `ID_SALES = ${idSale} AND CODLOJA = ${codloja}`)
-
-    return res.json(products)
+      var resp
+  
+      if (products.length > 0 ) {
+        const delivery = await ViewDeliverys.findSome(0, `ID = ${products[0].ID_DELIVERY}`)
+  
+        resp = {products, delivery}
+      } else {
+        resp = false
+      }
+  
+      return res.json(resp)
+    } catch (error) {
+      return res.status(400).json(error)
+    }
   }
 }

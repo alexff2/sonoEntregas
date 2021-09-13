@@ -7,13 +7,23 @@ const useStyles = makeStyles( theme => ({
     alignItems: 'center',
     justifyContent: 'center'
   },
-  paper: {
+  paper1: {
     backgroundColor: theme.palette.background.paper,
     border: '2px solid #000',
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3),
     width: 'min(95vw, 700px)',
     maxHeight: 'calc(100vh - 100px)',
+    overflow: 'scroll'
+  },
+  paper2: {  
+    border: 'none',
+    color: 'var(--text-light)',
+    backgroundColor: '#f5f5f5',
+    letterSpacing: -0.5,
+    padding: 0,
+    width: 'min(95vw, 800px)',
+    maxHeight: 'calc(100vh - 50px)',
     overflow: 'scroll'
   }
 }))
@@ -35,8 +45,8 @@ export default function TransitionsModal({ open, setOpen, title, children, class
         }}
       >
         <Fade in={open}>
-          <div className={classes.paper}>
-            <h2 id="transition-modal-title">{title}</h2>
+          <div className={title ? classes.paper1 : classes.paper2}>
+            {title ? <h2 id="transition-modal-title">{title}</h2>:null}
             <div id="transition-modal-description" className={classes.modalContent}>
               {children}
             </div>

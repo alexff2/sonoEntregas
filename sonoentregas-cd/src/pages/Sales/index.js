@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { 
   Box, 
   makeStyles, 
   InputBase, 
   fade, 
   Table, 
+  Collapse,
+  IconButton,
+  Typography,
   TableContainer, 
   TableHead, 
   TableRow, 
@@ -18,6 +21,7 @@ import {
   InputLabel 
 } from "@material-ui/core"
 import SearchIcon from '@material-ui/icons/Search'
+import { KeyboardArrowDown, KeyboardArrowUp} from '@material-ui/icons'
 
 import { useShop } from '../../context/shopContext'
 
@@ -29,7 +33,74 @@ import EnhancedTableHead from '../../components/EnhancedTableHead'
 import Modal from '../../components/Modal'
 import ModalSales from './ModalSales'
 
+function Row({ sale, classes, setShops, modalDetalProduct }) {
+  const [open, setOpen] = React.useState(false)
+  
+  return (
+    <React.Fragment>
+      <TableRow className={classes.root}>
+        <TableCell>
+          <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+            {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+          </IconButton>
+        </TableCell>
+        <TableCell>{sale.ID_SALES}</TableCell>
+        <TableCell>{sale.NOMECLI}</TableCell>
+        <TableCell align="right">{getDate(sale.EMISSAO)}</TableCell>
+        <TableCell align="right">{setShops(sale.CODLOJA)}</TableCell>
+      </TableRow>
+
+      <TableRow>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <Box margin={1}>
+              <Typography variant="h6" gutterBottom component="div">
+                Produtos
+              </Typography>
+              <Table size="small" aria-label="purchases">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Código</TableCell>
+                    <TableCell>Descrição</TableCell>
+                    <TableCell>Quantidade</TableCell>
+                    <TableCell align="right">Valor (R$)</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {sale.products.map((produto) => (
+                    <TableRow key={produto.CODPRODUTO} onClick={() => modalDetalProduct(sale, produto)}>
+                      <TableCell component="th" scope="row">
+                        {produto.COD_ORIGINAL}
+                      </TableCell>
+                      <TableCell>{produto.DESCRICAO}</TableCell>
+                      <TableCell>{produto.QUANTIDADE}</TableCell>
+                      <TableCell align="right">{
+                        Intl
+                          .NumberFormat('pt-br',{style: 'currency', currency: 'BRL'})
+                          .format(produto.NVTOTAL)
+                      }</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Box>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+
+    </React.Fragment>
+  );
+}
+
 const useStyles = makeStyles(theme => ({
+  root: {
+    '& > *': {
+      borderBottom: 'unset'
+    },
+    '&:hover': {
+      background: theme.palette.primary.light
+    }
+  },
   barHeader: {
     padding: theme.spacing(2),
     background: theme.palette.primary.main,
@@ -103,13 +174,14 @@ const useStyles = makeStyles(theme => ({
 }))
 
 export default function Sales() {
+  const [ openModalProduct, setOpenModalProduct ] = useState(false)
   const [ order, setOrder ] = useState('asc')
   const [ orderBy, setOrderBy ] = useState('idSales')
-  const [ sales, setSalesFinish ] = useState([])
+  const [ sales, setSales ] = useState([])
   const [ search, setSearch ] = useState()
   const [ typeSeach, setTypeSeach ] = useState('ID_SALES')
-  const [ openModalSales, setOpenModalSales ] = useState(false)
   const [ saleCurrent, setSaleCurrent ] = useState([])
+  const [ productCurrent, setProductCurrent ] = useState([])
 
   const { shop } = useShop()
   const classes = useStyles()
@@ -118,13 +190,13 @@ export default function Sales() {
     try {
       if (search !== '') {
         const { data } = await api.get(`sales/${typeSeach}/${search}/null`)
-        setSalesFinish(data)
+        setSales(data)
       } else {
-        setSalesFinish([])
+        setSales([])
       }
     } catch (e) {
       alert(e)
-      setSalesFinish([])
+      setSales([])
     }
   }
 
@@ -139,16 +211,17 @@ export default function Sales() {
     setOrderBy(property)
   }
 
-  const modalDetalsSales = sale => {
+  const modalDetalProduct = (sale, product) => {
+    setOpenModalProduct(true)
     setSaleCurrent(sale)
-    setOpenModalSales(true)
+    setProductCurrent(product)
   }
 
   const headCell = [
+    { id: '', numeric: false, disablePadding: false, label: '', class: classes.tableHeadCellStart },
     { id: 'ID_SALES', numeric: false, disablePadding: false, label: 'Nº Venda', class: classes.tableHeadCellStart },
     { id: 'NOMECLI', numeric: false, disablePadding: false, label: 'Nome do Cliente', class: classes.tableHeadCellStart },
     { id: 'EMISSAO', numeric: true, disablePadding: false, label: 'Data Emissão', class: classes.tableHeadCell },
-    { id: 'D_ENTREGA2', numeric: true, disablePadding: false, label: 'Data Entregue', class: classes.tableHeadCell },
     { id: 'CODLOJA', numeric: true, disablePadding: false, label: 'Loja', class: classes.tableHeadCell },
   ]
 
@@ -167,7 +240,7 @@ export default function Sales() {
         >
           <MenuItem value={'ID_SALES'}>Código Venda</MenuItem>
           <MenuItem value={'NOMECLI'}>Nome Cliente</MenuItem>
-          <MenuItem value={'D_ENTREGA2'}>Data Entrega</MenuItem>
+          <MenuItem value={'D_DELIVERED'}>Data Entrega</MenuItem>
         </Select>
       </FormControl>
 
@@ -175,7 +248,7 @@ export default function Sales() {
           <div className={classes.searchIcon}>
             <SearchIcon/>
           </div>
-          { typeSeach === 'D_ENTREGA2' ?
+          { typeSeach === 'D_DELIVERED' ?
             <input 
               type="date" 
               className={classes.inputDate}
@@ -210,13 +283,13 @@ export default function Sales() {
             <TableBody>
               {stableSort(sales, getComparator(order, orderBy))
                 .map( sale => (
-                <TableRow key={sale.ID} onClick={() => modalDetalsSales(sale)}>
-                  <TableCell>{sale.ID_SALES}</TableCell>
-                  <TableCell>{sale.NOMECLI}</TableCell>
-                  <TableCell align="right">{getDate(sale.EMISSAO)}</TableCell>
-                  <TableCell align="right">{getDate(sale.D_ENTREGA2)}</TableCell>
-                  <TableCell align="right">{setShops(sale.CODLOJA)}</TableCell>
-                </TableRow>
+                <Row 
+                  key={sale.ID} 
+                  modalDetalProduct={modalDetalProduct}
+                  sale={sale}
+                  classes={classes}
+                  setShops={setShops}
+                />
               ))}
             </TableBody>
           </Table>
@@ -224,13 +297,13 @@ export default function Sales() {
       </Box>
 
       <Modal 
-        open={openModalSales}
-        setOpen={setOpenModalSales}
-        title="Detalhes da entrega"
+        open={openModalProduct}
+        setOpen={setOpenModalProduct}
+        title={false}
         >
         <ModalSales
-          setOpen={setOpenModalSales}
           sale={saleCurrent}
+          product={productCurrent}
         />
       </Modal>
     </Box>

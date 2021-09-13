@@ -17,9 +17,9 @@ CREATE TABLE [dbo].[DELIVERYS_PROD](
 	[CODLOJA] [float] NOT NULL,
 	[QTD_DELIV] [float] NOT NULL,
 	[COD_ORIGINAL] [varchar](20) COLLATE SQL_Latin1_General_CP850_CI_AI NOT NULL,
-	[D_MOUNTING] [date] NULL,
-	[D_DELIVERING] [date] NULL,
-	[D_DELIVERED] [date] NULL,
+	[D_MOUNTING] [datetime] NULL,
+	[D_DELIVERING] [datetime] NULL,
+	[D_DELIVERED] [datetime] NULL,
 	[DELIVERED] [bit] NULL
 ) ON [PRIMARY]
 
