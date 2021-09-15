@@ -9,7 +9,7 @@ export default function Home(){
     <div className="home">
       <p>Bem vindo!</p>
       <div>
-        <img src={logo} alt="Logo" />
+        <img src={logo} alt="Logo" style={{width: '55rem'}} />
       </div>
     </div>
   )

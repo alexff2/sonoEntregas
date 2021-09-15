@@ -14,36 +14,6 @@
 
 ## Etapas:
 
-* Scripts de Autalização do banco *
-update SALES set STATUS = 'Aberta' where STATUS = 'Aberto'
-update SALES set STATUS = 'Fechada' where STATUS = 'Finalizada'
-
-use SONOENTREGAS
-ALTER TABLE dbo.SALES_PROD ADD STATUS VARCHAR(15) NOT NULL DEFAULT 'Enviado'
-
-UPDATE SALES_PROD SET STATUS = 'Finalizada'
-FROM SALES A
-INNER JOIN SALES_PROD B ON A.ID_SALES = B.ID_SALES
-where a.STATUS = 'Fechada'
-
-INSERT DELIVERYS_PROD
-select A.ID_DELIVERY, A.ID_SALE, A.CODLOJA, B.QUANTIDADE, B.COD_ORIGINAL, C.D_ENTREGA2, C.D_ENTREGA2, C.D_ENTREGA2, 1
-from DELIVERYS_SALES A 
-INNER JOIN SALES_PROD B ON A.ID_SALE = B.ID_SALES AND A.CODLOJA = B.CODLOJA
-INNER JOIN SALES C ON A.ID_SALE = C.ID_SALES AND A.CODLOJA = B.CODLOJA
-
-Alterar ViewDevSales
-Criar ViweDeliProd
-
-UPDATE DELIVERYS_PROD SET QTD_DELIV = B.QUANTIDADE
-FROM DELIVERYS_PROD A
-INNER JOIN SALES_PROD B ON A.ID_SALE = B.ID_SALES AND A.COD_ORIGINAL = B.COD_ORIGINAL
-WHERE A.DELIVERED = 0
-
 ================================================================================
 
-# Procedimentos de atualização do banco de dados em produção #
-
-- Ajustar tabela SALES e outras para que nao haja duplicidade;
-- Corrigir chave da tabela sales_prod, alterar codproduto para cod_original
 - Melhorar infra de consulta de entregas (contextDelivery para deixar sistema mais leve)
