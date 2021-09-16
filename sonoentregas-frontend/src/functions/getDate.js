@@ -20,3 +20,18 @@ export default function getDate(date = false) {
     return date
   }
 }
+
+export function getTransformDate(date, days) {
+  var data, dia, diaF, mes, mesF, anoF
+
+  data = new Date(date)
+  dia  = (data.getDate()+days).toString()
+  console.log(data.getDate(), data, date)
+  diaF = (dia.length === 1) ? '0'+dia : dia
+  mes  = (data.getMonth()+1).toString() //+1 pois no getMonth Janeiro começa com zero.
+  mesF = (mes.length === 1) ? '0'+mes : mes
+  anoF = data.getFullYear()
+  date = `${anoF}-${mesF}-${diaF}`
+
+  return date
+}

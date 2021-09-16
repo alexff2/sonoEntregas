@@ -1,3 +1,38 @@
+.tab {
+  justify-content: flex-start !important;
+  padding: 0 0 !important;
+  overflow: hidden;
+}
+
+.tab input {
+  background-color: inherit;
+  font-size: 1.5rem;
+  font-weight: 600;
+  padding: 0 1rem;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-bottom: 4px;
+  border-radius: 0;
+}
+
+.tab input:hover {
+  background-color: rgb(150, 149, 149);
+}
+
+.tab input.active {
+  background-color: rgb(150, 149, 149);
+}
+
+.tab:first-child {
+  border-radius: 0.37rem 0 0 0;
+}
+
+.tabcontent {
+  display: none;
+}
+
 /*Modal sales ===========================*/
 div.sales-head {
   margin-bottom: 0.5rem;
