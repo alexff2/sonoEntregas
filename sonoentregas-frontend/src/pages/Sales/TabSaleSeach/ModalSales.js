@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import './style.css'
 
-import api from '../../services/api'
-import getDates from '../../functions/getDates'
+import api from '../../../services/api'
+import getDates from '../../../functions/getDate'
 
 function ModalSales({ sale, product }) {
   const [ dateLoading, setDateLoading ] = useState(false)
@@ -29,9 +29,7 @@ function ModalSales({ sale, product }) {
   },[sale, product])
 
   return (
-    <div
-      className="modal-overlaw" 
-    >
+    
       <div>
         <div className="headerModal">
           <h2>DAV <span>#{sale.ID_SALES}</span></h2>
@@ -144,7 +142,6 @@ function ModalSales({ sale, product }) {
         </div>
       </div>
 
-    </div>
   );
 }
 
