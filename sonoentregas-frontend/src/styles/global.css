@@ -10,6 +10,8 @@
   --white: #fff;
   --gray: #f0f2f5;
   --gray-line: #DCDDE0;
+  --gray-light: #f9f9f9;
+  --gray-bold: #4e5461;
   --text: #666666;
   --texthighlight: #B3B9FF;
   --black: #2E384D;
@@ -102,6 +104,7 @@ main div.footer-container{
 .modal {
   background-color: var(--gray);
   border-radius: 0.5rem;
+  padding: 2.5rem;
 }
 
 .modal h2 {

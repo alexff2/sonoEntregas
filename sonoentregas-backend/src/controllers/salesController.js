@@ -17,17 +17,22 @@ module.exports = {
       } else if (typesearch === 'D_DELIVERED') {
         const salesProd = await Sales._query(0, `SELECT ID_SALE FROM DELIVERYS_PROD WHERE ${typesearch} = '${search}'`)
 
-        var idSale = ''
-
-        for (let i = 0; i < salesProd[0].length; i++){
-          if ( i === 0 ){
-            idSale+= salesProd[0][i].ID_SALE
-          } else {
-            idSale+= `, ${salesProd[0][i].ID_SALE}`
+        if (salesProd[0].length > 0 ) {
+          var idSale = ''
+  
+          for (let i = 0; i < salesProd[0].length; i++){
+            if ( i === 0 ){
+              idSale+= salesProd[0][i].ID_SALE
+            } else {
+              idSale+= `, ${salesProd[0][i].ID_SALE}`
+            }
           }
+  
+          sales = await Sales.findSome(0, `ID_SALES IN (${idSale})`)
+        } else {
+          return res.status(404).json('Nenhuma entrega realizada neste dia!')
         }
 
-        sales = await Sales.findSome(0, `ID_SALES IN (${idSale})`)
       } else {
         sales = await Sales.findSome(0, `${typesearch} = '${search}'`)
       }

@@ -178,7 +178,7 @@ export default function Sales() {
   const [ order, setOrder ] = useState('asc')
   const [ orderBy, setOrderBy ] = useState('idSales')
   const [ sales, setSales ] = useState([])
-  const [ search, setSearch ] = useState()
+  const [ search, setSearch ] = useState('')
   const [ typeSeach, setTypeSeach ] = useState('ID_SALES')
   const [ saleCurrent, setSaleCurrent ] = useState([])
   const [ productCurrent, setProductCurrent ] = useState([])
@@ -195,7 +195,7 @@ export default function Sales() {
         setSales([])
       }
     } catch (e) {
-      alert(e)
+      alert(e.response.data)
       setSales([])
     }
   }
@@ -252,7 +252,10 @@ export default function Sales() {
             <input 
               type="date" 
               className={classes.inputDate}
-              onChange={e => setSearch(e.target.value)}
+              onChange={e => {
+                setTypeSeach(e.target.value)
+                setSearch('')
+              }}
             />:
             <InputBase
               placeholder="Pesquisar…"

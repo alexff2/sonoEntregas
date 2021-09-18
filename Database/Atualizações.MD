@@ -6,7 +6,6 @@
 * Criar relatório de vendas enviadas do dia;
 * Possibilidade de alterar a quantidade enviada do produto para entrega;
 * Vendas a receber;
-* Não permitir enviar venda com data de entrega inferior a 10 dias corridos.
 
 ## Pendências Futuras
 * Imprimir dav pelo sistema;

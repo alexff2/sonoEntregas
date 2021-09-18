@@ -5,8 +5,6 @@ import { getLoja, getUser } from '../../../services/auth'
 
 import '../../../styles/pages/sales.css'
 
-import ModalAlert, { openMOdalAlert } from '../../../components/ModalAlert'
-
 import getDate, { getTransformDate } from '../../../functions/getDate'
 
 function SetEstoque({ product, putProduct }) {
@@ -33,9 +31,8 @@ function SetEstoque({ product, putProduct }) {
 }
 
 
-export default function TabSendSale(){
+export default function TabSendSale({ openMOdalAlert, setChildrenAlertModal }){
   const [ modal, setModal ] = useState([])
-  const [ childrenAlertModal, setChildrenAlertModal ] = useState('Vazio')
   const [ sales, setSales ] = useState([])
   const [ orcParc, setOrcParc ] = useState([])
   const [ productSales, setProductSales ] = useState([])
@@ -65,7 +62,7 @@ export default function TabSendSale(){
         
         document.querySelector('#load-sales').innerHTML = ''
     })
-  }, [cod, emissao])
+  }, [cod, emissao, setChildrenAlertModal])
 
   const openModal = async item => {
     try {
@@ -232,8 +229,6 @@ export default function TabSendSale(){
         </div>
       ))
       }
-
-      <ModalAlert>{childrenAlertModal}</ModalAlert>
     </div>
   )
 }

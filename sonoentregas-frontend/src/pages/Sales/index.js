@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
 
+import ModalAlert, { openMOdalAlert } from '../../components/ModalAlert'
 import TabSendSale from './TabSendSale'
 import TabSaleSeach from './TabSaleSeach'
 
 export default function Vendas(){
+  const [ childrenAlertModal, setChildrenAlertModal ] = useState('Vazio')
 
   useEffect(() => {
     document.getElementById('CONSULTAR').style.display = "block";
@@ -33,14 +35,21 @@ export default function Vendas(){
       
       <div className="body-container">
         <div id="ENVIAR" className="tabcontent">
-          <TabSendSale />
+          <TabSendSale
+            openMOdalAlert={openMOdalAlert}
+            setChildrenAlertModal={setChildrenAlertModal}
+          />
         </div>
 
         <div id="CONSULTAR" className="tabcontent">
-          <TabSaleSeach />
+          <TabSaleSeach
+            openMOdalAlert={openMOdalAlert}
+            setChildrenAlertModal={setChildrenAlertModal}
+          />
         </div>
       </div>
 
+      <ModalAlert>{childrenAlertModal}</ModalAlert>
     </div>
   )
 }

@@ -79,7 +79,12 @@ const Login = ({history}) => {
             <input type="text" placeholder="Usuário..." onChange={e => setUser(e.target.value)}/>
           </div>
           <div className="field">
-            <input type="password" placeholder="Senha..." onChange={e => setPassword(e.target.value)} onDragEnter={login}/>
+            <input
+              type="password"
+              placeholder="Senha..."
+              onChange={e => setPassword(e.target.value)}
+              onKeyPress={e => e.key === 'Enter' ? login(e) : null}
+            />
           </div>
           <button type="submit">Logar</button>
         </form>

@@ -62,10 +62,10 @@ function Row({ sale, modalDetalProduct }) {
   );
 }
 
-export default function TabSaleSeach() {
+export default function TabSaleSeach({ openMOdalAlert, setChildrenAlertModal }) {
   const [ openModalProduct, setOpenModalProduct ] = useState(false)
   const [ sales, setSales ] = useState([])
-  const [ search, setSearch ] = useState()
+  const [ search, setSearch ] = useState('')
   const [ typeSeach, setTypeSeach ] = useState('ID_SALES')
   const [ saleCurrent, setSaleCurrent ] = useState([])
   const [ productCurrent, setProductCurrent ] = useState([])
@@ -77,9 +77,12 @@ export default function TabSaleSeach() {
         setSales(data)
       } else {
         setSales([])
+        setChildrenAlertModal('Selecione um filtro!')
+        openMOdalAlert()
       }
     } catch (e) {
-      alert(e)
+      setChildrenAlertModal(e.response.data)
+      openMOdalAlert()
       setSales([])
     }
   }
@@ -95,9 +98,12 @@ export default function TabSaleSeach() {
       {/*Campo de busca de vendas*/}
       <div>
         <select 
-          name="typeSales" 
+          name="typeSales"
           id="typeSales" 
-          onChange={e => setTypeSeach(e.target.value)}
+          onChange={e => {
+            setTypeSeach(e.target.value)
+            setSearch('')
+          }}
         >
           <option value={'ID_SALES'}>Código Venda</option>
           <option value={'NOMECLI'}>Nome Cliente</option>
@@ -109,15 +115,21 @@ export default function TabSaleSeach() {
             Icone
           </div>
           { typeSeach === 'D_DELIVERED' ?
-            <input 
-              type="date" 
-              onChange={e => setSearch(e.target.value)}
-            />:
-            <input
-              placeholder="Pesquisar…"
-              onChange={e => setSearch(e.target.value)}
-              onDragEnter={searchSales}
-            />
+            <div>
+              <input
+                type="date" 
+                onChange={e => setSearch(e.target.value)}
+              />
+            </div>:
+            <>
+              <input
+                type="text"
+                placeholder="Pesquisar…"
+                onChange={e => setSearch(e.target.value)}
+                onKeyPress={e => e.key === 'Enter' ? searchSales() : null}
+                value={search}
+              />
+            </>
           }
         </div>
 
@@ -147,7 +159,15 @@ export default function TabSaleSeach() {
         </table>
       </div>
 
-      <Modal openModal={openModalProduct}>
+      <Modal 
+        openModal={openModalProduct}
+        setOpenModal={setOpenModalProduct}
+        styleModal={{
+          padding: 0,
+          letterSpacing: '-0.5px',
+          backgroundColor: '#f5f5f5'
+        }}
+      >
         <ModalSales
           sale={saleCurrent}
           product={productCurrent}
