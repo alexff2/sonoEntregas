@@ -1,4 +1,5 @@
 import React, { useState } from "react"
+import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineSearch } from 'react-icons/ai'
 
 import api from '../../../services/api'
 import getDate from '../../../functions/getDate'
@@ -12,8 +13,8 @@ function Row({ sale, modalDetalProduct }) {
   return (
     <React.Fragment>
       <tr>
-        <td>
-          b
+        <td style={{width: 10}} onClick={() => setOpen(!open)}>
+          { open ? <AiOutlineArrowUp /> : <AiOutlineArrowDown />}
         </td>
         <td>{sale.ID_SALES}</td>
         <td>{sale.NOMECLI}</td>
@@ -96,10 +97,11 @@ export default function TabSaleSeach({ openMOdalAlert, setChildrenAlertModal }) 
   return(
     <>
       {/*Campo de busca de vendas*/}
-      <div>
+      <div className="fieldsSearchSales">
         <select 
           name="typeSales"
           id="typeSales" 
+          className="selectSearchSales"
           onChange={e => {
             setTypeSeach(e.target.value)
             setSearch('')
@@ -110,10 +112,8 @@ export default function TabSaleSeach({ openMOdalAlert, setChildrenAlertModal }) 
           <option value={'D_DELIVERED'}>Data Entrega</option>
         </select>
 
-        <div>
-          <div>
-            Icone
-          </div>
+        <div className="inputsSeachSales">
+          <AiOutlineSearch />
           { typeSeach === 'D_DELIVERED' ?
             <div>
               <input
@@ -133,7 +133,7 @@ export default function TabSaleSeach({ openMOdalAlert, setChildrenAlertModal }) 
           }
         </div>
 
-        <button onClick={searchSales}>Pesquisar</button>
+        <button onClick={searchSales}>PESQUISAR</button>
       </div>
 
       {/*Tabela de vendas*/}
@@ -141,7 +141,7 @@ export default function TabSaleSeach({ openMOdalAlert, setChildrenAlertModal }) 
         <table>
           <thead>
             <tr>
-              <th></th>
+              <th id="thSales-firstIten"></th>
               <th>Código</th>
               <th>Cliente</th>
               <th>Emissao</th>

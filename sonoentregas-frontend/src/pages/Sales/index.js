@@ -26,14 +26,14 @@ export default function Vendas(){
   }
 
   return(
-    <div className="container">
+    <div className="container sales-container">
 
-      <div className="header-container tab">
+      <div className="tab">
         <input className="tablinks" type="button" value="ENVIAR" onClick={e => openTab(e)} />
         <input className="tablinks active" type="button" value="CONSULTAR" onClick={e => openTab(e)} />
       </div>
       
-      <div className="body-container">
+      <div className="tab-body body-container">
         <div id="ENVIAR" className="tabcontent">
           <TabSendSale
             openMOdalAlert={openMOdalAlert}

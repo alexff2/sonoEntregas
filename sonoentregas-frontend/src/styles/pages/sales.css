@@ -1,32 +1,41 @@
+.sales-container {
+  border: none !important;
+}
+
 .tab {
-  justify-content: flex-start !important;
-  padding: 0 0 !important;
-  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0;
 }
 
 .tab input {
+  width: 180px;
+  height: 35px;
   background-color: inherit;
   font-size: 1.5rem;
   font-weight: 600;
   padding: 0 1rem;
   border: none;
-  outline: none;
   cursor: pointer;
   transition: 0.3s;
-  margin-bottom: 4px;
-  border-radius: 0;
 }
 
 .tab input:hover {
-  background-color: rgb(150, 149, 149);
+  background-color: var(--gray-line);
+  border-color: var(--gray-line);
+  border-radius: 0.5rem 0.5rem 0 0;
 }
 
 .tab input.active {
-  background-color: rgb(150, 149, 149);
+  background-color: var(--gray-line);
+  border-color: var(--gray-line);
+  border-radius: 0.5rem 0.5rem 0 0;
 }
 
-.tab:first-child {
-  border-radius: 0.37rem 0 0 0;
+.tab-body {
+  border: solid;
+  border-color: var(--gray-line);
 }
 
 .tabcontent {
