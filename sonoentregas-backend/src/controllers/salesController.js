@@ -6,16 +6,18 @@ const ViewDeliverys = require('../models/ViewDeliverys')
 module.exports = {
   async index( req, res ){
     try {
-      const { typesearch, search, status } = req.params
+      const { typesearch, search, status, codloja } = req.params
 
       var sales
 
+      const whereCodloja = codloja ? ` AND CODLOJA = ${codloja}` : ''
+
       if (typesearch === 'NOMECLI') {
-        sales = await Sales.findSome(0, `${typesearch} LIKE '${search}%'`)
+        sales = await Sales.findSome(0, `${typesearch} LIKE '${search}%'${whereCodloja}`)
       } else if (typesearch === 'false') {
         sales = await Sales.findSome(0, `STATUS = '${status}'`)
       } else if (typesearch === 'D_DELIVERED') {
-        const salesProd = await Sales._query(0, `SELECT ID_SALE FROM DELIVERYS_PROD WHERE ${typesearch} = '${search}'`)
+        const salesProd = await Sales._query(0, `SELECT ID_SALE FROM DELIVERYS_PROD WHERE ${typesearch} = '${search}'${whereCodloja}`)
 
         if (salesProd[0].length > 0 ) {
           var idSale = ''
@@ -34,7 +36,7 @@ module.exports = {
         }
 
       } else {
-        sales = await Sales.findSome(0, `${typesearch} = '${search}'`)
+        sales = await Sales.findSome(0, `${typesearch} = '${search}'${whereCodloja}`)
       }
       
       for (let i = 0; i < sales.length; i++) {

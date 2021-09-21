@@ -30,7 +30,7 @@ routes.get('/:loja/:emissao/vendas', vendasController.vendasSce)
 routes.get('/:loja/vendas/:numvenda', vendasController.vendasSceProd)
 routes.post('/:loja/vendas/submit', vendasController.submitSale)
 //Sales Sono Delivery
-routes.get('/sales/:typesearch/:search/:status', salesController.index)
+routes.get('/sales/:typesearch/:search/:status/:codloja', salesController.index)
 routes.get('/salesProdct/:idSale/:codloja/:codproduto', salesController.findProductDetals)
 //Cars
 routes.get('/cars', carsController.index)

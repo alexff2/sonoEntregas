@@ -1,11 +1,14 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineSearch } from 'react-icons/ai'
 
 import api from '../../../services/api'
 import getDate from '../../../functions/getDate'
+import { getLoja } from '../../../services/auth'
 
 import Modal from '../../../components/Modal'
 import ModalSales from './ModalSales'
+
+const { cod: Codloja } = JSON.parse(getLoja())
 
 function Row({ sale, modalDetalProduct }) {
   const [open, setOpen] = React.useState(false)
@@ -14,47 +17,49 @@ function Row({ sale, modalDetalProduct }) {
     <React.Fragment>
       <tr>
         <td style={{width: 10}} onClick={() => setOpen(!open)}>
-          { open ? <AiOutlineArrowUp /> : <AiOutlineArrowDown />}
+          { open ? <AiOutlineArrowUp /> : <AiOutlineArrowDown /> }
         </td>
         <td>{sale.ID_SALES}</td>
         <td>{sale.NOMECLI}</td>
         <td>{getDate(sale.EMISSAO)}</td>
       </tr>
 
-      <tr>
-        <td style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-          <div>
-            <div>
-              <h3>
-                Produtos
-              </h3>
-              <table>
-                <thead>
-                  <tr>
-                    <td>Código</td>
-                    <td>Descrição</td>
-                    <td>Quantidade</td>
-                    <td>Valor (R$)</td>
+      <tr id="trProdId">
+        <td style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={4}>
+          <div className={open ? 'tabProdSeach openDiv': 'tabProdSeach'}>
+            <h3>
+              Produtos
+            </h3>
+            <table>
+              <thead>
+                <tr id="trProd">
+                  <td>Código</td>
+                  <td>Descrição</td>
+                  <td>Quantidade</td>
+                  <td colSpan={2}>Valor (R$)</td>
+                </tr>
+              </thead>
+              <tbody>
+                {sale.products.map((produto) => (
+                  <tr key={produto.CODPRODUTO}>
+                    <td onClick={() => modalDetalProduct(sale, produto)}>
+                      {produto.COD_ORIGINAL}
+                    </td>
+                    <td onClick={() => modalDetalProduct(sale, produto)}>{produto.DESCRICAO}</td>
+                    <td onClick={() => modalDetalProduct(sale, produto)}>{produto.QUANTIDADE}</td>
+                    <td onClick={() => modalDetalProduct(sale, produto)}>{
+                      Intl
+                        .NumberFormat('pt-br',{style: 'currency', currency: 'BRL'})
+                        .format(produto.NVTOTAL)
+                    }</td>
+                    {
+                      produto.STATUS === 'Enviado' ? 
+                        <td id="btnCancel" onClick={() => console.log('teste')}>Cancelar</td> : null
+                    }
                   </tr>
-                </thead>
-                <tbody>
-                  {sale.products.map((produto) => (
-                    <tr key={produto.CODPRODUTO} onClick={() => modalDetalProduct(sale, produto)}>
-                      <td >
-                        {produto.COD_ORIGINAL}
-                      </td>
-                      <td>{produto.DESCRICAO}</td>
-                      <td>{produto.QUANTIDADE}</td>
-                      <td>{
-                        Intl
-                          .NumberFormat('pt-br',{style: 'currency', currency: 'BRL'})
-                          .format(produto.NVTOTAL)
-                      }</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
         </td>
       </tr>
@@ -71,10 +76,15 @@ export default function TabSaleSeach({ openMOdalAlert, setChildrenAlertModal }) 
   const [ saleCurrent, setSaleCurrent ] = useState([])
   const [ productCurrent, setProductCurrent ] = useState([])
 
+  useEffect(()=>{
+    api.get(`sales/ID_SALES/6586/null/${Codloja}`)
+    .then(resp => setSales(resp.data))
+  },[])
+
   const searchSales = async () => {
     try {
       if (search !== '') {
-        const { data } = await api.get(`sales/${typeSeach}/${search}/null`)
+        const { data } = await api.get(`sales/${typeSeach}/${search}/null/${Codloja}`)
         setSales(data)
       } else {
         setSales([])

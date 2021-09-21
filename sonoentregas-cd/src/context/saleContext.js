@@ -11,7 +11,7 @@ export default function SaleProvider({ children }){
 
   useEffect(()=>{
     api
-      .get('sales/false/false/Aberta')
+      .get('sales/false/false/Aberta/null')
       .then( resp => setSales(resp.data))
   },[])
 

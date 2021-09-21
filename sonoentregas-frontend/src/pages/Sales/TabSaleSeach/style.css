@@ -63,6 +63,40 @@
   color: var(--white);
 }
 
+.tabProdSeach {
+  display: none;
+  margin-bottom: 1rem;
+
+  background-color: rgb(197, 194, 194);
+}
+
+.openDiv {
+  display: block;
+}
+
+#trProdId:hover {
+  background-color: rgba(230, 230, 230, 0.411);
+}
+
+#trProdId h3 {
+  padding: 1rem 0.5rem;
+}
+
+#trProd {
+  background-color: rgb(221, 221, 221);
+}
+#btnCancel {
+  text-align: center;
+  border-radius: 1.5rem;
+  background-color: var(--blue-dark);
+  color: var(--white);
+  cursor: pointer;
+}
+
+#btnCancel:hover {
+  opacity: .8;
+}
+
 /*====================== MODAL SALES*/
 .headerModal {
   padding: 1rem 1.5rem;
@@ -200,56 +234,4 @@
 
 .products {
   padding: 0 1.5rem 1rem;
-}
-
-.products table {
-  width: 100%;
-}
-
-.products td, th {
-  padding: 0.7rem 1rem;
-  text-align: start;
-}
-
-.products th {
-  background-color: var(--gray-line);
-}
-
-.products th:first-child {
-  border-radius: 0.5rem 0 0 0;
-
-}
-.products th:last-child {
-  border-radius: 0 0.5rem 0 0;
-}
-
-.products tbody tr {
-  background-color: rgba(230, 230, 230, 0.411);
-}
-
-.products tbody tr:hover {
-  background-color: var(--white);
-}
-
-.products tbody td {
-  color: var(--blue-dark);
-}
-
-/* ================ GLOBAL */
-.titleContent {
-  margin-bottom: 0.5rem;
-  font-size: 1.3rem;
-  color: var(--gray-bold);
-}
-
-.modal h2 {
-  margin-bottom: 1rem;
-}
-
-.red {
-  color: var(--red);
-}
-
-.green {
-  color: var(--green);
 }
