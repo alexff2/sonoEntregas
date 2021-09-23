@@ -105,6 +105,8 @@ main div.footer-container{
   background-color: var(--gray);
   border-radius: 0.5rem;
   padding: 2.5rem;
+  overflow: scroll;
+  max-height: calc(100vh - 100px);
 }
 
 .modal h2 {

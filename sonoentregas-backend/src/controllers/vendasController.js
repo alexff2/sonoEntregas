@@ -79,5 +79,28 @@ module.exports = {
     } catch (error) {
       res.status(400).json(error)
     }
+  },
+  async cancelSubmitSales( req, res ){
+    try {
+      const { ID_SALES, CODLOJA, CODPRODUTO, QUANTIDADE } = req.body
+
+      await SalesProd._query(0, `DELETE SALES_PROD WHERE ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA} AND CODPRODUTO = '${CODPRODUTO}'`)
+      await Sales._query(CODLOJA, `UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL - ${QUANTIDADE}, EST_LOJA = EST_LOJA - ${QUANTIDADE} WHERE CODIGO = ${CODPRODUTO} AND CODLOJA = 1`)
+      await Sales._query(CODLOJA, `UPDATE NVENDI2 SET STATUS = NULL WHERE NUMVENDA = ${ID_SALES} AND CODPRODUTO = ${CODPRODUTO}`)
+
+      const ProdSales = await SalesProd.findSome(0, `ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`)
+
+      if (ProdSales.length === 0) {
+        console.log(ProdSales)
+        await SalesProd._query(0, `DELETE SALES WHERE ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`)        
+        await SalesProd._query(0, `DELETE ORCPARC WHERE ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`)
+        await Sales._query(CODLOJA, `UPDATE NVENDA2 SET STATUS = NULL WHERE CODIGOVENDA = ${ID_SALES}`)
+
+        return res.json({msg: 'Venda também excluída!', venda: true})
+      }
+      return res.json({msg: 'Produto excluído com sucesso!', venda: false})
+    } catch (error) {
+      return res.status(400).json(error)
+    }
   }
 }

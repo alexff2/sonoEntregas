@@ -78,7 +78,7 @@ export default function ModalDelivery({ setOpen, selectDelivery, setCurrentDeliv
       setCurrentDeliv([...currentDeliv, dataDelivery])
 
       if (dataDelivery.ID) {
-        const { data: dataSales } = await api.get('sales/false/false/Aberta')
+        const { data: dataSales } = await api.get('sales/false/false/Aberta/null')
   
         contextSales.setSales(dataSales)
       }

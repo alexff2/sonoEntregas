@@ -8,7 +8,7 @@ export default function Vendas(){
   const [ childrenAlertModal, setChildrenAlertModal ] = useState('Vazio')
 
   useEffect(() => {
-    document.getElementById('CONSULTAR').style.display = "block";
+    document.getElementById('ENVIAR').style.display = "block";
   }, [])
 
   const openTab = e => {
@@ -29,8 +29,8 @@ export default function Vendas(){
     <div className="container sales-container">
 
       <div className="tab">
-        <input className="tablinks" type="button" value="ENVIAR" onClick={e => openTab(e)} />
-        <input className="tablinks active" type="button" value="CONSULTAR" onClick={e => openTab(e)} />
+        <input className="tablinks active" type="button" value="ENVIAR" onClick={e => openTab(e)} />
+        <input className="tablinks" type="button" value="CONSULTAR" onClick={e => openTab(e)} />
       </div>
       
       <div className="tab-body body-container">

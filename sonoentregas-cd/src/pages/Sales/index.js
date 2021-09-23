@@ -189,7 +189,8 @@ export default function Sales() {
   const searchSales = async () => {
     try {
       if (search !== '') {
-        const { data } = await api.get(`sales/${typeSeach}/${search}/null`)
+        const { data } = await api.get(`sales/${typeSeach}/${search}/null/false`)
+        data.length === 0 && alert('Produto não encontrado!')
         setSales(data)
       } else {
         setSales([])
@@ -235,7 +236,10 @@ export default function Sales() {
           label="Tipo"
           labelId="fieldSeach"
           className={classes.fieldSeach}
-          onChange={e => setTypeSeach(e.target.value)}
+          onChange={e => {
+            setTypeSeach(e.target.value)
+            setSearch('')
+          }}
           defaultValue={'ID_SALES'}
         >
           <MenuItem value={'ID_SALES'}>Código Venda</MenuItem>
@@ -252,10 +256,7 @@ export default function Sales() {
             <input 
               type="date" 
               className={classes.inputDate}
-              onChange={e => {
-                setTypeSeach(e.target.value)
-                setSearch('')
-              }}
+              onChange={e => setSearch(e.target.value)}
             />:
             <InputBase
               placeholder="Pesquisar…"

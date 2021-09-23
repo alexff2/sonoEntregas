@@ -10,7 +10,7 @@ module.exports = {
 
       var sales
 
-      const whereCodloja = codloja ? ` AND CODLOJA = ${codloja}` : ''
+      const whereCodloja = codloja !== 'false' ? ` AND CODLOJA = ${codloja}` : ''
 
       if (typesearch === 'NOMECLI') {
         sales = await Sales.findSome(0, `${typesearch} LIKE '${search}%'${whereCodloja}`)

@@ -8,9 +8,7 @@ import { getLoja } from '../../../services/auth'
 import Modal from '../../../components/Modal'
 import ModalSales from './ModalSales'
 
-const { cod: Codloja } = JSON.parse(getLoja())
-
-function Row({ sale, modalDetalProduct }) {
+function Row({ sale, modalDetalProduct, cancelSubmitSales }) {
   const [open, setOpen] = React.useState(false)
   
   return (
@@ -54,7 +52,7 @@ function Row({ sale, modalDetalProduct }) {
                     }</td>
                     {
                       produto.STATUS === 'Enviado' ? 
-                        <td id="btnCancel" onClick={() => console.log('teste')}>Cancelar</td> : null
+                        <td id="btnCancel" onClick={() => cancelSubmitSales(produto)}>Cancelar</td> : null
                     }
                   </tr>
                 ))}
@@ -76,10 +74,14 @@ export default function TabSaleSeach({ openMOdalAlert, setChildrenAlertModal }) 
   const [ saleCurrent, setSaleCurrent ] = useState([])
   const [ productCurrent, setProductCurrent ] = useState([])
 
+  const { cod: Codloja } = JSON.parse(getLoja())
+
   useEffect(()=>{
-    api.get(`sales/ID_SALES/6586/null/${Codloja}`)
-    .then(resp => setSales(resp.data))
-  },[])
+    api.get(`sales/STATUS/Aberta/null/${Codloja}`)
+    .then(resp => {
+      setSales(resp.data)
+    })
+  },[Codloja])
 
   const searchSales = async () => {
     try {
@@ -102,6 +104,22 @@ export default function TabSaleSeach({ openMOdalAlert, setChildrenAlertModal }) 
     setOpenModalProduct(true)
     setSaleCurrent(sale)
     setProductCurrent(product)
+  }
+
+  const cancelSubmitSales = async produto => {
+    try {
+      const {data} = await api.post(`vendas`, produto)
+
+      const { data: DataSales } = await api.get(`sales/STATUS/Aberta/null/${Codloja}`)
+      setSales(DataSales)
+
+      setChildrenAlertModal(data.msg)
+      openMOdalAlert()
+    } catch (error) {
+      setChildrenAlertModal('Erro no sistema, entrar em contato com ADM')
+      console.log(error)
+      openMOdalAlert()
+    }
   }
 
   return(
@@ -163,6 +181,7 @@ export default function TabSaleSeach({ openMOdalAlert, setChildrenAlertModal }) 
                 key={sale.ID} 
                 modalDetalProduct={modalDetalProduct}
                 sale={sale}
+                cancelSubmitSales={cancelSubmitSales}
               />
             ))}
           </tbody>
