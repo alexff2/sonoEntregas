@@ -4,7 +4,7 @@ import '../styles/pages/login.css'
 
 import { authLogin, userLogin, setLoja } from '../services/auth'
 import api from '../services/api'
-import validateFilds from '../functions/validateFields'
+import { validateFilds } from '../functions/validateFields'
 
 import ModalAlert, { openMOdalAlert } from '../components/ModalAlert'
 

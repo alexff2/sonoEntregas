@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 
 import { getUser, getLoja } from '../../../services/auth'
 import api from '../../../services/api'
+import { validateObs } from '../../../functions/validateFields'
 
 const { ID: USER_ID } = JSON.parse(getUser())
 
@@ -41,6 +42,7 @@ export default function ModalSendSale({
   const [ productSales, setProductSales ] = useState([])
   const [ sendProduct, setSendProduct ] = useState([])
   const [ openObs, setOpenObs ] = useState(false)
+  const [ obs, setObs ] = useState('')
 
   const { cod } = JSON.parse(getLoja())
 
@@ -64,10 +66,12 @@ export default function ModalSendSale({
 
   const submitSales = async sale => {
     try {
-      if(sendProduct.length > 0) {
+      if(sendProduct.length > 0 && validateObs(obs, openObs)) {
         sale["products"] = sendProduct
         sale.USER_ID = USER_ID
         sale.orcParc = orcParc
+        sale.OBS2 = obs
+        sale.HAVE_OBS2 = openObs ? 1 : 0
 
         const { data } = await api.post(`${cod}/vendas/submit`, sale)
         
@@ -78,7 +82,12 @@ export default function ModalSendSale({
         setModal([])
         setSendProduct([])
       } else {
-        setChildrenAlertModal('Selecione um produto')
+        if (sendProduct.length === 0) {
+          setChildrenAlertModal('Selecione um produto')
+        } else if (!validateObs(obs, openObs)){
+          setChildrenAlertModal('Coloque uma observação ou desabilite o checkbox de observação')
+        }
+        openMOdalAlert()
       }
     } catch (error) {
       console.log(error)
@@ -117,7 +126,7 @@ export default function ModalSendSale({
               }</div>
               <div>
                 <div><span>Observação?</span><input type="checkbox" onChange={() => setOpenObs(!openObs)}/></div>
-                { openObs && <textarea cols={60}></textarea> }
+                { openObs && <textarea cols={60} onChange={e => setObs(e.target.value)}></textarea> }
               </div>
             </div>
             <div className="sales-buttons">

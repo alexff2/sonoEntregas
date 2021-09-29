@@ -35,7 +35,7 @@ export default function TabSendSale({ openMOdalAlert, setChildrenAlertModal }){
         
         document.querySelector('#load-sales').innerHTML = ''
     })
-  }, [cod, emissao, setChildrenAlertModal])
+  }, [cod, emissao, setChildrenAlertModal, openMOdalAlert])
 
   return(
     <div>
