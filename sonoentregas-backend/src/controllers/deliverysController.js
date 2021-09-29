@@ -6,7 +6,7 @@ const Produtos = require('../models/Produtos')
 
 const DevService = require('../services/DevService')
 
-const getDate = require('../functions/getDate')
+const { getDate } = require('../functions/getDate')
 
 module.exports = {
   async index( req, res ){

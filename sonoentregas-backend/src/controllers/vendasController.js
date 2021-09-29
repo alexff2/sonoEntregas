@@ -5,7 +5,7 @@ const SalesProd = require('../models/SalesProd')
 const OrcParc = require('../models/OrcParc')
 const ViewOrcParcLoja = require('../models/ViewOrcParcLoja')
 
-const getDate = require('../functions/getDate')
+const { getDate, getTransformDate } = require('../functions/getDate')
 
 module.exports = {
   async vendasSce(req, res) {
@@ -35,9 +35,10 @@ module.exports = {
     try {
       const { loja } = req.params
       
-      let { CODIGOVENDA, CODCLIENTE, NOMECLI, VALORPROD, DESCONTO, TOTALVENDA, EMISSAO, STATUS, ENDERECO, NUMERO, BAIRRO, CIDADE, ESTADO, PONTOREF, OBS, products, USER_ID, D_ENTREGA1, VENDEDOR, FONE, CGC_CPF, INS_RG, FAX, orcParc, O_V } = req.body
+      let { CODIGOVENDA, CODCLIENTE, NOMECLI, VALORPROD, DESCONTO, TOTALVENDA, EMISSAO, STATUS, ENDERECO, NUMERO, BAIRRO, CIDADE, ESTADO, PONTOREF, OBS, products, USER_ID, VENDEDOR, FONE, CGC_CPF, INS_RG, FAX, orcParc, O_V } = req.body
 
       const D_ENVIO = getDate()
+      const D_ENTREGA1 = getTransformDate(EMISSAO, 11) //Objetivo do sistema
 
       if (!STATUS) {        
         STATUS = 'Enviado'

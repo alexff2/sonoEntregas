@@ -6,3 +6,6 @@
 
 # Ignores do backend
 /sonoentregas-backend/node_modules
+
+# Logs do Sistema
+/Logs

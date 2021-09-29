@@ -70,6 +70,17 @@ module.exports = [
     logging: false
   },
   {
+    database: "SONO_COHAB", 
+    username: "SUPERSCERG", 
+    password: "S35SUP5RSRG",
+    host: "174.200.204.254",
+    port: 1433,
+    dialect: "mssql",
+    dialectOptions: {
+      options: { encrypt: false }
+    }
+  },
+  {
     database: "SONO_TESTE", 
     username: "SUPERSCERG", 
     password: "S35SUP5RSRG",
