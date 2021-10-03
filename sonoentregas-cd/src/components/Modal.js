@@ -24,11 +24,11 @@ const useStyles = makeStyles( theme => ({
     padding: 0,
     width: 'min(95vw, 800px)',
     maxHeight: 'calc(100vh - 50px)',
-    overflow: 'scroll'
+    overflow: 'auto'
   }
 }))
 
-export default function TransitionsModal({ open, setOpen, title, children, className }) {
+export default function TransitionsModal({ open, setOpen, title, children }) {
   const classes = useStyles()
   return (
       <Modal

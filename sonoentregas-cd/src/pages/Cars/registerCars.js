@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { Box, makeStyles, TextField } from '@material-ui/core'
-import { useCars } from '../../context/carsContext'
+
 import { ButtonCancel, ButtonSucess } from '../../components/Buttons'
+import ModalAlert from '../../components/ModalAlert'
+
+import { useCars } from '../../context/carsContext'
 
 import api from '../../services/api'
 
@@ -20,6 +23,8 @@ const useStyles = makeStyles(() => ({
 function RegisterCars({ 
     selectCar, setValue, setIsDesableFind, setIsDesableRegister, setIsDesableUpdate
   }) {
+  const [ openMOdalAlert, setOpenModalAlert ] = useState()
+  const [ childrenAlert, setChildrenAlert ] = useState()
   const [ description, setDescription ] = useState()
   const [ plate, setPlate ] = useState()
   const [ model, setModel ] = useState()
@@ -46,10 +51,13 @@ function RegisterCars({
         
         setValue(0)
       } catch (error) {
-        alert(`Erro retornado: ${error}. Entre em contato com administrador do sistema`)
+        setChildrenAlert('Erro ao conectar com servidor, entre em contato com Administrador!')
+        setOpenModalAlert(true)
+        console.log(error)
       }
     } else {
-      alert("Preencha todos os campos!")
+      setChildrenAlert('Preencha todos os campos abaixo!')
+      setOpenModalAlert(true)
     }
   }
   const updateCar = async () => {
@@ -60,14 +68,17 @@ function RegisterCars({
 
       setCars( cars.map( item => item.ID === data.ID ? data : item ) )
       
-      alert('Veículo alterado com sucesso')
+      setChildrenAlert('Veículo alterado com sucesso!')
+      setOpenModalAlert(true)
       
       setValue(0)
       setIsDesableFind(false)
       setIsDesableRegister(false)
       setIsDesableUpdate(true)
     } catch (error) {
-      alert(`Erro retornado: ${error}. Entre em contato com administrador do sistema`)
+      setChildrenAlert('Erro ao conectr com servidor, entre em contado com servidor!')
+      setOpenModalAlert(true)
+      console.log(error)
     }
   }
   const cancelRegister = () => {
@@ -122,6 +133,7 @@ function RegisterCars({
           />
         </Box>
       </form>
+      <ModalAlert open={openMOdalAlert} setOpen={setOpenModalAlert}>{childrenAlert}</ModalAlert>
     </Box>
   )
 }

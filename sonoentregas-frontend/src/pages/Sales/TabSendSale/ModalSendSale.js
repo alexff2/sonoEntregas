@@ -125,7 +125,9 @@ export default function ModalSendSale({
                   .format(item.TOTALVENDA)
               }</div>
               <div>
-                <div><span>Observação?</span><input type="checkbox" onChange={() => setOpenObs(!openObs)}/></div>
+                <div className="divObsCkeck">
+                  <span>Observação?</span><input type="checkbox" onChange={() => setOpenObs(!openObs)}/>
+                </div>
                 { openObs && <textarea cols={60} onChange={e => setObs(e.target.value)}></textarea> }
               </div>
             </div>

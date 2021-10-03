@@ -8,13 +8,17 @@ import {
   Select,
   MenuItem
 } from "@material-ui/core"
+
 import { ButtonCancel, ButtonSucess } from '../../components/Buttons'
+import ModalAlert from '../../components/ModalAlert'
+
 import { useUsers } from '../../context/usersContext'
 import { useDrivers } from '../../context/driverContext'
 import { useAssistants } from '../../context/assistantContext'
 import validateFields from '../../functions/validateFields'
 
 import api from '../../services/api'
+import ModalALert from "../../components/ModalAlert"
 
 const useStyles = makeStyles( theme => ({
   //Style buttons
@@ -34,6 +38,8 @@ const useStyles = makeStyles( theme => ({
 }))
 
 export default function ModalUsers({ selectUser, setOpen }) {
+  const [ openMOdalAlert, setOpenModalAlert ] = useState(false)
+  const [ childrenAlert, SetChildrenAlert ] = useState('Vazio')
   const [ name, setName ] = useState()
   const [ office, setOffice ] = useState()
   const { users, setUsers } = useUsers()
@@ -68,10 +74,13 @@ export default function ModalUsers({ selectUser, setOpen }) {
 
         setOpen(false)
       } catch (error) {
-        alert(`Erro retornado: ${error}. Entre em contato com administrador do sistema`)
+        SetChildrenAlert('Sem conexão com o servidor, entre em contato com Administrador')
+        setOpenModalAlert(true)
+        console.log(error)
       }
     }else{
-      alert('Preencha todos os campos abaixo!')
+      SetChildrenAlert('Preencha todos os campos abaixo!')
+      setOpenModalAlert(true)
     }
   }
 
@@ -91,10 +100,13 @@ export default function ModalUsers({ selectUser, setOpen }) {
         
         setOpen(false)
       } catch (error) {
-        alert(`Erro retornado: ${error}. Entre em contato com administrador do sistema`)
+        SetChildrenAlert('Sem conexão com o servidor, entre em contato com Administrador')
+        setOpenModalAlert(true)
+        console.log(error)
       }
     } else {
-      alert('Preencha todos os campos abaixo!')
+      SetChildrenAlert('Preencha todos os campos abaixo!')
+      setOpenModalAlert(true)
     }
   }
 
@@ -149,6 +161,8 @@ export default function ModalUsers({ selectUser, setOpen }) {
         />
       </div>
       </form>
+
+      <ModalALert open={openMOdalAlert} setOpen={setOpenModalAlert}>{childrenAlert}</ModalALert>
     </Box>
   )
 }

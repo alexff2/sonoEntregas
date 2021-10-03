@@ -62,6 +62,10 @@ div.sales-field div span {
 div.sales-field div input {
   font-size: 0.5rem;
 }
+.divObsCkeck{
+  display: flex;
+  align-items: center;
+} 
 div.sales-buttons {
   display: flex;
   align-items: center;

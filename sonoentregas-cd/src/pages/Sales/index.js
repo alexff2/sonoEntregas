@@ -31,6 +31,7 @@ import { getComparator, stableSort } from '../../functions/orderTable'
 
 import EnhancedTableHead from '../../components/EnhancedTableHead'
 import Modal from '../../components/Modal'
+import ModalAlert from '../../components/ModalAlert'
 import ModalSales from './ModalSales'
 
 function Row({ sale, classes, setShops, modalDetalProduct }) {
@@ -175,6 +176,8 @@ const useStyles = makeStyles(theme => ({
 
 export default function Sales() {
   const [ openModalProduct, setOpenModalProduct ] = useState(false)
+  const [ openModalAlert, setOpenModalAlert ] = useState(false)
+  const [ childrenAlert, setChildrenAlert ] = useState(false)
   const [ order, setOrder ] = useState('asc')
   const [ orderBy, setOrderBy ] = useState('idSales')
   const [ sales, setSales ] = useState([])
@@ -190,13 +193,21 @@ export default function Sales() {
     try {
       if (search !== '') {
         const { data } = await api.get(`sales/${typeSeach}/${search}/null/false`)
-        data.length === 0 && alert('Produto não encontrado!')
-        setSales(data)
+        if (data.length === 0){
+          setChildrenAlert('Venda não encontrado!') 
+          setOpenModalAlert(true)
+        } else {
+          setSales(data)
+        }
       } else {
+        setChildrenAlert('Preencha o campo de pesquisa!') 
+        setOpenModalAlert(true)
         setSales([])
       }
     } catch (e) {
-      alert(e.response.data)
+      console.log(e.response.data)
+      setChildrenAlert("Erro ao comunicar com o Servidor")
+      setOpenModalAlert(true)
       setSales([])
     }
   }
@@ -310,6 +321,10 @@ export default function Sales() {
           product={productCurrent}
         />
       </Modal>
+
+      <ModalAlert open={openModalAlert} setOpen={setOpenModalAlert}>
+        {childrenAlert}
+      </ModalAlert>
     </Box>
   )
 }
