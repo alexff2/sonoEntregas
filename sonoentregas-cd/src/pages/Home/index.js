@@ -4,7 +4,7 @@ import {
   Container,
   makeStyles
 } from '@material-ui/core';
-import Sales from './Sales';
+//import Sales from './Sales';
 import Cards from './Cards';
 
 const useStyles = makeStyles((theme) => ({
@@ -21,7 +21,7 @@ export default function Home(){
       <Cards />
       
       <Box className={classes.sales}>
-        <Sales />
+        
       </Box>
 
     </Container>

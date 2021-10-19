@@ -14,7 +14,7 @@ const useStyles = makeStyles( theme => ({
     padding: theme.spacing(2, 4, 3),
     width: 'min(95vw, 700px)',
     maxHeight: 'calc(100vh - 100px)',
-    overflow: 'scroll'
+    overflow: 'auto'
   },
   paper2: {  
     border: 'none',

@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react"
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineSearch } from 'react-icons/ai'
 
 import api from '../../../services/api'
-import getDate from '../../../functions/getDate'
+import { dateSqlToReact } from '../../../functions/getDate'
 import { getLoja } from '../../../services/auth'
 
 import Modal from '../../../components/Modal'
 import ModalSales from './ModalSales'
 
-function Row({ sale, modalDetalProduct, cancelSubmitSales }) {
+function Row({ sale, modalDetalProduct, cancelSubmitSales, reverseStock }) {
   const [open, setOpen] = React.useState(false)
   
   return (
@@ -19,14 +19,15 @@ function Row({ sale, modalDetalProduct, cancelSubmitSales }) {
         </td>
         <td>{sale.ID_SALES}</td>
         <td>{sale.NOMECLI}</td>
-        <td>{getDate(sale.EMISSAO)}</td>
+        <td>{dateSqlToReact(sale.EMISSAO)}</td>
+        <td>{dateSqlToReact(sale.D_ENTREGA1)}</td>
       </tr>
 
       <tr id="trProdId">
-        <td style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={4}>
+        <td style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={5}>
           <div className={open ? 'tabProdSeach openDiv': 'tabProdSeach'}>
             <h3>
-              Produtos
+              Produtos{ sale.HAVE_OBS2? <span style={{fontSize: 12, color: 'red', fontWeight: 100}}> - {sale.OBS2}</span>: null}
             </h3>
             <table>
               <thead>
@@ -51,9 +52,9 @@ function Row({ sale, modalDetalProduct, cancelSubmitSales }) {
                         .format(produto.NVTOTAL)
                     }</td>
                     {
-                      produto.STATUS === 'Enviado' ? 
-                        <td id="btnCancel" onClick={() => cancelSubmitSales(produto)}>Cancelar</td> : null
+                      produto.STATUS === 'Enviado' && <td id="btnCancel" onClick={() => cancelSubmitSales(produto)}>Cancelar</td>
                     }
+                    {produto.STATUS === 'Finalizada' && produto.DOWN_EST && <td id="btnEstornar" onClick={() => reverseStock(produto)}>Estornar Estoque</td>}
                   </tr>
                 ))}
               </tbody>
@@ -87,14 +88,20 @@ export default function TabSaleSeach({ openMOdalAlert, setChildrenAlertModal }) 
     try {
       if (search !== '') {
         const { data } = await api.get(`sales/${typeSeach}/${search}/null/${Codloja}`)
-        setSales(data)
+        if (data.length === 0){
+          setChildrenAlertModal('Venda(s) não encontrada(s)!') 
+          openMOdalAlert(true)
+        } else {
+          setSales(data)
+        }
       } else {
-        setSales([])
-        setChildrenAlertModal('Selecione um filtro!')
+        setChildrenAlertModal('Preencha o campo de pesquisa!') 
         openMOdalAlert()
+        setSales([])
       }
     } catch (e) {
-      setChildrenAlertModal(e.response.data)
+      console.log(e)
+      setChildrenAlertModal("Erro ao comunicar com o Servidor")
       openMOdalAlert()
       setSales([])
     }
@@ -109,6 +116,22 @@ export default function TabSaleSeach({ openMOdalAlert, setChildrenAlertModal }) 
   const cancelSubmitSales = async produto => {
     try {
       const {data} = await api.post(`vendas`, produto)
+
+      const { data: DataSales } = await api.get(`sales/STATUS/Aberta/null/${Codloja}`)
+      setSales(DataSales)
+
+      setChildrenAlertModal(data.msg)
+      openMOdalAlert()
+    } catch (error) {
+      setChildrenAlertModal('Erro no sistema, entrar em contato com ADM')
+      console.log(error)
+      openMOdalAlert()
+    }
+  }
+
+  const reverseStock = async produto => {
+    try {
+      const {data} = await api.post(`vendas/reverse`, produto)
 
       const { data: DataSales } = await api.get(`sales/STATUS/Aberta/null/${Codloja}`)
       setSales(DataSales)
@@ -137,12 +160,13 @@ export default function TabSaleSeach({ openMOdalAlert, setChildrenAlertModal }) 
         >
           <option value={'ID_SALES'}>Código Venda</option>
           <option value={'NOMECLI'}>Nome Cliente</option>
-          <option value={'D_DELIVERED'}>Data Entrega</option>
+          <option value={'D_DELIVERED'}>Finalizadas</option>
+          <option value={'D_MOUNTING'}>Iniciadas</option>
         </select>
 
         <div className="inputsSeachSales">
           <AiOutlineSearch />
-          { typeSeach === 'D_DELIVERED' ?
+          { typeSeach === 'D_DELIVERED' || typeSeach === 'D_MOUNTING' ?
             <div>
               <input
                 type="date" 
@@ -173,6 +197,7 @@ export default function TabSaleSeach({ openMOdalAlert, setChildrenAlertModal }) 
               <th>Código</th>
               <th>Cliente</th>
               <th>Emissao</th>
+              <th>Previsão</th>
             </tr>
           </thead>
           <tbody>
@@ -182,6 +207,7 @@ export default function TabSaleSeach({ openMOdalAlert, setChildrenAlertModal }) 
                 modalDetalProduct={modalDetalProduct}
                 sale={sale}
                 cancelSubmitSales={cancelSubmitSales}
+                reverseStock={reverseStock}
               />
             ))}
           </tbody>

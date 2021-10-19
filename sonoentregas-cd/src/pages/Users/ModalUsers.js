@@ -18,7 +18,6 @@ import { useAssistants } from '../../context/assistantContext'
 import validateFields from '../../functions/validateFields'
 
 import api from '../../services/api'
-import ModalALert from "../../components/ModalAlert"
 
 const useStyles = makeStyles( theme => ({
   //Style buttons
@@ -162,7 +161,7 @@ export default function ModalUsers({ selectUser, setOpen }) {
       </div>
       </form>
 
-      <ModalALert open={openMOdalAlert} setOpen={setOpenModalAlert}>{childrenAlert}</ModalALert>
+      <ModalAlert open={openMOdalAlert} setOpen={setOpenModalAlert}>{childrenAlert}</ModalAlert>
     </Box>
   )
 }

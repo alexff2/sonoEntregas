@@ -15,6 +15,7 @@ import {
 
 //Context
 import { useSale } from '../../context/saleContext';
+import { useShop } from '../../context/shopContext';
 
 //Components
 import EnhancedTableHead from '../../components/EnhancedTableHead'
@@ -47,6 +48,15 @@ const useStyles = makeStyles( theme =>({
   },
   numberImput: {
     width: 40
+  },
+  dateDelivRed: {
+    color: 'red'
+  },
+  dateDelivBlack: {
+    color: 'black'
+  },
+  dateDelivYellow: {
+    color: 'yellow'
   }
 }))
 
@@ -55,9 +65,9 @@ const CheckProd = ({ sendSalesProd, selectSales, produto, classes }) => {
   const [ inputNumber, setInputNumber ] = useState(false)
 
   if (selectSales) {
-    return null
+    return <TableCell></TableCell>
   } else if (produto.STATUS !== 'Enviado') {
-    return <div>{produto.STATUS}</div>
+    return <TableCell>{produto.STATUS}</TableCell>
   } else {
     return (
       <>
@@ -82,7 +92,36 @@ const CheckProd = ({ sendSalesProd, selectSales, produto, classes }) => {
   }
 }
 
-function Row({sendSalesProd, classes, sale, selectSales}){
+function Row({sendSalesProd, sale, selectSales}){
+  const { shop } = useShop()
+  const classes = useStyles()
+
+  const setShops = codShop => {
+    const shopCurrent = shop[codShop]
+    return shopCurrent.database
+  }
+
+  const styleDateDeliv = () => {
+    var dateDeliv, dateNow, dateAlert
+    dateDeliv = new Date(sale.D_ENTREGA1)
+    dateDeliv.setDate(dateDeliv.getDate()+1)
+    dateDeliv.setHours(0,0,0,0)
+
+    dateNow = new Date().setHours(0,0,0,0)
+
+    dateAlert = new Date()
+    dateAlert.setDate(dateAlert.getDate()+2)
+    dateAlert.setHours(0,0,0,0)
+
+    if (dateDeliv < dateNow) {
+      return classes.dateDelivRed
+    } else if (dateDeliv >= dateNow && dateDeliv <= dateAlert){
+      return classes.dateDelivYellow
+    } else {
+      return classes.dateDelivBlack
+    }
+  }
+
   return(
     <React.Fragment>
       <TableRow className={classes.root}>
@@ -92,7 +131,8 @@ function Row({sendSalesProd, classes, sale, selectSales}){
         <TableCell>{sale.NOMECLI}</TableCell>
         <TableCell>{sale.BAIRRO}
         </TableCell>
-        <TableCell align="right">{getDate(sale.D_ENTREGA1)}</TableCell>
+        <TableCell align="right" className={styleDateDeliv()}>{getDate(sale.D_ENTREGA1)}</TableCell>
+        <TableCell align="right">{setShops(sale.CODLOJA)}</TableCell>
       </TableRow>
   
       <TableRow>
@@ -195,6 +235,7 @@ export default function TableSales({
     { id: 'NOMECLI', numeric: false, disablePadding: false, label: 'Nome do Cliente', class: classes.tableHeadCellStart },
     { id: 'BAIRRO', numeric: false, disablePadding: false, label: 'Bairro', class: classes.tableHeadCellStart },
     { id: 'D_ENTREGA1', numeric: true, disablePadding: false, label: 'Data Entrega', class: classes.tableHeadCell },
+    { id: 'CODLOJA', numeric: true, disablePadding: false, label: 'Loja', class: classes.tableHeadCell },
   ]
 
   return(

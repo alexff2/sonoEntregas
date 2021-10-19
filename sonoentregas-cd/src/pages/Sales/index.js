@@ -33,65 +33,7 @@ import EnhancedTableHead from '../../components/EnhancedTableHead'
 import Modal from '../../components/Modal'
 import ModalAlert from '../../components/ModalAlert'
 import ModalSales from './ModalSales'
-
-function Row({ sale, classes, setShops, modalDetalProduct }) {
-  const [open, setOpen] = React.useState(false)
-  
-  return (
-    <React.Fragment>
-      <TableRow className={classes.root}>
-        <TableCell>
-          <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
-            {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-          </IconButton>
-        </TableCell>
-        <TableCell>{sale.ID_SALES}</TableCell>
-        <TableCell>{sale.NOMECLI}</TableCell>
-        <TableCell align="right">{getDate(sale.EMISSAO)}</TableCell>
-        <TableCell align="right">{setShops(sale.CODLOJA)}</TableCell>
-      </TableRow>
-
-      <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box margin={1}>
-              <Typography variant="h6" gutterBottom component="div">
-                Produtos
-              </Typography>
-              <Table size="small" aria-label="purchases">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Código</TableCell>
-                    <TableCell>Descrição</TableCell>
-                    <TableCell>Quantidade</TableCell>
-                    <TableCell align="right">Valor (R$)</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {sale.products.map((produto) => (
-                    <TableRow key={produto.CODPRODUTO} onClick={() => modalDetalProduct(sale, produto)}>
-                      <TableCell component="th" scope="row">
-                        {produto.COD_ORIGINAL}
-                      </TableCell>
-                      <TableCell>{produto.DESCRICAO}</TableCell>
-                      <TableCell>{produto.QUANTIDADE}</TableCell>
-                      <TableCell align="right">{
-                        Intl
-                          .NumberFormat('pt-br',{style: 'currency', currency: 'BRL'})
-                          .format(produto.NVTOTAL)
-                      }</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Box>
-          </Collapse>
-        </TableCell>
-      </TableRow>
-
-    </React.Fragment>
-  );
-}
+import ModalUpdateDateDeliv from './ModalUpdateDateDeliv'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -171,8 +113,94 @@ const useStyles = makeStyles(theme => ({
   tableHeadCellStart:{
     //color: theme.palette.common.white,
     fontWeight: theme.typography.fontWeightBold
+  },
+  updateDateDeliv: {
+    cursor: 'pointer'
+  },
+  notUpdateDateDeliv: {
+    cursor: 'auto'
   }
 }))
+
+function Row({ sale, setShops, modalDetalProduct, typeSeach }) {
+  const [open, setOpen] = React.useState(false)
+  const [openModalUpdaDate, setOpenModalUpdaDate] = React.useState(false)
+  const classes = useStyles()
+
+  const updateDateDeliv = () => {
+    if (typeSeach === 'EMISSAO' && sale.HAVE_OBS2) {
+      setOpenModalUpdaDate(true)
+    }
+  }
+
+  const styleDateUpdate = () => {
+    if (typeSeach === 'EMISSAO' && sale.HAVE_OBS2) {
+      return classes.updateDateDeliv
+    } else {
+      return classes.notUpdateDateDeliv
+    }
+
+  }
+  
+  return (
+    <React.Fragment>
+      <TableRow className={classes.root}>
+        <TableCell>
+          <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+            {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+          </IconButton>
+        </TableCell>
+        <TableCell style={sale.HAVE_OBS2 ? {color: 'Red', fontWeight: 700}: {}}>{sale.ID_SALES}</TableCell>
+        <TableCell>{sale.NOMECLI}</TableCell>
+        <TableCell align="right">{getDate(sale.EMISSAO)}</TableCell>
+        <TableCell align="right" onClick={updateDateDeliv} className={styleDateUpdate()}>
+          {getDate(sale.D_ENTREGA1)}
+        </TableCell>
+        <TableCell align="right">{setShops(sale.CODLOJA)}</TableCell>
+      </TableRow>
+
+      <TableRow>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <Box margin={1}>
+              <Typography variant="h6" gutterBottom component="div">
+                Produtos {sale.HAVE_OBS2 ? (<span style={{color: 'red', fontSize: 12}}>- {sale.OBS2}</span>) : ''}
+              </Typography>
+              <Table size="small" aria-label="purchases">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Código</TableCell>
+                    <TableCell>Descrição</TableCell>
+                    <TableCell>Quantidade</TableCell>
+                    <TableCell align="right">Valor (R$)</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {sale.products.map((produto) => (
+                    <TableRow key={produto.CODPRODUTO} onClick={() => modalDetalProduct(sale, produto)}>
+                      <TableCell component="th" scope="row">
+                        {produto.COD_ORIGINAL}
+                      </TableCell>
+                      <TableCell>{produto.DESCRICAO}</TableCell>
+                      <TableCell>{produto.QUANTIDADE}</TableCell>
+                      <TableCell align="right">{
+                        Intl
+                          .NumberFormat('pt-br',{style: 'currency', currency: 'BRL'})
+                          .format(produto.NVTOTAL)
+                      }</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Box>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+
+      <ModalUpdateDateDeliv open={openModalUpdaDate} setOpen={setOpenModalUpdaDate} sale={sale} />
+    </React.Fragment>
+  );
+}
 
 export default function Sales() {
   const [ openModalProduct, setOpenModalProduct ] = useState(false)
@@ -194,7 +222,7 @@ export default function Sales() {
       if (search !== '') {
         const { data } = await api.get(`sales/${typeSeach}/${search}/null/false`)
         if (data.length === 0){
-          setChildrenAlert('Venda não encontrado!') 
+          setChildrenAlert('Venda(s) não encontrada(s)!') 
           setOpenModalAlert(true)
         } else {
           setSales(data)
@@ -233,7 +261,8 @@ export default function Sales() {
     { id: '', numeric: false, disablePadding: false, label: '', class: classes.tableHeadCellStart },
     { id: 'ID_SALES', numeric: false, disablePadding: false, label: 'Nº Venda', class: classes.tableHeadCellStart },
     { id: 'NOMECLI', numeric: false, disablePadding: false, label: 'Nome do Cliente', class: classes.tableHeadCellStart },
-    { id: 'EMISSAO', numeric: true, disablePadding: false, label: 'Data Emissão', class: classes.tableHeadCell },
+    { id: 'EMISSAO', numeric: true, disablePadding: false, label: 'Emissão', class: classes.tableHeadCell },
+    { id: 'D_ENTREGA1', numeric: true, disablePadding: false, label: 'Previsão', class: classes.tableHeadCell },
     { id: 'CODLOJA', numeric: true, disablePadding: false, label: 'Loja', class: classes.tableHeadCell },
   ]
 
@@ -255,7 +284,9 @@ export default function Sales() {
         >
           <MenuItem value={'ID_SALES'}>Código Venda</MenuItem>
           <MenuItem value={'NOMECLI'}>Nome Cliente</MenuItem>
-          <MenuItem value={'D_DELIVERED'}>Data Entrega</MenuItem>
+          <MenuItem value={'D_DELIVERED'}>Finalizadas</MenuItem>
+          <MenuItem value={'D_MOUNTING'}>Entregando</MenuItem>
+          <MenuItem value={'EMISSAO'}>Data de Emisão</MenuItem>
         </Select>
       </FormControl>
 
@@ -263,7 +294,7 @@ export default function Sales() {
           <div className={classes.searchIcon}>
             <SearchIcon/>
           </div>
-          { typeSeach === 'D_DELIVERED' ?
+          { typeSeach === 'D_DELIVERED' || typeSeach === 'D_MOUNTING' || typeSeach === 'EMISSAO'?
             <input 
               type="date" 
               className={classes.inputDate}
@@ -302,8 +333,8 @@ export default function Sales() {
                   key={sale.ID} 
                   modalDetalProduct={modalDetalProduct}
                   sale={sale}
-                  classes={classes}
                   setShops={setShops}
+                  typeSeach={typeSeach}
                 />
               ))}
             </TableBody>

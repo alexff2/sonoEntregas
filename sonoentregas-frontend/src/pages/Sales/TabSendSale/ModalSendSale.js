@@ -4,10 +4,9 @@ import { getUser, getLoja } from '../../../services/auth'
 import api from '../../../services/api'
 import { validateObs } from '../../../functions/validateFields'
 
-const { ID: USER_ID } = JSON.parse(getUser())
-
 function SetEstoque({ product, putProduct }) {
   const [ productCd, setProductCd ] = useState()
+  const [ inputQtd, setInputQtd ] = useState(false)
 
   useEffect(() => {
     api.get(`products/COD_ORIGINAL/${product.COD_ORIGINAL}`).then( resp => setProductCd(resp.data[0]))
@@ -19,16 +18,30 @@ function SetEstoque({ product, putProduct }) {
       <>  
         <td>{productCd.EST_ATUAL}</td>
         <td>{productCd.EST_DISPONIVEL}</td>
-        <td><input type="checkbox" onChange={(e) => putProduct(e, product)}/></td>
+        <td>
+          <input 
+            type="number" 
+            style={{width: 40}}
+            defaultValue={product.QUANTIDADE}
+            max={product.QUANTIDADE}
+            min={1}
+            onChange={e => product.QUANTIDADE = e.target.value}
+            disabled={inputQtd}
+          />
+        </td>
+        <td><input type="checkbox" onChange={(e) =>{
+          putProduct(e, product)
+          setInputQtd(!inputQtd)
+        }}/></td>
       </> 
       : <>
+          <td>{product.QUANTIDADE}</td>
           <td colSpan="3">Produto não encontrado</td>
         </>
     }
   </>
   )
 }
-
 
 export default function ModalSendSale({ 
   item,
@@ -45,6 +58,8 @@ export default function ModalSendSale({
   const [ obs, setObs ] = useState('')
 
   const { cod } = JSON.parse(getLoja())
+  const { ID: USER_ID } = JSON.parse(getUser())
+  
 
   useEffect(()=>{
     api.get(`${cod}/vendas/${item.CODIGOVENDA}`)
@@ -53,8 +68,12 @@ export default function ModalSendSale({
     
         setOrcParc(resp.data.orcparc)
       })
-      .catch( err => setChildrenAlertModal(err))
-  },[ cod, item, setChildrenAlertModal ])
+      .catch( err => {
+        setChildrenAlertModal("Falha ao buscar produtos da venda!")
+        openMOdalAlert()
+        console.log(err)
+      })
+  },[ cod, item, setChildrenAlertModal, openMOdalAlert ])
 
   const putProduct = (e, product) => {
     if(e.target.checked){
@@ -62,6 +81,7 @@ export default function ModalSendSale({
     } else {
       setSendProduct(sendProduct.filter(item => item.codproduto !== product.codproduto))
     }
+    console.log(product)
   }
 
   const submitSales = async sale => {
@@ -142,10 +162,10 @@ export default function ModalSendSale({
               <tr>
                 <th>Código</th>
                 <th>Descrição</th>
-                <th>Qtd</th>
                 <th>Valor</th>
                 <th>Estoque</th>
                 <th>Disponível</th>
+                <th>Qtd</th>
                 <th></th>
               </tr>
             </thead>
@@ -154,7 +174,6 @@ export default function ModalSendSale({
               <tr key={product.COD_ORIGINAL}>
                 <td>{product.COD_ORIGINAL}</td>
                 <td>{product.DESCRICAO}</td>
-                <td>{product.QUANTIDADE}</td>
                 <td>
                   {Intl
                     .NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'})

@@ -4,7 +4,7 @@ import '../../../styles/pages/sales.css'
 
 import api from '../../../services/api'
 import { getLoja } from '../../../services/auth'
-import getDate from '../../../functions/getDate'
+import { getDateToSql } from '../../../functions/getDate'
 
 import ModalSendSale from './ModalSendSale'
 
@@ -20,7 +20,7 @@ export default function TabSendSale({ openMOdalAlert, setChildrenAlertModal }){
     document.querySelector('#load-sales').innerHTML = 'Carregando...'
 
     api
-      .get(`${cod}/${emissao ? emissao: getDate()}/vendas`)
+      .get(`${cod}/${emissao ? emissao : getDateToSql()}/vendas`)
       .then( resp => {
         setSales(resp.data)
         
@@ -53,7 +53,7 @@ export default function TabSendSale({ openMOdalAlert, setChildrenAlertModal }){
             <th>Código</th>
             <th>Cliente</th>
             <th>Valor</th>
-            <th>Status</th>
+            <th>Enviada?</th>
           </tr>
         </thead>
         <tbody>
@@ -68,7 +68,7 @@ export default function TabSendSale({ openMOdalAlert, setChildrenAlertModal }){
                   .NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'})
                   .format(item.TOTALVENDA)}</td>
               <td className={ item.STATUS ? 'green' : 'red'}>
-                {item.STATUS ? item.STATUS : 'Pendente'}
+                {item.STATUS ? 'Sim' : 'Não'}
               </td>
             </tr>
           ))}

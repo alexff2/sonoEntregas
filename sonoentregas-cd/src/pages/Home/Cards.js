@@ -44,7 +44,7 @@ const Item = ({classes, title, icon: Icon, value, seachHome}) => {
   const { setSales }  = useSale()
   
   const seachSales = async () => {
-    const { data } = await api.get('sales/false/false/Aberta')
+    const { data } = await api.get('sales/false/false/Aberta/null')
     setSales(data)
     seachHome()
   }

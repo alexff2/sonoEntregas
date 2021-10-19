@@ -16,7 +16,7 @@ module.exports = {
         sales = await Sales.findSome(0, `${typesearch} LIKE '${search}%'${whereCodloja}`)
       } else if (typesearch === 'false') {
         sales = await Sales.findSome(0, `STATUS = '${status}'`)
-      } else if (typesearch === 'D_DELIVERED') {
+      } else if (typesearch === 'D_DELIVERED' || typesearch === 'D_MOUNTING') {
         const salesProd = await Sales._query(0, `SELECT ID_SALE FROM DELIVERYS_PROD WHERE ${typesearch} = '${search}'${whereCodloja}`)
 
         if (salesProd[0].length > 0 ) {
@@ -32,7 +32,7 @@ module.exports = {
   
           sales = await Sales.findSome(0, `ID_SALES IN (${idSale})`)
         } else {
-          return res.status(404).json('Nenhuma entrega realizada neste dia!')
+          sales = []
         }
 
       } else {
@@ -68,6 +68,18 @@ module.exports = {
       return res.json(resp)
     } catch (error) {
       return res.status(400).json(error)
+    }
+  },
+  async updaDateDeliv( req, res ){
+    try {
+      const { idSale } = req.params
+      const { dateDeliv, CODLOJA } = req.body
+  
+      await Sales._query(0, `UPDATE SALES SET D_ENTREGA1 = '${dateDeliv}' WHERE ID_SALES = ${idSale} AND CODLOJA = ${CODLOJA}`)
+
+      res.json(dateDeliv)
+    } catch (error) {
+      res.status(400).json(error)
     }
   }
 }
