@@ -7,5 +7,8 @@
 # Ignores do backend
 /sonoentregas-backend/node_modules
 
+# Ignores do dashboard
+/sonoentregas-dashboard/node_modules
+
 # Logs do Sistema
 /Logs
