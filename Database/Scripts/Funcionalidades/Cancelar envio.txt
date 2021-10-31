@@ -1,0 +1,31 @@
+CANCELAR ENVIO
+-- NA LOJA
+declare @codvenda int
+set @codvenda = 15009
+
+update prodlojas set est_atual = est_atual - 1, est_loja = EST_LOJA - 1 where  CODLOJA = 1 and 
+codigo in (select codproduto from nvendi2  WHERE NUMVENDA = @codvenda and status  is not NULL)
+update nvenda2 set STATUS = NULL WHERE CODIGOVENDA = @codvenda
+update nvendi2 set STATUS = NULL WHERE NUMVENDA = @codvenda
+
+select status, * from nvenda2  WHERE CODIGOVENDA = @codvenda
+select status, * from nvendi2  WHERE NUMVENDA = @codvenda
+select * from produtos 
+where codigo in (select codproduto from nvendi2  WHERE NUMVENDA = @codvenda and status  is not NULL)
+
+-- NO CD
+
+declare @codvenda int, @codloja int
+set @codvenda = 15009
+set @codloja = 4
+
+select * from SALES where ID_SALES = @codvenda
+select * from SALES_PROD where ID_SALES = @codvenda
+select * from ORCPARC where ID_SALES = @codvenda
+SELECT * FROM DELIVERYS_SALES WHERE ID_SALE = @codvenda
+
+
+DELETE SALES where ID_SALES = @codvenda and codloja = @codloja
+DELETE SALES_PROD where ID_SALES = @codvenda and codloja = @codloja
+DELETE ORCPARC where ID_SALES = @codvenda and codloja = @codloja
+

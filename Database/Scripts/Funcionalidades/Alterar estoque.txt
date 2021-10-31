@@ -1,0 +1,4 @@
+update SONO..PRODLOJAS set EST_ATUAL = EST_ATUAL - 1, EST_LOJA = EST_LOJA - 1 
+from sono..PRODLOJAS a inner join sono..produtos b on a.codigo = b.codigo
+where a.CODLOJA = 1
+and b.ALTERNATI in ('2586-7', '1261-4', '2320-7')

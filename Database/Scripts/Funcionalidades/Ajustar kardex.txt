@@ -1,0 +1,63 @@
+--SELECT MAX(CODIGO) FROM KARDEX_PRODUTOS_HISTORICO
+-- SAIDA
+INSERT KARDEX_PRODUTOS_HISTORICO([CODIGO]
+           ,[CODLOJA]
+           ,[DATA]
+           ,[HORA]
+           ,[MODULO]
+           ,[DOCUMENTO]
+           ,[CODPRODUTO]
+           ,[QUANT_ENTRADA]
+           ,[QUANT_SAIDA]
+           ,[ENTRADA_SAIDA]
+           ,[OBS]
+           ,[CODCF]
+           ,[NOMECF]
+           ,[EMBALAGEM]
+           ,[CALCULAR]
+           ,[VALORUNITARIO]
+           ,[LOTE]
+           ,[TIPOCLI_FOR_FUN]
+           ,[USUARIO]
+           ,[ITEM]
+           ,[MU_ITEM]
+           ,[MU_QTD_MENORUN]
+           ,[MU_UNIDADE]
+           ,[SEQUENCIA]
+           ,[SALDO]
+           ,[PROCESSAR])
+SELECT CODIGO+25037, 1, '2015-01-01 00:00:00.000', '16:57:57', 'ACERTO EST SAI LOJA', 'SCPT001', CODIGO, 0, DIF, 'S', 'ACERTO AUTOMATICO DO KARDEX', 0, 'ALEXANDRE',
+0, 'S', 0, 1, 'F', 'ALEXANDRE', 1, -1, 1, 'UN', CODIGO+25037, 0, 'S'
+FROM VIEW_KARDEX_DIF_EST WHERE DIF > 0
+
+-- ENTRADA
+INSERT KARDEX_PRODUTOS_HISTORICO
+([CODIGO]
+           ,[CODLOJA]
+           ,[DATA]
+           ,[HORA]
+           ,[MODULO]
+           ,[DOCUMENTO]
+           ,[CODPRODUTO]
+           ,[QUANT_ENTRADA]
+           ,[QUANT_SAIDA]
+           ,[ENTRADA_SAIDA]
+           ,[OBS]
+           ,[CODCF]
+           ,[NOMECF]
+           ,[EMBALAGEM]
+           ,[CALCULAR]
+           ,[VALORUNITARIO]
+           ,[LOTE]
+           ,[TIPOCLI_FOR_FUN]
+           ,[USUARIO]
+           ,[ITEM]
+           ,[MU_ITEM]
+           ,[MU_QTD_MENORUN]
+           ,[MU_UNIDADE]
+           ,[SEQUENCIA]
+           ,[SALDO]
+           ,[PROCESSAR])
+SELECT CODIGO+25037, '01', '2015-01-01 00:00:00.000', '16:57:57', 'ACERTO EST ENT LOJA', 'SCRIP002', CODIGO, DIF*-1, 0, 'E', 'ACERTO AUTOMATICO DO KARDEX', 0, 'ALEXANDRE',
+0, 'S', 0, 1, 'F', 'ALEXANDRE', 1, -1, 1, 'UN', CODIGO+25037, 0, 'S'
+FROM VIEW_KARDEX_DIF_EST WHERE DIF < 0
