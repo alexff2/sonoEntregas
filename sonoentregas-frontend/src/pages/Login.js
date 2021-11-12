@@ -23,7 +23,8 @@ const Login = ({history}) => {
         setShops(datas)
       })
       .catch( e => {
-        setChildrenAlertModal(`Sem conexão com o servidor. Erro: ${e}`)
+        setChildrenAlertModal('Sem conexão com o servidor.')
+         console.log(e)
         openMOdalAlert()
       })
   },[])
@@ -63,7 +64,8 @@ const Login = ({history}) => {
         openMOdalAlert()
       }
     } catch (error) {
-        setChildrenAlertModal(`Sem conexão com o servidor. Erro: ${error}`)
+        setChildrenAlertModal('Sem conexão com o servidor')
+        console.log(error)
 
         openMOdalAlert()
     }
