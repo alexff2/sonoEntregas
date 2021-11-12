@@ -47,7 +47,7 @@ routes.post('/deliverys', deliverysController.create)
 routes.put('/deliverys/:id', deliverysController.update)
 routes.delete('/deliverys/:id', deliverysController.delete)
 routes.put('/deliverys/status/:id', deliverysController.updateSatus)
-//Home
+//Homes
 routes.get('/home', homeController.index)
 routes.get('/dashboard/:datesearch', dashboardController.index)
 
