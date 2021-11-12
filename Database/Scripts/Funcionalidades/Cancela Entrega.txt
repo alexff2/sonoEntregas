@@ -30,8 +30,13 @@ set @idSales = 127053 set @codloja = 2
 delete sales where id_sales = @idSales and CODLOJA = @codloja
 delete SALES_PROD  where id_sales = @idSales and CODLOJA = @codloja
 delete ORCPARC where id_sales = @idSales and CODLOJA = @codloja
+update delivery_prod set DELIVERED = 1 WHERE ID_SALE = @idSales and CODLOJA = @codloja and ID_DELIVERY = --verificar codigo da entrega
 
 select * from sales where id_sales = @idSales and CODLOJA = @codloja
 select * from SALES_PROD  where id_sales = @idSales and CODLOJA = @codloja
 select * from ORCPARC where id_sales = @idSales and CODLOJA = @codloja
+
+SELECT * FROM SONO..PRODUTOS WHERE ALTERNATI IN ('', '') --- consultar código dos produtos
+update SONO..PRODLOJAS SET EST_ATUAL = EST_ATUAL + 1, EST_LOJA = EST_LOJA + 1 WHERE CODIGO IN () AND CODLOJA = 1
+
 

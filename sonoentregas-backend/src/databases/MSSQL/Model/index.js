@@ -78,13 +78,11 @@ class Model {
     const data = await this.findSome(loja, `${colum} = ${id}`)
     
     return data[0]
-  
   }
   async updateNotReturn(loja, values, id, colum = 'ID') {
     const script = `UPDATE ${this.tab} SET ${values} WHERE ${colum} = ${id}`
     
     await this._query(loja, script, QueryTypes.UPDATE)
-
   }
   
   async delete(loja, id, colum = 'ID') {
@@ -99,7 +97,15 @@ class Model {
     const script = `DELETE FROM ${this.tab} WHERE ${colum} = ${id}`
     
     await this._query(loja, script, QueryTypes.DELETE)
-    
+  }
+
+  async count(loja, where = '', groupBy = ''){
+    const group = groupBy === '' ? groupBy : `, ${groupBy}`
+    const groupby = groupBy === '' ? groupBy : `GROUP BY ${groupBy}`
+
+    const script = `SELECT COUNT(*) AS ${this.tab}${group} FROM ${this.tab} ${where} ${groupby}`
+
+    return await this._query(loja, script, QueryTypes.SELECT)
   }
   
   async _query(loja, script, type){

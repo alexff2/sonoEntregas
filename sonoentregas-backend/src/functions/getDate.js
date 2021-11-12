@@ -1,8 +1,9 @@
 module.exports = {
   getDate(date = false) {
     if (date) {
-      var data = new Date(date),
-        dia  = data.getDate().toString(),
+      var data = new Date(date)
+      data.setDate(data.getDate()+1)
+      var dia  = data.getDate().toString(),
         diaF = (dia.length === 1) ? '0'+dia : dia,
         mes  = (data.getMonth()+1).toString(), //+1 pois no getMonth Janeiro começa com zero.
         mesF = (mes.length === 1) ? '0'+mes : mes,
@@ -20,7 +21,7 @@ module.exports = {
       return date
     }
   },
-  getTransformDate(date, days) {
+  setDaysInDate(date, days) {
     var data, dia, diaF, mes, mesF, anoF
   
     data = new Date(date)
