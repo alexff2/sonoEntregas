@@ -7,7 +7,7 @@ import {
   Select,
   MenuItem
 } from "@material-ui/core"
-import TableSales from './TableSales'
+import TableSales from '../../components/TableSales'
 import { ButtonCancel, ButtonSucess } from '../../components/Buttons'
 
 //context
@@ -21,14 +21,30 @@ import api from '../../services/api'
 
 const useStyles = makeStyles(theme => ({
   //Style form select\
-  divFormControl:{
+  divFormControl: {
     width: '100%',
     display: 'flex',
     justifyContent: 'space-between',
-    paddingBottom: theme.spacing(2)
   },
-  formControl:{
+  formControl: {
     width: '30%'
+  },
+  divSearchSale: {
+    display: 'flex',
+    '& button': {
+      margin: '16px 0 8px 16px',
+      width: 100,
+      background: theme.palette.primary.main,
+      border: 'none',
+      borderRadius: 4,
+      color: 'white',
+      cursor: 'pointer',
+      opacity: '1',
+      transition: '0.4s',
+      '&:hover': {
+        opacity: '0.7'
+      } 
+    }
   },
   //Style buttons
   btnActions: {
@@ -45,13 +61,15 @@ export default function ModalDelivery({ setOpen, selectDelivery, setCurrentDeliv
   const [ codCar, setCodCar ] = useState()
   const [ codDriver, setCodDriver ] = useState()
   const [ codAssistant, setCodAssistant ] = useState()
+  const [ idSale, setIdISale ] = useState()
+  const [ salesCreate, setSalesCreate ] = useState([])
   const [ salesProd, setSalesProd ] = useState([])
 
   const { cars } = useCars()
   const { drivers } = useDrivers()
   const { assistants } = useAssistants()
   const { delivery, setDelivery } = useDelivery()
-  const contextSales = useSale()
+  const { sales, setSales } = useSale()
 
   //Styes
   const classes = useStyles()
@@ -77,10 +95,10 @@ export default function ModalDelivery({ setOpen, selectDelivery, setCurrentDeliv
       setDelivery([...delivery, dataDelivery])
       setCurrentDeliv([...currentDeliv, dataDelivery])
 
-      if (dataDelivery.ID) {
+      if (dataDelivery.ID) { //Melhorar performace
         const { data: dataSales } = await api.get('sales/false/false/Aberta/null')
   
-        contextSales.setSales(dataSales)
+        setSales(dataSales)
       }
 
       setOpen(false)
@@ -107,6 +125,13 @@ export default function ModalDelivery({ setOpen, selectDelivery, setCurrentDeliv
       console.log(e)
       alert('Entre em contato com Administrador')
     }
+  }
+
+  const setSalesInModal = e => {
+    e.preventDefault()
+    //Fazer validations
+    const found = salesCreate.find( sale => sale.ID_SALES === idSale ) 
+    found === undefined && setSalesCreate([ ...salesCreate, ...sales.filter( sale => sale.ID_SALES === idSale ) ])
   }
 
   //Component
@@ -182,10 +207,31 @@ export default function ModalDelivery({ setOpen, selectDelivery, setCurrentDeliv
         </FormControl>
       </div>
 
+      <hr style={{ marginTop: '16px' }}/>
+
+      {selectDelivery ? null
+       :<div className={classes.divSearchSale}>
+          <TextField
+            id="idSales"
+            label="Inserir venda"
+            placeholder="Digite código da venda"
+            fullWidth
+            margin="normal"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            variant="outlined"
+            onChange={(e) => setIdISale(parseInt(e.target.value))}
+          />
+          <button onClick={e => setSalesInModal(e)}>Inserir</button>
+        </div>
+      }
+
       <TableSales 
-        selectSales={selectDelivery ? selectDelivery.sales : false} 
+        selectSales={selectDelivery ? selectDelivery.sales : salesCreate} 
         setSalesProd={setSalesProd}
         salesProd={salesProd}
+        type={ selectDelivery ? 'update' : 'create' }
       />
 
       <div className={classes.btnActions}>

@@ -123,8 +123,8 @@ const useStyles = makeStyles(theme => ({
 }))
 
 function Row({ sale, setShops, modalDetalProduct, typeSeach }) {
-  const [open, setOpen] = React.useState(false)
-  const [openModalUpdaDate, setOpenModalUpdaDate] = React.useState(false)
+  const [open, setOpen] = useState(false)
+  const [openModalUpdaDate, setOpenModalUpdaDate] = useState(false)
   const classes = useStyles()
 
   const updateDateDeliv = () => {

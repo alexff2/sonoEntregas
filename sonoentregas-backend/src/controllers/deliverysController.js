@@ -18,7 +18,6 @@ module.exports = {
       
       const dataDeliverys = await DevService.findDev(deliverys)
 
-      console.log('Depois')
       return res.json(dataDeliverys)
     } catch (error) {
       res.status(400).json(error)
