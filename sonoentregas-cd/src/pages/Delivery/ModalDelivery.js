@@ -46,6 +46,12 @@ const useStyles = makeStyles(theme => ({
       } 
     }
   },
+  error: {
+    margin: '4px 0',
+    padding: 4,
+    backgroundColor: theme.palette.error.light,
+    color: '#FFF'
+  },
   //Style buttons
   btnActions: {
     width: '100%',
@@ -64,6 +70,7 @@ export default function ModalDelivery({ setOpen, selectDelivery, setCurrentDeliv
   const [ idSale, setIdISale ] = useState()
   const [ salesCreate, setSalesCreate ] = useState([])
   const [ salesProd, setSalesProd ] = useState([])
+  const [ errorMsg, setErrorMsg ] = useState('')
 
   const { cars } = useCars()
   const { drivers } = useDrivers()
@@ -129,9 +136,16 @@ export default function ModalDelivery({ setOpen, selectDelivery, setCurrentDeliv
 
   const setSalesInModal = e => {
     e.preventDefault()
-    //Fazer validations
-    const found = salesCreate.find( sale => sale.ID_SALES === idSale ) 
-    found === undefined && setSalesCreate([ ...salesCreate, ...sales.filter( sale => sale.ID_SALES === idSale ) ])
+
+    const saleFound = salesCreate.find( sale => sale.ID_SALES === idSale )
+
+    if(saleFound === undefined) {
+      const saleFoundContext = sales.filter( sale => sale.ID_SALES === idSale )
+ 
+      saleFoundContext.length > 0 ? setSalesCreate([ ...salesCreate,  ...saleFoundContext]) : setErrorMsg('Venda não encontrada')
+    } else {
+      setErrorMsg('Venda já lançada')
+    }
   }
 
   //Component
@@ -209,7 +223,7 @@ export default function ModalDelivery({ setOpen, selectDelivery, setCurrentDeliv
 
       <hr style={{ marginTop: '16px' }}/>
 
-      {selectDelivery ? null
+      { selectDelivery ? null
        :<div className={classes.divSearchSale}>
           <TextField
             id="idSales"
@@ -221,11 +235,16 @@ export default function ModalDelivery({ setOpen, selectDelivery, setCurrentDeliv
               shrink: true,
             }}
             variant="outlined"
-            onChange={(e) => setIdISale(parseInt(e.target.value))}
+            onChange={ e => {
+              setErrorMsg('')
+              setIdISale(parseInt(e.target.value))
+            }}
+            onKeyPress={ e => e.key === 'Enter' && setIdISale(parseInt(e.target.value))}
           />
           <button onClick={e => setSalesInModal(e)}>Inserir</button>
         </div>
       }
+      {errorMsg === '' ? null : <div className={classes.error}>{errorMsg}</div> }
 
       <TableSales 
         selectSales={selectDelivery ? selectDelivery.sales : salesCreate} 

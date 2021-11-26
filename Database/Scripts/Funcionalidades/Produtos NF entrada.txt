@@ -1,0 +1,7 @@
+select a.PRODUTO, b.NOME, a.QUANTIDADE, a.VTOTAL, c.NUM_DOC from NFITENS a
+inner join produtos b on a.PRODUTO = b.CODIGO
+inner join NFISCAL c on a.NNF = c.NF
+where c.emissao between '2021-09-01' and '2021-09-30'
+
+
+https://www.dtidigital.com.br/blog/context-api-como-usar-de-forma-simples-e-facil/

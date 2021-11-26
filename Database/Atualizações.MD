@@ -1,6 +1,7 @@
 # Pendências Lojas
 * Verificar codigos e descrição nas lojas de acordo com base de dados do CD;
 * Verificar as Bibox
+* Separar vendas iniciadas e colocar o nome ENTREGAS
 
 # Pendências
 * Possibilidade de alterar a quantidade enviada do produto para entrega;
