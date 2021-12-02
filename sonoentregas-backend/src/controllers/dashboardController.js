@@ -1,11 +1,13 @@
-const { salesByDate } = require('../services/dashboardService')
+const { issueDate, salesByDate } = require('../services/dashboardService')
 
 module.exports = {
   async index( req, res ){
     const { datesearch } = req.params
 
-    const sales = await salesByDate(datesearch)
+    const issue = await issueDate(datesearch)
+    const sales = await salesByDate(issue)
 
+    console.log(sales)
     return res.json(sales)
   }
 }

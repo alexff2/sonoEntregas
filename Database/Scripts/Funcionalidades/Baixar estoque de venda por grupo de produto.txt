@@ -1,0 +1,7 @@
+--update PRODLOJAS set EST_ATUAL = est_atual - b.qtd, EST_LOJA = est_loja - b.qtd
+from prodlojas a 
+inner join (select a.CODPRODUTO, sum(a.QUANTIDADE) qtd from NVENDI2 a
+	inner join PRODUTOS b on a.CODPRODUTO = b.CODIGO
+	where b.GRUPO = 5
+	group by a.CODPRODUTO) b on a.codigo = b.CODPRODUTO
+where a.CODLOJA = 1
