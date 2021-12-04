@@ -31,7 +31,7 @@
     "eject-react": "react-scripts eject",
     "build-electron": "electron-builder",
     "build": "yarn build-react && yarn build-electron",
-    "start": "concurrently \"cross-env BROWSER=none yarn start-react\" \"wait-on http://localhost:3000 && electron .\""
+    "start": "set PORT=3334 && concurrently \"cross-env BROWSER=none yarn start-react\" \"wait-on http://localhost:3334 && electron .\""
   },
   "eslintConfig": {
     "extends": "react-app"

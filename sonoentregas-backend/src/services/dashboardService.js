@@ -1,5 +1,8 @@
 const Sales = require('../models/Sales')
+const { QueryTypes } = require('sequelize')
+
 const { getDate } = require('../functions/getDate')
+const { decimalAdjust } = require('../functions/roundNumber')
 
 module.exports = {
   async issueDate(datesearch, days = 15){
@@ -21,12 +24,15 @@ module.exports = {
     return issue
   },
 
-  async salesByDate(issue){
+  async salesByDeliv(issue){
+    const issueStart = issue[0]
+    const issueEnd = issue[issue.length - 1]
+
     const salesArray = []
     const delivArray = []
 
-    const sales = await Sales.count(0, `WHERE EMISSAO BETWEEN '${issue[0]}' AND '${issue[issue.length - 1]}'`, 'EMISSAO')
-    const deliv = await Sales._query(0, `SELECT * FROM VIEW_DELIVERED_BY_DAYS WHERE D_DELIVERED BETWEEN '${issue[0]}' AND '${issue[issue.length - 1]}'`)
+    const sales = await Sales.count(0, `WHERE EMISSAO BETWEEN '${issueStart}' AND '${issueEnd}'`, 'EMISSAO')
+    const deliv = await Sales._query(0, `SELECT * FROM VIEW_DELIVERED_BY_DAYS WHERE D_DELIVERED BETWEEN '${issueStart}' AND '${issueEnd}'`)
     
     issue.forEach(elEmis => {
       const foundSale = sales.find(elSales => getDate(elSales.EMISSAO) === elEmis )
@@ -36,6 +42,38 @@ module.exports = {
       foundDeliv ? delivArray.push(foundDeliv.QTD_SALES) : delivArray.push(0)
     })
 
-    return {issue, salesArray, delivArray}
+    return { salesArray, delivArray}
+  },
+
+  async onTime(issue){
+    const issueStart = issue[0]
+    const issueEnd = issue[issue.length - 1]
+
+    const delivOnTime = await Sales._query(0, `SELECT COUNT(ID_SALE) delivOnTime FROM view_deliv_finish_sales where D_DELIVERED BETWEEN '${issueStart}' and '${issueEnd}' AND D_DELIVERED <= D_ENTREGA1`, QueryTypes.SELECT)
+    
+    const delivTot = await Sales._query(0, `SELECT COUNT(ID_SALE) delivTot FROM view_deliv_finish_sales where D_DELIVERED BETWEEN '${issueStart}' and '${issueEnd}'`, QueryTypes.SELECT)
+  
+    const delivLate = delivTot[0].delivTot - delivOnTime[0].delivOnTime
+
+    const valueCalcPerc = (delivOnTime[0].delivOnTime / delivTot[0].delivTot) * 100
+
+    const percDelivOnTime = decimalAdjust( 'round',valueCalcPerc, -1)
+
+    return { delivTot: delivTot[0].delivTot, delivOnTime: delivOnTime[0].delivOnTime, delivLate, percDelivOnTime }
+  },
+
+  async salesOpen(){
+    const sales = await Sales.findSome(0, "STATUS = 'Aberta'", 'ID_SALES, D_ENTREGA1')
+  
+    const totSalesOpen = sales.length
+    var salesLate = 0, salesAwait = 0, salesOutOfStock = 0
+
+    sales.forEach(sale => {
+      getDate(sale.D_ENTREGA1) < getDate() && salesLate++
+    })
+
+    console.log(totSalesOpen, salesLate)
+
+    return { totSalesOpen, salesLate, salesAwait, salesOutOfStock }
   }
 }

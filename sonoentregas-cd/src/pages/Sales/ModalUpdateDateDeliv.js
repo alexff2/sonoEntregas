@@ -1,19 +1,21 @@
 import React from 'react'
 
+import { useSale } from '../../context/saleContext'
 import Modal from '../../components/Modal'
 import { ButtonSucess } from '../../components/Buttons'
 
 import api from '../../services/api'
 
-export default function ModalUpdateDateDev({open, setOpen, sale}){
+export default function ModalUpdateDateDev({open, setOpen, saleCurrent}){
   const [ dateDeliv, setDateDeliv ] = React.useState('')
   const [ msgError, setMsgError ] = React.useState(false)
   const [ childrenError, setChildrenError ] = React.useState(false)
+  const { sales } = useSale()
 
   const changeDateDeliv = e => {
     setMsgError(false)
     
-    if (new Date(e.target.value).setHours(0,0,0,0) >= new Date(sale.EMISSAO).setHours(0,0,0,0)) {
+    if (new Date(e.target.value).setHours(0,0,0,0) >= new Date(saleCurrent.EMISSAO).setHours(0,0,0,0)) {
       setDateDeliv(e.target.value)
     } else {
       e.target.value = ''
@@ -29,9 +31,11 @@ export default function ModalUpdateDateDev({open, setOpen, sale}){
   const updateDateDeliv = async () => {
     try {
       if (dateDeliv !== '') {
-        const { data } = await api.post(`sales/updateDate/${sale.ID_SALES}`, { dateDeliv, CODLOJA: sale.CODLOJA })
-    
-        sale.D_ENTREGA1 = data
+        const { data } = await api.post(`sales/updateDate/${saleCurrent.ID_SALES}`, { dateDeliv, CODLOJA: saleCurrent.CODLOJA })
+
+        saleCurrent.D_ENTREGA1 = data
+
+        sales.find( sale => sale.ID === saleCurrent.ID && (sale.D_ENTREGA1 = data))
   
         setOpen(false)
       } else {
@@ -43,7 +47,7 @@ export default function ModalUpdateDateDev({open, setOpen, sale}){
   }
 
   return(
-    <Modal open={open} setOpen={setOpen} title="Alterar data de previsão de entrega" >
+    <Modal open={open} setOpen={setOpen} title="Agenda nova data de entrega" >
       Nova Data: <input type="date" onChange={changeDateDeliv} style={{marginRight: 10}}/>
       <ButtonSucess children="Salvar" onClick={updateDateDeliv}/>
       {msgError && <div><span style={{color: 'red'}}>{childrenError}</span></div>}

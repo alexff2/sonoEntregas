@@ -49,6 +49,6 @@ routes.delete('/deliverys/:id', deliverysController.delete)
 routes.put('/deliverys/status/:id', deliverysController.updateSatus)
 //Homes
 routes.get('/home', homeController.index)
-routes.get('/dashboard/salesbydeliv/:datesearch', dashboardController.index)
+routes.get('/dashboard/:datesearch', dashboardController.index)
 
 module.exports = routes

@@ -197,7 +197,11 @@ function Row({ sale, setShops, modalDetalProduct, typeSeach }) {
         </TableCell>
       </TableRow>
 
-      <ModalUpdateDateDeliv open={openModalUpdaDate} setOpen={setOpenModalUpdaDate} sale={sale} />
+      <ModalUpdateDateDeliv 
+        open={openModalUpdaDate}
+        setOpen={setOpenModalUpdaDate}
+        saleCurrent={sale}
+      />
     </React.Fragment>
   );
 }
