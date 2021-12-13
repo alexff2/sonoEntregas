@@ -1,0 +1,22 @@
+USE [SONOENTREGAS]
+GO
+
+/****** Object:  View [dbo].[VIEW_DELIV_FINISH_SALES]    Script Date: 12/10/2021 07:39:28 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE view [dbo].[VIEW_DELIV_FINISH_SALES] as
+select ID_SALE, a.CODLOJA, b.EMISSAO, b.D_ENTREGA1, D_DELIVERED from DELIVERYS_PROD a
+inner join sales b on a.ID_SALE = b.ID_SALES and a.CODLOJA = b.CODLOJA
+where a.DELIVERED = 0 and D_DELIVERED is not null
+group by id_sale, a.CODLOJA, b.EMISSAO, b.D_ENTREGA1, D_DELIVERED
+
+
+
+GO
+
+

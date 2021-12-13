@@ -2,8 +2,11 @@ const {
   issueDate,
   salesByDeliv,
   onTime,
-  salesOpen
+  salesOpen,
+  salesByShop,
+  salesEndDevFinish
 } = require('../services/dashboardService')
+const { salesDevInf } = require('../services/homeService')
 
 module.exports = {
   async index( req, res ){
@@ -17,7 +20,13 @@ module.exports = {
 
     const salesOpenDatas = await salesOpen()
 
-    return res.json({ 
+    const dataSalesByShop = await salesByShop(issue)
+
+    const { salesOnRelease, salesOnDelivring, devOnRelease, delivering } = await salesDevInf()
+
+    const { devFinish, salesFinish } = await salesEndDevFinish(issue)
+
+      return res.json({ 
       issue,
       delivArray,
       salesArray,
@@ -25,7 +34,16 @@ module.exports = {
       delivOnTime,
       delivLate,
       percDelivOnTime,
-      salesOpenDatas
+      salesOpenDatas,
+      salesByShop: dataSalesByShop,
+      salesDevInfos: {
+        salesOnRelease,
+        salesOnDelivring,
+        devOnRelease,
+        delivering,
+        devFinish,
+        salesFinish
+      }
     })
   }
 }

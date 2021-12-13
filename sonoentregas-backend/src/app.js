@@ -8,4 +8,4 @@ app
   .use(cors())
   .use(express.json())
   .use(routes)
-  .listen(8081)
+  .listen(8081, () => console.log('Servidor rodando na porta 8081'))

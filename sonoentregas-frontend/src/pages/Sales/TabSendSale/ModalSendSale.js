@@ -81,7 +81,6 @@ export default function ModalSendSale({
     } else {
       setSendProduct(sendProduct.filter(item => item.codproduto !== product.codproduto))
     }
-    console.log(product)
   }
 
   const submitSales = async sale => {

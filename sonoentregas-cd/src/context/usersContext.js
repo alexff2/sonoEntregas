@@ -10,7 +10,6 @@ export default function UsersProvider({ children }){
   useEffect(() => {
     api.get('users/0')
       .then( resp => setUsers(resp.data.filter( item => item.OFFICE === 'User')))
-      .catch(e => alert(e))
   },[])
 
   return(

@@ -67,8 +67,8 @@ export default function ModalDelivery({ setOpen, selectDelivery, setCurrentDeliv
   const [ codCar, setCodCar ] = useState()
   const [ codDriver, setCodDriver ] = useState()
   const [ codAssistant, setCodAssistant ] = useState()
-  const [ idSale, setIdISale ] = useState()
-  const [ salesCreate, setSalesCreate ] = useState([])
+  const [ idSale, setIdSale ] = useState('')
+  const [ createDevSales, setCreateDevSales ] = useState([])
   const [ salesProd, setSalesProd ] = useState([])
   const [ errorMsg, setErrorMsg ] = useState('')
 
@@ -137,15 +137,17 @@ export default function ModalDelivery({ setOpen, selectDelivery, setCurrentDeliv
   const setSalesInModal = e => {
     e.preventDefault()
 
-    const saleFound = salesCreate.find( sale => sale.ID_SALES === idSale )
+    const saleFound = createDevSales.find( sale => sale.ID_SALES === idSale )
 
     if(saleFound === undefined) {
-      const saleFoundContext = sales.filter( sale => sale.ID_SALES === idSale )
+      const salesToDev = sales.filter( sale => sale.ID_SALES === idSale )
  
-      saleFoundContext.length > 0 ? setSalesCreate([ ...salesCreate,  ...saleFoundContext]) : setErrorMsg('Venda não encontrada')
+      salesToDev.length > 0 ? setCreateDevSales([ ...createDevSales,  ...salesToDev]) : setErrorMsg('Venda não encontrada')
     } else {
       setErrorMsg('Venda já lançada')
     }
+
+    setIdSale('')
   }
 
   //Component
@@ -234,12 +236,12 @@ export default function ModalDelivery({ setOpen, selectDelivery, setCurrentDeliv
             InputLabelProps={{
               shrink: true,
             }}
+            value={idSale}
             variant="outlined"
             onChange={ e => {
               setErrorMsg('')
-              setIdISale(parseInt(e.target.value))
+              setIdSale(parseInt(e.target.value))
             }}
-            onKeyPress={ e => e.key === 'Enter' && setIdISale(parseInt(e.target.value))}
           />
           <button onClick={e => setSalesInModal(e)}>Inserir</button>
         </div>
@@ -247,7 +249,7 @@ export default function ModalDelivery({ setOpen, selectDelivery, setCurrentDeliv
       {errorMsg === '' ? null : <div className={classes.error}>{errorMsg}</div> }
 
       <TableSales 
-        selectSales={selectDelivery ? selectDelivery.sales : salesCreate} 
+        selectSales={selectDelivery ? selectDelivery.sales : createDevSales} 
         setSalesProd={setSalesProd}
         salesProd={salesProd}
         type={ selectDelivery ? 'update' : 'create' }

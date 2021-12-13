@@ -49,9 +49,9 @@ module.exports = {
     const issueStart = issue[0]
     const issueEnd = issue[issue.length - 1]
 
-    const delivOnTime = await Sales._query(0, `SELECT COUNT(ID_SALE) delivOnTime FROM view_deliv_finish_sales where D_DELIVERED BETWEEN '${issueStart}' and '${issueEnd}' AND D_DELIVERED <= D_ENTREGA1`, QueryTypes.SELECT)
+    const delivOnTime = await Sales._query(0, `SELECT COUNT(ID_SALE) delivOnTime FROM VIEW_DELIV_FINISH_SALES where D_DELIVERED BETWEEN '${issueStart}' and '${issueEnd}' AND D_DELIVERED <= D_ENTREGA1`, QueryTypes.SELECT)
     
-    const delivTot = await Sales._query(0, `SELECT COUNT(ID_SALE) delivTot FROM view_deliv_finish_sales where D_DELIVERED BETWEEN '${issueStart}' and '${issueEnd}'`, QueryTypes.SELECT)
+    const delivTot = await Sales._query(0, `SELECT COUNT(ID_SALE) delivTot FROM VIEW_DELIV_FINISH_SALES where D_DELIVERED BETWEEN '${issueStart}' and '${issueEnd}'`, QueryTypes.SELECT)
   
     const delivLate = delivTot[0].delivTot - delivOnTime[0].delivOnTime
 
@@ -63,17 +63,50 @@ module.exports = {
   },
 
   async salesOpen(){
-    const sales = await Sales.findSome(0, "STATUS = 'Aberta'", 'ID_SALES, D_ENTREGA1')
+    const sales = await Sales.findSome(0, "STATUS = 'Aberta'", 'ID_SALES, D_ENTREGA1, SCHEDULED')
   
     const totSalesOpen = sales.length
-    var salesLate = 0, salesAwait = 0, salesOutOfStock = 0
-
+    var salesLate = 0, salesAwait = 0, scheduledSales = 0
     sales.forEach(sale => {
-      getDate(sale.D_ENTREGA1) < getDate() && salesLate++
+      if (getDate(sale.D_ENTREGA1) < getDate()){
+        salesLate++
+      } else if (sale.SCHEDULED) {
+        scheduledSales++
+      } else {
+        salesAwait++
+      }
     })
 
-    console.log(totSalesOpen, salesLate)
+    const statusSales = [ salesLate, salesAwait, scheduledSales ]
 
-    return { totSalesOpen, salesLate, salesAwait, salesOutOfStock }
+    return { totSalesOpen, statusSales }
+  },
+
+  async salesByShop(issue){
+    const issueStart = issue[0]
+    const issueEnd = issue[issue.length - 1]
+    const labels = []
+    const datas = []
+
+    const data = await Sales._query(0,`SELECT COUNT(ID_SALE) QTD_SALES, B.DESC_ABREV FROM VIEW_DELIV_FINISH_SALES A INNER JOIN LOJAS B ON A.CODLOJA = B.CODLOJA WHERE D_DELIVERED BETWEEN '${issueStart}' AND '${issueEnd}' GROUP BY A.CODLOJA, B.DESC_ABREV ORDER BY A.CODLOJA `,QueryTypes.SELECT)
+
+    data.forEach( item => {
+      datas.push(item.QTD_SALES)
+      labels.push(item.DESC_ABREV)
+    })
+    return { labels, datas }
+  },
+
+  async salesEndDevFinish(issue){
+    const issueEnd = issue[issue.length - 1]
+
+    var salesFinish = await Sales._query(0,`SELECT QTD_SALES FROM VIEW_DELIVERED_BY_DAYS WHERE D_DELIVERED = '${issueEnd}'`, QueryTypes.SELECT)
+    salesFinish.length > 0 ? salesFinish = salesFinish[0].QTD_SALES : salesFinish = 0
+
+    var devFinish = await Sales._query(0,`SELECT COUNT(ID_DELIVERY) QTD_DELIV FROM VIEW_D_DELV_ROUTES WHERE D_DELIVERING = '${issueEnd}'`, QueryTypes.SELECT)
+    
+    devFinish.length > 0 ? devFinish = devFinish[0].QTD_DELIV : devFinish = 0
+
+    return { salesFinish, devFinish }
   }
 }

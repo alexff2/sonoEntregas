@@ -10,7 +10,6 @@ export default function DriversProvider({ children }){
   useEffect(() => {
     api.get('users/0')
       .then( resp => setDrivers(resp.data.filter( item => item.OFFICE === 'Driver')))
-      .catch(e => alert(e))
   },[])
 
   return(

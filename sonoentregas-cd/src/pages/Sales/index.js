@@ -115,7 +115,10 @@ const useStyles = makeStyles(theme => ({
     fontWeight: theme.typography.fontWeightBold
   },
   updateDateDeliv: {
-    cursor: 'pointer'
+    cursor: 'pointer',
+    '&:hover': {
+      backgroundColor: fade(theme.palette.common.white, 0.15),
+    }
   },
   notUpdateDateDeliv: {
     cursor: 'auto'
@@ -128,13 +131,11 @@ function Row({ sale, setShops, modalDetalProduct, typeSeach }) {
   const classes = useStyles()
 
   const updateDateDeliv = () => {
-    if (typeSeach === 'EMISSAO' && sale.HAVE_OBS2) {
-      setOpenModalUpdaDate(true)
-    }
+    if (typeSeach === 'EMISSAO') setOpenModalUpdaDate(true)
   }
 
   const styleDateUpdate = () => {
-    if (typeSeach === 'EMISSAO' && sale.HAVE_OBS2) {
+    if (typeSeach === 'EMISSAO') {
       return classes.updateDateDeliv
     } else {
       return classes.notUpdateDateDeliv

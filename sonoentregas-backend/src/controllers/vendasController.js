@@ -39,7 +39,6 @@ module.exports = {
 
       const D_ENVIO = getDate()
       const D_ENTREGA1 = setDaysInDate(EMISSAO, 11) //Objetivo do sistema
-      console.log(O_V)
       const DOWN_EST = O_V == 0 ? 1 : 'NULL'
 
       if (!STATUS) {

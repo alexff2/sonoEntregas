@@ -75,7 +75,7 @@ module.exports = {
       const { idSale } = req.params
       const { dateDeliv, CODLOJA } = req.body
   
-      await Sales._query(0, `UPDATE SALES SET D_ENTREGA1 = '${dateDeliv}' WHERE ID_SALES = ${idSale} AND CODLOJA = ${CODLOJA}`)
+      await Sales._query(0, `UPDATE SALES SET D_ENTREGA1 = '${dateDeliv}', SCHEDULED = 1 WHERE ID_SALES = ${idSale} AND CODLOJA = ${CODLOJA}`)
 
       res.json(dateDeliv)
     } catch (error) {

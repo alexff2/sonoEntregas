@@ -6,7 +6,7 @@ import {
   Typography,
   makeStyles
 } from '@material-ui/core'
-import { Assignment, ShoppingCart } from '@material-ui/icons'
+import { LocalShipping, ShoppingCart } from '@material-ui/icons'
 import api from '../../services/api'
 
 import { useSale } from '../../context/saleContext'
@@ -59,8 +59,8 @@ const Item = ({classes, title, icon: Icon, value, seachHome}) => {
         />
       )}
         <Typography 
-          variant="h5" 
-          color="textSecondary" 
+          variant="h6"
+          color="textSecondary"
           className={classes.text}
         >{value}</Typography>
         <Typography 
@@ -91,19 +91,19 @@ export default function Home(){
             title: 'Vendas Pendentes',
           },
           {
-            icon: Assignment,
-            value: resp.data.OnReleaseSales,
+            icon: ShoppingCart,
+            value: (resp.data.salesOnRelease + resp.data.salesOnDelivring),
             title: 'Vendas em processo',
           },
           {
-            icon: Assignment,
-            value: resp.data.OnReleaseDev,
-            title: 'Entregas em lançamento',
+            icon: LocalShipping,
+            value: resp.data.devOnRelease,
+            title: 'Rotas em lançamento',
           },
           {
-            icon: Assignment,
+            icon: LocalShipping,
             value: resp.data.delivering,
-            title: 'Entregas em deslocamento',
+            title: 'Rotas em deslocamento',
           }
         ])
       })
@@ -111,7 +111,7 @@ export default function Home(){
   }
 
   return(
-    <Grid container spacing={5}>
+    <Grid container spacing={3}>
       
       {itens.map( item => (
         <Item 
