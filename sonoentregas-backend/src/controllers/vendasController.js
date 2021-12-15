@@ -38,7 +38,7 @@ module.exports = {
       let { CODIGOVENDA, CODCLIENTE, NOMECLI, VALORPROD, DESCONTO, TOTALVENDA, EMISSAO, STATUS, ENDERECO, NUMERO, BAIRRO, CIDADE, ESTADO, PONTOREF, OBS, products, USER_ID, VENDEDOR, FONE, CGC_CPF, INS_RG, FAX, orcParc, O_V , OBS2, HAVE_OBS2} = req.body //
 
       const D_ENVIO = getDate()
-      const D_ENTREGA1 = setDaysInDate(EMISSAO, 11) //Objetivo do sistema
+      const D_ENTREGA1 = setDaysInDate(EMISSAO, 15) //Objetivo do sistema
       const DOWN_EST = O_V == 0 ? 1 : 'NULL'
 
       if (!STATUS) {
