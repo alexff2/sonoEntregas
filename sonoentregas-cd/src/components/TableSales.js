@@ -23,7 +23,7 @@ import { useShop } from '../context/shopContext';
 import EnhancedTableHead from './EnhancedTableHead'
 
 //Functions
-import getDate from '../functions/getDates'
+import { getDateBr } from '../functions/getDates'
 import { getComparator, stableSort } from '../functions/orderTable'
 
 const useStyles = makeStyles( theme =>({
@@ -149,7 +149,7 @@ function Row({sendSalesProd, sale, type}) {
         <TableCell>{sale.NOMECLI}</TableCell>
         <TableCell>{sale.BAIRRO}
         </TableCell>
-        <TableCell align="right" className={styleDateDeliv()}>{getDate(sale.D_ENTREGA1)}</TableCell>
+        <TableCell align="right" className={styleDateDeliv()}>{getDateBr(sale.D_ENTREGA1)}</TableCell>
         <TableCell align="right">{setShops(sale.CODLOJA)}</TableCell>
       </TableRow>
   

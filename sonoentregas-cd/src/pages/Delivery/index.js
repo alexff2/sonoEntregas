@@ -1,49 +1,26 @@
-import React, { useEffect, useState, Fragment } from "react"
+import React, { useState } from 'react'
 import {
   Box,
-  Button,
   Fab,
   fade,
   makeStyles,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem
-} from "@material-ui/core"
-import { Add, Delete, Edit } from "@material-ui/icons"
+} from '@material-ui/core'
+import { Add } from '@material-ui/icons'
 
 //Components
 import Modal from '../../components/Modal'
 import ModalDelivery from './ModalDelivery'
 import ModalFinish from './ModalFinish'
+import ModalDelivering from './ModalDelivering'
+import TabDeliv from './TabDeliv'
 //Context
 import { useDelivery } from '../../context/deliveryContext'
-import { useCars } from '../../context/carsContext'
-import { useDrivers } from '../../context/driverContext'
-import { useAssistants } from '../../context/assistantContext'
+import { useDeliveryFinish } from '../../context/deliveryFinishContext'
 import { useSale } from '../../context/saleContext'
 
 import api from '../../services/api'
 
 const useStyle = makeStyles(theme => ({
-  head: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.common.white,
-    fontWeight: theme.typography.fontWeightBold
-  },
-  body: {
-    '&:nth-of-type(odd)': {
-      backgroundColor: theme.palette.action.hover,
-      padding: 0
-    }
-  },
   btnAdd: {
     position: 'fixed',
     bottom: '1.5rem',
@@ -63,92 +40,39 @@ const useStyle = makeStyles(theme => ({
     border: '2px solid #000',
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3),
+  },
+  boxTabHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    '& span': {
+      fontSize: 20,
+      fontWeight: theme.typography.fontWeightBold
+    },
+    '& div': {
+      fontSize: 15,
+      fontWeight: theme.typography.fontWeightBold,
+      '& input': {
+        border: 'none'
+      }
+    }
   }
 }))
 
-//Component Button Update Status
-function BtnStatus({ selectDelivery, delivery, setDelivery, finishDelivery }){
-  const updateDelivery = async status => {
-    if (status === 'Entregando') {
-      selectDelivery.STATUS = status
-      
-      for( let i = 0; i < selectDelivery.sales.length; i++){
-        for( let j = 0; j < selectDelivery.sales[i].products.length; j++){
-          selectDelivery.sales[i].products[j].STATUS = status
-        }
-      }
-      
-      const { data } = await api.put(`deliverys/status/${selectDelivery.ID}`, selectDelivery)
-      
-      setDelivery(delivery.map( item => item.ID === selectDelivery.ID ? data : item))
-    } else if (status === 'Finalizada') {
-      finishDelivery(selectDelivery)
-    }
-  }
-
-  if (selectDelivery.STATUS === 'Em lançamento') {
-    return <Button onClick={() => updateDelivery('Entregando')}>Entregar</Button>
-  } else if (selectDelivery.STATUS === 'Entregando') {
-    return <Button onClick={() => updateDelivery('Finalizada')}>Finalizar</Button>
-  } else {
-    return null
-  }
-}
-
 export default function Delivery() {
   //Modals Open States
-  const [ open, setOpen ] = useState(false)
+  const [ openCreateDeliv, setOpenCreateDeliv ] = useState(false)
   const [ openUpdateDelivery, setOpenUpdateDelivery ] = useState(false)
+  const [ openModalDelivering, setOpenModalDelivering ] = useState(false)
   const [ openFinish, setOpenFinish ] = useState(false)
-  const [ currentDeliv, setCurrentDeliv ] = useState([])
+  const [ openViewFinish, setOpenViewFinish ] = useState(false)
 
   //States
-  const [ deliveryUpdate, setDeliveryUpdate ] = useState({})
-  const { delivery, setDelivery } = useDelivery()
-  const { cars } = useCars()
-  const { drivers } = useDrivers()
-  const { assistants } = useAssistants()
+  const [ selectDelivery, setSelectDelivery ] = useState({})
+   const { delivery, setDelivery } = useDelivery()
+  const { deliveryFinish, setDeliveryFinish } = useDeliveryFinish()
   const { setSales } = useSale()
 
-  useEffect(()=>{
-    setCurrentDeliv(delivery.filter( deliv => deliv.STATUS !== 'Finalizada'))
-  },[delivery])
-
-  //Styles
   const classes = useStyle()
-  const StyleStatus = status => {
-    var background
-    if (status === 'Em lançamento') {
-      background = '#2196f3'
-    } else if (status === 'Entregando') {
-      background = '#ff9800'
-    } else if (status === 'Finalizada') {
-      background = '#388e3c'
-    }
-    return { 
-      background,
-      color: '#FFF',
-      width: '100%',
-      minHeight: '2rem',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center'
-    }
-  }
-
-  //return car description and driver description
-  const descriptionCar = codCar => {
-    const car = cars.filter(item => item.ID === codCar)
-    return car[0].DESCRIPTION
-  }
-  const descriptionDriver = codDriver => {
-    const driver = drivers.filter(item => item.ID === codDriver)
-    return driver[0].DESCRIPTION
-  }
-  const descriptionAssistants = codAssistant => {
-    const assistant = assistants.filter(item => item.ID === codAssistant)
-    return assistant[0].DESCRIPTION
-  }
 
   //Functions
   const deleteDelivery = async cod => {
@@ -156,7 +80,6 @@ export default function Delivery() {
       const { data } = await api.delete(`deliverys/${cod}`)
 
       setDelivery(delivery.filter(item => item.ID !== cod))
-      setCurrentDeliv(delivery.filter(item => item.ID !== cod))
 
       if (data.delete) {
         const { data: dataSales } = await api.get('sales/false/false/Aberta/null')
@@ -167,100 +90,84 @@ export default function Delivery() {
       console.log(error)
     }
   }
-  const updateDelivery = item => {
-    setDeliveryUpdate(item)
-    setOpenUpdateDelivery(true)
+  const openModals = (item, modal) => {
+    switch (modal) {
+      case 'update':
+        setSelectDelivery(item)
+        setOpenUpdateDelivery(true)
+        break;
+      case 'view':
+        setSelectDelivery(item)
+        setOpenViewFinish(true)
+        break;
+      case 'finish':
+        setSelectDelivery(item)
+        setOpenFinish(true)
+        break;
+      case 'status':
+        if (item.STATUS === 'Em lançamento') {
+          setOpenModalDelivering(true)
+          setSelectDelivery(item)
+        } else if (item.STATUS === 'Entregando') {
+          setOpenFinish(true)
+          setSelectDelivery(item)
+        }
+        break
+      default:
+        break
+    }
+    
   }
-  const finishDelivery = item => {
-    setDeliveryUpdate(item)
-    setOpenFinish(true)
-  }
-
-  const seachDeliv = tipo => {
-    tipo === 0 ? setCurrentDeliv(delivery)
-    : api.get('deliverys/Finalizada').then(resp => setCurrentDeliv(resp.data))
+  const seachDelivFinish = async e => {
+    const { data } = await api.get(`deliverys/close/${e.target.value}`)
+    setDeliveryFinish(data)
   }
 
   return (
-    <Box>
+    <>
+      <Box>
+        <div className={classes.boxTabHeader}>
+          <span>Rotas em processo</span>
+        </div>
+        <TabDeliv
+          type="open"
+          deleteDelivery={deleteDelivery}
+          openModals={openModals}
+        />
 
-      <TableContainer component={Paper}>
-        <Table aria-label="custumezed table">
-          <TableHead>
-            <TableRow>
-            {['Código', 'Descrição', 'Motorista', 'Auxiliar', 'Veículo', 'Status'].map((value, index) => (
-              <TableCell className={classes.head} key={index}>{value}</TableCell>
-            ))}
-              <TableCell style={{paddingTop: 0, paddingBottom: 0}} colSpan={2} className={classes.head}>
-                <FormControl variant="outlined">
-                  <InputLabel id="fieldSeach" className={classes.label}>Entregas</InputLabel>
-                  <Select
-                    label="Entregas"
-                    labelId="fieldSeach"
-                    className={classes.fieldSeach}
-                    defaultValue={0}
-                    onChange={e => seachDeliv(e.target.value)}
-                  >
-                    <MenuItem value={0}>Abertas</MenuItem>
-                    <MenuItem value={1}>Finalizadas</MenuItem>
-                  </Select>
-                </FormControl>
-              </TableCell>
-            
-            </TableRow>
-          </TableHead>
-          
-          <TableBody>
-          {currentDeliv.map( item => (
-            <TableRow key={item.ID} className={classes.body}>
-              <TableCell width={'5%'}>{item.ID}</TableCell>
-              <TableCell width={'24%'}>{item.DESCRIPTION}</TableCell>
-              <TableCell width={'13%'}>{descriptionDriver(item.ID_DRIVER)}</TableCell>
-              <TableCell width={'13%'}>{descriptionAssistants(item.ID_ASSISTANT)}</TableCell>
-              <TableCell width={'15%'}>{descriptionCar(item.ID_CAR)}</TableCell>
-              <TableCell width={'15%'}>
-                <div style={StyleStatus(item.STATUS)} >{item.STATUS}</div>
-              </TableCell>
-              <TableCell width={'8%'} align="right">
-                {item.STATUS === 'Finalizada' || item.STATUS === 'Entregando' ? null : (
-                <Fragment>
-                  <Edit onClick={()=> updateDelivery(item)}/>
-                  <Delete onClick={()=> deleteDelivery(item.ID)}/>
-                </Fragment>
-                )}
-              </TableCell>
-              <TableCell width={'7%'}>
-                <BtnStatus
-                  selectDelivery={item}
-                  delivery={delivery}
-                  setDelivery={setDelivery}
-                  finishDelivery={finishDelivery}
-                />
-              </TableCell>
-            </TableRow>
-          ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+        <Box>
+          <div className={classes.boxTabHeader} style={{paddingTop: '1rem'}}>
+            <span>Rotas Finalizadas</span>
+            <div>Dia: <input type='date' onChange={seachDelivFinish}/></div>
+          </div>
+          {deliveryFinish.length > 0 &&
+            <TabDeliv
+              type="close"
+              openModals={openModals}
+            />
+          }
+        </Box>
 
-      <Fab 
-        color="primary"
-        className={classes.btnAdd}
-        onClick={() => setOpen(true)}
-      >
-        <Add />
-      </Fab>
-
+        <Fab 
+          color="primary"
+          className={classes.btnAdd}
+          onClick={() => setOpenCreateDeliv(true)}
+        >
+          <Add />
+        </Fab>
+      </Box>
+      
+      {/* Modais*/}
       <Modal 
-        open={open}
-        setOpen={setOpen}
+        open={openCreateDeliv}
+        setOpen={setOpenCreateDeliv}
         title="Lançar Entrega"
       >
         <ModalDelivery
-          setOpen={setOpen}
+          setOpen={setOpenCreateDeliv}
           selectDelivery={false}
-          currentDeliv={currentDeliv}
-          setCurrentDeliv={setCurrentDeliv}
+          delivery={delivery}
+          setDelivery={setDelivery}
         />
       </Modal>
 
@@ -271,9 +178,7 @@ export default function Delivery() {
       >
         <ModalDelivery 
           setOpen={setOpenUpdateDelivery} 
-          selectDelivery={deliveryUpdate} 
-          currentDeliv={currentDeliv}
-          setCurrentDeliv={setCurrentDeliv}
+          selectDelivery={selectDelivery}
         />
       </Modal>
 
@@ -284,12 +189,34 @@ export default function Delivery() {
       >
         <ModalFinish 
           setOpen={setOpenFinish}
-          selectDelivery={deliveryUpdate}
-          currentDeliv={currentDeliv}
-          setCurrentDeliv={setCurrentDeliv}
+          selectDelivery={selectDelivery}
+          type={'open'}
         />
       </Modal>
 
-    </Box>
+      <Modal
+        open={openViewFinish}
+        setOpen={setOpenViewFinish}
+        title={"Visualização"}
+      >
+        <ModalFinish 
+          setOpen={setOpenViewFinish}
+          selectDelivery={selectDelivery}
+          type={'close'}
+        />
+      </Modal>
+
+      <Modal
+        open={openModalDelivering}
+        setOpen={setOpenModalDelivering}
+        title={"Iniciar deslocamento do caminhão"}
+      >
+        <ModalDelivering
+          setOpen={setOpenModalDelivering}
+          selectDelivery={selectDelivery}
+        />
+      </Modal>
+
+    </>
   )
 }

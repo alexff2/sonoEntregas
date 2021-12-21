@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   makeStyles,
   Box,
@@ -14,14 +14,13 @@ import {
 } from "@material-ui/core"
 
 import { ButtonCancel, ButtonSucess } from '../../components/Buttons'
+import ModalALert from '../../components/ModalAlert'
 
-import getDate from '../../functions/getDates'
+import { getDateBr } from '../../functions/getDates'
 
 //context
-import { useCars } from '../../context/carsContext'
-import { useDrivers } from '../../context/driverContext'
-import { useAssistants } from '../../context/assistantContext'
 import { useDelivery } from '../../context/deliveryContext'
+import { useDeliveryFinish } from '../../context/deliveryFinishContext'
 import { useSale } from '../../context/saleContext'
 
 import api from '../../services/api'
@@ -36,23 +35,19 @@ const useStyles = makeStyles(theme => ({
   divHeader:{
     width: '100%',
     display: 'flex',
-    flexDirection: 'row',
     marginTop: -20,
     marginBottom: 15,
+    '& span' : {
+      fontWeight: 700
+    },
     '& > div': {
       width: '50%',
       '& > p' : {
         marginBottom: 2,
         marginTop: 2,
-        '& > span' : {
-          fontWeight: 700
-        }
       },
       '& > div' : {
         marginBottom: 2,
-        '& > span' : {
-          fontWeight: 700
-        }
       }
     }
   },
@@ -83,7 +78,89 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-const Row = ({ sale, sendSalesProd, classes }) => {
+const RowProd = ({product, status, stateCheckedAllProd, type })=>{
+  const [ checkProd, setCheckProd ] = useState(false)
+
+  useEffect(()=>{
+    setCheckProd(stateCheckedAllProd)
+  },[stateCheckedAllProd])
+
+  const checkedPro = e => {
+    if (e.target.checked) {
+      setCheckProd(true)
+      product.STATUS = 'Finalizada'
+      product.DELIVERED = false //false is zero
+      product.REASON_RETURN = 'NULL'
+    } else {
+      setCheckProd(false)
+      product.STATUS = 'Entregando'
+      product.DELIVERED = true //false is zero
+    }
+  }
+  return(
+    <>
+      <TableRow>
+        <TableCell component="th" scope="row">
+          {product.CODPRODUTO}
+        </TableCell>
+        <TableCell>{product.DESCRICAO}</TableCell>
+        <TableCell>{product.QTD_DELIV}</TableCell>
+        <TableCell align="right">{
+          Intl
+            .NumberFormat('pt-br',{style: 'currency', currency: 'BRL'})
+            .format(product.NVTOTAL)
+        }</TableCell>
+        {type === 'open' &&
+          <TableCell align="right">
+            <Checkbox
+              onChange={checkedPro}
+              checked={checkProd}
+            />
+          </TableCell>
+        }
+        {status === 'Finalizada' &&
+          <TableCell align="right">
+            {product.DELIVERED ? 
+              <span style={{
+                fontSize: 12,
+                backgroundColor: 'red',
+                color: 'white',
+                padding: 3
+              }}>Retorno</span>  : 
+              <span style={{
+                fontSize: 12,
+                backgroundColor: 'green',
+                color: 'white',
+                padding: 3
+              }}>Entregue</span>}
+          </TableCell>
+        }
+      </TableRow>
+      {(!checkProd && type === 'open') &&
+        <TableRow>
+          <TableCell colSpan={5}>
+            <Box>
+              Motivo de retorno: <input type="text" onChange={
+                e => product.REASON_RETURN = e.target.value
+              }/>
+            </Box>
+          </TableCell>
+        </TableRow>
+      }
+      { (status === 'Finalizada' && product.REASON_RETURN !== null) &&
+        <TableRow>
+          <TableCell colSpan={5}>
+            <Box>
+              Motivo de retorno: {product.REASON_RETURN}
+            </Box>
+          </TableCell>
+        </TableRow>
+      }
+    </>
+  )
+}
+
+const RowSale = ({ sale, classes, type, status, stateCheckedAllProd }) => {
   return(
     <React.Fragment>
       <TableRow className={classes.root}>
@@ -96,7 +173,7 @@ const Row = ({ sale, sendSalesProd, classes }) => {
           .NumberFormat('pt-br',{style: 'currency', currency: 'BRL'})
           .format(sale.TOTAL)
         }</TableCell>
-        <TableCell align="right">{getDate(sale.EMISSAO)}</TableCell>
+        <TableCell align="right">{getDateBr(sale.EMISSAO)}</TableCell>
       </TableRow>
 
       <TableRow>
@@ -112,27 +189,17 @@ const Row = ({ sale, sendSalesProd, classes }) => {
                   <TableCell>Descrição</TableCell>
                   <TableCell>Qtd. Entrega</TableCell>
                   <TableCell align="right">Valor (R$)</TableCell>
+                  {type === 'open' && <TableCell></TableCell>}
                 </TableRow>
               </TableHead>
               <TableBody>
-                {sale.products.map((produto) => (
-                  <TableRow key={produto.CODPRODUTO}>
-                    <TableCell component="th" scope="row">
-                      {produto.CODPRODUTO}
-                    </TableCell>
-                    <TableCell>{produto.DESCRICAO}</TableCell>
-                    <TableCell>{produto.QTD_DELIV}</TableCell>
-                    <TableCell align="right">{
-                      Intl
-                        .NumberFormat('pt-br',{style: 'currency', currency: 'BRL'})
-                        .format(produto.NVTOTAL)
-                    }</TableCell>
-                    <TableCell align="right">
-                    <Checkbox
-                      onChange={(e) => sendSalesProd(e, produto)}
-                    />
-                  </TableCell>
-                  </TableRow>
+                {sale.products.map((product) => (
+                  <RowProd key={product.CODPRODUTO}
+                    product={product}
+                    status={status}
+                    stateCheckedAllProd={stateCheckedAllProd}
+                    type={type}
+                  />
                 ))}
               </TableBody>
             </Table>
@@ -143,52 +210,39 @@ const Row = ({ sale, sendSalesProd, classes }) => {
   )
 }
 
-export default function ModalFinish({ setOpen, selectDelivery, currentDeliv, setCurrentDeliv}){
+export default function ModalFinish({ setOpen, selectDelivery, type }){
   //States
+  const [ openModalAlert, setOpenModalAlert ] = useState(false)
+  const [ childrenModalAlert, setChildrenOpenModalAlert ] = useState('')
   const [ dateDelivery, setDateDelivery ] = useState(false)
-  
-  const { cars } = useCars()
-  const { drivers } = useDrivers()
-  const { assistants } = useAssistants()
+  const [ stateCheckedAllProd, setStateCheckedAllProd ] = useState(false)
+
   const { delivery, setDelivery } = useDelivery()
+  const { deliveryFinish, setDeliveryFinish } = useDeliveryFinish()
   const stateSales = useSale()
 
-  //Styes
   const classes = useStyles()
-  
-  //Functions Outher
-  const descriptionCar = () => {
-    const car = cars.filter(car => car.ID === selectDelivery.ID_CAR)
-    return car[0].DESCRIPTION
-  }
-  const descriptionDriver = () => {
-    const driver = drivers.filter(driver => driver.ID === selectDelivery.ID_DRIVER)
-    return driver[0].DESCRIPTION
-  }
-  const descriptionAssistants = () => {
-    const assistant = assistants.filter(assistant => assistant.ID === selectDelivery.ID_ASSISTANT)
-    return assistant[0].DESCRIPTION
-  }
-  const sendSalesProd = (e, product) => {
+
+  //Functions
+  const checkedAllProd = e => {
     if (e.target.checked){
+      setStateCheckedAllProd(true)
       selectDelivery.sales.forEach(sale =>{
         sale.products.forEach(produto => {
-          if (produto.COD_ORIGINAL === product.COD_ORIGINAL){
-            produto.STATUS = 'Enviado'
-          }
+          produto.STATUS = 'Finalizada'
+          produto.DELIVERED = false
         })
       })
     } else {
+      setStateCheckedAllProd(false)
       selectDelivery.sales.forEach(sale =>{
         sale.products.forEach(produto => {
-          if (produto.COD_ORIGINAL === product.COD_ORIGINAL){
-            produto.STATUS = 'Entregando'
-          }
+          produto.STATUS = 'Entregando'
+          produto.DELIVERED = true
         })
       })
     }
   }
-
   const finish = async () => {
     try {
       if(dateDelivery){
@@ -199,8 +253,9 @@ export default function ModalFinish({ setOpen, selectDelivery, currentDeliv, set
   
         selectDelivery.sales.forEach(sale =>{
           sale.products.forEach(produto => {
-            if (produto.STATUS === 'Entregando'){
-              produto.STATUS = status
+            if(produto.STATUS === 'Entregando') {
+              produto.STATUS = 'Enviado'
+              produto.DELIVERED = true
             }
           })
         })
@@ -212,38 +267,48 @@ export default function ModalFinish({ setOpen, selectDelivery, currentDeliv, set
           stateSales.setSales(resp.data)
         }
     
-        setDelivery(delivery.map( item => item.ID === data.ID ? data : item))
-        setCurrentDeliv(currentDeliv.filter( deliv => deliv.ID !== data.ID ))
+        setDelivery(delivery.filter( deliv => deliv.ID !== data.ID ))
+        setDeliveryFinish([...deliveryFinish, selectDelivery])
         setOpen(false)
       } else {
-        alert('Selecione a data de entrega')
+        setChildrenOpenModalAlert('Selecione a data de entrega')
+        setOpenModalAlert(true)
       }
     } catch (error) {
       console.log(error)
-      alert('Erro de conexão, entrar em contato com ADM')
+      setChildrenOpenModalAlert('Erro de conexão, entrar em contato com ADM')
+      setOpenModalAlert(true)
     }
   }
-  //Component
+
+  //Main Component
   return(
     <form>
+      <button onClick={e=>{
+        e.preventDefault()
+        console.log(selectDelivery)
+      }}>Dev</button>
       <h3 className={classes.titleModalFinish}>{selectDelivery.DESCRIPTION}</h3>
       <div className={classes.divHeader}>    
         <div>
-          <p><span>Motorista: </span>{descriptionDriver()}</p>
-          <p><span>Auxiliar: </span> {descriptionAssistants()}</p>
+          <p><span>Motorista: </span>{selectDelivery.DRIVER}</p>
+          <p><span>Auxiliar: </span> {selectDelivery.ASSISTANT}</p>
         </div>
 
         <div>
-          <p><span>Veículo: </span> {descriptionCar()}</p>
-          <div>
-            <span>Data da Entrega: </span>
-            <input 
-              type="date"
-              required
-              onChange={e => setDateDelivery(e.target.value)}
-            />
-          </div>
+          <p><span>Veículo: </span> {selectDelivery.CAR}</p>
+          {type !== 'close' &&
+            <div>
+              <span>Data da Entrega: </span>
+              <input 
+                type="date"
+                required
+                onChange={e => setDateDelivery(e.target.value)}
+              />&nbsp;
+            </div>
+          }
         </div>
+        {type !== 'close' &&<span>Todos: <Checkbox onChange={checkedAllProd}/></span>}
       </div>
 
       <TableContainer component={Paper}>
@@ -259,25 +324,39 @@ export default function ModalFinish({ setOpen, selectDelivery, currentDeliv, set
 
           <TableBody>
             {selectDelivery.sales.map(sale => (
-              <Row  key={sale.ID_SALES} sale={sale} sendSalesProd={sendSalesProd} classes={classes}/>
+              <RowSale
+                key={sale.ID_SALES}
+                sale={sale}
+                classes={classes}
+                type={type}
+                status={selectDelivery.STATUS}
+                stateCheckedAllProd={stateCheckedAllProd}
+              />
             ))}
           </TableBody>
         </Table>
       </TableContainer>
 
+      {type !== 'close' &&
+        <div className={classes.btnActions}>
+          <ButtonSucess 
+            children={"Finalizar"}
+            className={classes.btnSucess}
+            onClick={finish}
+          />
+          <ButtonCancel 
+            children="Cancelar"
+            onClick={() => setOpen(false)}
+            className={classes.btnCancel}
+          />
+        </div>
+      }
 
-      <div className={classes.btnActions}>
-        <ButtonSucess 
-          children={"Finalizar"}
-          className={classes.btnSucess}
-          onClick={finish}
-        />
-        <ButtonCancel 
-          children="Cancelar"
-          onClick={() => setOpen(false)}
-          className={classes.btnCancel}
-        />
-      </div>
+      <ModalALert
+        open={openModalAlert}
+        setOpen={setOpenModalAlert}
+        children={childrenModalAlert}
+      />
     </form>
   )
 }

@@ -103,7 +103,7 @@ module.exports = {
     var salesFinish = await Sales._query(0,`SELECT QTD_SALES FROM VIEW_DELIVERED_BY_DAYS WHERE D_DELIVERED = '${issueEnd}'`, QueryTypes.SELECT)
     salesFinish.length > 0 ? salesFinish = salesFinish[0].QTD_SALES : salesFinish = 0
 
-    var devFinish = await Sales._query(0,`SELECT COUNT(ID_DELIVERY) QTD_DELIV FROM VIEW_D_DELV_ROUTES WHERE D_DELIVERING = '${issueEnd}'`, QueryTypes.SELECT)
+    var devFinish = await Sales._query(0,`SELECT COUNT(ID_DELIVERY) QTD_DELIV FROM VIEW_D_DELV_ROUTES WHERE D_DELIVERED = '${issueEnd}'`, QueryTypes.SELECT)
     
     devFinish.length > 0 ? devFinish = devFinish[0].QTD_DELIV : devFinish = 0
 

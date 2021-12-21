@@ -5,12 +5,6 @@ import { makeStyles } from '@material-ui/core'
 import Modal from './Modal'
 
 const useMakeStyle = makeStyles( theme => ({
-  modalAlert: {
-    width: 500,
-    [theme.breakpoints.only('sm')]:{
-      width: '90vw'
-    }
-  },
   headerX: {
     backgroundColor: 'rgb(226, 116, 126)',
     padding: '2rem',
@@ -48,7 +42,7 @@ export default function ModalALert({ children, open, setOpen }){
   const classes = useMakeStyle()
   return(
     <Modal open={open} setOpen={setOpen} title={false}>
-      <div className={classes.modalAlert}>
+      <div>
         <div className={classes.headerX}>
           <div><AddIcon fontSize="large"/></div>
         </div>

@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt')
 const Users = require('../models/Users')
 
 module.exports = {
@@ -9,14 +10,20 @@ module.exports = {
   
       return res.json(users)
     } catch (error) {
+      const { original } = error
       return res.status(400).json(original)
     }
   },
   async create(req, res) {
     try {
       const { codloja, description, active, office, password } = req.body
-      
-      const values = `${codloja}, '${description}', ${active}, '${office}', '${password}'`
+      var passwordHas
+
+      bcrypt.hash(password, 10, (errBt, hash)=>{
+        if (errBt) return res.status(500).json({error: errBt})
+        passwordHas = hash
+      })
+      const values = `${codloja}, '${description}', ${active}, '${office}', '${passwordHas}'`
       
       return res.json(await Users.creator(0, values))
     } catch (error) {

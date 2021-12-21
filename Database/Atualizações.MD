@@ -2,17 +2,16 @@
 * Verificar codigos e descrição nas lojas de acordo com base de dados do CD;
 * Verificar as Bibox
 * Separar vendas iniciadas e colocar o nome ENTREGAS
-* Estudar e ajustar 6 vendas em lançamento e colocar datas na tabela Delivery
 * Verificar dados sequintes: sale:15204	loja:4	prod:1862	
-* Ajustar View Deliverys
+
+# Atualização de banco
+ALTER TABLE DELIVERYS_PROD ADD REASON_RETURN VARCHAR(250) NULL
 
 # Pendências
 * Vendas a receber;
-* Ajustr modal Alert colocando children de conexao com servidor padrão;
 
 ## Pendências Futuras
 * Imprimir dav pelo sistema;
-* Mudar cor de acordo com vencimento do prazo de entrega;
 
 ## Etapas:
 ================================================================================

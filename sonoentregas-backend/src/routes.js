@@ -34,6 +34,7 @@ routes.post('/vendas', vendasController.cancelSubmitSales)
 routes.post('/vendas/reverse', vendasController.reverseStock)
 //Sales Sono Delivery
 routes.get('/sales/:typesearch/:search/:status/:codloja', salesController.index)
+routes.get('/sales/:status/:where', salesController.sales)
 routes.get('/salesProdct/:idSale/:codloja/:codproduto', salesController.findProductDetals)
 routes.post('/sales/updateDate/:idSale', salesController.updaDateDeliv)
 //Cars
@@ -43,6 +44,7 @@ routes.put('/cars/:id', carsController.update)
 routes.delete('/cars/:id', carsController.delete)
 //Deliverys
 routes.get('/deliverys/:status', deliverysController.index)
+routes.get('/deliverys/:status/:date', deliverysController.index)
 routes.post('/deliverys', deliverysController.create)
 routes.put('/deliverys/:id', deliverysController.update)
 routes.delete('/deliverys/:id', deliverysController.delete)

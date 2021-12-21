@@ -26,7 +26,7 @@ import { KeyboardArrowDown, KeyboardArrowUp} from '@material-ui/icons'
 import { useShop } from '../../context/shopContext'
 
 import api from '../../services/api'
-import getDate from '../../functions/getDates'
+import { getDateBr } from '../../functions/getDates'
 import { getComparator, stableSort } from '../../functions/orderTable'
 
 import EnhancedTableHead from '../../components/EnhancedTableHead'
@@ -153,9 +153,9 @@ function Row({ sale, setShops, modalDetalProduct, typeSeach }) {
         </TableCell>
         <TableCell style={sale.HAVE_OBS2 ? {color: 'Red', fontWeight: 700}: {}}>{sale.ID_SALES}</TableCell>
         <TableCell>{sale.NOMECLI}</TableCell>
-        <TableCell align="right">{getDate(sale.EMISSAO)}</TableCell>
+        <TableCell align="right">{getDateBr(sale.EMISSAO)}</TableCell>
         <TableCell align="right" onClick={updateDateDeliv} className={styleDateUpdate()}>
-          {getDate(sale.D_ENTREGA1)}
+          {getDateBr(sale.D_ENTREGA1)}
         </TableCell>
         <TableCell align="right">{setShops(sale.CODLOJA)}</TableCell>
       </TableRow>

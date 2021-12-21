@@ -2,6 +2,7 @@ const Sales = require('../models/Sales')
 const ViewSalesProd = require('../models/ViewSalesProd')
 const ViewDeliveryProd = require('../models/ViewDeliveryProd')
 const ViewDeliverys = require('../models/ViewDeliverys')
+const { findSales } = require('../services/salesService')
 
 module.exports = {
   async index( req, res ){
@@ -38,11 +39,27 @@ module.exports = {
       } else {
         sales = await Sales.findSome(0, `${typesearch} = '${search}'${whereCodloja}`)
       }
+      var idSale = ''
       
-      for (let i = 0; i < sales.length; i++) {
-        var products = await ViewSalesProd.findSome(0, `ID_SALES = ${sales[i].ID_SALES} AND CODLOJA = ${sales[i].CODLOJA}`)
-        sales[i]["products"] = products
+      for (let i = 0; i < sales.length; i++){
+        if ( i === 0 ){
+          idSale+= sales[i].ID_SALES
+        } else {
+          idSale+= `, ${sales[i].ID_SALES}`
+        }
       }
+  
+      const viewSalesProd = await ViewSalesProd.findSome(0, `ID_SALES IN (${idSale})`)
+  
+      sales.forEach(sale => {
+        sale["products"] = []
+  
+        viewSalesProd.forEach(saleProd => {
+          if (sale.ID_SALES === saleProd.ID_SALES && sale.CODLOJA === saleProd.CODLOJA) {
+            sale.products.push(saleProd)
+          }
+        })
+      })
       
       return res.json(sales)
     } catch (error) {
@@ -81,5 +98,10 @@ module.exports = {
     } catch (error) {
       res.status(400).json(error)
     }
+  },
+  async sales(req, res){
+    const {status, where} = req.params
+    const { sales } = await findSales(status, where)
+    return res.json(sales)
   }
 }

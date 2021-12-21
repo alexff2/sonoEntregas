@@ -12,7 +12,7 @@ const useStyles = makeStyles( theme => ({
     border: '2px solid #000',
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3),
-    width: 'min(95vw, 700px)',
+    width: '95vw, 700px)',
     maxHeight: 'calc(100vh - 100px)',
     overflow: 'auto'
   },
@@ -22,7 +22,7 @@ const useStyles = makeStyles( theme => ({
     backgroundColor: '#f5f5f5',
     letterSpacing: -0.5,
     padding: 0,
-    width: 'min(95vw, 800px)',
+    width: 'min(95vw, 500px)',
     maxHeight: 'calc(100vh - 50px)',
     overflow: 'auto'
   }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import './style.css'
 
 import api from '../../services/api'
-import getDates from '../../functions/getDates'
+import { getDateBr } from '../../functions/getDates'
 
 function ModalSales({ sale, product }) {
   const [ dateLoading, setDateLoading ] = useState(false)
@@ -39,7 +39,7 @@ function ModalSales({ sale, product }) {
         <div className="content">
           <div className="infoDav">
             <h3 className="titleContent">Informações da DAV</h3>
-            <div className="info"><label>Data do envio ao CD: </label>{getDates(sale.D_ENVIO)}</div>
+            <div className="info"><label>Data do envio ao CD: </label>{getDateBr(sale.D_ENVIO)}</div>
             <div className="info"><label>Vendedor: </label>{sale.VENDEDOR}</div>
             <div className="info"><label>Status da entrega: </label>{product.STATUS}</div>
           </div>
@@ -58,7 +58,7 @@ function ModalSales({ sale, product }) {
 
                 <div className="detalsStatus">
                   <div className="statusCurrent">Enviado</div>
-                  <div className="statusDate">{getDates(sale.D_ENVIO)}</div>
+                  <div className="statusDate">{getDateBr(sale.D_ENVIO)}</div>
                 </div>
               </div>
               
@@ -72,7 +72,7 @@ function ModalSales({ sale, product }) {
 
                 <div className="detalsStatus">
                   <div className="statusCurrent">Carregando</div>
-                  <div className="statusDate">{dateLoading ? getDates(dateLoading) : ''}</div>
+                  <div className="statusDate">{dateLoading ? getDateBr(dateLoading) : ''}</div>
                 </div>
               </div>
               
@@ -86,7 +86,7 @@ function ModalSales({ sale, product }) {
 
                 <div className="detalsStatus">
                   <div className="statusCurrent">Entregando</div>
-                  <div className="statusDate">{dateStartDeliv ? getDates(dateStartDeliv) : ''}</div>
+                  <div className="statusDate">{dateStartDeliv ? getDateBr(dateStartDeliv) : ''}</div>
                 </div>
               </div>
               
@@ -99,7 +99,7 @@ function ModalSales({ sale, product }) {
 
                 <div className="detalsStatus">
                   <div className="statusCurrent">{dateFinishDeliv ? 'Finalizada' : 'Previsto para:'}</div>
-                  <div className="statusDate">{dateFinishDeliv ? getDates(dateFinishDeliv) : getDates(datePrevDeliv)}</div>
+                  <div className="statusDate">{dateFinishDeliv ? getDateBr(dateFinishDeliv) : getDateBr(datePrevDeliv)}</div>
                 </div>
               </div>
             </div>

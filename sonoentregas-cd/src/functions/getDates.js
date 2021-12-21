@@ -1,4 +1,4 @@
-export default function getDate(date = false) {
+export function convertDate(date=false){
   var data, dia, diaF, mes, mesF, anoF
   if (date) {
     
@@ -9,8 +9,7 @@ export default function getDate(date = false) {
     mes  = (data.getMonth()+1).toString() //+1 pois no getMonth Janeiro começa com zero.
     mesF = (mes.length === 1) ? '0'+mes : mes
     anoF = data.getFullYear()
-    date = `${diaF}-${mesF}-${anoF}`
-    return date
+    return {diaF, mesF, anoF}
   } else { 
     data = new Date()
     dia  = data.getDate().toString()
@@ -18,10 +17,20 @@ export default function getDate(date = false) {
     mes  = (data.getMonth()+1).toString() //+1 pois no getMonth Janeiro começa com zero.
     mesF = (mes.length === 1) ? '0'+mes : mes
     anoF = data.getFullYear()
-    date = `${diaF}-${mesF}-${anoF}`
-    return date
+    return {diaF, mesF, anoF}
   }
 }
+
+export function getDateBr(date = false) {
+  const { diaF, mesF, anoF } = convertDate(date)
+  return `${diaF}-${mesF}-${anoF} `
+}
+
+export function getDateSql(date = false) {
+  const { diaF, mesF, anoF } = convertDate(date)
+  return `${anoF}-${mesF}-${diaF} `
+}
+
 export function setDate(days, date = false) {
   var data, dia, diaF, mes, mesF, anoF
   if (date) {
