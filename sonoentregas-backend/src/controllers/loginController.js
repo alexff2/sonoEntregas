@@ -1,5 +1,5 @@
 const Users = require('../models/Users')
-const bcrypt = require('bcrypt')
+//const bcrypt = require('bcrypt')
 
 module.exports = {
   async login(req, res) {
@@ -10,10 +10,9 @@ module.exports = {
   
       const data = await Users.findSome(0, where)
 
-      const match = await bcrypt.compare(password, data[0].password)
+      //const match = await bcrypt.compare(password, data[0].password)
 
-      if (match) return res.status(409).json({ auth: true })
-      else return  res.status(201).json({ auth: false })
+      return res.status(201).json(data[0])
     } catch (error) {
       return res.status(400).json(error)
     }

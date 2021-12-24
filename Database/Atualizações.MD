@@ -5,7 +5,7 @@
 * Verificar dados sequintes: sale:15204	loja:4	prod:1862	
 
 # Atualização de banco
-ALTER TABLE DELIVERYS_PROD ADD REASON_RETURN VARCHAR(250) NULL
+
 
 # Pendências
 * Vendas a receber;
