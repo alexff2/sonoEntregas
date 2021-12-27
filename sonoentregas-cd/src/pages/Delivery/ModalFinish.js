@@ -284,10 +284,6 @@ export default function ModalFinish({ setOpen, selectDelivery, type }){
   //Main Component
   return(
     <form>
-      <button onClick={e=>{
-        e.preventDefault()
-        console.log(selectDelivery)
-      }}>Dev</button>
       <h3 className={classes.titleModalFinish}>{selectDelivery.DESCRIPTION}</h3>
       <div className={classes.divHeader}>    
         <div>

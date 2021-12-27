@@ -76,7 +76,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
   const { drivers } = useDrivers()
   const { assistants } = useAssistants()
   const { delivery, setDelivery } = useDelivery()
-  const { sales, setSales } = useSale()
+  const { setSales } = useSale()
 
   //Styes
   const classes = useStyles()
@@ -132,19 +132,32 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
     }
   }
 
-  const setSalesInModal = e => {
+  const setSalesInModal = async e => {
     e.preventDefault()
 
     const saleFound = createDevSales.find( sale => sale.ID_SALES === idSale )
 
     if(saleFound === undefined) {
-      const salesToDev = sales.filter( sale => sale.ID_SALES === idSale )
+      try {
+        if (idSale !== ''){
+          const response = await api.get(`sales/ID_SALES/${idSale}/null/false`)
+
+          response.data !== '' ? setCreateDevSales([ ...createDevSales,  ...response.data]) : setErrorMsg('Venda não encontrada')
+        } else {
+          setErrorMsg('Preencha o campo Código da Venda')
+        }
+      } catch (e) {
+        console.log(e.response)
  
-      salesToDev.length > 0 ? setCreateDevSales([ ...createDevSales,  ...salesToDev]) : setErrorMsg('Venda não encontrada')
+        if (e.response.status === 400) {
+          setErrorMsg('Requisição Incorreta (Verifique valor digitado)!')
+        } else {
+          setErrorMsg('Erro ao comunicar com servidor!')
+        }
+      }
     } else {
       setErrorMsg('Venda já lançada')
     }
-
     setIdSale('')
   }
 

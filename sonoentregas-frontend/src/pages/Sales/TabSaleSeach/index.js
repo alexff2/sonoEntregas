@@ -34,8 +34,9 @@ function Row({ sale, modalDetalProduct, cancelSubmitSales, reverseStock }) {
                 <tr id="trProd">
                   <td>Código</td>
                   <td>Descrição</td>
-                  <td>Quantidade</td>
-                  <td colSpan={2}>Valor (R$)</td>
+                  <td className="qtdProd">Quantidade</td>
+                  <td>Valor (R$)</td>
+                  <td></td>
                 </tr>
               </thead>
               <tbody>

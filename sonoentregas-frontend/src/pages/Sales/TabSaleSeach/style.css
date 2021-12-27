@@ -93,6 +93,10 @@
   cursor: pointer;
 }
 
+.qtdProd {
+  width: 0.5rem;
+}
+
 #btnCancel:hover {
   opacity: .8;
 }

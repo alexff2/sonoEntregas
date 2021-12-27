@@ -4,26 +4,60 @@ import './style.css'
 import api from '../../../services/api'
 import { dateSqlToReact } from '../../../functions/getDate'
 
+const CheckFinishStatus = ({ prod, datePrevDeliv }) => {
+  const [ status, setStatus ] = useState({})
+
+  useEffect(()=>{
+    if (prod.D_DELIVERED) {
+      if(!prod.DELIVERED) {
+        setStatus({
+          msg: 'Finalizada',
+          color: 'blue'
+        })
+      } else {
+        setStatus({
+          msg: 'Retorno',
+          color: 'red'
+        })
+      }
+    } else {
+      setStatus({
+        msg: 'Previsto para:',
+        color: '#91949c'
+      })
+    }
+  },[prod])
+
+  return (
+    <div style={{color: status.color}}>
+      <div className="statusFig">
+        <div className="startCircle">
+          <div style={ {backgroundColor: status.color}}></div>
+        </div>
+      </div>
+
+      <div className="detalsStatus">
+        <div className="statusCurrent">{status.msg}</div>
+        <div className="statusDate">{prod.D_DELIVERED ? dateSqlToReact(prod.D_DELIVERED) : datePrevDeliv}</div>
+      </div>
+    </div>
+  )
+}
+
 function ModalSales({ sale, product }) {
-  const [ dateLoading, setDateLoading ] = useState(false)
-  const [ dateStartDeliv, setDateStartDeliv ] = useState(false)
-  const [ dateFinishDeliv, setDateFinishDeliv ] = useState(false)
   const [ datePrevDeliv, setDatePrevDeliv ] = useState('')
-  const [ detalsDeliv, setDetalsDeliv ] = useState({})
+  const [ prodsDetails, setProdsDetails] = useState([])
+  const [ detailsDeliv, setDetailsDeliv ] = useState({})
 
   useEffect(()=>{
     api.get(`salesProdct/${sale.ID_SALES}/${sale.CODLOJA}/${product.CODPRODUTO}`)
       .then(resp => {
         setDatePrevDeliv(dateSqlToReact(sale.D_ENTREGA1))
         if (!resp.data) {
-          setDateLoading(false)
-          setDateStartDeliv(false)
-          setDateFinishDeliv(false)
+          setProdsDetails([])
         } else {
-          setDateLoading(resp.data.products[0].D_MOUNTING)
-          setDateStartDeliv(resp.data.products[0].D_DELIVERING)
-          setDateFinishDeliv(resp.data.products[0].D_DELIVERED)
-          setDetalsDeliv(resp.data.delivery[0])
+          setProdsDetails(resp.data.products)
+          setDetailsDeliv(resp.data.delivery[0])
         }
       })
   },[sale, product])
@@ -47,13 +81,14 @@ function ModalSales({ sale, product }) {
           <div className="status">
             <div className="devTitleStatus">Status da Entrega</div>
             
-            <div className="statusBar">
+            {prodsDetails.map((prod,i) =>(
+            <div className="statusBar" key={i}>
               <div style={{color: 'blue'}}>
                 <div className="statusFig">
                   <div className="startCircle">
                     <div style={{backgroundColor: 'blue'}}></div>
                   </div>
-                  <div className="bar" style={ dateLoading ? {backgroundColor: 'blue'} : {backgroundColor: '#91949c'}}></div>
+                  <div className="bar" style={ prod.D_MOUNTING ? {backgroundColor: 'blue'} : {backgroundColor: '#91949c'}}></div>
                 </div>
 
                 <div className="detalsStatus">
@@ -62,47 +97,37 @@ function ModalSales({ sale, product }) {
                 </div>
               </div>
               
-              <div style={ dateLoading ? {color: 'blue'} : {}}>
+              <div style={ prod.D_MOUNTING ? {color: 'blue'} : {}}>
                 <div className="statusFig">
                   <div className="startCircle">
-                    <div style={ dateLoading ? {backgroundColor: 'blue'} : {backgroundColor: '#91949c'}}></div>
+                    <div style={ prod.D_MOUNTING ? {backgroundColor: 'blue'} : {backgroundColor: '#91949c'}}></div>
                   </div>
-                  <div className="bar" style={ dateStartDeliv ? {backgroundColor: 'blue'} : {backgroundColor: '#91949c'}}></div>
+                  <div className="bar" style={ prod.D_DELIVERING ? {backgroundColor: 'blue'} : {backgroundColor: '#91949c'}}></div>
                 </div>
 
                 <div className="detalsStatus">
                   <div className="statusCurrent">Carregando</div>
-                  <div className="statusDate">{dateLoading ? dateSqlToReact(dateLoading) : ''}</div>
+                  <div className="statusDate">{prod.D_MOUNTING ? dateSqlToReact(prod.D_MOUNTING) : ''}</div>
                 </div>
               </div>
               
-              <div style={ dateStartDeliv ? {color: 'blue'} : {}}>
+              <div style={ prod.D_DELIVERING ? {color: 'blue'} : {}}>
                 <div className="statusFig">
                   <div className="startCircle">
-                    <div style={ dateStartDeliv ? {backgroundColor: 'blue'} : {backgroundColor: '#91949c'}}></div>
+                    <div style={ prod.D_DELIVERING ? {backgroundColor: 'blue'} : {backgroundColor: '#91949c'}}></div>
                   </div>
-                  <div className="bar" style={ dateFinishDeliv ? {backgroundColor: 'blue'} : {backgroundColor: '#91949c'}}></div>
+                  <div className="bar" style={ prod.D_DELIVERED ? {backgroundColor: 'blue'} : {backgroundColor: '#91949c'}}></div>
                 </div>
 
                 <div className="detalsStatus">
                   <div className="statusCurrent">Entregando</div>
-                  <div className="statusDate">{dateStartDeliv ? dateSqlToReact(dateStartDeliv) : ''}</div>
+                  <div className="statusDate">{prod.D_DELIVERING ? dateSqlToReact(prod.D_DELIVERING) : ''}</div>
                 </div>
               </div>
               
-              <div style={ dateFinishDeliv ? {color: 'blue'} : {}}>
-                <div className="statusFig">
-                  <div className="startCircle">
-                    <div style={ dateFinishDeliv ? {backgroundColor: 'blue'} : {backgroundColor: '#91949c'}}></div>
-                  </div>
-                </div>
-
-                <div className="detalsStatus">
-                  <div className="statusCurrent">{dateFinishDeliv ? 'Finalizada' : 'Previsto para:'}</div>
-                  <div className="statusDate">{dateFinishDeliv ? dateSqlToReact(dateFinishDeliv) : datePrevDeliv}</div>
-                </div>
-              </div>
+              <CheckFinishStatus prod={prod} datePrevDeliv={datePrevDeliv}/>
             </div>
+            ))}
           </div>
 
           <div className="dataDelivery">
@@ -113,29 +138,29 @@ function ModalSales({ sale, product }) {
                 <div>{sale.BAIRRO+', '+ sale.CIDADE+' - '+sale.ESTADO}</div>
               </div>
               <div className="deliveryTransport">
-              <div><label>Rota: </label>{detalsDeliv.DESCRIPTION}</div>
-              <div><label>Motorista: </label>{detalsDeliv.DRIVER}</div>
-              <div><label>Auxiliar: </label>{detalsDeliv.ASSISTANT}</div>
+              <div><label>Rota: </label>{detailsDeliv.DESCRIPTION}</div>
+              <div><label>Motorista: </label>{detailsDeliv.DRIVER}</div>
+              <div><label>Auxiliar: </label>{detailsDeliv.ASSISTANT}</div>
               </div>
             </div>
           </div>
 
           <div className="products">
-            <h3 className="titleContent">Produtos</h3>
+            <h3 className="titleContent">Retornos</h3>
             <table>
               <thead>
                 <tr>
-                  <th>Código</th>
-                  <th>Descrição</th>
-                  <th>Quantidade</th>
+                  <th>Data</th>
+                  <th>Motivos</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>{product.COD_ORIGINAL}</td>
-                  <td>{product.DESCRICAO}</td>
-                  <td>{product.QTD_DELIV}</td>
-                </tr>
+                {prodsDetails.map((prod, i) => (
+                  <tr key={i}>
+                    <td>{dateSqlToReact(prod.D_DELIVERED)}</td>
+                    <td>{prod.REASON_RETURN}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

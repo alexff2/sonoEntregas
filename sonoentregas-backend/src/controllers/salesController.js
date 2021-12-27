@@ -1,6 +1,6 @@
 const Sales = require('../models/Sales')
 const ViewSalesProd = require('../models/ViewSalesProd')
-const ViewDeliveryProd = require('../models/ViewDeliveryProd')
+const ViewDeliveryProd = require('../models/ViewDeliveryProd2')
 const ViewDeliverys = require('../models/ViewDeliverys')
 const { findSales } = require('../services/salesService')
 
@@ -39,29 +39,34 @@ module.exports = {
       } else {
         sales = await Sales.findSome(0, `${typesearch} = '${search}'${whereCodloja}`)
       }
-      var idSale = ''
-      
-      for (let i = 0; i < sales.length; i++){
-        if ( i === 0 ){
-          idSale+= sales[i].ID_SALES
-        } else {
-          idSale+= `, ${sales[i].ID_SALES}`
-        }
-      }
-  
-      const viewSalesProd = await ViewSalesProd.findSome(0, `ID_SALES IN (${idSale})`)
-  
-      sales.forEach(sale => {
-        sale["products"] = []
-  
-        viewSalesProd.forEach(saleProd => {
-          if (sale.ID_SALES === saleProd.ID_SALES && sale.CODLOJA === saleProd.CODLOJA) {
-            sale.products.push(saleProd)
+
+      if (sales.length > 0){
+        var idSale = ''
+        
+        for (let i = 0; i < sales.length; i++){
+          if ( i === 0 ){
+            idSale+= sales[i].ID_SALES
+          } else {
+            idSale+= `, ${sales[i].ID_SALES}`
           }
+        }
+    
+        const viewSalesProd = await ViewSalesProd.findSome(0, `ID_SALES IN (${idSale})`)
+    
+        sales.forEach(sale => {
+          sale["products"] = []
+    
+          viewSalesProd.forEach(saleProd => {
+            if (sale.ID_SALES === saleProd.ID_SALES && sale.CODLOJA === saleProd.CODLOJA) {
+              sale.products.push(saleProd)
+            }
+          })
         })
-      })
-      
-      return res.json(sales)
+        
+        return res.json(sales)
+      } else {
+        return res.status(204).json('Venda não encontrada')
+      }
     } catch (error) {
       return res.status(400).json(error)
     }
@@ -70,7 +75,7 @@ module.exports = {
     try {
       const { idSale, codloja, codproduto } = req.params
   
-      const products = await ViewDeliveryProd.findSome(0, `ID_SALES = ${idSale} AND CODLOJA = ${codloja} AND CODPRODUTO = ${codproduto} AND DELIVERED = 0`)
+      const products = await ViewDeliveryProd.findSome(0, `ID_SALES = ${idSale} AND CODLOJA = ${codloja} AND CODPRODUTO = ${codproduto}`)
 
       var resp
   
@@ -78,11 +83,11 @@ module.exports = {
         const delivery = await ViewDeliverys.findSome(0, `ID = ${products[0].ID_DELIVERY}`)
   
         resp = {products, delivery}
+        return res.status(200).json(resp)
       } else {
         resp = false
+        return res.status(204).json(resp)
       }
-  
-      return res.json(resp)
     } catch (error) {
       return res.status(400).json(error)
     }

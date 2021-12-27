@@ -225,12 +225,13 @@ export default function Sales() {
   const searchSales = async () => {
     try {
       if (search !== '') {
-        const { data } = await api.get(`sales/${typeSeach}/${search}/null/false`)
-        if (data.length === 0){
+        const response = await api.get(`sales/${typeSeach}/${search}/null/false`)
+        if (response.data === ''){
+          console.log(response)
           setChildrenAlert('Venda(s) não encontrada(s)!') 
           setOpenModalAlert(true)
         } else {
-          setSales(data)
+          setSales(response.data)
         }
       } else {
         setChildrenAlert('Preencha o campo de pesquisa!') 
@@ -238,10 +239,16 @@ export default function Sales() {
         setSales([])
       }
     } catch (e) {
-      console.log(e.response.data)
-      setChildrenAlert("Erro ao comunicar com o Servidor")
-      setOpenModalAlert(true)
-      setSales([])
+      console.log(e.response)
+      if (e.response.status === 400) {
+        setChildrenAlert("Requisição Incorreta (Verifique valor digitado)!")
+        setOpenModalAlert(true)
+        setSales([])
+      } else {
+        setChildrenAlert("Erro ao comunicar com o Servidor")
+        setOpenModalAlert(true)
+        setSales([])
+      }
     }
   }
 
