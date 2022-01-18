@@ -1,7 +1,6 @@
 import React from 'react'
 import {
   Box,
-  Container,
   makeStyles
 } from '@material-ui/core'
 //Components
@@ -12,7 +11,14 @@ import { useSale } from '../../context/saleContext'
 
 const useStyles = makeStyles((theme) => ({
   sales: {
-    marginTop: theme.spacing(4)
+    marginTop: theme.spacing(4),
+    display: 'flex',
+  },
+  boxAddress: {
+    width: '40%'
+  },
+  container: {
+    
   }
 }))
 
@@ -21,7 +27,7 @@ export default function Home(){
   const { sales } = useSale()
 
   return(
-    <Container disableGutters maxWidth={false}>
+    <Box className={classes.container}>
       
       <Cards />
       
@@ -32,8 +38,9 @@ export default function Home(){
           setSalesProd={[]}
           type={'home'}
         />
+        <Box className={classes.boxAddress}>Endereço</Box>
       </Box>
 
-    </Container>
+    </Box>
   )
 }

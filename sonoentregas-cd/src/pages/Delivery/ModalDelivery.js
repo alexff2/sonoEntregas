@@ -7,8 +7,11 @@ import {
   Select,
   MenuItem
 } from "@material-ui/core"
+
+//Components
 import TableSales from '../../components/TableSales'
 import { ButtonCancel, ButtonSucess } from '../../components/Buttons'
+import ModalAlert from '../../components/ModalAlert'
 
 //context
 import { useCars } from '../../context/carsContext'
@@ -71,12 +74,14 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
   const [ createDevSales, setCreateDevSales ] = useState([])
   const [ salesProd, setSalesProd ] = useState([])
   const [ errorMsg, setErrorMsg ] = useState('')
+  const [ openModalAlert, setOpenModalAlert ] = useState(false)
+  const [ childrenModal, setChildrenModal ] = useState('')
 
   const { cars } = useCars()
   const { drivers } = useDrivers()
   const { assistants } = useAssistants()
   const { delivery, setDelivery } = useDelivery()
-  const { setSales } = useSale()
+  const { sales, setSales } = useSale()
 
   //Styes
   const classes = useStyles()
@@ -110,7 +115,8 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
       setOpen(false)
 
     } catch (error) {
-      alert('Erro ao cadastar Entrega, entre em contato com ADM')
+      setOpenModalAlert(true)
+      setChildrenModal('Erro ao cadastar Entrega, entre em contato com ADM')
       console.log(error)
     }
   }
@@ -128,7 +134,8 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
       setOpen(false)
     } catch (e) {
       console.log(e)
-      alert('Entre em contato com Administrador')
+      setOpenModalAlert(true)
+      setChildrenModal('Entre em contato com Administrador')
     }
   }
 
@@ -279,6 +286,11 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
         />
       </div>
 
+      <ModalAlert
+        open={openModalAlert}
+        setOpen={setOpenModalAlert}
+        children={childrenModal}
+      />
     </form>
   )
 }

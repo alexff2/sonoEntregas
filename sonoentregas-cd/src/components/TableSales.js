@@ -14,7 +14,7 @@ import {
   Paper,
   Checkbox
 } from '@material-ui/core'
-import { KeyboardArrowDown, KeyboardArrowUp} from '@material-ui/icons'
+import { Height, KeyboardArrowDown, KeyboardArrowUp} from '@material-ui/icons'
 
 //Context
 import { useShop } from '../context/shopContext';
@@ -27,7 +27,57 @@ import { getDateBr } from '../functions/getDates'
 import { getComparator, stableSort } from '../functions/orderTable'
 
 const useStyles = makeStyles( theme =>({
-  root: {
+  TabContainer: {
+    borderRadius: '4px 0 0 0',
+    '& > table': {
+      '& > thead': {
+        display: 'block'
+      },
+      '& > tbody': {
+        display: 'block'
+      }
+    }
+  },
+  tableHead: {
+    background: theme.palette.primary.main
+  },
+  headUpDown: {
+    color: theme.palette.common.white,
+    fontWeight: theme.typography.fontWeightBold,
+    padding: '0 10px',
+    width: '5%'
+  },
+  headIdSale:{
+    color: theme.palette.common.white,
+    fontWeight: theme.typography.fontWeightBold,
+    padding: '0 10px',
+    width: '15%'
+  },
+  headName:{
+    color: theme.palette.common.white,
+    fontWeight: theme.typography.fontWeightBold,
+    padding: 0,
+    width: '45%'
+  },
+  headDate:{
+    color: theme.palette.common.white,
+    fontWeight: theme.typography.fontWeightBold,
+    padding: 0,
+    width: '17%',
+    textAlign: 'end'
+  },
+  headShop:{
+    color: theme.palette.common.white,
+    fontWeight: theme.typography.fontWeightBold,
+    padding: '0 20px 0 0',
+    width: '18%',
+    textAlign: 'end'
+  },
+  tableBody: {
+    height: 'calc(100vh - 300px)',
+    overflowY: 'scroll'
+  },
+  row: {
     '& > *': {
       borderBottom: 'unset'
     },
@@ -35,39 +85,48 @@ const useStyles = makeStyles( theme =>({
       background: theme.palette.primary.light
     }
   },
-  root1: {
+  row1: {
     '& > *': {
       borderBottom: 'unset'
     },
     background: theme.palette.primary.light
   },
-  tableHead: {
-    background: theme.palette.primary.main
+  bodyUpDown: {
+    padding: '0 10px',
+    width: '6.5%'
   },
-  tableHeadCell: {
-    textAlign: 'end',
-    color: theme.palette.common.white,
-    fontWeight: theme.typography.fontWeightBold
+  bodyIdSale:{
+    padding: '0 10px',
+    width: '15.5%'
   },
-  tableHeadCellStart:{
-    color: theme.palette.common.white,
-    fontWeight: theme.typography.fontWeightBold
-  },
-  tableBody: {
-    overflow: 'scroll'
-  },
-  numberImput: {
-    width: 40
+  bodyName:{
+    padding: 0,
+    width: '46%',
+    fontSize: 12
   },
   dateDelivRed: {
-    color: 'red'
+    color: 'red',
+    padding: 0,
+    width: '17%',
+    textAlign: 'end'
   },
   dateDelivBlack: {
-    color: 'black'
+    color: 'black',
+    padding: 0,
+    width: '17%',
+    textAlign: 'end'
   },
   dateDelivYellow: {
-    color: 'yellow'
-  }
+    color: 'yellow',
+    padding: 0,
+    width: '17%',
+    textAlign: 'end'
+  },
+  bodyShop:{
+    padding: 0,
+    width: '10%',
+    textAlign: 'end'
+  },
 }))
 
 const CheckProd = ({ sendSalesProd, type, produto, classes }) => {
@@ -84,7 +143,7 @@ const CheckProd = ({ sendSalesProd, type, produto, classes }) => {
         <TableCell>
           <input 
             type="number" 
-            className={classes.numberImput}
+            style={{width: 40}}
             defaultValue={produto.QUANTIDADE - produto.QTD_DELIV}
             max={produto.QUANTIDADE - produto.QTD_DELIV}
             min={1}
@@ -135,22 +194,18 @@ function Row({sendSalesProd, sale, type}) {
 
   return(
     <React.Fragment>
-      <TableRow className={ type === 'home' ? classes.root : classes.root1 }>
+      <TableRow className={ type === 'home' ? classes.row : classes.row1 }>
         {type === 'home' ? 
-        <TableCell>
-          <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+        <TableCell className={classes.bodyUpDown}>
+          <IconButton aria-label="expand row" style={{padding: 0}} onClick={() => setOpen(!open)}>
             {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
           </IconButton>
         </TableCell> : null
         }
-        <TableCell component="th" scope="row">
-          {sale.ID_SALES}
-        </TableCell>
-        <TableCell>{sale.NOMECLI}</TableCell>
-        <TableCell>{sale.BAIRRO}
-        </TableCell>
-        <TableCell align="right" className={styleDateDeliv()}>{getDateBr(sale.D_ENTREGA1)}</TableCell>
-        <TableCell align="right">{setShops(sale.CODLOJA)}</TableCell>
+        <TableCell className={classes.bodyIdSale}>{sale.ID_SALES}</TableCell>
+        <TableCell className={classes.bodyName}>{sale.NOMECLI}</TableCell>
+        <TableCell className={styleDateDeliv()}>{getDateBr(sale.D_ENTREGA1)}</TableCell>
+        <TableCell className={classes.bodyShop}>{setShops(sale.CODLOJA)}</TableCell>
       </TableRow>
   
       <TableRow>
@@ -250,23 +305,22 @@ export default function TableSales({
   }
 
   const headCell = type === 'home' ? [
-    { id: '', numeric: false, disablePadding: false, label: '', class: classes.tableHeadCellStart },
-    { id: 'ID_SALES', numeric: false, disablePadding: false, label: 'Nº Venda', class: classes.tableHeadCellStart },
-    { id: 'NOMECLI', numeric: false, disablePadding: false, label: 'Nome do Cliente', class: classes.tableHeadCellStart },
-    { id: 'BAIRRO', numeric: false, disablePadding: false, label: 'Bairro', class: classes.tableHeadCellStart },
-    { id: 'D_ENTREGA1', numeric: true, disablePadding: false, label: 'Data Entrega', class: classes.tableHeadCell },
-    { id: 'CODLOJA', numeric: true, disablePadding: false, label: 'Loja', class: classes.tableHeadCell }
+    { id: '', numeric: false, label: '', class: classes.headUpDown },
+    { id: 'ID_SALES', numeric: false, label: 'Nº Venda', class: classes.headIdSale },
+    { id: 'NOMECLI', numeric: false, label: 'Nome do Cliente', class: classes.headName },
+    { id: 'D_ENTREGA1', numeric: true, label: 'Data Entrega', class: classes.headDate },
+    { id: 'CODLOJA', numeric: true, label: 'Loja', class: classes.headShop }
   ] : [
-    { id: 'ID_SALES', numeric: false, disablePadding: false, label: 'Nº Venda', class: classes.tableHeadCellStart },
-    { id: 'NOMECLI', numeric: false, disablePadding: false, label: 'Nome do Cliente', class: classes.tableHeadCellStart },
-    { id: 'BAIRRO', numeric: false, disablePadding: false, label: 'Bairro', class: classes.tableHeadCellStart },
-    { id: 'D_ENTREGA1', numeric: true, disablePadding: false, label: 'Data Entrega', class: classes.tableHeadCell },
-    { id: 'CODLOJA', numeric: true, disablePadding: false, label: 'Loja', class: classes.tableHeadCell }
+    { id: 'ID_SALES', numeric: false, label: 'Nº Venda', class: classes.headIdSale },
+    { id: 'NOMECLI', numeric: false, label: 'Nome do Cliente', class: classes.headName },
+    { id: 'D_ENTREGA1', numeric: true, label: 'Data Entrega', class: classes.headDate },
+    { id: 'CODLOJA', numeric: true, label: 'Loja', class: classes.headShop }
   ]
 
   return(
-    <TableContainer component={Paper}>
-        <Table aria-label="collapsible table">
+    <TableContainer component={Paper} className={classes.TabContainer}>
+        <Table id="tableId">
+
           <EnhancedTableHead
             order={order}
             orderBy={orderBy}
@@ -274,7 +328,7 @@ export default function TableSales({
             headCells={headCell}
             classe={classes}
           />
-          
+
           <TableBody className={classes.tableBody}>
             {stableSort(currentSales, getComparator(order, orderBy))
               .map( sale => (
