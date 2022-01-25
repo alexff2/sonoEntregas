@@ -155,12 +155,16 @@ function ModalSales({ sale, product }) {
                 </tr>
               </thead>
               <tbody>
-                {prodsDetails.map((prod, i) => (
-                  <tr key={i}>
-                    <td>{dateSqlToReact(prod.D_DELIVERED)}</td>
-                    <td>{prod.REASON_RETURN}</td>
-                  </tr>
-                ))}
+                {
+                prodsDetails
+                  .filter( prod => prod.DELIVERED)
+                  .map((prod, i) => (
+                    <tr key={i}>
+                      <td>{dateSqlToReact(prod.D_DELIVERED)}</td>
+                      <td>{prod.REASON_RETURN}</td>
+                    </tr>
+                  ))
+                }
               </tbody>
             </table>
           </div>

@@ -5,11 +5,13 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  Box
 } from "@material-ui/core"
 
 //Components
 import TableSales from '../../components/TableSales'
+import BoxInfo from '../../components/BoxInfo'
 import { ButtonCancel, ButtonSucess } from '../../components/Buttons'
 import ModalAlert from '../../components/ModalAlert'
 
@@ -23,14 +25,23 @@ import { useSale } from '../../context/saleContext'
 import api from '../../services/api'
 
 const useStyles = makeStyles(theme => ({
+  sales: {
+    marginTop: theme.spacing(1),
+    display: 'flex',
+    width: 1100
+  },
+  boxAddress: {
+    width: 509
+  },
   //Style form select\
   divFormControl: {
     width: '100%',
     display: 'flex',
-    justifyContent: 'space-between',
+    alignItems: 'center'
   },
   formControl: {
-    width: '30%'
+    width: '15%',
+    marginLeft: '1%'
   },
   divSearchSale: {
     display: 'flex',
@@ -66,57 +77,63 @@ const useStyles = makeStyles(theme => ({
 
 export default function ModalDelivery({ setOpen, selectDelivery }){
   //States
-  const [ description, setDescription ] = useState()
-  const [ codCar, setCodCar ] = useState()
-  const [ codDriver, setCodDriver ] = useState()
-  const [ codAssistant, setCodAssistant ] = useState()
+  const [ description, setDescription ] = useState('')
+  const [ codCar, setCodCar ] = useState(false)
+  const [ codDriver, setCodDriver ] = useState(false)
+  const [ codAssistant, setCodAssistant ] = useState(false)
   const [ idSale, setIdSale ] = useState('')
   const [ createDevSales, setCreateDevSales ] = useState([])
   const [ salesProd, setSalesProd ] = useState([])
   const [ errorMsg, setErrorMsg ] = useState('')
   const [ openModalAlert, setOpenModalAlert ] = useState(false)
-  const [ childrenModal, setChildrenModal ] = useState('')
+  const [ childrenModalAlert, setChildrenModalAlert ] = useState('')
 
   const { cars } = useCars()
   const { drivers } = useDrivers()
   const { assistants } = useAssistants()
   const { delivery, setDelivery } = useDelivery()
-  const { sales, setSales } = useSale()
+  const { setSales } = useSale()
 
   //Styes
   const classes = useStyles()
 
   //Start component
   useEffect(() => {
-    setDescription(selectDelivery.DESCRIPTION)
-    setCodCar(selectDelivery.ID_CAR)
-    setCodDriver(selectDelivery.ID_DRIVER)
-    setCodAssistant(selectDelivery.ID_ASSISTANT)
+    if (selectDelivery){
+      setDescription(selectDelivery.DESCRIPTION)
+      setCodCar(selectDelivery.ID_CAR)
+      setCodDriver(selectDelivery.ID_DRIVER)
+      setCodAssistant(selectDelivery.ID_ASSISTANT)
+    }
   }, [selectDelivery])
 
   //Functions Outher
   const createDelivery = async () => {
     try {
+      if (!codCar || !codDriver || !codAssistant){
+        setOpenModalAlert(true)
+        setChildrenModalAlert('Preencha todos as informações')
+      } else {
 
-      const data = {
-        description, codCar, codDriver, codAssistant, salesProd, status: 'Em lançamento'
-      }
-
-      const { data: dataDelivery } = await api.post('deliverys', data)
-
-      setDelivery([...delivery, dataDelivery])
-
-      if (dataDelivery.ID) { //Melhorar performace
-        const { data: dataSales } = await api.get('sales/false/false/Aberta/null')
+        const data = {
+          description, codCar, codDriver, codAssistant, salesProd, status: 'Em lançamento'
+        }
   
-        setSales(dataSales)
+        const { data: dataDelivery } = await api.post('deliverys', data)
+  
+        setDelivery([...delivery, dataDelivery])
+  
+        if (dataDelivery.ID) { //Melhorar performace
+          const { data: dataSales } = await api.get('sales/false/false/Aberta/null')
+    
+          setSales(dataSales)
+        }
+  
+        setOpen(false)
       }
-
-      setOpen(false)
-
     } catch (error) {
       setOpenModalAlert(true)
-      setChildrenModal('Erro ao cadastar Entrega, entre em contato com ADM')
+      setChildrenModalAlert('Erro ao cadastar Entrega, entre em contato com ADM')
       console.log(error)
     }
   }
@@ -135,7 +152,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
     } catch (e) {
       console.log(e)
       setOpenModalAlert(true)
-      setChildrenModal('Entre em contato com Administrador')
+      setChildrenModalAlert('Entre em contato com Administrador')
     }
   }
 
@@ -147,9 +164,13 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
     if(saleFound === undefined) {
       try {
         if (idSale !== ''){
-          const response = await api.get(`sales/ID_SALES/${idSale}/null/false`)
+          const {data} = await api.get(`sales/ID_SALES/${idSale}/null/false`)
 
-          response.data !== '' ? setCreateDevSales([ ...createDevSales,  ...response.data]) : setErrorMsg('Venda não encontrada')
+          if(data !== '' ) {
+            data[0].STATUS === 'Aberta' ? 
+              setCreateDevSales([ ...createDevSales,  ...data]) :
+              setErrorMsg('Venda FECHADA já lançada em rota, consultar no menu VENDAS para saber STATUS da rota')
+          } else setErrorMsg('Venda não encontrada')
         } else {
           setErrorMsg('Preencha o campo Código da Venda')
         }
@@ -171,21 +192,20 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
   //Component
   return(
     <form>
-      <TextField
-        id="description"
-        label="Descrição"
-        placeholder="Descrição da entrega"
-        fullWidth
-        margin="normal"
-        InputLabelProps={{
-          shrink: true,
-        }}
-        variant="outlined"
-        defaultValue={selectDelivery ? selectDelivery.DESCRIPTION : ''}
-        onChange={(e) => setDescription(e.target.value)}
-      />
-
       <div className={classes.divFormControl}>
+        <TextField
+          id="description"
+          label="Descrição"
+          placeholder="Descrição da entrega"
+          style={{width: '52%'}}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          variant="outlined"
+          defaultValue={selectDelivery ? selectDelivery.DESCRIPTION : ''}
+          onChange={(e) => setDescription(e.target.value)}
+          required
+        />
         <FormControl variant="outlined" className={classes.formControl}>
           <InputLabel id="driverLabel">Motorista</InputLabel>
           <Select
@@ -194,6 +214,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
             id="driver"
             defaultValue={selectDelivery ? selectDelivery.ID_DRIVER : 0}
             onChange={(e) => setCodDriver(e.target.value)}
+            required
           >
             <MenuItem value={0}>
               <em>None</em>
@@ -212,6 +233,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
             id="assistant"
             defaultValue={selectDelivery ? selectDelivery.ID_ASSISTANT : 0}
             onChange={(e) => setCodAssistant(e.target.value)}
+            required
           >
             <MenuItem value={0}>
               <em>None</em>
@@ -230,6 +252,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
             label="Veículo"
             defaultValue={selectDelivery ? selectDelivery.ID_CAR : 0}
             onChange={(e) => setCodCar(e.target.value)}
+            required
           >
             <MenuItem value={0}>
               <em>None</em>
@@ -243,35 +266,40 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
 
       <hr style={{ marginTop: '16px' }}/>
 
-      { selectDelivery ? null
-       :<div className={classes.divSearchSale}>
-          <TextField
-            id="idSales"
-            label="Inserir venda"
-            placeholder="Digite código da venda"
-            fullWidth
-            margin="normal"
-            InputLabelProps={{
-              shrink: true,
-            }}
-            value={idSale}
-            variant="outlined"
-            onChange={ e => {
-              setErrorMsg('')
-              setIdSale(parseInt(e.target.value))
-            }}
-          />
-          <button onClick={e => setSalesInModal(e)}>Inserir</button>
-        </div>
-      }
+      <div className={classes.divSearchSale}>
+        <TextField
+          id="idSales"
+          label="Inserir venda"
+          placeholder="Digite código da venda"
+          fullWidth
+          margin="normal"
+          InputLabelProps={{
+            shrink: true,
+          }}
+          value={idSale}
+          variant="outlined"
+          onChange={ e => {
+            setErrorMsg('')
+            setIdSale(parseInt(e.target.value))
+          }}
+        />
+        <button onClick={e => setSalesInModal(e)}>Inserir</button>
+      </div>
+
       {errorMsg === '' ? null : <div className={classes.error}>{errorMsg}</div> }
 
-      <TableSales 
-        selectSales={selectDelivery ? selectDelivery.sales : createDevSales} 
-        setSalesProd={setSalesProd}
-        salesProd={salesProd}
-        type={ selectDelivery ? 'update' : 'create' }
-      />
+      <Box className={classes.sales}>
+        <TableSales 
+          selectSales={selectDelivery ? selectDelivery.sales : createDevSales} 
+          setSalesProd={setSalesProd}
+          salesProd={salesProd}
+          type={ selectDelivery ? 'update' : 'create' }
+        />
+
+        <Box className={classes.boxAddress}>
+          <BoxInfo loc="NotModal"/>
+        </Box>
+      </Box>
 
       <div className={classes.btnActions}>
         <ButtonSucess 
@@ -289,7 +317,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
       <ModalAlert
         open={openModalAlert}
         setOpen={setOpenModalAlert}
-        children={childrenModal}
+        children={childrenModalAlert}
       />
     </form>
   )

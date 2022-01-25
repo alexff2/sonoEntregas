@@ -10,6 +10,7 @@ import DriverProvider from './driverContext'
 import AssistantProvider from './assistantContext'
 import UsersProvider from './usersContext'
 import AlertProvider from './alertContext'
+import AddressProvider from './addressContext'
 
 export default function DefaultContext({children}){
   return (
@@ -21,11 +22,13 @@ export default function DefaultContext({children}){
               <DeliveryFinishProvider>
                 <AssistantProvider>
                   <SaleProvider>
-                    <CarsProvider>
-                      <DriverProvider>
-                          {children}
-                      </DriverProvider>
-                    </CarsProvider>
+                    <AddressProvider>
+                      <CarsProvider>
+                        <DriverProvider>
+                            {children}
+                        </DriverProvider>
+                      </CarsProvider>
+                    </AddressProvider>
                   </SaleProvider>
                 </AssistantProvider>
               </DeliveryFinishProvider>

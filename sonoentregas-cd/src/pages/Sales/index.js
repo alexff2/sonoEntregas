@@ -24,6 +24,7 @@ import SearchIcon from '@material-ui/icons/Search'
 import { KeyboardArrowDown, KeyboardArrowUp} from '@material-ui/icons'
 
 import { useShop } from '../../context/shopContext'
+import { useAddress } from '../../context/addressContext'
 
 import api from '../../services/api'
 import { getDateBr } from '../../functions/getDates'
@@ -34,6 +35,7 @@ import Modal from '../../components/Modal'
 import ModalAlert from '../../components/ModalAlert'
 import ModalSales from './ModalSales'
 import ModalUpdateDateDeliv from './ModalUpdateDateDeliv'
+import BoxInfo from "../../components/BoxInfo"
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -119,30 +121,27 @@ const useStyles = makeStyles(theme => ({
     '&:hover': {
       backgroundColor: fade(theme.palette.common.white, 0.15),
     }
-  },
-  notUpdateDateDeliv: {
-    cursor: 'auto'
   }
 }))
 
-function Row({ sale, setShops, modalDetalProduct, typeSeach }) {
+function Row({ sale, setShops, modalDetalProduct, setOpenModalBoxInfo }) {
   const [open, setOpen] = useState(false)
   const [openModalUpdaDate, setOpenModalUpdaDate] = useState(false)
   const classes = useStyles()
+  const { setAddress } = useAddress()
 
-  const updateDateDeliv = () => {
-    if (typeSeach === 'EMISSAO') setOpenModalUpdaDate(true)
+  const setInfoInBox = () => {
+    setOpenModalBoxInfo(true)
+    setAddress({
+      OBS2: sale.OBS2,
+      ENDERECO: sale.ENDERECO,
+      PONTOREF: sale.PONTOREF,
+      OBS: sale.OBS,
+      SCHEDULED: sale.SCHEDULED,
+      OBS_SCHEDULED: sale.OBS_SCHEDULED
+    })
   }
 
-  const styleDateUpdate = () => {
-    if (typeSeach === 'EMISSAO') {
-      return classes.updateDateDeliv
-    } else {
-      return classes.notUpdateDateDeliv
-    }
-
-  }
-  
   return (
     <React.Fragment>
       <TableRow className={classes.root}>
@@ -151,10 +150,13 @@ function Row({ sale, setShops, modalDetalProduct, typeSeach }) {
             {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
           </IconButton>
         </TableCell>
-        <TableCell style={sale.HAVE_OBS2 ? {color: 'Red', fontWeight: 700}: {}}>{sale.ID_SALES}</TableCell>
+        <TableCell
+          style={sale.HAVE_OBS2 ? {color: 'Red', fontWeight: 700, cursor: 'pointer'}: {cursor: 'pointer'}}
+          onClick={setInfoInBox}
+          >{sale.ID_SALES}</TableCell>
         <TableCell>{sale.NOMECLI}</TableCell>
         <TableCell align="right">{getDateBr(sale.EMISSAO)}</TableCell>
-        <TableCell align="right" onClick={updateDateDeliv} className={styleDateUpdate()}>
+        <TableCell align="right" onClick={()=>setOpenModalUpdaDate(true)} className={classes.updateDateDeliv}>
           {getDateBr(sale.D_ENTREGA1)}
         </TableCell>
         <TableCell align="right">{setShops(sale.CODLOJA)}</TableCell>
@@ -165,7 +167,7 @@ function Row({ sale, setShops, modalDetalProduct, typeSeach }) {
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box margin={1}>
               <Typography variant="h6" gutterBottom component="div">
-                Produtos {sale.HAVE_OBS2 ? (<span style={{color: 'red', fontSize: 12}}>- {sale.OBS2}</span>) : ''}
+                Produtos
               </Typography>
               <Table size="small" aria-label="purchases">
                 <TableHead>
@@ -209,6 +211,7 @@ function Row({ sale, setShops, modalDetalProduct, typeSeach }) {
 
 export default function Sales() {
   const [ openModalProduct, setOpenModalProduct ] = useState(false)
+  const [ openModalBoxInfo, setOpenModalBoxInfo ] = useState(false)
   const [ openModalAlert, setOpenModalAlert ] = useState(false)
   const [ childrenAlert, setChildrenAlert ] = useState(false)
   const [ order, setOrder ] = useState('asc')
@@ -281,26 +284,25 @@ export default function Sales() {
   return(
     <Box>
       <Box className={classes.barHeader}>
-
-      <FormControl variant="outlined">
-        <InputLabel id="fieldSeach" className={classes.label}>Tipo</InputLabel>
-        <Select
-          label="Tipo"
-          labelId="fieldSeach"
-          className={classes.fieldSeach}
-          onChange={e => {
-            setTypeSeach(e.target.value)
-            setSearch('')
-          }}
-          defaultValue={'ID_SALES'}
-        >
-          <MenuItem value={'ID_SALES'}>Código Venda</MenuItem>
-          <MenuItem value={'NOMECLI'}>Nome Cliente</MenuItem>
-          <MenuItem value={'D_DELIVERED'}>Finalizadas</MenuItem>
-          <MenuItem value={'D_MOUNTING'}>Entregando</MenuItem>
-          <MenuItem value={'EMISSAO'}>Data de Emisão</MenuItem>
-        </Select>
-      </FormControl>
+        <FormControl variant="outlined">
+          <InputLabel id="fieldSeach" className={classes.label}>Tipo</InputLabel>
+          <Select
+            label="Tipo"
+            labelId="fieldSeach"
+            className={classes.fieldSeach}
+            onChange={e => {
+              setTypeSeach(e.target.value)
+              setSearch('')
+            }}
+            defaultValue={'ID_SALES'}
+          >
+            <MenuItem value={'ID_SALES'}>Código Venda</MenuItem>
+            <MenuItem value={'NOMECLI'}>Nome Cliente</MenuItem>
+            <MenuItem value={'D_DELIVERED'}>Finalizadas</MenuItem>
+            <MenuItem value={'D_MOUNTING'}>Entregando</MenuItem>
+            <MenuItem value={'EMISSAO'}>Data de Emisão</MenuItem>
+          </Select>
+        </FormControl>
 
         <div className={classes.search}>
           <div className={classes.searchIcon}>
@@ -320,12 +322,12 @@ export default function Sales() {
               }}
               inputProps={{ 'aria-label': 'search' }}
               onChange={e => setSearch(e.target.value)}
+              onKeyPress={e => e.key === 'Enter' ? searchSales() : null}
             />
           }
         </div>
 
         <Button className={classes.btnSearch} onClick={searchSales}>Pesquisar</Button>
-
       </Box>
       
       <Box>
@@ -346,7 +348,7 @@ export default function Sales() {
                   modalDetalProduct={modalDetalProduct}
                   sale={sale}
                   setShops={setShops}
-                  typeSeach={typeSeach}
+                  setOpenModalBoxInfo={setOpenModalBoxInfo}
                 />
               ))}
             </TableBody>
@@ -354,6 +356,7 @@ export default function Sales() {
         </TableContainer>
       </Box>
 
+      {/*Modal sales product details*/}
       <Modal 
         open={openModalProduct}
         setOpen={setOpenModalProduct}
@@ -363,6 +366,14 @@ export default function Sales() {
           sale={saleCurrent}
           product={productCurrent}
         />
+      </Modal>
+
+      {/*Modal update date delivery*/}
+      <Modal
+        open={openModalBoxInfo}
+        setOpen={setOpenModalBoxInfo}
+        >
+        <BoxInfo loc="Modal"/>
       </Modal>
 
       <ModalAlert open={openModalAlert} setOpen={setOpenModalAlert}>

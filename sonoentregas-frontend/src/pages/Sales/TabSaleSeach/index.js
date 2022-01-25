@@ -81,8 +81,11 @@ export default function TabSaleSeach({ openMOdalAlert, setChildrenAlertModal }) 
   useEffect(()=>{
     api.get(`sales/STATUS/Aberta/null/${Codloja}`)
     .then(resp => {
-      setSales(resp.data)
+      if(resp.data){
+        setSales(resp.data)
+      }
     })
+    .catch( e => console.log(e) )
   },[Codloja])
 
   const searchSales = async () => {

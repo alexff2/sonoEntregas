@@ -22,8 +22,11 @@ set @codloja = 4
 select * from SALES where ID_SALES = @codvenda
 select * from SALES_PROD where ID_SALES = @codvenda
 select * from ORCPARC where ID_SALES = @codvenda
-SELECT * FROM DELIVERYS_SALES WHERE ID_SALE = @codvenda
+SELECT * FROM DELIVERYS_PROD WHERE ID_SALE = @codvenda
 
+update DELIVERYS_PROD set DELIVERED = 1 where codloja = @codloja and ID_SALE = @codvenda
+update sales set STATUS = 'Aberta' where codloja = @codloja and ID_SALES = @codvenda
+update SALES_PROD set STATUS = 'Enviado' where codloja = @codloja and ID_SALES = @codvenda
 
 DELETE SALES where ID_SALES = @codvenda and codloja = @codloja
 DELETE SALES_PROD where ID_SALES = @codvenda and codloja = @codloja

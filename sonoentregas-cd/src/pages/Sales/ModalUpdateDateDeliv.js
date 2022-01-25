@@ -1,15 +1,42 @@
 import React from 'react'
+import { Box, InputBase, makeStyles } from '@material-ui/core'
 
 import { useSale } from '../../context/saleContext'
 import Modal from '../../components/Modal'
-import { ButtonSucess } from '../../components/Buttons'
+import { ButtonSucess, ButtonCancel } from '../../components/Buttons'
 
 import api from '../../services/api'
 
+const useStyles = makeStyles( theme => ({
+  box: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    width: 500
+  },
+  inputBase: {
+    width: '70%',
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: theme.shape.borderRadius,
+    paddingLeft: 4
+  },
+  inputDate: {
+    width: '29%',
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: theme.shape.borderRadius,
+    paddingLeft: 4
+  },
+  boxButton: {
+    width: '100%',
+    textAlign: 'end'
+  }
+}))
 export default function ModalUpdateDateDev({open, setOpen, saleCurrent}){
   const [ dateDeliv, setDateDeliv ] = React.useState('')
+  const [ obsSched, setObsSched ] = React.useState('')
   const [ error, setError ] = React.useState(false)
   const [ childrenError, setChildrenError ] = React.useState(false)
+
+  const classes = useStyles()
   const { sales } = useSale()
 
   const changeDateDeliv = e => {
@@ -31,7 +58,11 @@ export default function ModalUpdateDateDev({open, setOpen, saleCurrent}){
   const updateDateDeliv = async () => {
     try {
       if (dateDeliv !== '') {
-        const { data } = await api.post(`sales/updateDate/${saleCurrent.ID_SALES}`, { dateDeliv, CODLOJA: saleCurrent.CODLOJA })
+        const { data } = await api.post(`sales/updateDate/${saleCurrent.ID_SALES}`, { 
+          dateDeliv,
+          CODLOJA: saleCurrent.CODLOJA,
+          OBS_SCHED: obsSched
+        })
 
         saleCurrent.D_ENTREGA1 = data
 
@@ -48,9 +79,19 @@ export default function ModalUpdateDateDev({open, setOpen, saleCurrent}){
 
   return(
     <Modal open={open} setOpen={setOpen} title="Agenda nova data de entrega" >
-      Nova Data: <input type="date" onChange={changeDateDeliv} style={{marginRight: 10}}/>
-      <ButtonSucess children="Salvar" onClick={updateDateDeliv}/>
+      <Box className={classes.box}>
+        <InputBase placeholder="Observação" onChange={e => setObsSched(e.target.value)} className={classes.inputBase}/>
+        <input type="date" onChange={changeDateDeliv} className={classes.inputDate}/>
+      </Box>
+
       {error && <div><span style={{color: 'red'}}>{childrenError}</span></div>}
+
+      <hr />
+
+      <Box className={classes.boxButton}>
+        <ButtonSucess children="Salvar" onClick={updateDateDeliv}/>
+        <ButtonCancel children="Cancelar" onClick={() => setOpen(false)}/>
+      </Box>
     </Modal>
   )
 }

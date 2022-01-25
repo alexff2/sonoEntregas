@@ -31,7 +31,7 @@ module.exports = {
             }
           }
   
-          sales = await Sales.findSome(0, `ID_SALES IN (${idSale})`)
+          sales = await Sales.findSome(0, `ID_SALES IN (${idSale}) ${whereCodloja}`)
         } else {
           sales = []
         }
@@ -75,12 +75,12 @@ module.exports = {
     try {
       const { idSale, codloja, codproduto } = req.params
   
-      const products = await ViewDeliveryProd.findSome(0, `ID_SALES = ${idSale} AND CODLOJA = ${codloja} AND CODPRODUTO = ${codproduto}`)
+      const products = await ViewDeliveryProd.findSome(0, `ID_SALES = ${idSale} AND CODLOJA = ${codloja} AND CODPRODUTO = ${codproduto} ORDER BY ID_DELIVERY`)
 
       var resp
   
       if (products.length > 0 ) {
-        const delivery = await ViewDeliverys.findSome(0, `ID = ${products[0].ID_DELIVERY}`)
+        const delivery = await ViewDeliverys.findSome(0, `ID = ${products[products.length - 1].ID_DELIVERY}`)
   
         resp = {products, delivery}
         return res.status(200).json(resp)
@@ -95,9 +95,9 @@ module.exports = {
   async updaDateDeliv( req, res ){
     try {
       const { idSale } = req.params
-      const { dateDeliv, CODLOJA } = req.body
+      const { dateDeliv, CODLOJA, OBS_SCHED } = req.body
   
-      await Sales._query(0, `UPDATE SALES SET D_ENTREGA1 = '${dateDeliv}', SCHEDULED = 1 WHERE ID_SALES = ${idSale} AND CODLOJA = ${CODLOJA}`)
+      await Sales._query(0, `UPDATE SALES SET D_ENTREGA1 = '${dateDeliv}', SCHEDULED = 1, OBS_SCHEDULED = '${OBS_SCHED}' WHERE ID_SALES = ${idSale} AND CODLOJA = ${CODLOJA}`)
 
       res.json(dateDeliv)
     } catch (error) {

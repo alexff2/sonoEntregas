@@ -10,7 +10,18 @@ export default function ShopProvider({ children }){
   useEffect(()=>{
     api
       .get('conections')
-      .then( resp => setShop(resp.data))
+      .then( resp => {
+        resp.data &&
+        setShop([{database: "SONOENTREGAS"},
+          {database: "SONO"},
+          {database: "SONO_JP1"},
+          {database: "SONO_JP2"},
+          {database: "RIO_ANIL"},
+          {database: "S_ILHA"},
+          {database: "COHAB"},
+          {database: "SONO_PN"}
+        ])
+      })
   },[])
 
 

@@ -5,13 +5,14 @@ import {
 } from '@material-ui/core'
 //Components
 import Sales from '../../components/TableSales'
+import BoxInfo from '../../components/BoxInfo'
 import Cards from './Cards'
 //Contexts
 import { useSale } from '../../context/saleContext'
 
 const useStyles = makeStyles((theme) => ({
   sales: {
-    marginTop: theme.spacing(4),
+    marginTop: theme.spacing(3),
     display: 'flex',
   },
   boxAddress: {
@@ -38,7 +39,9 @@ export default function Home(){
           setSalesProd={[]}
           type={'home'}
         />
-        <Box className={classes.boxAddress}>Endereço</Box>
+        <Box className={classes.boxAddress}>
+          <BoxInfo loc="NotModal"/>
+        </Box>
       </Box>
 
     </Box>

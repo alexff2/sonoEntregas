@@ -14,10 +14,11 @@ import {
   Paper,
   Checkbox
 } from '@material-ui/core'
-import { Height, KeyboardArrowDown, KeyboardArrowUp} from '@material-ui/icons'
+import { KeyboardArrowDown, KeyboardArrowUp} from '@material-ui/icons'
 
 //Context
-import { useShop } from '../context/shopContext';
+import { useShop } from '../context/shopContext'
+import { useAddress } from '../context/addressContext'
 
 //Components
 import EnhancedTableHead from './EnhancedTableHead'
@@ -45,37 +46,50 @@ const useStyles = makeStyles( theme =>({
     color: theme.palette.common.white,
     fontWeight: theme.typography.fontWeightBold,
     padding: '0 10px',
-    width: '5%'
+    width: 46
   },
   headIdSale:{
     color: theme.palette.common.white,
     fontWeight: theme.typography.fontWeightBold,
-    padding: '0 10px',
-    width: '15%'
+    padding: '5px 0 5px 10px',
+    width: 110
   },
   headName:{
     color: theme.palette.common.white,
     fontWeight: theme.typography.fontWeightBold,
     padding: 0,
-    width: '45%'
+    width: 280
+  },
+  headDistrict:{
+    color: theme.palette.common.white,
+    fontWeight: theme.typography.fontWeightBold,
+    padding: 0,
+    width: 130
   },
   headDate:{
     color: theme.palette.common.white,
     fontWeight: theme.typography.fontWeightBold,
     padding: 0,
-    width: '17%',
+    width: 115,
     textAlign: 'end'
   },
   headShop:{
     color: theme.palette.common.white,
     fontWeight: theme.typography.fontWeightBold,
-    padding: '0 20px 0 0',
-    width: '18%',
+    padding: '0 24px 0 0',
+    width: 118,
     textAlign: 'end'
   },
-  tableBody: {
-    height: 'calc(100vh - 300px)',
-    overflowY: 'scroll'
+  tableBody1: {
+    height: 'calc(100vh - 320px)',
+    overflowY: 'auto',
+    overflowX: 'hidden',
+    marginRight: -1
+  },
+  tableBody2: {
+    height: 'calc(100vh - 490px)',
+    overflowX: 'hidden',
+    overflowY: 'auto'
   },
   row: {
     '& > *': {
@@ -93,40 +107,51 @@ const useStyles = makeStyles( theme =>({
   },
   bodyUpDown: {
     padding: '0 10px',
-    width: '6.5%'
+    width: 46
   },
   bodyIdSale:{
-    padding: '0 10px',
-    width: '15.5%'
+    padding: '5px 0 5px 10px',
+    width: 110
   },
   bodyName:{
     padding: 0,
-    width: '46%',
+    width: 280,
+    fontSize: 12
+  },
+  bodyDistrict:{
+    padding: 0,
+    width: 130,
     fontSize: 12
   },
   dateDelivRed: {
     color: 'red',
     padding: 0,
-    width: '17%',
+    width: 115,
     textAlign: 'end'
   },
   dateDelivBlack: {
     color: 'black',
     padding: 0,
-    width: '17%',
+    width: 115,
     textAlign: 'end'
   },
   dateDelivYellow: {
     color: 'yellow',
     padding: 0,
-    width: '17%',
+    width: 115,
     textAlign: 'end'
   },
   bodyShop:{
     padding: 0,
-    width: '10%',
+    width: 95,
     textAlign: 'end'
   },
+  tdCheckBox: {
+    padding: '0 10px',
+    '& > span': {
+      padding: 0
+    }
+  }
 }))
 
 const CheckProd = ({ sendSalesProd, type, produto, classes }) => {
@@ -136,11 +161,11 @@ const CheckProd = ({ sendSalesProd, type, produto, classes }) => {
   if (type === 'update' || type === 'home') {
     return null
   } else if (produto.STATUS !== 'Enviado') {
-    return <TableCell>{produto.STATUS}</TableCell>
+    return <TableCell style={{padding: '0px 10px'}}>{produto.STATUS}</TableCell>
   } else {
     return (
       <>
-        <TableCell>
+        <TableCell  style={{padding: '0px 10px'}}>
           <input 
             type="number" 
             style={{width: 40}}
@@ -151,7 +176,7 @@ const CheckProd = ({ sendSalesProd, type, produto, classes }) => {
             disabled={inputNumber}
           />
         </TableCell>
-        <TableCell align="right">
+        <TableCell align="right" className={classes.tdCheckBox}>
           <Checkbox
             onChange={(e) => sendSalesProd(e, produto, qtdDeliv, setInputNumber)}
           />
@@ -161,7 +186,7 @@ const CheckProd = ({ sendSalesProd, type, produto, classes }) => {
   }
 }
 
-function Row({sendSalesProd, sale, type}) {
+function Row({sendSalesProd, sale, type, setAddress}) {
   const [ open, setOpen ] = useState(false)
   const { shop } = useShop()
   const classes = useStyles()
@@ -192,6 +217,17 @@ function Row({sendSalesProd, sale, type}) {
     }
   }
 
+  const setInformations = sale => {
+    setAddress({
+      OBS2: sale.OBS2,
+      ENDERECO: sale.ENDERECO,
+      PONTOREF: sale.PONTOREF,
+      OBS: sale.OBS,
+      SCHEDULED: sale.SCHEDULED,
+      OBS_SCHEDULED: sale.OBS_SCHEDULED
+    })
+  }
+
   return(
     <React.Fragment>
       <TableRow className={ type === 'home' ? classes.row : classes.row1 }>
@@ -202,30 +238,31 @@ function Row({sendSalesProd, sale, type}) {
           </IconButton>
         </TableCell> : null
         }
-        <TableCell className={classes.bodyIdSale}>{sale.ID_SALES}</TableCell>
-        <TableCell className={classes.bodyName}>{sale.NOMECLI}</TableCell>
+        <TableCell className={classes.bodyIdSale} onClick={() => setInformations(sale)}>{sale.ID_SALES}</TableCell>
+        <TableCell className={classes.bodyName} onClick={() => setInformations(sale)}>{sale.NOMECLI}</TableCell>
+        <TableCell className={classes.bodyDistrict} onClick={() => setInformations(sale)}>{sale.BAIRRO}</TableCell>
         <TableCell className={styleDateDeliv()}>{getDateBr(sale.D_ENTREGA1)}</TableCell>
         <TableCell className={classes.bodyShop}>{setShops(sale.CODLOJA)}</TableCell>
       </TableRow>
   
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+        <TableCell style={{ padding: 0 }} colSpan={6}>
           <Collapse in={ type !== 'home' ? true : open} timeout="auto" unmountOnExit>
-            <Box margin={1}>
-              <Typography variant="h6" gutterBottom component="div">
+            <Box margin={0}>
+              <Typography variant="h6" gutterBottom component="div" style={{padding: '0 10px', margin: 0}}>
                 Produtos
               </Typography>
               <Table size="small" aria-label="purchases">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Código</TableCell>
-                    <TableCell>Descrição</TableCell>
-                    <TableCell>Qtd. Tot.</TableCell>
-                    <TableCell>Qtd. Entregue</TableCell>
+                    <TableCell style={{padding: '0px 10px'}}>Código</TableCell>
+                    <TableCell style={{padding: '0px 10px'}}>Descrição</TableCell>
+                    <TableCell style={{padding: '0px 10px'}}>Qtd. Tot.</TableCell>
+                    <TableCell style={{padding: '0px 10px'}}>Qtd. Entregue</TableCell>
                     {type === 'update' || type === 'home' ? null :
                       <>
-                        <TableCell align="right">Qtd</TableCell>
-                        <TableCell></TableCell>
+                        <TableCell style={{padding: '0px 10px'}} align="right">Qtd</TableCell>
+                        <TableCell style={{padding: '0px 10px'}}></TableCell>
                       </>
                     }
                   </TableRow>
@@ -233,12 +270,12 @@ function Row({sendSalesProd, sale, type}) {
                 <TableBody>
                   {sale.products.map((produto) => (
                     <TableRow key={produto.CODPRODUTO}>
-                      <TableCell component="th" scope="row">
+                      <TableCell  style={{padding: '0px 10px'}} component="th" scope="row">
                         {produto.COD_ORIGINAL}
                       </TableCell>
-                      <TableCell>{produto.DESCRICAO}</TableCell>
-                      <TableCell>{produto.QUANTIDADE}</TableCell>
-                      <TableCell>{produto.QTD_DELIV}</TableCell>
+                      <TableCell style={{padding: '0px 10px'}}>{produto.DESCRICAO}</TableCell>
+                      <TableCell style={{padding: '0px 10px'}}>{produto.QUANTIDADE}</TableCell>
+                      <TableCell style={{padding: '0px 10px'}}>{produto.QTD_DELIV}</TableCell>
                       
                       <CheckProd 
                         sendSalesProd={sendSalesProd} 
@@ -268,6 +305,7 @@ export default function TableSales({
   const [ order, setOrder ] = useState('asc')
   const [ orderBy, setOrderBy ] = useState('idSales')
   const [currentSales, setCurrentSales] = useState([])
+  const { setAddress } = useAddress()
   const classes = useStyles()
 
   //Start Component
@@ -308,11 +346,13 @@ export default function TableSales({
     { id: '', numeric: false, label: '', class: classes.headUpDown },
     { id: 'ID_SALES', numeric: false, label: 'Nº Venda', class: classes.headIdSale },
     { id: 'NOMECLI', numeric: false, label: 'Nome do Cliente', class: classes.headName },
+    { id: 'BAIRRO', numeric: false, label: 'Bairro', class: classes.headDistrict },
     { id: 'D_ENTREGA1', numeric: true, label: 'Data Entrega', class: classes.headDate },
     { id: 'CODLOJA', numeric: true, label: 'Loja', class: classes.headShop }
   ] : [
     { id: 'ID_SALES', numeric: false, label: 'Nº Venda', class: classes.headIdSale },
     { id: 'NOMECLI', numeric: false, label: 'Nome do Cliente', class: classes.headName },
+    { id: 'BAIRRO', numeric: false, label: 'Bairro', class: classes.headDistrict },
     { id: 'D_ENTREGA1', numeric: true, label: 'Data Entrega', class: classes.headDate },
     { id: 'CODLOJA', numeric: true, label: 'Loja', class: classes.headShop }
   ]
@@ -329,10 +369,16 @@ export default function TableSales({
             classe={classes}
           />
 
-          <TableBody className={classes.tableBody}>
+          <TableBody className={type === 'home' ? classes.tableBody1 : classes.tableBody2}>
             {stableSort(currentSales, getComparator(order, orderBy))
               .map( sale => (
-              <Row  key={sale.ID_SALES} sendSalesProd={sendSalesProd} classes={classes} sale={sale} type={type}/>
+              <Row  
+                key={sale.ID_SALES} 
+                sendSalesProd={sendSalesProd} 
+                classes={classes} sale={sale} 
+                type={type}
+                setAddress={setAddress}
+              />
             ))}
           </TableBody>
         
