@@ -167,17 +167,23 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
           const {data} = await api.get(`sales/ID_SALES/${idSale}/null/false`)
 
           if(data !== '' ) {
-            data[0].STATUS === 'Aberta' ? 
-              setCreateDevSales([ ...createDevSales,  ...data]) :
-              setErrorMsg('Venda FECHADA já lançada em rota, consultar no menu VENDAS para saber STATUS da rota')
+            var isOpenSales = false
+            for (let i = 0; i < data.length; i++) {
+              if (data[i].STATUS === 'Aberta') {
+                var sale = [data[i]]
+                setCreateDevSales([...createDevSales, ...sale])
+                isOpenSales = true
+              }
+            }
+            !isOpenSales && setErrorMsg('Venda FECHADA já lançada em rota, consultar no menu VENDAS para saber STATUS da rota')
           } else setErrorMsg('Venda não encontrada')
         } else {
           setErrorMsg('Preencha o campo Código da Venda')
         }
       } catch (e) {
-        console.log(e.response)
+        console.log(e)
  
-        if (e.response.status === 400) {
+        if (e.response && e.response.status === 400) {
           setErrorMsg('Requisição Incorreta (Verifique valor digitado)!')
         } else {
           setErrorMsg('Erro ao comunicar com servidor!')
