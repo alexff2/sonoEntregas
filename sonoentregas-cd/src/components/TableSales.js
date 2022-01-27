@@ -158,7 +158,7 @@ const CheckProd = ({ sendSalesProd, type, produto, classes }) => {
   const [ qtdDeliv, setQtdDeliv ] = useState(0)
   const [ inputNumber, setInputNumber ] = useState(false)
 
-  if (type === 'update' || type === 'home') {
+  if (type === 'home') {
     return null
   } else if (produto.STATUS !== 'Enviado') {
     return <TableCell style={{padding: '0px 10px'}}>{produto.STATUS}</TableCell>
@@ -231,12 +231,12 @@ function Row({sendSalesProd, sale, type, setAddress}) {
   return(
     <React.Fragment>
       <TableRow className={ type === 'home' ? classes.row : classes.row1 }>
-        {type === 'home' ? 
+        {type === 'home' &&
         <TableCell className={classes.bodyUpDown}>
           <IconButton aria-label="expand row" style={{padding: 0}} onClick={() => setOpen(!open)}>
             {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
           </IconButton>
-        </TableCell> : null
+        </TableCell> 
         }
         <TableCell className={classes.bodyIdSale} onClick={() => setInformations(sale)}>{sale.ID_SALES}</TableCell>
         <TableCell className={classes.bodyName} onClick={() => setInformations(sale)}>{sale.NOMECLI}</TableCell>

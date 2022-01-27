@@ -100,10 +100,12 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
   //Start component
   useEffect(() => {
     if (selectDelivery){
+      console.log(selectDelivery)
       setDescription(selectDelivery.DESCRIPTION)
       setCodCar(selectDelivery.ID_CAR)
       setCodDriver(selectDelivery.ID_DRIVER)
       setCodAssistant(selectDelivery.ID_ASSISTANT)
+      setCreateDevSales(selectDelivery.sales)
     }
   }, [selectDelivery])
 
@@ -296,7 +298,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
 
       <Box className={classes.sales}>
         <TableSales 
-          selectSales={selectDelivery ? selectDelivery.sales : createDevSales} 
+          selectSales={createDevSales} 
           setSalesProd={setSalesProd}
           salesProd={salesProd}
           type={ selectDelivery ? 'update' : 'create' }
