@@ -36,8 +36,7 @@ module.exports = {
       const delivCreate = await Deliverys.creator(0, valuesDelivery)
       
       const dataDelivery = await ViewDeliverys.findSome(0, `ID = ${delivCreate.ID}`)
-      console.log(dataDelivery)
-      
+
       await salesProd.forEach( async produto => {
         var { ID_SALES, CODLOJA, COD_ORIGINAL, QUANTIDADE, QTD_DELIV, qtdDeliv } = produto
 
@@ -48,7 +47,7 @@ module.exports = {
         await DeliveryProd.creatorNotReturn(0, valueProd, true)
 
         if ((QUANTIDADE - QTD_DELIV) == qtdDeliv || qtdDeliv === 0) {
-          await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = '${status}' WHERE ID_SALES = ${ID_SALES} AND COD_ORIGINAL = '${COD_ORIGINAL}'`)
+          await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = '${status}' WHERE ID_SALES = ${ID_SALES} AND COD_ORIGINAL = '${COD_ORIGINAL}' AND CODLOJA = ${CODLOJA}`)
         }
         
         produto.STATUS = 'Em lançamento'
@@ -56,7 +55,7 @@ module.exports = {
         const prod = await SalesProd.findSome(0, `ID_SALES = ${ID_SALES} and STATUS = 'Enviado'`)
 
         if (prod.length === 0) {
-          await Sales.updateNotReturn(0, `STATUS = 'Fechada'`, ID_SALES, 'ID_SALES')
+          await Sales._query(0, `UPDATE SALES SET STATUS = 'Fechada' WHERE ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`)
         }
       })
       
@@ -70,13 +69,49 @@ module.exports = {
   async update( req, res ) {
     try {
       const { id } = req.params
-      const { description, codCar, codDriver, codAssistant } = req.body
+      const { description, codCar, codDriver, codAssistant, salesProd } = req.body
 
       const script = `DESCRIPTION = '${description}', ID_CAR = ${codCar}, ID_DRIVER = ${codDriver}, ID_ASSISTANT = ${codAssistant}`
       
       const delivery = await Deliverys.update(0, script, id)
+      const dataDelivery = await ViewDeliverys.findSome(0, `ID = ${delivery.ID}`)
 
-      res.json(delivery)
+      const delivUpdateStatus = await DeliveryProd.findSome(0, `ID_DELIVERY = ${delivery.ID}`)
+
+      delivUpdateStatus.forEach(async deliv => {
+        await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = 'Enviado' WHERE ID_SALES = ${deliv.ID_SALE} AND COD_ORIGINAL = '${deliv.COD_ORIGINAL}' AND CODLOJA = ${deliv.CODLOJA}`)
+        
+        await Sales._query(0, `UPDATE SALES SET STATUS = 'Aberta' WHERE ID_SALES = ${deliv.ID_SALE} AND CODLOJA = ${deliv.CODLOJA}`)
+      })
+
+      await DeliveryProd.deleteNotReturn(0, delivery.ID, 'ID_DELIVERY')
+      
+      const dataTime = getDate()
+
+      await salesProd.forEach( async produto => {
+        var { ID_SALES, CODLOJA, COD_ORIGINAL, QUANTIDADE, QTD_DELIV, qtdDeliv } = produto
+
+        var qtd = qtdDeliv === 0 ? (QUANTIDADE - QTD_DELIV) : qtdDeliv
+        
+        var valueProd = `${dataDelivery[0].ID}, ${ID_SALES}, ${CODLOJA}, ${qtd}, '${COD_ORIGINAL}', '${dataTime}', NULL, NULL, 0`
+        
+        await DeliveryProd.creatorNotReturn(0, valueProd, true)
+
+        //if ((QUANTIDADE - QTD_DELIV) == qtdDeliv || qtdDeliv === 0) {//Ajustar quantidade entrega
+          await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = 'Em lançamento' WHERE ID_SALES = ${ID_SALES} AND COD_ORIGINAL = '${COD_ORIGINAL}' AND CODLOJA = ${CODLOJA}`)
+        //}
+
+        produto.STATUS = 'Em lançamento'
+
+        const prod = await SalesProd.findSome(0, `ID_SALES = ${ID_SALES} and STATUS = 'Enviado'`)
+
+        if (prod.length === 0) {
+          await Sales._query(0, `UPDATE SALES SET STATUS = 'Fechada' WHERE ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`)
+        }
+      })
+
+      const dataDeliverys = await DevService.findDev([dataDelivery[0]])
+      res.json(dataDeliverys[0])
     } catch (e) {
       res.status(400).json(e)
     }

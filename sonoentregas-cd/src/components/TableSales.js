@@ -156,11 +156,11 @@ const useStyles = makeStyles( theme =>({
 
 const CheckProd = ({ sendSalesProd, type, produto, classes }) => {
   const [ qtdDeliv, setQtdDeliv ] = useState(0)
-  const [ inputNumber, setInputNumber ] = useState(false)
+  const [ inputNumber, setInputNumber ] = useState(produto.STATUS !== 'Enviado')
 
   if (type === 'home') {
     return null
-  } else if (produto.STATUS !== 'Enviado') {
+  } else if (produto.STATUS !== 'Enviado' && type !== 'update') {
     return <TableCell style={{padding: '0px 10px'}}>{produto.STATUS}</TableCell>
   } else {
     return (
@@ -179,6 +179,7 @@ const CheckProd = ({ sendSalesProd, type, produto, classes }) => {
         <TableCell align="right" className={classes.tdCheckBox}>
           <Checkbox
             onChange={(e) => sendSalesProd(e, produto, qtdDeliv, setInputNumber)}
+            defaultChecked={produto.STATUS !== 'Enviado'}
           />
         </TableCell>
       </>
@@ -259,7 +260,7 @@ function Row({sendSalesProd, sale, type, setAddress}) {
                     <TableCell style={{padding: '0px 10px'}}>Descrição</TableCell>
                     <TableCell style={{padding: '0px 10px'}}>Qtd. Tot.</TableCell>
                     <TableCell style={{padding: '0px 10px'}}>Qtd. Entregue</TableCell>
-                    {type === 'update' || type === 'home' ? null :
+                    {type !== 'home' &&
                       <>
                         <TableCell style={{padding: '0px 10px'}} align="right">Qtd</TableCell>
                         <TableCell style={{padding: '0px 10px'}}></TableCell>

@@ -100,12 +100,19 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
   //Start component
   useEffect(() => {
     if (selectDelivery){
-      console.log(selectDelivery)
       setDescription(selectDelivery.DESCRIPTION)
       setCodCar(selectDelivery.ID_CAR)
       setCodDriver(selectDelivery.ID_DRIVER)
       setCodAssistant(selectDelivery.ID_ASSISTANT)
       setCreateDevSales(selectDelivery.sales)
+      var salesProdTemp = []
+      selectDelivery.sales.forEach(sale => {
+        sale.products.forEach(product => {
+          product['qtdDeliv'] = product.QTD_DELIV
+          salesProdTemp.push(product)
+        })
+      })
+      setSalesProd(salesProdTemp)
     }
   }, [selectDelivery])
 
@@ -142,14 +149,18 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
 
   const updateDelivery = async () => {
     try {
-      const data = { description, codCar, codDriver, codAssistant }
+      const dataDelivery = { description, codCar, codDriver, codAssistant, salesProd }
 
-      const { data: dataDelivery } = await api.put(`deliverys/${selectDelivery.ID}`, data)
-      
-      dataDelivery['sales'] = selectDelivery.sales
-      
-      setDelivery(delivery.map( item => item.ID === selectDelivery.ID ? dataDelivery : item))
-      
+      const { data } = await api.put(`deliverys/${selectDelivery.ID}`, dataDelivery)
+
+      setDelivery(delivery.map( item => item.ID === selectDelivery.ID ? data : item))
+
+      if (data.ID) { //Melhorar performace
+        const { data: dataSales } = await api.get('sales/false/false/Aberta/null')
+  
+        setSales(dataSales)
+      }
+
       setOpen(false)
     } catch (e) {
       console.log(e)
