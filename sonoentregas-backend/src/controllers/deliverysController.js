@@ -31,36 +31,34 @@ module.exports = {
 
       const valuesDelivery = `'${description}', ${codCar}, ${codDriver}, ${codAssistant}, '${status}'`
 
-      const dataTime = getDate()
-      
       const delivCreate = await Deliverys.creator(0, valuesDelivery)
-      
+
       const dataDelivery = await ViewDeliverys.findSome(0, `ID = ${delivCreate.ID}`)
+
+      const dataTime = getDate()
 
       await salesProd.forEach( async produto => {
         var { ID_SALES, CODLOJA, COD_ORIGINAL, QUANTIDADE, QTD_DELIV, qtdDeliv } = produto
 
         var qtd = qtdDeliv === 0 ? (QUANTIDADE - QTD_DELIV) : qtdDeliv
-        
+
         var valueProd = `${dataDelivery[0].ID}, ${ID_SALES}, ${CODLOJA}, ${qtd}, '${COD_ORIGINAL}', '${dataTime}', NULL, NULL, 0`
-        
+
         await DeliveryProd.creatorNotReturn(0, valueProd, true)
 
-        if ((QUANTIDADE - QTD_DELIV) == qtdDeliv || qtdDeliv === 0) {
+        if ((QUANTIDADE - QTD_DELIV) === qtdDeliv || qtdDeliv === 0) {
           await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = '${status}' WHERE ID_SALES = ${ID_SALES} AND COD_ORIGINAL = '${COD_ORIGINAL}' AND CODLOJA = ${CODLOJA}`)
         }
-        
-        produto.STATUS = 'Em lançamento'
 
-        const prod = await SalesProd.findSome(0, `ID_SALES = ${ID_SALES} and STATUS = 'Enviado'`)
+        const prod = await SalesProd.findSome(0, `ID_SALES = ${ID_SALES} and STATUS = 'Enviado' AND CODLOJA = ${CODLOJA}`)
 
         if (prod.length === 0) {
           await Sales._query(0, `UPDATE SALES SET STATUS = 'Fechada' WHERE ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`)
         }
       })
-      
+
       const dataDeliverys = await DevService.findDev([dataDelivery[0]])
-      
+
       return res.json(dataDeliverys[0])
     } catch (error) {
       res.status(400).json(error)
@@ -100,8 +98,6 @@ module.exports = {
         //if ((QUANTIDADE - QTD_DELIV) == qtdDeliv || qtdDeliv === 0) {//Ajustar quantidade entrega
           await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = 'Em lançamento' WHERE ID_SALES = ${ID_SALES} AND COD_ORIGINAL = '${COD_ORIGINAL}' AND CODLOJA = ${CODLOJA}`)
         //}
-
-        produto.STATUS = 'Em lançamento'
 
         const prod = await SalesProd.findSome(0, `ID_SALES = ${ID_SALES} and STATUS = 'Enviado'`)
 
@@ -145,15 +141,17 @@ module.exports = {
 
       for (let i = 0; i < delivery.sales.length; i++) {
         for (let j = 0; j < delivery.sales[i].products.length; j++) {
-          
-          var qtd = delivery.sales[i].products[j].QUANTIDADE
+
+          var qtd = delivery.sales[i].products[j].QTD_DELIV
           var cod = delivery.sales[i].products[j].COD_ORIGINAL
           var reason = delivery.sales[i].products[j].REASON_RETURN
           var status = delivery.sales[i].products[j].STATUS
           var codLoja = delivery.sales[i].CODLOJA
           var idSales = delivery.sales[i].ID_SALES
 
-          await Deliverys._query(0, `UPDATE SALES_PROD SET STATUS = '${status}' WHERE ID_SALES = ${idSales} AND CODLOJA = ${codLoja} AND COD_ORIGINAL = '${cod}'`)
+          if (updateStatus){
+            await Deliverys._query(0, `UPDATE SALES_PROD SET STATUS = '${status}' WHERE ID_SALES = ${idSales} AND CODLOJA = ${codLoja} AND COD_ORIGINAL = '${cod}'`)
+          }
 
           if (status === 'Entregando') {
 
@@ -176,7 +174,7 @@ module.exports = {
         }
       }
 
-      await Deliverys.updateNotReturn(0, `STATUS = '${delivery.STATUS}'`, id)
+      //await Deliverys.updateNotReturn(0, `STATUS = '${delivery.STATUS}'`, id)
 
       res.json(delivery)
     } catch (e) {

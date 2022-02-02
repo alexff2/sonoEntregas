@@ -22,22 +22,6 @@ export default function ModalDelivering({ setOpen, selectDelivery }){
 
   const { errorDiv } = useStyle()
 
-  const changeDate = e => {
-    setError(false)
-    
-    if (new Date(e.target.value).setHours(0,0,0,0) >= new Date('2021-12-15').setHours(0,0,0,0)) {
-      setDate(e.target.value)
-    } else {
-      e.target.value = ''
-
-      setDate('')
-
-      setError(true)
-
-      setChildrenError('Data não permitida, por favor escolha uma data maior ou igual a hoje')
-    }
-  }
-
   const delivering = async () => {
     if (date === '') {
       setError(true)
@@ -65,7 +49,7 @@ export default function ModalDelivering({ setOpen, selectDelivery }){
     <div>
       <hr />
       Selecione a data de saída: &nbsp;
-      <input type="date" onChange={changeDate}/>&nbsp;
+      <input type="date" onChange={e => setDate(e.target.value)}/>&nbsp;
       <ButtonSucess children={'SALVAR'} onClick={delivering}/><br/><br/>
       {error && <div className={errorDiv}><span>{childrenError}</span></div>}
     </div>

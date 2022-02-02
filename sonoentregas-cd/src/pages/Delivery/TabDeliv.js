@@ -82,17 +82,17 @@ export default function TabDeliv({ type, deleteDelivery, openModals }){
         {delivery.map( item => (
           <TableRow key={item.ID} className={classes.body}>
             <TableCell width={'5%'}>{item.ID}</TableCell>
-            <TableCell width={'24%'}>{item.DESCRIPTION}</TableCell>
+            <TableCell width={'25%'}>{item.DESCRIPTION}</TableCell>
             <TableCell width={'13%'}>{item.DRIVER}</TableCell>
             <TableCell width={'13%'}>{item.ASSISTANT}</TableCell>
-            <TableCell width={'15%'}>{item.CAR}</TableCell>
+            <TableCell width={'10%'}>{item.CAR}</TableCell>
             <TableCell width={'15%'}>
               <div 
                 style={StyleStatus(item.STATUS)}
                 onClick={() => openModals(item, 'view')}
               >{item.STATUS}</div>
             </TableCell>
-            <TableCell width={'8%'} align="right">
+            <TableCell width={'10%'} align="right">
               {(item.STATUS === 'Em lançamento') && (
               <>
                 <Edit onClick={()=> openModals(item, 'update')}/>
