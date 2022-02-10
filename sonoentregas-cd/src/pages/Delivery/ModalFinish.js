@@ -216,12 +216,22 @@ export default function ModalFinish({ setOpen, selectDelivery, type }){
   const [ childrenModalAlert, setChildrenOpenModalAlert ] = useState('')
   const [ dateDelivery, setDateDelivery ] = useState(false)
   const [ stateCheckedAllProd, setStateCheckedAllProd ] = useState(false)
+  const [ disabledBtnGrav, setDisabledBtnGrav ] = useState(false)
 
-  const { delivery, setDelivery } = useDelivery()
+  const { setDelivery } = useDelivery()
   const { deliveryFinish, setDeliveryFinish } = useDeliveryFinish()
   const stateSales = useSale()
 
   const classes = useStyles()
+
+  useEffect(()=>{
+    type === 'open' && selectDelivery.sales.forEach(sale =>{
+      sale.products.forEach(produto => {
+        produto.DELIVERED = true
+        produto.STATUS = 'Enviado'
+      })
+    })
+  },[selectDelivery, type])
 
   //Functions
   const checkedAllProd = e => {
@@ -246,6 +256,7 @@ export default function ModalFinish({ setOpen, selectDelivery, type }){
   const finish = async () => {
     try {
       if(dateDelivery){
+        setDisabledBtnGrav(true)
         const status = 'Finalizada'
     
         selectDelivery.STATUS = status
@@ -253,10 +264,7 @@ export default function ModalFinish({ setOpen, selectDelivery, type }){
   
         selectDelivery.sales.forEach(sale =>{
           sale.products.forEach(produto => {
-            if(produto.STATUS === 'Entregando') {
-              produto.STATUS = 'Enviado'
-              produto.DELIVERED = true
-            }
+            if (produto.QUANTIDADE !== produto.QTD_DELIVERED + produto.QTD_DELIV) produto['UPST'] = false
           })
         })
   
@@ -266,8 +274,9 @@ export default function ModalFinish({ setOpen, selectDelivery, type }){
           const resp = await api.get('sales/false/false/Aberta/null')
           stateSales.setSales(resp.data)
         }
-    
-        setDelivery(delivery.filter( deliv => deliv.ID !== data.ID ))
+
+        const { data: dataDeliv } = await api.get('deliverys/status/') 
+        setDelivery(dataDeliv)
         setDeliveryFinish([...deliveryFinish, selectDelivery])
         setOpen(false)
       } else {
@@ -339,6 +348,7 @@ export default function ModalFinish({ setOpen, selectDelivery, type }){
             children={"Finalizar"}
             className={classes.btnSucess}
             onClick={finish}
+            disabled={disabledBtnGrav}
           />
           <ButtonCancel 
             children="Cancelar"

@@ -18,9 +18,9 @@ export default function ModalDelivering({ setOpen, selectDelivery }){
   const [ date, setDate ] = useState('')
   const [ error, setError ] = useState(false)
   const [ childrenError, setChildrenError ] = useState('')
-  const { delivery, setDelivery } = useDelivery()
-
+  const { setDelivery } = useDelivery()
   const { errorDiv } = useStyle()
+  const [ disabledBtnGrav, setDisabledBtnGrav ] = useState(false)
 
   const delivering = async () => {
     if (date === '') {
@@ -28,19 +28,23 @@ export default function ModalDelivering({ setOpen, selectDelivery }){
 
       setChildrenError('Selecione uma data válida!')
     } else {
+      setDisabledBtnGrav(true)
+
       selectDelivery.STATUS = 'Entregando'
       selectDelivery['DATE'] = date
   
-      for( let i = 0; i < selectDelivery.sales.length; i++){
-        for( let j = 0; j < selectDelivery.sales[i].products.length; j++){
-          selectDelivery.sales[i].products[j].STATUS = 'Entregando'
+      selectDelivery.sales.forEach(sale =>{
+        sale.products.forEach(produto => {
+          produto.STATUS = 'Entregando'
+          if (produto.QUANTIDADE !== (produto.QTD_DELIVERING + produto.QTD_DELIV)) produto['UPST'] = false
         }
-      }
-  
-      const { data } = await api.put(`deliverys/status/${selectDelivery.ID}`, selectDelivery)
-  
-      setDelivery(delivery.map( item => item.ID === selectDelivery.ID ? data : item))
-  
+      )})
+
+      await api.put(`deliverys/status/${selectDelivery.ID}`, selectDelivery)
+
+      const {data} = await api.get('deliverys/open')
+      setDelivery(data)
+
       setOpen(false)
     }
   }
@@ -50,7 +54,7 @@ export default function ModalDelivering({ setOpen, selectDelivery }){
       <hr />
       Selecione a data de saída: &nbsp;
       <input type="date" onChange={e => setDate(e.target.value)}/>&nbsp;
-      <ButtonSucess children={'SALVAR'} onClick={delivering}/><br/><br/>
+      <ButtonSucess children={'SALVAR'} onClick={delivering} disabled={disabledBtnGrav}/><br/><br/>
       {error && <div className={errorDiv}><span>{childrenError}</span></div>}
     </div>
   )

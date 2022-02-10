@@ -156,11 +156,11 @@ const useStyles = makeStyles( theme =>({
 
 const CheckProd = ({ sendSalesProd, type, produto, classes }) => {
   const [ qtdDeliv, setQtdDeliv ] = useState(0)
-  const [ inputNumber, setInputNumber ] = useState(produto.STATUS !== 'Enviado')
+  const [ inputNumber, setInputNumber ] = useState(produto.checked)
 
   if (type === 'home') {
     return null
-  } else if (produto.STATUS !== 'Enviado' && type !== 'update') {
+  } else if ((produto.STATUS === 'Em lançamento' && type !== 'update') || produto.STATUS === 'Finalizada' || produto.STATUS === 'Entregando') {
     return <TableCell style={{padding: '0px 10px'}}>{produto.STATUS}</TableCell>
   } else {
     return (
@@ -169,17 +169,18 @@ const CheckProd = ({ sendSalesProd, type, produto, classes }) => {
           <input 
             type="number" 
             style={{width: 40}}
-            defaultValue={produto.QUANTIDADE - produto.QTD_DELIV}
-            max={produto.QUANTIDADE - produto.QTD_DELIV}
+            defaultValue={(type === 'update' && produto.checked) ? produto.QTD_DELIV : produto.QUANTIDADE - produto.QTD_DELIV}
+            max={(type === 'update' && produto.checked) ? produto.QUANTIDADE - (produto.QTD_MOUNTING - produto.QTD_DELIV) : produto.QUANTIDADE - produto.QTD_DELIV}
             min={1}
-            onChange={e => setQtdDeliv(e.target.value)}
+            onChange={e => setQtdDeliv(parseInt(e.target.value))}
             disabled={inputNumber}
           />
         </TableCell>
+
         <TableCell align="right" className={classes.tdCheckBox}>
           <Checkbox
             onChange={(e) => sendSalesProd(e, produto, qtdDeliv, setInputNumber)}
-            defaultChecked={produto.STATUS !== 'Enviado'}
+            defaultChecked={produto.checked}
           />
         </TableCell>
       </>
@@ -276,8 +277,8 @@ function Row({sendSalesProd, sale, type, setAddress}) {
                       </TableCell>
                       <TableCell style={{padding: '0px 10px'}}>{produto.DESCRICAO}</TableCell>
                       <TableCell style={{padding: '0px 10px'}}>{produto.QUANTIDADE}</TableCell>
-                      <TableCell style={{padding: '0px 10px'}}>{produto.QTD_DELIV}</TableCell>
-                      
+                      <TableCell style={{padding: '0px 10px'}}>{(type === 'update' && produto.checked) ? produto.QTD_MOUNTING - produto.QTD_DELIV : produto.QTD_DELIV}</TableCell>
+
                       <CheckProd 
                         sendSalesProd={sendSalesProd} 
                         type={type}

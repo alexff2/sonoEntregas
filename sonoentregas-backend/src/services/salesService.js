@@ -23,6 +23,7 @@ module.exports = {
       sale["products"] = []
 
       viewSalesProd.forEach(saleProd => {
+        saleProd['checked'] = false
         if (sale.ID_SALES === saleProd.ID_SALES && sale.CODLOJA === saleProd.CODLOJA) {
           sale.products.push(saleProd)
         }

@@ -79,7 +79,8 @@ export default function Delivery() {
     try {
       const { data } = await api.delete(`deliverys/${cod}`)
 
-      setDelivery(delivery.filter(item => item.ID !== cod))
+      const { data: dataDeliv } = await api.get('deliverys/status/') 
+      setDelivery(dataDeliv)
 
       if (data.delete) {
         const { data: dataSales } = await api.get('sales/false/false/Aberta/null')

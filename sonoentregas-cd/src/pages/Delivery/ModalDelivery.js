@@ -87,11 +87,12 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
   const [ errorMsg, setErrorMsg ] = useState('')
   const [ openModalAlert, setOpenModalAlert ] = useState(false)
   const [ childrenModalAlert, setChildrenModalAlert ] = useState('')
+  const [ disabledBtnGrav, setDisabledBtnGrav ] = useState(false)
 
   const { cars } = useCars()
   const { drivers } = useDrivers()
   const { assistants } = useAssistants()
-  const { delivery, setDelivery } = useDelivery()
+  const { setDelivery } = useDelivery()
   const { setSales } = useSale()
 
   //Styes
@@ -109,6 +110,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
       selectDelivery.sales.forEach(sale => {
         sale.products.forEach(product => {
           product['qtdDeliv'] = product.QTD_DELIV
+          product['checked'] = true
           salesProdTemp.push(product)
         })
       })
@@ -123,6 +125,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
         setOpenModalAlert(true)
         setChildrenModalAlert('Preencha todos as informações')
       } else {
+        setDisabledBtnGrav(true)
 
         const data = {
           description, codCar, codDriver, codAssistant, salesProd, status: 'Em lançamento'
@@ -130,9 +133,10 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
   
         const { data: dataDelivery } = await api.post('deliverys', data)
   
-        setDelivery([...delivery, dataDelivery])
+        const { data: dataDeliv } = await api.get('deliverys/status/') 
+        setDelivery(dataDeliv)
   
-        if (dataDelivery.ID) { //Melhorar performace
+        if (dataDelivery.ID) { //Tenta melhorar performace
           const { data: dataSales } = await api.get('sales/false/false/Aberta/null')
     
           setSales(dataSales)
@@ -149,11 +153,14 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
 
   const updateDelivery = async () => {
     try {
+      setDisabledBtnGrav(true)
+
       const dataDelivery = { description, codCar, codDriver, codAssistant, salesProd }
 
       const { data } = await api.put(`deliverys/${selectDelivery.ID}`, dataDelivery)
 
-      setDelivery(delivery.map( item => item.ID === selectDelivery.ID ? data : item))
+      const { data: dataDeliv } = await api.get('deliverys/status/') 
+      setDelivery(dataDeliv)
 
       if (data.ID) { //Melhorar performace
         const { data: dataSales } = await api.get('sales/false/false/Aberta/null')
@@ -325,6 +332,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
           children={selectDelivery ? "Editar" : "Lançar"}
           className={classes.btnSucess}
           onClick={selectDelivery ? updateDelivery : createDelivery}
+          disabled={disabledBtnGrav}
         />
         <ButtonCancel 
           children="Cancelar"

@@ -2,7 +2,7 @@ const ViewDeliverySales = require('../models/ViewDeliverySales')
 const ViewDeliveryProd2 = require('../models/ViewDeliveryProd2')
 
 module.exports = {
-  async findDev( deliverys, type ) {
+  async findDev( deliverys ) {
 
       for (let i = 0; i < deliverys.length; i++) {
         var sales = await ViewDeliverySales.findSome(0, `ID_DELIVERY = ${deliverys[i].ID}`)
