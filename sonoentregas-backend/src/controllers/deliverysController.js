@@ -61,6 +61,7 @@ module.exports = {
 
       return res.json(dataDeliverys[0])
     } catch (error) {
+      console.log(error)
       res.status(400).json(error)
     }
   },
@@ -101,7 +102,7 @@ module.exports = {
           await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = 'Em lançamento' WHERE ID_SALES = ${ID_SALES} AND COD_ORIGINAL = '${COD_ORIGINAL}' AND CODLOJA = ${CODLOJA}`)
         }
 
-        const prod = await SalesProd.findSome(0, `CODLOJA = ${CODLOJA} ID_SALES = ${ID_SALES} and STATUS = 'Enviado'`)
+        const prod = await SalesProd.findSome(0, `CODLOJA = ${CODLOJA} AND ID_SALES = ${ID_SALES} and STATUS = 'Enviado'`)
 
         if (prod.length === 0) {
           await Sales._query(0, `UPDATE SALES SET STATUS = 'Fechada' WHERE ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`)
@@ -111,6 +112,7 @@ module.exports = {
       const dataDeliverys = await DevService.findDev([dataDelivery[0]])
       res.json(dataDeliverys[0])
     } catch (e) {
+      console.log(e)
       res.status(400).json(e)
     }
   },
