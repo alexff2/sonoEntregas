@@ -93,7 +93,7 @@ const RowProd = ({product, status, stateCheckedAllProd, type })=>{
       product.REASON_RETURN = 'NULL'
     } else {
       setCheckProd(false)
-      product.STATUS = 'Entregando'
+      product.STATUS = 'Enviado'
       product.DELIVERED = true //false is zero
     }
   }
@@ -247,7 +247,7 @@ export default function ModalFinish({ setOpen, selectDelivery, type }){
       setStateCheckedAllProd(false)
       selectDelivery.sales.forEach(sale =>{
         sale.products.forEach(produto => {
-          produto.STATUS = 'Entregando'
+          produto.STATUS = 'Enviado'
           produto.DELIVERED = true
         })
       })
@@ -257,9 +257,8 @@ export default function ModalFinish({ setOpen, selectDelivery, type }){
     try {
       if(dateDelivery){
         setDisabledBtnGrav(true)
-        const status = 'Finalizada'
     
-        selectDelivery.STATUS = status
+        selectDelivery.STATUS = 'Finalizada'
         selectDelivery['dateDelivery'] = dateDelivery
   
         selectDelivery.sales.forEach(sale =>{
