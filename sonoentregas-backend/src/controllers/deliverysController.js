@@ -69,6 +69,7 @@ module.exports = {
     try {
       const { id } = req.params
       const { description, codCar, codDriver, codAssistant, salesProd } = req.body
+      console.log(salesProd)
 
       const script = `DESCRIPTION = '${description}', ID_CAR = ${codCar}, ID_DRIVER = ${codDriver}, ID_ASSISTANT = ${codAssistant}`
       
@@ -90,16 +91,26 @@ module.exports = {
       const dataTime = getDate()
 
       await salesProd.forEach( async produto => {
-        var { ID_SALES, CODLOJA, COD_ORIGINAL, QUANTIDADE, QTD_DELIV, QTD_MOUNTING, qtdDeliv } = produto
+        var { ID_SALES, CODLOJA, COD_ORIGINAL, QUANTIDADE, QTD_DELIV, QTD_MOUNTING, qtdDeliv, checked } = produto
 
-        var qtd = qtdDeliv === 0 ? QTD_DELIV : qtdDeliv
+        //var qtd = (qtdDeliv === 0 && checked) ? QTD_DELIV : qtdDeliv
+        var qtd
+        if (qtdDeliv === 0 && checked) qtd = QTD_DELIV
+        else if (qtdDeliv === 0 && !checked) qtd = (QUANTIDADE - QTD_DELIV)
+        else qtd = qtdDeliv
         
         var valueProd = `${dataDelivery[0].ID}, ${ID_SALES}, ${CODLOJA}, ${qtd}, '${COD_ORIGINAL}', '${dataTime}', NULL, NULL, 0`
         
         await DeliveryProd.creatorNotReturn(0, valueProd, true)
 
-        if (((QTD_MOUNTING - QTD_DELIV) + qtd) === QUANTIDADE) {
-          await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = 'Em lançamento' WHERE ID_SALES = ${ID_SALES} AND COD_ORIGINAL = '${COD_ORIGINAL}' AND CODLOJA = ${CODLOJA}`)
+        if (checked){
+          if (((QTD_MOUNTING - QTD_DELIV) + qtd) === QUANTIDADE) {
+            await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = 'Em lançamento' WHERE ID_SALES = ${ID_SALES} AND COD_ORIGINAL = '${COD_ORIGINAL}' AND CODLOJA = ${CODLOJA}`)
+          }
+        } else {
+          if ((QUANTIDADE - QTD_DELIV) === qtdDeliv || qtdDeliv === 0) {
+            await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = 'Em lançamento' WHERE ID_SALES = ${ID_SALES} AND COD_ORIGINAL = '${COD_ORIGINAL}' AND CODLOJA = ${CODLOJA}`)
+          }
         }
 
         const prod = await SalesProd.findSome(0, `CODLOJA = ${CODLOJA} AND ID_SALES = ${ID_SALES} and STATUS = 'Enviado'`)
