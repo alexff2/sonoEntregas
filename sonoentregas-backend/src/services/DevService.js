@@ -2,20 +2,47 @@ const ViewDeliverySales = require('../models/ViewDeliverySales')
 const ViewDeliveryProd2 = require('../models/ViewDeliveryProd2')
 
 module.exports = {
-  async findDev( deliverys ) {
+  async findSalesDev( deliverys ) {
+    try {
+      if (deliverys.length > 0) {
+        var idDeliv = ''
 
-      for (let i = 0; i < deliverys.length; i++) {
-        var sales = await ViewDeliverySales.findSome(0, `ID_DELIVERY = ${deliverys[i].ID}`)
-        
-        for (let j = 0; j < sales.length; j++) {
-          var products = await ViewDeliveryProd2.findSome(0, `ID_DELIVERY = ${sales[j].ID_DELIVERY} AND ID_SALES = ${sales[j].ID_SALES} AND CODLOJA = ${sales[j].CODLOJA}`)
-  
-          sales[j]['products'] = products
+      for (let i = 0; i < deliverys.length; i++){
+        if ( i === 0 ){
+          idDeliv+= deliverys[i].ID
+        } else {
+          idDeliv+= `, ${deliverys[i].ID}`
         }
-  
-        deliverys[i]['sales'] = sales 
       }
 
-    return deliverys
+      var sales = await ViewDeliverySales.findSome(0, `ID_DELIVERY IN (${idDeliv})`)
+
+      const vDelivProd2 = await ViewDeliveryProd2.findSome(0, `ID_DELIVERY IN (${idDeliv})`)
+
+      deliverys.forEach(delivery => {
+        delivery['sales'] = []
+
+        sales.forEach(sale => {
+
+          sale["products"] = []
+
+          vDelivProd2.forEach(saleProd => {
+            if (sale.ID_SALES === saleProd.ID_SALES && sale.CODLOJA === saleProd.CODLOJA && saleProd.ID_DELIVERY === sale.ID_DELIVERY) {
+              sale.products.push(saleProd)
+            }
+          })
+
+          if (sale.ID_DELIVERY === delivery.ID) {
+            delivery.sales.push(sale)
+          }
+        })
+      })
+      return deliverys
+      } else {
+        return []
+      }
+    } catch (error) {
+      console.log(error)
+    }
   }
 }

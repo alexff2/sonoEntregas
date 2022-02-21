@@ -18,7 +18,7 @@ module.exports = {
 
       const deliverys = await ViewDeliverys.findSome(0, where)
       
-      const dataDeliverys = await DevService.findDev(deliverys)
+      const dataDeliverys = await DevService.findSalesDev(deliverys)
 
       return res.json(dataDeliverys)
     } catch (error) {
@@ -57,7 +57,7 @@ module.exports = {
         }
       })
 
-      const dataDeliverys = await DevService.findDev([dataDelivery[0]])
+      const dataDeliverys = await DevService.findSalesDev([dataDelivery[0]])
 
       return res.json(dataDeliverys[0])
     } catch (error) {
@@ -120,7 +120,7 @@ module.exports = {
         }
       })
 
-      const dataDeliverys = await DevService.findDev([dataDelivery[0]])
+      const dataDeliverys = await DevService.findSalesDev([dataDelivery[0]])
       res.json(dataDeliverys[0])
     } catch (e) {
       console.log(e)
@@ -185,7 +185,7 @@ module.exports = {
 
             await Produtos._query(1,`UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL + ${qtd}, EST_LOJA = EST_LOJA + ${qtd} FROM PRODLOJAS A INNER JOIN PRODUTOS B ON A.CODIGO = B.CODIGO WHERE A.CODLOJA = 1 AND B.ALTERNATI = '${cod}'`)
             
-            await Sales.updateNotReturn(0, `STATUS = 'Aberta'`, idSales, 'ID_SALES')
+            await Sales._query(0, `UPDATE SALES SET STATUS = 'Aberta' WHERE ID_SALES = ${idSales} AND CODLOJA = ${codLoja}`)
           }
         }
       }

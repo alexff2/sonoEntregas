@@ -7,8 +7,9 @@ module.exports = {
     where !== 'false' ?
       sales = await Sales.findSome(0, `STATUS = '${status}' AND ${where}`):
       sales = await Sales.findSome(0, `STATUS = '${status}'`)
+
     var idSale = ''
-    
+
     for (let i = 0; i < sales.length; i++){
       if ( i === 0 ){
         idSale+= sales[i].ID_SALES

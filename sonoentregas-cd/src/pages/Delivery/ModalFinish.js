@@ -292,7 +292,7 @@ export default function ModalFinish({ setOpen, selectDelivery, type }){
   //Main Component
   return(
     <form>
-      <h3 className={classes.titleModalFinish}>{selectDelivery.DESCRIPTION}</h3>
+      <h3 className={classes.titleModalFinish}>{selectDelivery.DESCRIPTION} - {selectDelivery.sales.length} Venda(s)</h3>
       <div className={classes.divHeader}>    
         <div>
           <p><span>Motorista: </span>{selectDelivery.DRIVER}</p>
