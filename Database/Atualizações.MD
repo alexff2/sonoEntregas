@@ -4,6 +4,8 @@
 * Separar vendas iniciadas e colocar o nome ENTREGAS
 * Verificar dados sequintes: sale:15204	loja:4	prod:1862	
 * Permitir enviar da loja para o CD produtos restantes de DAV já enviada
+* Colocar horario de entregas
+* Verificar validação de produto cadastrado no CD e nas Lojas
 
 # Atualização de banco
 

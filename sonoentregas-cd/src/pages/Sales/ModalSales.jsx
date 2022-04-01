@@ -125,7 +125,7 @@ function ModalSales({ sale, product }) {
                 </div>
               </div>
               
-              <CheckFinishStatus prod={{D_DELIVERED: null, DELIVERED: true}} datePrevDeliv={datePrevDeliv}/>
+              <CheckFinishStatus prod={{}} datePrevDeliv={datePrevDeliv}/>
             </div>
             }
             {prodsDetails.map((prod,i) =>(

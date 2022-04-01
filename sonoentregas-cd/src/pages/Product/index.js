@@ -35,8 +35,7 @@ const useStyles = makeStyles(theme => ({
     '&:hover': {
       backgroundColor: fade(theme.palette.common.white, 0.25),
     },
-    marginRight: theme.spacing(2),
-    width: '60%'
+    marginRight: theme.spacing(2)
   },
   searchIcon: {
     padding: theme.spacing(0, 2),
@@ -98,20 +97,19 @@ export default function Product() {
   return(
     <Box>
       <Box className={classes.barHeader}>
-
-      <FormControl variant="outlined">
-        <InputLabel id="fieldSeach" className={classes.label}>Tipo</InputLabel>
-        <Select
-          label="Tipo"
-          labelId="fieldSeach"
-          className={classes.fieldSeach}
-          onChange={e => setTypeSeach(e.target.value)}
-          defaultValue={'NOME'}
-        >
-          <MenuItem value={'NOME'}>Descrição</MenuItem>
-          <MenuItem value={'COD_ORIGINAL'}>Código</MenuItem>
-        </Select>
-      </FormControl>
+        <FormControl variant="outlined">
+          <InputLabel id="fieldSeach" className={classes.label}>Tipo</InputLabel>
+          <Select
+            label="Tipo"
+            labelId="fieldSeach"
+            className={classes.fieldSeach}
+            onChange={e => setTypeSeach(e.target.value)}
+            defaultValue={'NOME'}
+          >
+            <MenuItem value={'NOME'}>Descrição</MenuItem>
+            <MenuItem value={'COD_ORIGINAL'}>Código</MenuItem>
+          </Select>
+        </FormControl>
 
         <div className={classes.search}>
           <div className={classes.searchIcon}>
@@ -129,7 +127,6 @@ export default function Product() {
         </div>
 
         <Button className={classes.btnSearch} onClick={searchProduct}>Pesquisar</Button>
-
       </Box>
 
       <TableContainer component={Paper}>

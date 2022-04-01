@@ -15,6 +15,8 @@ import { Delete, Edit } from '@material-ui/icons'
 import { useDelivery } from '../../context/deliveryContext'
 import { useDeliveryFinish } from '../../context/deliveryFinishContext'
 
+import StyleStatus from '../../functions/styleStatus'
+
 const useStyle = makeStyles(theme => ({
   headCell: {
     backgroundColor: theme.palette.primary.main,
@@ -43,27 +45,6 @@ export default function TabDeliv({ type, deleteDelivery, openModals }){
   useEffect(()=>{
     type === 'open' ? setDelivery(delivOpen) : setDelivery(deliveryFinish)
   },[type, delivOpen, deliveryFinish])
-
-  const StyleStatus = status => {
-    var background
-    if (status === 'Em lançamento') {
-      background = '#2196f3'
-    } else if (status === 'Entregando') {
-      background = '#ff9800'
-    } else if (status === 'Finalizada') {
-      background = '#388e3c'
-    }
-    return { 
-      background,
-      color: '#FFF',
-      width: '100%',
-      minHeight: '1.5rem',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      cursor: 'pointer'
-    }
-  }
 
 
   return (

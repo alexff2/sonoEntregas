@@ -1,3 +1,4 @@
+// @ts-check
 const Deliverys = require('../models/Deliverys')
 const ViewDeliverys = require('../models/ViewDeliverys')
 const DeliveryProd = require('../models/DeliveryProd')
@@ -6,10 +7,16 @@ const SalesProd = require('../models/SalesProd')
 const Produtos = require('../models/Produtos')
 
 const DevService = require('../services/DevService')
+const MainService = require('../services/MainService')
 
 const { getDate } = require('../functions/getDate')
 
 module.exports = {
+  /**
+   * @param {*} req 
+   * @param {*} res 
+   * @returns 
+   */
   async index( req, res ){
     try {
       const { status, date } = req.params
@@ -25,6 +32,11 @@ module.exports = {
       res.status(400).json(error)
     }
   },
+  /**
+   * @param {*} req 
+   * @param {*} res 
+   * @returns 
+   */
   async create( req, res ){
     try {
       const { description, codCar, codDriver, codAssistant, salesProd, status } = req.body
@@ -37,8 +49,8 @@ module.exports = {
 
       const dataTime = getDate()
 
-      await salesProd.forEach( async produto => {
-        var { ID_SALES, CODLOJA, COD_ORIGINAL, QUANTIDADE, QTD_DELIV, qtdDeliv } = produto
+      for(let i = 0; i < salesProd.length; i++) {
+        var { ID_SALES, CODLOJA, COD_ORIGINAL, QUANTIDADE, QTD_DELIV, qtdDeliv } = salesProd[i]
 
         var qtd = qtdDeliv === 0 ? (QUANTIDADE - QTD_DELIV) : parseInt(qtdDeliv)
 
@@ -55,7 +67,7 @@ module.exports = {
         if (prod.length === 0) {
           await Sales._query(0, `UPDATE SALES SET STATUS = 'Fechada' WHERE ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`)
         }
-      })
+      }
 
       const dataDeliverys = await DevService.findSalesDev([dataDelivery[0]])
 
@@ -65,11 +77,14 @@ module.exports = {
       res.status(400).json(error)
     }
   },
+  /**
+   * @param {*} req 
+   * @param {*} res 
+   */
   async update( req, res ) {
     try {
       const { id } = req.params
       const { description, codCar, codDriver, codAssistant, salesProd } = req.body
-      console.log(salesProd)
 
       const script = `DESCRIPTION = '${description}', ID_CAR = ${codCar}, ID_DRIVER = ${codDriver}, ID_ASSISTANT = ${codAssistant}`
       
@@ -79,20 +94,20 @@ module.exports = {
       //Buscando todas as vendas de delivProd para abri-las e deleta-las de delivProd
       const delivProdUpdateStatus = await DeliveryProd.findSome(0, `ID_DELIVERY = ${delivery.ID}`)
 
-      delivProdUpdateStatus.forEach(async deliv => {
-        await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = 'Enviado' WHERE ID_SALES = ${deliv.ID_SALE} AND COD_ORIGINAL = '${deliv.COD_ORIGINAL}' AND CODLOJA = ${deliv.CODLOJA}`)
-        
-        await Sales._query(0, `UPDATE SALES SET STATUS = 'Aberta' WHERE ID_SALES = ${deliv.ID_SALE} AND CODLOJA = ${deliv.CODLOJA}`)
-      })
+      for (let i = 0; i < delivProdUpdateStatus.length; i++) {
+        await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = 'Enviado' WHERE ID_SALES = ${delivProdUpdateStatus[i].ID_SALE} AND COD_ORIGINAL = '${delivProdUpdateStatus[i].COD_ORIGINAL}' AND CODLOJA = ${delivProdUpdateStatus[i].CODLOJA}`)
+
+        await Sales._query(0, `UPDATE SALES SET STATUS = 'Aberta' WHERE ID_SALES = ${delivProdUpdateStatus[i].ID_SALE} AND CODLOJA = ${delivProdUpdateStatus[i].CODLOJA}`)
+      }
 
       await DeliveryProd.deleteNotReturn(0, delivery.ID, 'ID_DELIVERY')
 
       //Inserindo novas vendas em delivProd e fechando as vendas
       const dataTime = getDate()
 
-      await salesProd.forEach( async produto => {
-        var { ID_SALES, CODLOJA, COD_ORIGINAL, QUANTIDADE, QTD_DELIV, QTD_MOUNTING, qtdDeliv, checked } = produto
-
+      for (let i = 0; i < salesProd.length; i++) {
+        var { ID_SALES, CODLOJA, COD_ORIGINAL, QUANTIDADE, QTD_DELIV, QTD_MOUNTING, qtdDeliv, checked } = salesProd[i]
+        
         //var qtd = (qtdDeliv === 0 && checked) ? QTD_DELIV : qtdDeliv
         var qtd
         if (qtdDeliv === 0 && checked) qtd = QTD_DELIV
@@ -102,7 +117,7 @@ module.exports = {
         var valueProd = `${dataDelivery[0].ID}, ${ID_SALES}, ${CODLOJA}, ${qtd}, '${COD_ORIGINAL}', '${dataTime}', NULL, NULL, 0`
         
         await DeliveryProd.creatorNotReturn(0, valueProd, true)
-
+        
         if (checked){
           if (((QTD_MOUNTING - QTD_DELIV) + qtd) === QUANTIDADE) {
             await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = 'Em lançamento' WHERE ID_SALES = ${ID_SALES} AND COD_ORIGINAL = '${COD_ORIGINAL}' AND CODLOJA = ${CODLOJA}`)
@@ -112,13 +127,14 @@ module.exports = {
             await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = 'Em lançamento' WHERE ID_SALES = ${ID_SALES} AND COD_ORIGINAL = '${COD_ORIGINAL}' AND CODLOJA = ${CODLOJA}`)
           }
         }
-
+        
         const prod = await SalesProd.findSome(0, `CODLOJA = ${CODLOJA} AND ID_SALES = ${ID_SALES} and STATUS = 'Enviado'`)
-
+        
         if (prod.length === 0) {
           await Sales._query(0, `UPDATE SALES SET STATUS = 'Fechada' WHERE ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`)
         }
-      })
+        console.log('ALTERANDO NOVAMENTE PRODUTO VENDA ---------------------------------')
+      }
 
       const dataDeliverys = await DevService.findSalesDev([dataDelivery[0]])
       res.json(dataDeliverys[0])
@@ -127,6 +143,10 @@ module.exports = {
       res.status(400).json(e)
     }
   },
+  /**
+   * @param {*} req 
+   * @param {*} res 
+   */
   async delete( req, res ) {
     try {
       const { id } = req.params
@@ -148,11 +168,27 @@ module.exports = {
       res.status(400).json(error)
     }
   },
+  /**
+   * @param {*} req 
+   * @param {*} res 
+   */
   async updateSatus( req, res ){
     const { id } = req.params
     const delivery = req.body
 
     try {
+      const maintenances = await MainService.findMain({
+        codloja: 0,
+        typeSeach: 'ID_DELIV_MAIN',
+        search: delivery.ID
+      })
+
+      if (delivery.STATUS === 'Entregando') {
+        for(let i = 0; i < maintenances.length; i++) {
+          maintenances[i]["date"] = delivery.DATE
+          await MainService.moveToMain(maintenances[i].ID_MAIN_ATTEMP, maintenances[i])
+        }
+      }
 
       for (let i = 0; i < delivery.sales.length; i++) {
         for (let j = 0; j < delivery.sales[i].products.length; j++) {
@@ -161,7 +197,9 @@ module.exports = {
           var cod = delivery.sales[i].products[j].COD_ORIGINAL
           var reason = delivery.sales[i].products[j].REASON_RETURN
           var status = delivery.sales[i].products[j].STATUS
-          var upSt = delivery.sales[i].products[j].UPST === undefined ? true : delivery.sales[i].products[j].UPST
+          var upSt = delivery.sales[i].products[j].UPST === undefined 
+            ? true 
+            : delivery.sales[i].products[j].UPST
           var DELIVERED = delivery.sales[i].products[j].DELIVERED
           var codLoja = delivery.sales[i].CODLOJA
           var idSales = delivery.sales[i].ID_SALES

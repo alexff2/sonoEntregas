@@ -19,6 +19,7 @@
   border: none;
   cursor: pointer;
   transition: 0.3s;
+  outline: 0;
 }
 
 .tab input:hover {
@@ -108,6 +109,7 @@ table.tab-modal-product th {
   background-color: white;
   padding: 1rem 2rem;
   font-weight: normal;
+  border: 0;  
 }
 
 table.tab-modal-product th:first-child,

@@ -18,9 +18,9 @@ export default function ModalDelivering({ setOpen, selectDelivery }){
   const [ date, setDate ] = useState('')
   const [ error, setError ] = useState(false)
   const [ childrenError, setChildrenError ] = useState('')
+  const [ disabledBtnGrav, setDisabledBtnGrav ] = useState(false)
   const { setDelivery } = useDelivery()
   const { errorDiv } = useStyle()
-  const [ disabledBtnGrav, setDisabledBtnGrav ] = useState(false)
 
   const delivering = async () => {
     if (date === '') {

@@ -1,0 +1,29 @@
+.tableMain {
+  border-spacing: 0;
+}
+
+.tableMain .cod {
+  width: 10%;
+}
+
+.tableMain .date {
+  width: 12%;
+}
+
+.infoMain {
+  display: flex;
+}
+.infoMain div {
+  width: 100%;
+}
+
+.replTrue{
+  background-color: var(--red);
+  padding: 0 0.5rem;
+  color: var(--text-inverse);
+}
+.replFalse{
+  background-color: var(--green);
+  padding: 0 0.5rem;
+  color: var(--text-inverse);
+}

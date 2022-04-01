@@ -13,6 +13,7 @@ const carsController = require('./controllers/carsController')
 const deliverysController = require('./controllers/deliverysController')
 const homeController = require('./controllers/homeController')
 const dashboardController = require('./controllers/dashboardController')
+const mainController = require('./controllers/mainController')
 
 //Routes
 //Conections
@@ -52,5 +53,14 @@ routes.put('/deliverys/status/:id', deliverysController.updateSatus)
 //Homes
 routes.get('/home', homeController.index)
 routes.get('/dashboard/:datesearch', dashboardController.index)
+//Maintenance
+routes.get('/maintenance/:codloja', mainController.index)
+routes.post('/maintenance', mainController.create)
+routes.delete('/maintenance/:id', mainController.delete)
+routes.get('/maintenance/:idSale/:codloja', mainController.searchSaleToMain)
+routes.get('/maintenance/:typeSeach/:search/:codloja', mainController.findMain)
+routes.get('/maintenanceattempt/:idMain', mainController.findMainAttempt)
+routes.post('/maintenanceattempt', mainController.createMainAtt)
+routes.put('/maintenanceattempt/:idMainAtt', mainController.updateMainAtt)
 
 module.exports = routes

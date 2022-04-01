@@ -6,13 +6,16 @@ import api from '../../../services/api'
 import { getLoja } from '../../../services/auth'
 import { getDateToSql } from '../../../functions/getDate'
 
+import { useModalAlert } from '../../../context/modalAlertContext'
+
 import ModalSendSale from './ModalSendSale'
 
-export default function TabSendSale({ openMOdalAlert, setChildrenAlertModal }){
+export default function TabSendSale(){
   const [ modal, setModal ] = useState([])
   const [ sales, setSales ] = useState([])
-  const [ emissao, setEmissao ] = useState()
-  const [ date, setDate ] = useState()
+  const [ emissao, setEmissao ] = useState(getDateToSql())
+  const [ date, setDate ] = useState(getDateToSql())
+  const { setOpen: setOpenAlert, setChildrenError, setType } = useModalAlert()
 
   const { cod } = JSON.parse(getLoja())
 
@@ -20,27 +23,27 @@ export default function TabSendSale({ openMOdalAlert, setChildrenAlertModal }){
     document.querySelector('#load-sales').innerHTML = 'Carregando...'
 
     api
-      .get(`${cod}/${emissao ? emissao : getDateToSql()}/vendas`)
+      .get(`${cod}/${emissao}/vendas`)
       .then( resp => {
         setSales(resp.data)
-        
+
         document.querySelector('#load-sales').innerHTML = ''
       })
       .catch( erro => {
         console.log(erro)
 
-        setChildrenAlertModal(`Não foi possível conectar com servidor, entre em contato com Administrador`)
+        setChildrenError(`Não foi possível conectar com servidor, entre em contato com Administrador`)
+        setOpenAlert()
+        setType()
 
-        openMOdalAlert()
-        
         document.querySelector('#load-sales').innerHTML = ''
     })
-  }, [cod, emissao, setChildrenAlertModal, openMOdalAlert])
+  }, [cod, emissao, setOpenAlert, setChildrenError, setType])
 
   return(
     <div>
       <div style={{marginBottom: '1rem'}}>
-        <input type="date" onChange={e => setDate(e.target.value)}/>
+        <input type="date" value={date} onChange={e => setDate(e.target.value)}/>
         <button onClick={() => setEmissao(date)}>Buscar</button>
       </div>
 
@@ -53,23 +56,21 @@ export default function TabSendSale({ openMOdalAlert, setChildrenAlertModal }){
             <th>Código</th>
             <th>Cliente</th>
             <th>Valor</th>
-            <th>Enviada?</th>
           </tr>
         </thead>
         <tbody>
           {sales.map(item =>(
             <tr 
               key={item.CODIGOVENDA} 
-              onClick={!item.STATUS ? ()=> setModal([item]) : null}
+              onClick={()=> setModal([item])}
             >
               <td>{item.CODIGOVENDA}</td>
               <td>{item.NOMECLI}</td>
-              <td>{Intl
+              <td>{
+                Intl
                   .NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'})
-                  .format(item.TOTALVENDA)}</td>
-              <td className={ item.STATUS ? 'green' : 'red'}>
-                {item.STATUS ? 'Sim' : 'Não'}
-              </td>
+                  .format(item.TOTALVENDA)
+              }</td>
             </tr>
           ))}
         </tbody>
@@ -81,10 +82,8 @@ export default function TabSendSale({ openMOdalAlert, setChildrenAlertModal }){
           key={item.CODIGOVENDA}
           item={item}
           setModal={setModal}
-          setChildrenAlertModal={setChildrenAlertModal}
-          openMOdalAlert={openMOdalAlert}
-          sales={sales}
-          setSales={setSales}
+          date={date}
+          setEmissao={setEmissao}
         />
       ))
       }

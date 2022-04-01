@@ -12,13 +12,15 @@
   --gray-line: #DCDDE0;
   --gray-light: #f9f9f9;
   --gray-bold: #4e5461;
+  --text-inverse: #fff;
   --text: #666666;
   --texthighlight: #B3B9FF;
   --black: #2E384D;
   --red: #E83F5B;
-  --green: #4CD62B;
+  --green: #5EB691;
   --blue: #5965E0;
   --blue-dark: #363f5f;
+  --orange: coral;
 }
 
 @media(max-width: 1080px){
@@ -113,21 +115,28 @@ main div.footer-container{
   margin-bottom: 1rem;
 }
 
-/*Tabs =====================*/
+/*Tables =====================*/
 
 table {
   width: 100%;
+  border-spacing: 0;
+  margin: 2px 0;
 }
 
 td, th {
   padding: 0.7rem 1rem;
   text-align: start;
+  border-right: 2px solid #F0F2F5;
+  border-bottom: 2px solid #F0F2F5;
+}
+td:last-child, th:last-child {
+  border-right: 0;
 }
 
 th {
   background-color: var(--gray-line);
 }
-
+/*With Border Radius*/
 th:first-child {
   border-radius: 0.5rem 0 0 0;
 
@@ -136,8 +145,17 @@ th:last-child {
   border-radius: 0 0.5rem 0 0;
 }
 
+/*Without Border Radius*/
+.tableWithoutBordRad th:first-child {
+  border-radius: 0;
+
+}
+.tableWithoutBordRad th:last-child {
+  border-radius: 0;
+}
+
 tbody tr {
-  background-color: rgba(230, 230, 230, 0.411);
+  background-color: #ECEDEF;
 }
 
 tbody tr:hover {

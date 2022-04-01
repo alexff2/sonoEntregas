@@ -23,7 +23,7 @@ export function convertDate(date=false){
 
 export function getDateBr(date = false) {
   const { diaF, mesF, anoF } = convertDate(date)
-  return `${diaF}-${mesF}-${anoF} `
+  return `${diaF}/${mesF}/${anoF} `
 }
 
 export function getDateSql(date = false) {

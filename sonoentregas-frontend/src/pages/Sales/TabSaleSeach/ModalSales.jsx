@@ -32,7 +32,7 @@ const CheckFinishStatus = ({ prod, datePrevDeliv }) => {
     <div style={{color: status.color}}>
       <div className="statusFig">
         <div className="startCircle">
-          <div style={ {backgroundColor: status.color}}></div>
+          <div style={{ backgroundColor: status.color }}></div>
         </div>
       </div>
 

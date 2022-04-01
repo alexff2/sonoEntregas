@@ -79,10 +79,33 @@ class Model {
     
     return data[0]
   }
+
   async updateNotReturn(loja, values, id, colum = 'ID') {
     const script = `UPDATE ${this.tab} SET ${values} WHERE ${colum} = ${id}`
     
     await this._query(loja, script, QueryTypes.UPDATE)
+  }
+
+  updateTw() {
+
+    //var values, where
+
+    const obj = {
+      collumns: () => {
+        console.log('valores')
+        return obj
+      },
+      cond: () => {
+        console.log('where')
+        return obj
+      }
+    }
+
+    /* const script = `UPDATE ${this.tab} SET ${values} WHERE ${where}`
+
+    await this._query(loja, script, QueryTypes.UPDATE) */
+
+    return obj
   }
   
   async delete(loja, id, colum = 'ID') {

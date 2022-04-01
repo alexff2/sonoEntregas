@@ -1,7 +1,21 @@
 //Module import
 import React from 'react'
-import { Box, Divider, Drawer, List, makeStyles } from '@material-ui/core'
-import { Assignment, Dashboard, LocalShipping, People, ShoppingCart } from '@material-ui/icons'
+import {
+  Box,
+  Divider,
+  Drawer,
+  List,
+  makeStyles
+} from '@material-ui/core'
+import {
+  EmojiTransportationTwoTone,
+  Dashboard,
+  LocalShipping,
+  People,
+  ShoppingCart,
+  KingBed,
+  Build
+} from '@material-ui/icons'
 
 //files import
 import NavItem from './NavItem'
@@ -18,7 +32,7 @@ const itens = [
   {
     title: 'Entregas',
     href: '/app/delivery',
-    icon: Assignment
+    icon: EmojiTransportationTwoTone
   },
   {
     title: 'Transportes',
@@ -33,7 +47,12 @@ const itens = [
   {
     title: 'Produtos',
     href: '/app/products',
-    icon: Dashboard
+    icon: KingBed
+  },
+  {
+    title: 'Assistências',
+    href: '/app/maintenance',
+    icon: Build
   },
   {
     title: 'Usuários',
@@ -42,7 +61,7 @@ const itens = [
   },
 ]
 
-const useStyle = makeStyles(()=>({
+const useStyle = makeStyles(() => ({
   drawer: {
     width: widthDrawer,
     flexShrink: 0
@@ -57,8 +76,8 @@ const useStyle = makeStyles(()=>({
 
 function Nav() {
   const classes = useStyle()
-  return(
-    <Drawer 
+  return (
+    <Drawer
       anchor="left"
       variant="persistent"
       open
@@ -78,13 +97,13 @@ function Nav() {
           flexDirection="column"
           p={2}
         >
-          <img src={logo} alt="Logo" className={classes.logo}/>
+          <img src={logo} alt="Logo" className={classes.logo} />
         </Box>
         <Divider />
         <Box p={2}>
           <List>
-            {itens.map( item => (
-              <NavItem 
+            {itens.map(item => (
+              <NavItem
                 key={item.title}
                 title={item.title}
                 href={item.href}

@@ -34,5 +34,14 @@ module.exports = {
     date = `${anoF}-${mesF}-${diaF}`
   
     return date
+  },
+  getHours(){
+    const date = new Date()
+    var hours, minutes, seconds
+    hours = date.getHours().length === 1 ?  '0'+date.getHours() : date.getHours()
+    minutes = date.getMinutes().length === 1 ?  '0'+date.getMinutes() : date.getMinutes()
+    seconds = date.getSeconds().length === 1 ?  '0'+date.getSeconds() : date.getSeconds()
+
+    return hours+':'+minutes+':'+seconds
   }
 }

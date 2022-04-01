@@ -5,6 +5,7 @@ import { Cached } from '@material-ui/icons'
 import { useSale } from '../context/saleContext'
 import { useDelivery } from '../context/deliveryContext'
 import { useDeliveryFinish } from '../context/deliveryFinishContext'
+import { useMaintenance } from '../context/maintenanceContext'
 
 import { getDateSql } from '../functions/getDates'
 import api from '../services/api'
@@ -36,6 +37,7 @@ export default function BtnUpdate(){
   const { setSales } = useSale()
   const { setDelivery } = useDelivery()
   const { setDeliveryFinish } = useDeliveryFinish()
+  const { setMaintenance } = useMaintenance()
   const classes = useStyles()
 
   const updateSys = async () => {
@@ -43,10 +45,12 @@ export default function BtnUpdate(){
       const { data: dataSales } = await api.get('sales/false/false/Aberta/null')
       const { data: dataDeliv } = await api.get('deliverys/open')
       const { data: dataDelivFinsh } = await api.get(`deliverys/close/${getDateSql()}`)
+      const { data: dataMain } = await api.get('/maintenance/null')
 
       setSales(dataSales)
       setDelivery(dataDeliv)
       setDeliveryFinish(dataDelivFinsh)
+      setMaintenance(dataMain)
     } catch (error) {
       console.log(error)
       setOpenModalAlert(true)

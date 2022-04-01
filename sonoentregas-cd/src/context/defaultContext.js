@@ -11,6 +11,7 @@ import AssistantProvider from './assistantContext'
 import UsersProvider from './usersContext'
 import AlertProvider from './alertContext'
 import AddressProvider from './addressContext'
+import MaintenanceProvider from './maintenanceContext'
 
 export default function DefaultContext({children}){
   return (
@@ -25,7 +26,9 @@ export default function DefaultContext({children}){
                     <AddressProvider>
                       <CarsProvider>
                         <DriverProvider>
+                          <MaintenanceProvider>
                             {children}
+                          </MaintenanceProvider>
                         </DriverProvider>
                       </CarsProvider>
                     </AddressProvider>

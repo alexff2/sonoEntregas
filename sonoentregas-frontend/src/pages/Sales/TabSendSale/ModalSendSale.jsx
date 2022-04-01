@@ -4,12 +4,16 @@ import { getUser, getLoja } from '../../../services/auth'
 import api from '../../../services/api'
 import { validateObs } from '../../../functions/validateFields'
 
+import { useModalAlert } from '../../../context/modalAlertContext'
+
 function SetEstoque({ product, putProduct }) {
   const [ productCd, setProductCd ] = useState()
   const [ inputQtd, setInputQtd ] = useState(false)
 
   useEffect(() => {
-    api.get(`products/COD_ORIGINAL/${product.COD_ORIGINAL}`).then( resp => setProductCd(resp.data[0]))
+    api
+      .get(`products/COD_ORIGINAL/${product.ALTERNATI}`)
+      .then( resp => setProductCd(resp.data[0]))
   },[product])
   
   return (
@@ -29,10 +33,16 @@ function SetEstoque({ product, putProduct }) {
             disabled={inputQtd}
           />
         </td>
-        <td><input type="checkbox" onChange={(e) =>{
-          putProduct(e, product)
-          setInputQtd(!inputQtd)
-        }}/></td>
+        <td>
+          {!product.STATUS &&
+            <input type="checkbox" 
+              onChange={(e) =>{
+                putProduct(e, product)
+                setInputQtd(!inputQtd)
+              }}
+            />
+          }
+        </td>
       </> 
       : <>
           <td>{product.QUANTIDADE}</td>
@@ -46,16 +56,15 @@ function SetEstoque({ product, putProduct }) {
 export default function ModalSendSale({ 
   item,
   setModal,
-  setChildrenAlertModal,
-  openMOdalAlert,
-  sales,
-  setSales
+  date,
+  setEmissao
  }){
   const [ orcParc, setOrcParc ] = useState([])
   const [ productSales, setProductSales ] = useState([])
   const [ sendProduct, setSendProduct ] = useState([])
   const [ openObs, setOpenObs ] = useState(false)
   const [ obs, setObs ] = useState('')
+  const { setOpen: setOpenAlert, setChildrenError, setType } = useModalAlert()
 
   const { cod } = JSON.parse(getLoja())
   const { ID: USER_ID } = JSON.parse(getUser())
@@ -69,11 +78,12 @@ export default function ModalSendSale({
         setOrcParc(resp.data.orcparc)
       })
       .catch( err => {
-        setChildrenAlertModal("Falha ao buscar produtos da venda!")
-        openMOdalAlert()
+        setChildrenError("Falha ao buscar produtos da venda!")
+        setOpenAlert()
+        setType()
         console.log(err)
       })
-  },[ cod, item, setChildrenAlertModal, openMOdalAlert ])
+  },[ cod, item, setChildrenError, setOpenAlert, setType ])
 
   const putProduct = (e, product) => {
     if(e.target.checked){
@@ -94,26 +104,25 @@ export default function ModalSendSale({
 
         const { data } = await api.post(`${cod}/vendas/submit`, sale)
         
-        sale.STATUS = data
-        
-        setSales(sales.map( item => item.CODIGOVENDA === sale.CODIGOVENDA ? sale : item))
+        data.create && setEmissao(date)
         
         setModal([])
         setSendProduct([])
       } else {
         if (sendProduct.length === 0) {
-          setChildrenAlertModal('Selecione um produto')
+          setChildrenError('Selecione um produto')
         } else if (!validateObs(obs, openObs)){
-          setChildrenAlertModal('Coloque uma observação ou desabilite o checkbox de observação')
+          setChildrenError('Coloque uma observação ou desabilite o checkbox de observação')
         }
-        openMOdalAlert()
+        setOpenAlert()
+        setType()
       }
     } catch (error) {
       console.log(error)
 
-      setChildrenAlertModal('Erro ao enviar venda, entre em contato com Administrador')
-
-      openMOdalAlert()
+      setChildrenError('Erro ao enviar venda, entre em contato com Administrador')
+      setOpenAlert()
+      setType()
     }
   }
 
@@ -124,6 +133,7 @@ export default function ModalSendSale({
       setOrcParc([])
     }
   }
+
   return (
     <div 
       className="modal-overlaw" 
@@ -133,7 +143,7 @@ export default function ModalSendSale({
       <div className="modal">
         <h2>Venda selecionada</h2>
         <div className="sales-modal">
-          
+
           <div className="sales-head">
             <div className="sales-field">
               <div><span>N Venda: </span>{item.CODIGOVENDA}</div>
@@ -166,12 +176,13 @@ export default function ModalSendSale({
                 <th>Disponível</th>
                 <th>Qtd</th>
                 <th></th>
+                <th>Satus</th>
               </tr>
             </thead>
             <tbody>
             {productSales.map(product => (
-              <tr key={product.COD_ORIGINAL}>
-                <td>{product.COD_ORIGINAL}</td>
+              <tr key={product.CODPRODUTO}>
+                <td>{product.ALTERNATI}</td>
                 <td>{product.DESCRICAO}</td>
                 <td>
                   {Intl
@@ -183,6 +194,11 @@ export default function ModalSendSale({
                   product={product}
                   putProduct={putProduct}
                 />
+                <td>{
+                  !product.STATUS
+                    ? <div style={{color: 'var(--red)'}}>Pendente</div>
+                    : <div style={{color: 'var(--green)'}}>{product.STATUS}</div>
+                }</td>
               </tr>
             ))}
             </tbody>

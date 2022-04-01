@@ -1,0 +1,70 @@
+.boxSeachMain {
+  margin-bottom: 1rem;
+}
+.boxSeachMain .btnSearch {
+  border: var(--orange);
+  background-color: var(--orange);
+  height: 100%;
+  color: #FFF;
+  font-weight: bold;
+  padding: 0.4rem 1rem;
+  border-radius: 5px;
+  margin-left: 0.5rem;
+}
+.boxSeachMain .btnSearch:hover{
+  opacity: 0.7;
+} 
+.boxSeachMain .btnSearch:disabled{
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+.headSendMain {
+  display: flex;
+  margin: 1rem 0;
+  justify-content: space-between;
+}
+.headSendMain div {
+  display: block;
+  font-weight: bold;
+}
+.headSendMain div div{
+  width: 100%;
+}
+.headSendMain div div span {
+  font-weight: 400;
+}
+
+#textArea {
+  display: flex;
+}
+#textArea textarea{
+  margin-left: 5px;
+}
+
+.prodsSale form table{
+  margin-bottom: 1rem;
+}
+
+.prodsSale form .btnSendMain {
+  margin-top: 1rem;
+}
+
+.prodsSale form .btnSendMain button {
+  width: 15%;
+  margin-top: 1rem;
+  border: none;
+  padding: 0.5rem 0;
+  border-radius: 15px;
+  color: #fff;
+  font-weight: bold;
+}
+
+.prodsSale form .btnSendMain button:hover {
+  opacity: 0.7;
+}
+
+.prodsSale form .btnSendMain button:disabled {
+  opacity: 1;
+  cursor: no-drop;
+}
