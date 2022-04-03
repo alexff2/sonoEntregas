@@ -17,15 +17,11 @@ CREATE TABLE [dbo].[MAINTENANCE](
 	[CODLOJA] [float] NOT NULL,
 	[ID_SALE] [float] NOT NULL,
 	[COD_ORIGINAL] [varchar](20) COLLATE SQL_Latin1_General_CP850_CI_AI NOT NULL,
-	[QUANTIDADE][float] NOT NULL,
+	[QUANTIDADE] [float] NOT NULL,
 	[STATUS] [varchar](15) NOT NULL,
 	[OBS] [varchar](250) NOT NULL,
 	[D_ENVIO] [datetime] NOT NULL,
 	[D_PREV] [datetime] NOT NULL,
-	[D_MOUNTING] [datetime] NULL,
-	[D_PROCESS] [datetime] NULL,
-	[D_MAINTENANCE] [datetime] NULL,
-	[DONE][BIT] NULL
  CONSTRAINT [PK_MAINTENANCE] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC
