@@ -133,7 +133,6 @@ module.exports = {
         if (prod.length === 0) {
           await Sales._query(0, `UPDATE SALES SET STATUS = 'Fechada' WHERE ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`)
         }
-        console.log('ALTERANDO NOVAMENTE PRODUTO VENDA ---------------------------------')
       }
 
       const dataDeliverys = await DevService.findSalesDev([dataDelivery[0]])

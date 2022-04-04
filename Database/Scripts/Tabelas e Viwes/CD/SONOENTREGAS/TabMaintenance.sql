@@ -19,6 +19,8 @@ CREATE TABLE [dbo].[MAINTENANCE](
 	[COD_ORIGINAL] [varchar](20) COLLATE SQL_Latin1_General_CP850_CI_AI NOT NULL,
 	[QUANTIDADE] [float] NOT NULL,
 	[STATUS] [varchar](15) NOT NULL,
+	[WARRANTY] [bit] NOT NULL,
+	[ID_CAT_DEF] [float] NOT NULL,
 	[OBS] [varchar](250) NOT NULL,
 	[D_ENVIO] [datetime] NOT NULL,
 	[D_PREV] [datetime] NOT NULL,

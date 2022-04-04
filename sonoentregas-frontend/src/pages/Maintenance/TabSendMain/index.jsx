@@ -13,9 +13,10 @@ export default function TabSendMain(){
   const [ idSale, setIdSale ] = useState('')
   const [ blockSearchSale, setBlockSearchSale ] = useState(false)
   const [ blockSale, setBlockSale ] = useState(true)
+  const [ catDefect, setCatDefect ] = useState([{ID:1, DESCRIPTION: '------'}])
   const [ sale, setSale ] = useState({})
-  const [ defect, setDefect ] = useState(false)
-  const [ warranty, setWarranty ] = useState(1)
+  const [ defect, setDefect ] = useState(1)
+  const [ warranty, setWarranty ] = useState(false)
   const [ obs, setObs ] = useState('')
   const [ mainProd, setMainProd ] = useState({})
   const { setMaintenance } = useMaintenance()
@@ -49,6 +50,7 @@ export default function TabSendMain(){
           if (data.length !== 0) {
             setBlockSearchSale(true)
             setSale(data[0])
+            setCatDefect(data[0].catDef)
             setBlockSale(false)
           } else {
             setOpenModalAlert(true)
@@ -77,9 +79,9 @@ export default function TabSendMain(){
     e.preventDefault()
     try {
       if (Object.keys(mainProd).length !== 0) {
-        mainProd.OBS = obs
-        mainProd.DEFECT = defect
         mainProd.WARRANTY = warranty
+        mainProd.DEFECT = defect
+        mainProd.OBS = obs
         const { data } = await api.post('maintenance', mainProd)
         setMaintenance(data)
         setBlockSearchSale(false)
@@ -135,10 +137,19 @@ export default function TabSendMain(){
           <div>
             Defeito reclamado: 
             <span>
-              <select name="defect" onChange={e => setDefect(e.target.value)}>
-                <option value="01">Teste 1</option>
-                <option value="02">Teste 2</option>
-                <option value="03">Teste 3</option>
+              <select
+                onChange={e => setDefect(e.target.value)} 
+                disabled={blockSale}
+                style={{
+                  width: '12rem',
+                  height: '2.3rem',
+                  backgroundColor: 'inherit',
+                  color: 'black'
+                }}
+              >
+                {catDefect.map(catDef =>(
+                  <option value={catDef.ID} key={catDef.ID}>{catDef.DESCRIPTION}</option>
+                ))}
               </select>
             </span>
           </div>

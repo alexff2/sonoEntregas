@@ -106,6 +106,18 @@ export default function ModalMain({ main }) {
 
           <div className="info"><label>Endereço: </label>{main.ENDE}</div>
           <div className="info"><label>Obs: </label>{main.OBS}</div>
+          <div className="info">
+            <div>
+            <div>
+            <label>Defeito reclamado: </label>{main.CAT_DEFECT}
+            </div>
+              <label>Em Garantia? </label>
+              {main.WARRANTY 
+                ? <span className='replTrue'>Sim</span> 
+                : <span className='replFalse'>Não</span>
+              }
+            </div>
+          </div>
         </div>
 
         <div className="status">

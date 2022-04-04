@@ -10,6 +10,7 @@ const Maintenance = require('../models/Maintenance')
 const MainAttempt = require('../models/MaintenanceAttempt')
 const ViewDeliveryProdMain = require('../models/ViewDeliveryProdMain')
 const ViewMaintenance = require('../models/ViewMaintenance')
+const ViewCatDef = require('../models/views/ViewCatDefect')
 const ViewMainAttempt = require('../models/ViewMainAttempt')
 
 const MainService = require('../services/MainService')
@@ -62,12 +63,13 @@ module.exports = {
    */
   async create(req, res) {
     try {
-      const { ID_DELIVERY, CODLOJA, ID_SALES, COD_ORIGINAL, OBS, QUANTIDADE } = req.body
+      const { ID_DELIVERY, CODLOJA, ID_SALES, COD_ORIGINAL, WARRANTY, DEFECT,OBS, QUANTIDADE } = req.body
   
       const D_ENVIO = getDate()
       const D_PREV = setDaysInDate(D_ENVIO, 10) //Objetivo do sistema
+      const WARRANTY_ = WARRANTY ? 1 : 0
   
-      await Maintenance.creator(0, `${ID_DELIVERY}, ${CODLOJA}, ${ID_SALES}, '${COD_ORIGINAL}', ${QUANTIDADE}, 'Enviado', '${OBS}', '${D_ENVIO}', '${D_PREV}'`)
+      await Maintenance.creator(0, `${ID_DELIVERY}, ${CODLOJA}, ${ID_SALES}, '${COD_ORIGINAL}', ${QUANTIDADE}, 'Enviado', '${WARRANTY_}','${DEFECT}','${OBS}', '${D_ENVIO}', '${D_PREV}'`)
   
       const main = await ViewMaintenance.findSome(0, `CODLOJA = ${CODLOJA} AND STATUS <> 'Finalizada'`)
   
@@ -77,6 +79,11 @@ module.exports = {
       return res.json(error)
     }
   },
+  /**
+   * @param {*} req 
+   * @param {*} res 
+   * @returns 
+   */
   async delete(req, res) {
     const { id } = req.params
     try {
@@ -110,6 +117,7 @@ module.exports = {
       if (products.length === 0) return res.json([])
 
       sale[0]["products"] = products
+      sale[0]["catDef"] = await ViewCatDef.findAll(0)
 
       return res.json(sale)
     } catch (error) {
