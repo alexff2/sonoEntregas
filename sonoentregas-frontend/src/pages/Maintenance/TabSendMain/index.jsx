@@ -14,6 +14,8 @@ export default function TabSendMain(){
   const [ blockSearchSale, setBlockSearchSale ] = useState(false)
   const [ blockSale, setBlockSale ] = useState(true)
   const [ sale, setSale ] = useState({})
+  const [ defect, setDefect ] = useState(false)
+  const [ warranty, setWarranty ] = useState(1)
   const [ obs, setObs ] = useState('')
   const [ mainProd, setMainProd ] = useState({})
   const { setMaintenance } = useMaintenance()
@@ -76,6 +78,8 @@ export default function TabSendMain(){
     try {
       if (Object.keys(mainProd).length !== 0) {
         mainProd.OBS = obs
+        mainProd.DEFECT = defect
+        mainProd.WARRANTY = warranty
         const { data } = await api.post('maintenance', mainProd)
         setMaintenance(data)
         setBlockSearchSale(false)
@@ -128,12 +132,46 @@ export default function TabSendMain(){
         <div>
           <div>DAV Nº: <span>{sale.ID_SALES}</span></div>
           <div>Cliente: <span>{sale.ID_CLIENT} - {sale.NOMECLI}</span></div>
+          <div>
+            Defeito reclamado: 
+            <span>
+              <select name="defect" onChange={e => setDefect(e.target.value)}>
+                <option value="01">Teste 1</option>
+                <option value="02">Teste 2</option>
+                <option value="03">Teste 3</option>
+              </select>
+            </span>
+          </div>
         </div>
         <div>
           <div>Emissão: <span>{sale.EMISSAO}</span></div>
-          <div>Valor: <span>{sale.TOTAL_PROD && Intl
-            .NumberFormat('pt-br', {style: 'currency', currency: 'BRL'})
-            .format(sale.TOTAL_PROD)}</span></div>
+          <div>
+            Valor: 
+            <span>
+              {sale.TOTAL_PROD && Intl
+                .NumberFormat('pt-br', {style: 'currency', currency: 'BRL'})
+                .format(sale.TOTAL_PROD)
+              }
+            </span>
+          </div>
+          <div style={{display: 'flex'}}>
+            Garantia?: &nbsp;
+            <span style={{display: 'flex', alignItems: 'center'}}>
+              <input
+                type="radio"
+                name="warranty"
+                disabled={blockSale}
+                onChange={() => setWarranty(true)}
+              />  <div style={{marginTop: -3}}> &nbsp;sim&nbsp;&nbsp;</div>
+              <input
+                type="radio"
+                name="warranty"
+                checked
+                disabled={blockSale}
+                onChange={() => setWarranty(false)}
+              /> <div style={{marginTop: -3}}> &nbsp;não&nbsp;</div>
+            </span>
+          </div>
         </div>
         <div>
           <div id='textArea'>

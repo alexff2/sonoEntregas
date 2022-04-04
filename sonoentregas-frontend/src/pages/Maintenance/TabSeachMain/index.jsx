@@ -89,7 +89,7 @@ export default function TabSaleSeach() {
 
   const cancelSubmitMain = async id => {
     try {
-      const { data } = await api.put(`maintenance/${id}`)
+      const { data } = await api.delete(`maintenance/${id}`)
       if (data.sucess) {
         setMaintenance(maintenance.filter(main => main.ID !== id))
         setType('sucess')

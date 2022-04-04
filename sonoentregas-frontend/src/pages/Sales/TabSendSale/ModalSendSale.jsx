@@ -74,7 +74,7 @@ export default function ModalSendSale({
     api.get(`${cod}/vendas/${item.CODIGOVENDA}`)
       .then( resp => {
         setProductSales(resp.data.products)
-    
+        console.log(item)
         setOrcParc(resp.data.orcparc)
       })
       .catch( err => {
