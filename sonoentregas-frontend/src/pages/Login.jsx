@@ -5,15 +5,14 @@ import '../styles/pages/login.css'
 import { authLogin, userLogin, setLoja } from '../services/auth'
 import api from '../services/api'
 import { validateFilds } from '../functions/validateFields'
-
-import ModalAlert, { openMOdalAlert } from '../components/ModalAlert'
+import ModalALert, { openMOdalAlert } from '../components/ModalAlert'
 
 const Login = ({history}) => {
+  const [modalAlert, setModalAlert] = useState('')
   const [ user, setUser ] = useState()
   const [ password, setPassword ] = useState()
   const [ shops, setShops ] = useState([])
   const [ selectShop, setSelectShop ] = useState('')
-  const [ childrenAlertModal, setChildrenAlertModal ] = useState('Vazio')
 
   useEffect(() => {
     api
@@ -23,9 +22,11 @@ const Login = ({history}) => {
         setShops(datas)
       })
       .catch( e => {
-        setChildrenAlertModal('Sem conexão com o servidor.')
-         console.log(e)
         openMOdalAlert()
+        console.log(e)
+        !e.response
+          ? setModalAlert('Erro ao conectar com servidor, entre em contato com Bruno!')
+          : setModalAlert('Erro ao processar requisição ao servidor, entre em contato com Alexandre!')
       })
   },[])
 
@@ -40,34 +41,37 @@ const Login = ({history}) => {
     
     try {
       if (validateFilds([password, user])) {
-        const { data } = await api.post('/login', {
+        const resp = await api.post('/login', {
           user, password, codloja: selectShop.cod
         })
+        const { data, status } = resp
 
-        if (data) {
+        if (status === 201) {
           authLogin('tokenteste123')
 
-          userLogin(JSON.stringify({ID: data.ID, NAME: data.DESCRIPTION}))
+          userLogin(JSON.stringify({ID: data.ID, NAME: data.DESCRIPTION, OFFICE: data.OFFICE}))
           
           setLoja(JSON.stringify(selectShop))
           
-          history.push('/home')
+          history.push('home')
         } else {
-          setChildrenAlertModal('Usuário não encontrado, verifique seu usuário e senha novamente.')
-
+          console.log(resp)
           openMOdalAlert()
+          setModalAlert('Usuário não encontrado, verifique seu usuário e senha novamente.')
         }
 
       } else {
-        setChildrenAlertModal('Preencha todos os campos corretamente.')
-
         openMOdalAlert()
+        setModalAlert('Preencha todos os campos corretamente.')
       }
-    } catch (error) {
-        setChildrenAlertModal('Sem conexão com o servidor')
-        console.log(error)
-
-        openMOdalAlert()
+    } catch (e) {
+      openMOdalAlert()
+      console.log(e.response)
+      if(!e.response)
+        setModalAlert('Erro na rede, entre em contato com Bruno!')
+      else if(e.response.status === 400)
+        setModalAlert('Erro no servidor, entre em contato com Alexadre!')
+      else setModalAlert(e.response.data)
     }
   }
 
@@ -91,9 +95,7 @@ const Login = ({history}) => {
           <button type="submit">Logar</button>
         </form>
       </div>
-      
-      <ModalAlert>{childrenAlertModal}</ModalAlert>
-      
+
       <div className="modal-overlaw" id="modal-shops">
         <div className="modal">
           <h2>Selecione a loja:</h2>
@@ -115,6 +117,8 @@ const Login = ({history}) => {
           </table>
         </div>
       </div>
+
+      <ModalALert>{modalAlert}</ModalALert>
     </div>
   )
 }

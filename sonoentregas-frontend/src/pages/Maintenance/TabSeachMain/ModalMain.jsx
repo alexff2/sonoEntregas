@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import api from '../../../services/api'
-import './style.css'
+import '../style.css'
 
 import { useModalAlert } from '../../../context/modalAlertContext'
 
 import { dateSqlToReact } from '../../../functions/getDate'
 
-const CheckFinishStatus = ({ main, datePrevMain }) => {
+const CheckFinishStatus = ({ maintDeliv, datePrevMain }) => {
   const [ status, setStatus ] = useState({})
 
   useEffect(()=>{
-    if (main.D_MAINTENANCE) {
-      if(main.DONE) {
+    if (maintDeliv.D_DELIVERED) {
+      if(maintDeliv.DONE) {
         setStatus({
           msg: 'Finalizada',
           color: 'blue'
@@ -28,7 +28,7 @@ const CheckFinishStatus = ({ main, datePrevMain }) => {
         color: '#91949c'
       })
     }
-  },[main])
+  },[maintDeliv])
 
   return (
     <div style={{color: status.color}}>
@@ -40,44 +40,45 @@ const CheckFinishStatus = ({ main, datePrevMain }) => {
 
       <div className="detalsStatus">
         <div className="statusCurrent">{status.msg}</div>
-        <div className="statusDate">{main.D_MAINTENANCE ? dateSqlToReact(main.D_MAINTENANCE) : dateSqlToReact(datePrevMain)}</div>
+        <div className="statusDate">{maintDeliv.D_DELIVERED ? dateSqlToReact(maintDeliv.D_DELIVERED) : dateSqlToReact(datePrevMain)}</div>
       </div>
     </div>
   )
 }
 
-export default function ModalMain({ main }) {
-  const [mainAttempt, setMainAttempt] = useState([])
+export default function ModalMain({ maint }) {
+  const [maintDelivs, setMaintDelivs] = useState([])
   const { setChildrenError, setOpen, setType } = useModalAlert()
 
   useEffect(()=>{
-    api.get(`maintenanceattempt/${main.ID}`)
-      .then(resp => setMainAttempt(resp.data))
+    maint &&
+    api.get(`maintenancedeliv/${maint.ID}`)
+      .then(resp => setMaintDelivs(resp.data))
       .catch(error => {
         console.log(error)
         setChildrenError('Erro ao comunicar com servidor, entre em contato com ADM!')
         setOpen(true)
         setType('error')
       })
-  },[main, setOpen, setChildrenError, setType])
+  },[maint, setOpen, setChildrenError, setType])
 
   return (
     <div>
       <div className="headerModal">
-        <h2>DAV <span>#{main.ID_SALE}</span></h2>
-        <h1>Detalhes da Assistência <span> - {main.ID}</span></h1>
+        <h2>DAV <span>#{maint.ID_SALE}</span></h2>
+        <h1>Detalhes da Assistência <span> - {maint.ID}</span></h1>
       </div>
       
       <div className="content">
         <div className="infoDav">
           <div className="infoMain">
             <div>
-              <div className="info"><label>Cliente: </label>{main.NOMECLI}</div>
-              <div className="info"><label>Produto: </label>{main.PRODUTO}</div>
-              {mainAttempt.length > 0 &&
+              <div className="info"><label>Cliente: </label>{maint.NOMECLI}</div>
+              <div className="info"><label>Produto: </label>{maint.PRODUTO}</div>
+              {maintDelivs.length > 0 &&
                 <div className="info">
                   <label>Trocar Produto? </label>
-                  {mainAttempt[0].CHANGE_PRODUCT 
+                  {maint.CHANGE_PRODUCT 
                     ? <span className='replTrue'>Sim</span> 
                     : <span className='replFalse'>Não</span>
                   }
@@ -86,16 +87,16 @@ export default function ModalMain({ main }) {
             </div>
 
             <div>
-              <div className="info"><label>Status: </label>{main.STATUS}</div>
-              {mainAttempt.length > 0 && 
+              <div className="info"><label>Status: </label>{maint.STATUS}</div>
+              {maintDelivs.length > 0 && 
                 <>
                 <div className="info">
                   <label>Motorista: </label>
-                  {mainAttempt[0].DRIVER}
+                  {maintDelivs[maintDelivs.length - 1].DRIVER}
                 </div>
                 <div className="info">
                   <label>Auxiliar: </label>
-                  {mainAttempt[0].ASSISTANT}
+                  {maintDelivs[maintDelivs.length - 1].ASSISTANT}
                 </div>
                 </>
               }
@@ -104,26 +105,25 @@ export default function ModalMain({ main }) {
 
           <hr style={{margin: '0.5rem 0'}} />
 
-          <div className="info"><label>Endereço: </label>{main.ENDE}</div>
-          <div className="info"><label>Obs: </label>{main.OBS}</div>
+          <div className="info"><label>Endereço: </label>{maint.ENDE}</div>
+          <div className="info"><label>Obs: </label>{maint.OBS}</div>
           <div className="info">
-            <div>
-            <div>
-            <label>Defeito reclamado: </label>{main.CAT_DEFECT}
-            </div>
-              <label>Em Garantia? </label>
-              {main.WARRANTY 
-                ? <span className='replTrue'>Sim</span> 
-                : <span className='replFalse'>Não</span>
-              }
-            </div>
+            <label>Defeito reclamado: </label>{maint.CAT_DEFECT}
           </div>
+          <div className="info">
+            <label>Em Garantia? </label>
+            {maint.WARRANTY 
+              ? <span className='replTrue'>Sim</span> 
+              : <span className='replFalse'>Não</span>
+            }
+          </div>
+          <div className="info"><label>Aberta por: </label>{maint.USERS}</div>
         </div>
 
         <div className="status">
           <div className="devTitleStatus">Status da Assistência</div>
 
-          { mainAttempt.length === 0 &&
+          { maintDelivs.length === 0 &&
           <div className="statusBar">
             <div style={{color: 'blue'}}>
               <div className="statusFig">
@@ -135,7 +135,7 @@ export default function ModalMain({ main }) {
 
               <div className="detalsStatus">
                 <div className="statusCurrent">Enviado</div>
-                <div className="statusDate">{dateSqlToReact(main.D_ENVIO)}</div>
+                <div className="statusDate">{dateSqlToReact(maint.D_ENVIO)}</div>
               </div>
             </div>
 
@@ -167,54 +167,54 @@ export default function ModalMain({ main }) {
               </div>
             </div>
 
-            <CheckFinishStatus main={{}} datePrevMain={main.D_PREV}/>
+            <CheckFinishStatus maintDeliv={{}} datePrevMain={maint.D_PREV}/>
           </div>}
 
-          {mainAttempt.map( mainAtt => (
-          <div className="statusBar" key={mainAtt.ID}>
+          {maintDelivs.map( maintDeliv => (
+          <div className="statusBar" key={maintDeliv.ID}>
             <div style={{color: 'blue'}}>
               <div className="statusFig">
                 <div className="startCircle">
                   <div style={{backgroundColor: 'blue'}}></div>
                 </div>
-                <div className="bar" style={ mainAtt.D_MOUNTING ? {backgroundColor: 'blue'} : {backgroundColor: '#91949c'}}></div>
+                <div className="bar" style={ maintDeliv.D_MOUNTING ? {backgroundColor: 'blue'} : {backgroundColor: '#91949c'}}></div>
               </div>
 
               <div className="detalsStatus">
                 <div className="statusCurrent">Enviado</div>
-                <div className="statusDate">{dateSqlToReact(main.D_ENVIO)}</div>
+                <div className="statusDate">{dateSqlToReact(maint.D_ENVIO)}</div>
               </div>
             </div>
             
-            <div style={ mainAtt.D_MOUNTING ? {color: 'blue'} : {}}>
+            <div style={ maintDeliv.D_MOUNTING ? {color: 'blue'} : {}}>
               <div className="statusFig">
                 <div className="startCircle">
-                  <div style={ mainAtt.D_MOUNTING ? {backgroundColor: 'blue'} : {backgroundColor: '#91949c'}}></div>
+                  <div style={ maintDeliv.D_MOUNTING ? {backgroundColor: 'blue'} : {backgroundColor: '#91949c'}}></div>
                 </div>
-                <div className="bar" style={ mainAtt.D_PROCESS ? {backgroundColor: 'blue'} : {backgroundColor: '#91949c'}}></div>
+                <div className="bar" style={ maintDeliv.D_DELIVING ? {backgroundColor: 'blue'} : {backgroundColor: '#91949c'}}></div>
               </div>
 
               <div className="detalsStatus">
                 <div className="statusCurrent">Carregando</div>
-                <div className="statusDate">{mainAtt.D_MOUNTING ? dateSqlToReact(mainAtt.D_MOUNTING) : ''}</div>
+                <div className="statusDate">{maintDeliv.D_MOUNTING ? dateSqlToReact(maintDeliv.D_MOUNTING) : ''}</div>
               </div>
             </div>
             
-            <div style={ mainAtt.D_PROCESS ? {color: 'blue'} : {}}>
+            <div style={ maintDeliv.D_DELIVING ? {color: 'blue'} : {}}>
               <div className="statusFig">
                 <div className="startCircle">
-                  <div style={ mainAtt.D_PROCESS ? {backgroundColor: 'blue'} : {backgroundColor: '#91949c'}}></div>
+                  <div style={ maintDeliv.D_DELIVING ? {backgroundColor: 'blue'} : {backgroundColor: '#91949c'}}></div>
                 </div>
-                <div className="bar" style={ mainAtt.D_MAINTENANCE ? {backgroundColor: 'blue'} : {backgroundColor: '#91949c'}}></div>
+                <div className="bar" style={ maintDeliv.D_DELIVERED ? {backgroundColor: 'blue'} : {backgroundColor: '#91949c'}}></div>
               </div>
 
               <div className="detalsStatus">
                 <div className="statusCurrent">Entregando</div>
-                <div className="statusDate">{mainAtt.D_PROCESS ? dateSqlToReact(mainAtt.D_PROCESS) : ''}</div>
+                <div className="statusDate">{maintDeliv.D_DELIVING ? dateSqlToReact(maintDeliv.D_DELIVING) : ''}</div>
               </div>
             </div>
             
-            <CheckFinishStatus main={mainAtt} datePrevMain={main.D_PREV}/>
+            <CheckFinishStatus maintDeliv={maintDeliv} datePrevMain={maint.D_PREV}/>
           </div>))}
         </div>
       </div>

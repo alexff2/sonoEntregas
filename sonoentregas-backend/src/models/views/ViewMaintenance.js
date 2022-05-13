@@ -1,4 +1,4 @@
-const Model = require('../databases/MSSQL/Model')
+const Model = require('../../databases/MSSQL/Model')
 
 class ViewMaintenance extends Model {
   constructor(){

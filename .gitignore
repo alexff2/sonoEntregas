@@ -6,6 +6,7 @@
 
 # Ignores do backend
 /sonoentregas-backend/node_modules
+/node_modules
 /sonoentregas-backend/src/databases/MSSQL/conections
 
 # Logs do Sistema

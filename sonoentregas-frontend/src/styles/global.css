@@ -40,6 +40,8 @@ body {
   background-color: var(--gray);
 }
 
+
+/*Defaut styles ==================================*/
 body, input, textarea, button, footer {
   font: 400 1rem "inter", sans-serif;
 }
@@ -49,6 +51,40 @@ button {
   margin-left: 0.25rem;
 }
 
+button {
+  cursor: pointer;
+}
+
+input {
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  border-color: var(--gray-line);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+select {
+  background-color: #354880;
+  height: 30px;
+  font-family:Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color:#fff;
+  text-indent: 0.01px; /* Remove seta padrão do FireFox */
+  text-overflow: "";  /* Remove seta padrão do FireFox */
+  margin: 0 5px 0 5px;
+  border-radius: 0.25rem;
+  padding: 3px 5px 3px 5px;
+}
+
+textarea {
+  border: 1px solid var(--gray-line);
+  border-radius: 5px;
+}
+
+/*Strutuct ========================================*/
 .header {
   position: fixed;
   top: 0;
@@ -80,14 +116,14 @@ main div.container div.header-container {
 }
 
 main div.container div.body-container {
-  padding: 1rem 1rem 3rem 1rem;
+  padding: 1rem;
 }
 
 main div.footer-container{
   height: 3rem;
 }
 
-/* Modal ========================*/
+/* Modal ============================================*/
 .modal-overlaw {
   background-color: rgba(0,0,0,0.7);
   position: fixed;
@@ -115,7 +151,7 @@ main div.footer-container{
   margin-bottom: 1rem;
 }
 
-/*Tables =====================*/
+/*Tables =============================================*/
 
 table {
   width: 100%;
@@ -124,7 +160,7 @@ table {
 }
 
 td, th {
-  padding: 0.7rem 1rem;
+  padding: 0.5rem;
   text-align: start;
   border-right: 2px solid #F0F2F5;
   border-bottom: 2px solid #F0F2F5;
@@ -166,37 +202,7 @@ tbody td {
   color: var(--blue-dark);
 }
 
-/*Defaut styles ==============*/
-
-button {
-  cursor: pointer;
-}
-
-input {
-  padding: 0.25rem;
-  border-radius: 0.25rem;
-  border-color: var(--gray-line);
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-select {
-  background-color: #354880;  /* Imagem de fundo (Seta) */
-  width: 100px; /* Tamanho do select, maior que o tamanho da div "div-select" */
-  height: 30px; /* altura do select, importante para que tenha a mesma altura em todo os navegadores */
-  font-family:Arial, Helvetica, sans-serif; /* Fonte do Select */ 
-  font-size: 16px; /* Tamanho da Fonte */
-  color:#fff; /* Cor da Fonte */
-  text-indent: 0.01px; /* Remove seta padrão do FireFox */
-  text-overflow: "";  /* Remove seta padrão do FireFox */
-  margin: 0 5px 0 5px;
-  border-radius: 0.25rem;
-  padding: 3px 5px 3px 5px;
-}
-
+/* BUTTONS ========================================*/
 .circle-add {
   width: 4rem;
   height: 4rem;
@@ -220,10 +226,96 @@ select {
   bottom: 3.2rem;
 }
 
+.boxBtnBorderCiclo {
+  margin-top: 1rem;
+}
+.btnBorderCiclo {
+  width: 15%;
+  border: none;
+  padding: 0.5rem 0;
+  border-radius: 15px;
+  color: #fff;
+  font-weight: bold;
+}
+
+.btnBorderCiclo:hover {
+  opacity: 0.7;
+}
+
+.btnBorderCiclo:disabled {
+  opacity: 1;
+  cursor: no-drop;
+}
+
+/*Outhers Components ==============================*/
+.selectTransparent {
+  background-color: transparent;
+  border: none;
+  color: var(--black);
+  width: 100%;
+  margin: 0;
+}
+
+.dateInput {
+  background-color: #354880;
+  color:#fff;
+  border-radius: 0.25rem;
+  border: none;
+}
+.dateInput::-webkit-calendar-picker-indicator{
+  color: #fff;
+  cursor: pointer;
+}
+.dateInput::-webkit-clear-button {
+  color: red;
+}
+
+.headerBorderCiclo {
+  padding: 1rem;
+  border: 1px solid var(--gray-bold);
+  border-radius: 5px 5px 0 0;
+}
+
+.bodyBorderCiclo {
+  padding: 1rem;
+  border: 1px solid var(--gray-bold);
+  border-radius: 0 0 5px 5px;
+}
+
+.labelField {
+  font-weight: 700;
+}
+
+.flexRowCenter {
+  display: flex;
+  align-items: center;
+}
+
+.marginTop {
+  margin-top: 1rem;
+}
+.marginRight {
+  margin-right: 1rem;
+}
+.marginBottom {
+  margin-bottom: 1rem;
+}
+.marginLeft {
+  margin-left: 1rem;
+}
+
 .red {
   color: var(--red);
+}
+.bGred {
+  background-color: var(--red);
+  color: white;
 }
 
 .green {
   color: var(--green);
+}
+.bGgreen {
+  color: white;
+  background-color: var(--green);
 }

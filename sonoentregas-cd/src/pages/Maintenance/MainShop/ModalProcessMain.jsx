@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { makeStyles } from '@material-ui/core'
+import { makeStyles, TextField } from '@material-ui/core'
 
 import { useMaintenance } from '../../../context/maintenanceContext'
 
@@ -23,14 +23,15 @@ const useStyle = makeStyles(theme => ({
   },
   divMotivo: {
     display: 'flex',
-    alignItems: 'center'
+    alignItems: 'center',
+    margin: ' 0.25rem 0'
   }
 }))
 
 export default function ModalProcessMain({ main, setOpen }) {
   const [ date, setDate ] = useState('')
   const [ reasonReturn, setReasonReturn ] = useState('')
-  const [ returnMain, setReturnMain ] = useState(false)
+  const [ returnMaint, setReturnMaint ] = useState(false)
   const [ error, setError ] = useState(false)
   const [ childrenError, setChildrenError ] = useState('')
   const [ disabledBtnGrav, setDisabledBtnGrav ] = useState(false)
@@ -44,7 +45,8 @@ export default function ModalProcessMain({ main, setOpen }) {
     } else {
       try {
         main["date"] = date
-        const { data } = await api.put(`/maintenanceattempt/${main.ID_MAIN_ATTEMP}`, main)
+        main["returnMaint"] = returnMaint
+        const { data } = await api.put(`/maintenancedeliv/${main.ID_MAINT_DELIV}`, main)
         setMaintenance(data)
         setOpen(false)
         setError(false)
@@ -62,9 +64,9 @@ export default function ModalProcessMain({ main, setOpen }) {
     } else {
       try {
         main["date"] = date
-        main["returnMain"] = returnMain
+        main["returnMaint"] = returnMaint
         main["reasonReturn"] = reasonReturn
-        const { data } = await api.put(`/maintenanceattempt/${main.ID_MAIN_ATTEMP}`, main)
+        const { data } = await api.put(`/maintenancedeliv/${main.ID_MAINT_DELIV}`, main)
         setMaintenance(data)
         setOpen(false)
         setError(false)
@@ -90,12 +92,19 @@ export default function ModalProcessMain({ main, setOpen }) {
       </>)}
       {main.STATUS === 'Em deslocamento' && (<>
         <div>
-          Não realizado? 
-          <input type="checkbox" onChange={e => setReturnMain(!returnMain)} /><br />
-          {returnMain && 
+          Retornado? 
+          <input type="checkbox" onChange={e => setReturnMaint(!returnMaint)} /><br />
+          {returnMaint && 
             <div className={classe.divMotivo}>
-              Motivo: &nbsp; 
-              <textarea onChange={e => setReasonReturn(e.target.value)}></textarea>
+              <TextField
+                id='outlined-multiline-static'
+                rows={2}
+                multiline
+                label='Motivo'
+                variant='outlined'
+                fullWidth
+                onChange={e => setReasonReturn(e.target.value)}
+                ></TextField>
             </div>}
         </div>
         <span>Selecione a data de finalização: </span>

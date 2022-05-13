@@ -1,13 +1,15 @@
 .tableMain {
   border-spacing: 0;
-}
-
-.tableMain .cod {
-  width: 10%;
+  font-size: 13PX;
 }
 
 .tableMain .date {
-  width: 12%;
+  width: 11%;
+}
+
+.dateSched {
+  color: var(--orange);
+  font-weight: bold;
 }
 
 .infoMain {

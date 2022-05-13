@@ -1,9 +1,10 @@
 // @ts-check
-const MaintenanceAttempt = require('../models/MaintenanceAttempt')
-const Maintenance = require('../models/Maintenance')
-const ViewMaintenance = require('../models/ViewMaintenance')
+const MaintenanceDeliv = require('../models/tables/MaintenanceDeliv')
+const Maintenance = require('../models/tables/Maintenance')
+const ViewMaintenance = require('../models/views/ViewMaintenance')
 
 const Prodlojas = require('../services/ProdLojaService')
+const { setDaysInDate } = require('../functions/getDate')
 
 /**
  * @typedef {Object} Condicions
@@ -18,92 +19,119 @@ module.exports = {
    * @param {Condicions} condicions 
    * @returns {Promise<Object[]>}
    */
-  async findMain(condicions) {
+  async findMain(condicions, cd = false) {
     const { codloja, search, typeSeach } = condicions
-    var main
+    var maint
 
-    const codLoja = codloja === 0 ? '' : `AND CODLOJA = ${codloja}`
+    const codLoja = codloja === 0 ? '' : ` AND CODLOJA = ${codloja}`
+    const toCd = cd ? ' AND TO_CD = 1' : ''
 
-    if (typeSeach === 'STATUS') main = await ViewMaintenance.findSome(0, `STATUS = 'Finalizada' AND D_MAINTENANCE = '${search}' ${codLoja}`)
-    else if (typeSeach === 'NOMECLI')  main = await ViewMaintenance.findSome(0, `${typeSeach} LIKE '${search}%' ${codLoja}`)
-    else main = await ViewMaintenance.findSome(0, `${typeSeach} = '${search}' ${codLoja}`)
+    if (typeSeach === 'close') maint = await ViewMaintenance.findSome(0, `STATUS = 'Finalizada' AND D_FINISH = '${search}'${codLoja}${toCd} ORDER BY ID`)
+    else if (typeSeach === 'NOMECLI') maint = await ViewMaintenance.findSome(0, `${typeSeach} LIKE '${search}%'${codLoja}${toCd}`)
+    else maint = await ViewMaintenance.findSome(0, `${typeSeach} = '${search}'${codLoja}${toCd}`)
 
-    return main
+    return maint
   },
   /**
-   * @param {number} idMainAtt 
-   * @param {Object} main 
+   * @param {number} id 
+   * @param {Object} maint 
    */
-  async moveToMain(idMainAtt, main){
+  async moveToMaint(id, maint){
     try {
       //Valores para Kardex
       const kardex = {
         MODULO: 'ASSISTENCIA',
-        DOC: main.ID_SALE,
-        OBS: 'Saida de mercadoria para assistência',
-        VALOR: main.UNITARIO1,
+        DOC: maint.ID_SALE,
+        OBS: `Entrega de assistência Nº ${maint.ID}`,
+        VALOR: maint.UNITARIO1,
         USUARIO: 'DEFAULT',
         tipo: 'S'
       }
 
-      await MaintenanceAttempt.updateNotReturn(0, `D_PROCESS = '${main.date}'`, idMainAtt)
+      await MaintenanceDeliv.updateAny(0, { D_DELIVING: maint.date }, { ID: id })
 
-      if(main.CHANGE_PRODUCT) await Prodlojas.updateEstProdloja(main, kardex)
+      if(maint.CHANGE_PROD) await Prodlojas.updateEstProdloja(maint, kardex)
   
-      await Maintenance.updateNotReturn(0, `STATUS = 'Em deslocamento'`, main.ID)
+      await Maintenance.updateAny(0, { STATUS: 'Em deslocamento' }, { ID: maint.ID })
     } catch (error) {
       console.log(error)
     }
   },
   /**
    * 
-   * @param {number} idMainAtt 
-   * @param {Object} main 
+   * @param {number} ID 
+   * @param {Object} maint 
    */
-  async finishToMainNotReturn(idMainAtt, main){
+  async finishToMaintNotReturn(ID, maint){
     try {
       //Valores para Kardex
       const kardex = {
         MODULO: 'ASSISTENCIA',
-        DOC: main.ID_SALE,
-        OBS: 'Entrada de mercadoria vindo de assistência / Provável Defeito',
-        VALOR: main.UNITARIO1,
+        DOC: maint.ID_SALE,
+        OBS: `Retorno de assistência Nº ${maint.ID} com defeito`,
+        VALOR: maint.UNITARIO1,
         USUARIO: 'DEFAULT',
         tipo: 'E'
       }
 
-      await MaintenanceAttempt.updateNotReturn(0, `D_MAINTENANCE = '${main.date}'`,idMainAtt)
+      await MaintenanceDeliv.updateAny(0, { 
+        D_DELIVERED: maint.date,
+      }, { ID })
 
-      if(main.CHANGE_PRODUCT) await Prodlojas.updateEstProdloja(main, kardex)
-  
-      await Maintenance.update(0, `STATUS = 'Finalizada'`, main.ID)
+      if(maint.CHANGE_PROD) await Prodlojas.updateEstProdloja(maint, kardex)
+
+      await Maintenance.updateAny(0, { 
+        D_FINISH: maint.date,
+        STATUS: 'Finalizada'
+      }, { ID: maint.ID })
     } catch (error) {
       console.log(error)
     }
   },
   /**
-   * @param {number} idMainAtt 
-   * @param {Object} main 
+   * @param {number} ID 
+   * @param {Object} maint
    */
-  async finishToMainReturn(idMainAtt, main){
+  async finishToMaintReturn(ID, maint){
     try {
       //Valores para Kardex
       const kardex = {
         MODULO: 'ASSISTENCIA',
-        DOC: main.ID_SALE,
-        OBS: 'Retorno de mercadoria vindo de assistência',
-        VALOR: main.UNITARIO1,
+        DOC: maint.ID_SALE,
+        OBS: `Retorno de assistência Nº ${maint.ID}`,
+        VALOR: maint.UNITARIO1,
         USUARIO: 'DEFAULT',
         tipo: 'E'
       }
 
-      await MaintenanceAttempt.updateNotReturn(0, `DONE = 0,  D_MAINTENANCE = '${main.date}', REASON_RETURN = '${main.reasonReturn}'`, idMainAtt)
+      await MaintenanceDeliv.updateAny(0, {
+        DONE: 0,
+        D_DELIVERED: maint.date,
+        REASON_RETURN: maint.reasonReturn
+      }, { ID })
 
-      if(main.CHANGE_PRODUCT) await Prodlojas.updateEstProdloja(main, kardex)
+      if(maint.CHANGE_PROD) await Prodlojas.updateEstProdloja(maint, kardex)
 
-      await Maintenance.update(0, `STATUS = 'Enviado'`, main.ID)
+      await Maintenance.updateAny(0, { STATUS: 'No CD' }, {ID: maint.ID})
     } catch (error) {
       console.log(error)
     }
+  },
+  /**
+   * @param {string} codloja
+   * @param {string} loc
+   * @returns 
+   */
+  async getViewMaint(codloja = '', loc = 'Shop'){
+    codloja = codloja !== 'null' ? ` AND CODLOJA = ${codloja}` : ''
+    loc = loc === 'Shop' ? '' : ' AND TO_CD = 1'
+
+    const maint = await ViewMaintenance.findSome(0, `STATUS <> 'Finalizada'${codloja}${loc} ORDER BY ID`)
+
+    for(var i in maint){
+      maint[i].DATE_PREV = maint[i].DATE_PREV !== null && setDaysInDate(maint[i].DATE_PREV,2)
+      maint[i].DATE_VISIT = maint[i].DATE_VISIT !== null && setDaysInDate(maint[i].DATE_VISIT,2)
+    }
+    return maint
   },
 }

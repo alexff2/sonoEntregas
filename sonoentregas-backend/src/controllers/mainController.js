@@ -6,12 +6,10 @@
  */
 
 const Sales = require('../models/Sales')
-const Maintenance = require('../models/Maintenance')
-const MainAttempt = require('../models/MaintenanceAttempt')
-const ViewDeliveryProdMain = require('../models/ViewDeliveryProdMain')
-const ViewMaintenance = require('../models/ViewMaintenance')
+const Maintenance = require('../models/tables/Maintenance')
+const ViewDeliveryProdMaint = require('../models/views/ViewDeliveryProdMaint')
+const ViewMaintenance = require('../models/views/ViewMaintenance')
 const ViewCatDef = require('../models/views/ViewCatDefect')
-const ViewMainAttempt = require('../models/ViewMainAttempt')
 
 const MainService = require('../services/MainService')
 
@@ -25,13 +23,11 @@ module.exports = {
    */
   async index(req, res) {
     try {
-      const { codloja } = req.params
+      var { codloja } = req.params
 
-      const where = codloja !== 'null' ? `AND CODLOJA = ${codloja}` : ''
+      const maint = await MainService.getViewMaint(codloja)
 
-      const main = await ViewMaintenance.findSome(0, `STATUS <> 'Finalizada' ${where}`)
-
-      return res.json(main)
+      return res.json(maint)
     } catch (error) {
       console.log(error)
       return res.status(400).json(error)
@@ -48,9 +44,9 @@ module.exports = {
 
       params.codloja = params.codloja !== 'null' ? params.codloja : 0
 
-      const main = await MainService.findMain(params)
+      const maint = await MainService.findMain(params)
 
-      return res.json(main)
+      return res.json(maint)
     } catch (error) {
       console.log(error)
       return res.status(400).json(error)
@@ -63,17 +59,17 @@ module.exports = {
    */
   async create(req, res) {
     try {
-      const { ID_DELIVERY, CODLOJA, ID_SALES, COD_ORIGINAL, WARRANTY, DEFECT,OBS, QUANTIDADE } = req.body
+      const { ID_DELIVERY, CODLOJA, ID_SALES, COD_ORIGINAL, WARRANTY, DEFECT, OBS, QUANTIDADE, ID_USER } = req.body
   
       const D_ENVIO = getDate()
       const D_PREV = setDaysInDate(D_ENVIO, 10) //Objetivo do sistema
       const WARRANTY_ = WARRANTY ? 1 : 0
   
-      await Maintenance.creator(0, `${ID_DELIVERY}, ${CODLOJA}, ${ID_SALES}, '${COD_ORIGINAL}', ${QUANTIDADE}, 'Enviado', '${WARRANTY_}','${DEFECT}','${OBS}', '${D_ENVIO}', '${D_PREV}'`)
+      await Maintenance.creator(0, `${ID_DELIVERY}, ${CODLOJA}, ${ID_SALES}, '${COD_ORIGINAL}', ${QUANTIDADE}, 'Aguardando', '${WARRANTY_}','${DEFECT}','${OBS}', '${D_ENVIO}', '${D_PREV}', ${ID_USER}`)
   
-      const main = await ViewMaintenance.findSome(0, `CODLOJA = ${CODLOJA} AND STATUS <> 'Finalizada'`)
+      const maint = await ViewMaintenance.findSome(0, `CODLOJA = ${CODLOJA} AND STATUS <> 'Finalizada'`)
   
-      return res.json(main)
+      return res.json(maint)
     } catch (error) {
       console.log(error)
       return res.json(error)
@@ -89,12 +85,12 @@ module.exports = {
     try {
       const main = await Maintenance.findSome(0, `ID = ${id}`, 'ID, STATUS')
   
-      if (main[0].STATUS === 'Enviado') {
+      if (main[0].STATUS === 'Aguardando') {
         await Maintenance.deleteNotReturn(0, id)
   
         return res.json({ sucess: 'Venda retornada com sucesso!'}) 
       } else {
-        return res.status(400).json({ sucess: 'Venda com status diferente de enviado!'}) 
+        return res.status(400).json({ sucess: 'Venda com status diferente de Aguardando!'}) 
       }
     } catch (error) {
       console.log(error)
@@ -106,13 +102,13 @@ module.exports = {
    * @param {*} res 
    * @returns 
    */
-  async searchSaleToMain(req, res) {
+  async searchSaleToMaint(req, res) {
     try {
       const { idSale, codloja } = req.params
 
       const sale = await Sales.findSome(0, ` STATUS = 'Fechada' AND ID_SALES = ${idSale} AND CODLOJA = ${codloja}`, 'ID_SALES, NOMECLI, ID_CLIENT, Convert(varchar(10), EMISSAO, 103) EMISSAO, TOTAL_PROD')
 
-      const products = await ViewDeliveryProdMain.findSome(0, `ID_SALES = ${idSale} AND CODLOJA = ${codloja} AND DELIVERED = 0`)
+      const products = await ViewDeliveryProdMaint.findSome(0, `ID_SALES = ${idSale} AND CODLOJA = ${codloja} AND DELIVERED = 0`)
 
       if (products.length === 0) return res.json([])
 
@@ -123,76 +119,6 @@ module.exports = {
     } catch (error) {
       console.log(error)
       return res.status(400).json(error)
-    }
-  },
-  /**
-   * @param {*} req 
-   * @param {*} res 
-   * @returns 
-   */
-  async findMainAttempt(req, res) {
-    const { idMain } = req.params
-
-    try {
-      const mainAttempt = await ViewMainAttempt.findSome(0, `ID_MAIN = ${idMain}`)
-
-      return res.json(mainAttempt)
-    } catch (error) {
-      console.log(error)
-      return res.status(400).json(error)
-    }
-  },
-  /**
-   * @param {*} req 
-   * @param {*} res 
-   * @returns 
-   */
-  async createMainAtt(req, res) {
-    try {
-      var { ID, changeProd, idDriver, idAssist, idDelivMain } = req.body
-
-      const D_MOUNTING = getDate()
-
-      changeProd =  changeProd ? 1 : 0
-      idDelivMain =  idDelivMain === 0 ? 'NULL' : idDelivMain
-
-      await MainAttempt.creatorNotReturn(0, `${ID}, ${changeProd}, '${D_MOUNTING}', NULL, NULL, 1, NULL, ${idDriver}, ${idAssist}, ${idDelivMain}`)
-
-      await Maintenance.update(0,`STATUS = 'Em lançamento'`, ID)
-
-      const main = await ViewMaintenance.findSome(0, `STATUS <> 'Finalizada'`)
-
-      return res.json(main)
-    } catch (error) {
-      console.log(error)
-      return res.json(error)
-    }
-  },
-  /**
-   * @param {*} req
-   * @param {*} res 
-   * @returns 
-   */
-  async updateMainAtt(req, res) {
-    /** @type {Params} */
-    const { idMainAtt } = req.params
-    const main = req.body
-
-    try {
-      if (main.STATUS === 'Em lançamento') await MainService.moveToMain(idMainAtt, main)
-      else if (main.STATUS === 'Em deslocamento') {
-        if (!main.returnMain) {
-          await MainService.finishToMainNotReturn(idMainAtt, main)
-        } else {
-          await MainService.finishToMainReturn(idMainAtt, main)
-        }
-      }
-
-      const mains = await ViewMaintenance.findSome(0, `STATUS <> 'Finalizada'`)
-      return res.json(mains)
-    } catch (error) {
-     console.log(error)
-     res.status(401).json(error)
     }
   }
 }

@@ -5,7 +5,7 @@ import { useMaintenance } from '../../../context/mainContext'
 import { useModalAlert } from '../../../context/modalAlertContext'
 import { dateSqlToReact } from '../../../functions/getDate'
 import api from '../../../services/api'
-import { getLoja } from '../../../services/auth'
+import { getLoja, getUser } from '../../../services/auth'
 
 import '../../../styles/pages/main.css'
 
@@ -23,6 +23,7 @@ export default function TabSendMain(){
   const { setChildrenError, setOpen: setOpenModalAlert, setType } = useModalAlert()
 
   const { cod: CodLoja } = JSON.parse(getLoja())
+  const { ID: idUser } = JSON.parse(getUser())
 
   const setStyleStatus = prod => {
     if (prod.STATUS_MAIN === 'Em Lançamento') {
@@ -82,6 +83,7 @@ export default function TabSendMain(){
         mainProd.WARRANTY = warranty
         mainProd.DEFECT = defect
         mainProd.OBS = obs
+        mainProd.ID_USER = idUser
         const { data } = await api.post('maintenance', mainProd)
         setMaintenance(data)
         setBlockSearchSale(false)
@@ -196,57 +198,59 @@ export default function TabSendMain(){
             ></textarea></div>
         </div>
       </div>
+
       <div className="prodsSale">
-        <form>
-          <table>
-            <thead>
-              <tr>
-                <th>Cod. Prod.</th>
-                <th>Name</th>
-                <th>QTD</th>
-                <th>Valor</th>
-                <th>Dat. Entr.</th>
-                <th>Cod. Entr.</th>
-                <th></th>
+        <table>
+          <thead>
+            <tr>
+              <th>Cod. Prod.</th>
+              <th>Name</th>
+              <th>QTD</th>
+              <th>Valor</th>
+              <th>Dat. Entr.</th>
+              <th>Cod. Entr.</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {sale.products && sale.products.map(prod =>(
+              <tr key={prod.COD_ORIGINAL}>
+                <td>{prod.COD_ORIGINAL}</td>
+                <td>{prod.DESCRICAO}</td>
+                <td>{prod.QTD_DELIV}</td>
+                <td>{Intl
+                  .NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'})
+                  .format(prod.NVTOTAL)}</td>
+                <td>{dateSqlToReact(prod.D_DELIVERED)}</td>
+                <td>{prod.ID_DELIVERY}</td>
+                <td
+                  style={setStyleStatus(prod)}
+                >
+                  {(prod.STATUS_MAIN && prod.STATUS_MAIN !== 'Finalizada') ? prod.STATUS_MAIN
+                  :<input type="radio" name='prod' onChange={() => setMainProd(prod)}/>
+                  }
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {sale.products && sale.products.map(prod =>(
-                <tr key={prod.COD_ORIGINAL}>
-                  <td>{prod.COD_ORIGINAL}</td>
-                  <td>{prod.DESCRICAO}</td>
-                  <td>{prod.QTD_DELIV}</td>
-                  <td>{Intl
-                    .NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'})
-                    .format(prod.NVTOTAL)}</td>
-                  <td>{dateSqlToReact(prod.D_DELIVERED)}</td>
-                  <td>{prod.ID_DELIVERY}</td>
-                  <td
-                    style={setStyleStatus(prod)}
-                  >
-                    {(prod.STATUS_MAIN && prod.STATUS_MAIN !== 'Finalizada') ? prod.STATUS_MAIN
-                    :<input type="radio" name='prod' onChange={() => setMainProd(prod)}/>
-                    }
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <hr />
-          <div className="btnSendMain">
-            <button 
-              style={{backgroundColor: 'var(--green)'}}
-              disabled={blockSale}
-              onClick={sendMain}
-            >CRIAR</button>
-            <button 
-              style={{backgroundColor: 'var(--red)'}}
-              disabled={blockSale}
-              onClick={cancelSendMain}
-            >CANCELAR</button>
-          </div>
-        </form>
+            ))}
+          </tbody>
+        </table>
       </div>
+
+      <hr />
+
+      <div className="boxBtnBorderCiclo">
+        <button 
+          className='btnBorderCiclo bGgreen'
+          disabled={blockSale}
+          onClick={sendMain}
+        >CRIAR</button>
+        <button 
+          className='btnBorderCiclo bGred'
+          disabled={blockSale}
+          onClick={cancelSendMain}
+        >CANCELAR</button>
+      </div>
+
       <div style={{ color: 'var(--red)', marginTop: '1rem' }}>Atenção! Na assistência deve ser enviada apenas um produto, para enviar outro, deve ser criada um nova assistência para a DAV.</div>
     </div>
   )

@@ -29,14 +29,15 @@ GO
 INSERT CAT_DEFECT_MAIN
 VALUES (1,'Espuma deformada'),
 (2,'Tecido manchado/mofado'),
-(3,'Tecido rasgado/esgarçado'),
+(3,'Tecido rasgado/esgarï¿½ado'),
 (4,'Fetim descosturado/solto'),
 (5,'Estrutura de maideira quebrada'),
 (6,'Estrutura de molas deformadas'),
 (7,'Espiral solto'),
 (8,'Fora de medida'),
-(9,'Pés/Rodízio quebrados'),
+(9,'Pï¿½s/Rodï¿½zio quebrados'),
 (10,'Falhas de bordas'),
 (11,'Aro amassado'),
 (12,'Tampo descolado'),
-(13,'Molas sem aro')
+(13,'Molas sem aro'),
+(14, 'OUTROS')

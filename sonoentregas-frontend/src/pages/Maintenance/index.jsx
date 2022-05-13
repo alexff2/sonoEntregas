@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from 'react'
 
-import ModalAlert, { openMOdalAlert } from '../../components/ModalAlert'
+import { getUser } from '../../services/auth'
+
 import TabSendMain from './TabSendMain'
 import TabSeachMain from './TabSeachMain'
+import Visit from './Visit'
 
 export default function Vendas(){
-  const [ childrenAlertModal, setChildrenAlertModal ] = useState('Vazio')
+  const { OFFICE } =  JSON.parse(getUser())
+  const [ userMaster, setUserMas ] = useState(false)
 
   useEffect(() => {
     document.getElementById('CONSULTAR').style.display = "block"
-  }, [])
+    setUserMas((OFFICE === 'Dev' || OFFICE === 'Master'))
+  }, [OFFICE])
 
   const openTab = e => {
     var i, tabcontent, tablinks;
@@ -31,25 +35,24 @@ export default function Vendas(){
       <div className="tab">
         <input className="tablinks active" value="CONSULTAR" type="button" onClick={e => openTab(e)} />
         <input className="tablinks" value="ENVIAR"  type="button" onClick={e => openTab(e)} />
+        {
+          userMaster &&
+          <input className="tablinks" value="VISITA"  type="button" onClick={e => openTab(e)} />
+        }
       </div>
       
       <div className="tab-body body-container">
         <div id="CONSULTAR" className="tabcontent">
-          <TabSeachMain
-            openMOdalAlert={openMOdalAlert}
-            setChildrenAlertModal={setChildrenAlertModal}
-          />
+          <TabSeachMain />
         </div>
 
         <div id="ENVIAR" className="tabcontent">
-          <TabSendMain
-            openMOdalAlert={openMOdalAlert}
-            setChildrenAlertModal={setChildrenAlertModal}
-          />
+          <TabSendMain />
+        </div>
+        <div id="VISITA" className="tabcontent">
+          <Visit/>
         </div>
       </div>
-
-      <ModalAlert>{childrenAlertModal}</ModalAlert>
     </div>
   )
 }

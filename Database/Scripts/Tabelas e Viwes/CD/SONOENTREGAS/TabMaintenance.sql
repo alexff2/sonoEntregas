@@ -1,7 +1,7 @@
 USE [SONOENTREGAS]
 GO
 
-/****** Object:  Table [dbo].[MAINTENANCE]    Script Date: 03/08/2022 15:32:31 ******/
+/****** Object:  Table [dbo].[MAINTENANCE]    Script Date: 05/13/2022 16:54:43 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -16,7 +16,7 @@ CREATE TABLE [dbo].[MAINTENANCE](
 	[ID_DELIVERY] [float] NOT NULL,
 	[CODLOJA] [float] NOT NULL,
 	[ID_SALE] [float] NOT NULL,
-	[COD_ORIGINAL] [varchar](20) COLLATE SQL_Latin1_General_CP850_CI_AI NOT NULL,
+	[COD_ORIGINAL] [varchar](20) NOT NULL,
 	[QUANTIDADE] [float] NOT NULL,
 	[STATUS] [varchar](15) NOT NULL,
 	[WARRANTY] [bit] NOT NULL,
@@ -24,6 +24,8 @@ CREATE TABLE [dbo].[MAINTENANCE](
 	[OBS] [varchar](250) NOT NULL,
 	[D_ENVIO] [datetime] NOT NULL,
 	[D_PREV] [datetime] NOT NULL,
+	[D_FINISH] [datetime] NULL,
+	[ID_USER] [float] NOT NULL,
  CONSTRAINT [PK_MAINTENANCE] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC
@@ -33,6 +35,9 @@ CREATE TABLE [dbo].[MAINTENANCE](
 GO
 
 SET ANSI_PADDING OFF
+GO
+
+ALTER TABLE [dbo].[MAINTENANCE] ADD  DEFAULT ((1)) FOR [ID_USER]
 GO
 
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { AiOutlineSearch } from 'react-icons/ai'
-import './style.css'
+import '../style.css'
 
 import { useMaintenance } from '../../../context/mainContext'
 import { useModalAlert } from '../../../context/modalAlertContext'
@@ -11,32 +11,21 @@ import Status from "../../../components/Status"
 import ModalMain from "./ModalMain"
 import Modal from "../../../components/Modal"
 
-export default function TabSaleSeach() {
-  const [ openModalMain, setOpenModalMain ] = useState('')
+export default function TabSeachMain() {
+  const [ openModalMain, setOpenModalMain ] = useState(false)
   const [ mainModal, setMainModal ] = useState('')
   const [ search, setSearch ] = useState('')
   const [ typeSeach, setTypeSeach ] = useState('STATUS')
   const [ typesStatus, setTypesStatus ] = useState('open')
+  const [ maintThis, setMaintThis ] = useState([])
   const { maintenance, setMaintenance } = useMaintenance()
-  const { setChildrenError, setOpen: setOpenModalAlert, setType } = useModalAlert()
+  const { setAlert } = useModalAlert()
 
   const { cod: Codloja } = JSON.parse(getLoja())
 
   useEffect(()=>{
-    api
-      .get(`maintenance/${Codloja}`)
-      .then(resp => {
-        if(resp.data){
-          setMaintenance(resp.data)
-        }
-      })
-      .catch(e => {
-        setChildrenError('Erro ao comunicar com servidor')
-        setOpenModalAlert(true)
-        setType('error')
-        console.log(e)
-      })
-  },[Codloja, setMaintenance,setChildrenError, setOpenModalAlert, setType])
+    setMaintThis(maintenance.filter(main => main.CODLOJA === Codloja))
+  },[Codloja, maintenance])
 
   const styleStatus = status => {
     const params = { status, type: 1, color: 1}
@@ -44,40 +33,37 @@ export default function TabSaleSeach() {
     status === 'Enviado' && (params.color = 3)
     status === 'Em lançamento' && (params.color = 0)
     status === 'Em deslocamento' && (params.color = 2)
+    status === 'No CD' && (params.color = 0)
     status === 'Finalizada' && (params.color = 1)
 
     return params
   }
 
-  const searchSales = async () => {
+  const searchMain = async () => {
     try {
       var resp
 
       if (typeSeach === 'STATUS' && typesStatus === 'open') {
-        resp = await api.get(`maintenance/${Codloja}`)
+        resp = await api.get(`maintenance/null`)
+      } else  if (typeSeach === 'STATUS' && typesStatus === 'close'){
+        resp = await api.get(`maintenance/${typesStatus}/${search}/null`)
       } else {
         if (search !== '') {
-          resp = await api.get(`maintenance/${typeSeach}/${search}/${Codloja}`)
+          resp = await api.get(`maintenance/${typeSeach}/${search}/null`)
         } else {
-          setType('error')
-          setOpenModalAlert(true)
-          setChildrenError('Preencha o campo de pesquisa!') 
+          setAlert('Preencha o campo de pesquisa!') 
           return
         }
       }
 
       if (resp.data.length === 0){
-        setType('error')
-        setOpenModalAlert(true)
-        setChildrenError('Assistência(s) não encontrada(s)!') 
+        setAlert('Assistência(s) não encontrada(s)!') 
       } else {
         setMaintenance(resp.data)
       }
     } catch (e) {
       console.log(e)
-      setType('error')
-      setOpenModalAlert(true)
-      setChildrenError("Erro ao comunicar com o Servidor")
+      setAlert("Erro ao comunicar com o Servidor")
       setMaintenance([])
     }
   }
@@ -92,17 +78,13 @@ export default function TabSaleSeach() {
       const { data } = await api.delete(`maintenance/${id}`)
       if (data.sucess) {
         setMaintenance(maintenance.filter(main => main.ID !== id))
-        setType('sucess')
-        setChildrenError(data.sucess)
-        setOpenModalAlert(true)
+        setAlert(data.sucess, 'sucess')
       } else {
         console.log(data)
       }
     } catch (e) {
       console.log(e)
-      setType('error')
-      setChildrenError("Erro ao comunicar com o Servidor")
-      setOpenModalAlert(true)
+      setAlert('Servidor')
     }
   }
 
@@ -138,7 +120,10 @@ export default function TabSaleSeach() {
               name="statusSales"
               id="statusSales" 
               className="selectSearchSales"
-              onChange={e => setTypesStatus(e.target.value)}
+              onChange={e => {
+                setSearch(e.target.value) 
+                setTypesStatus(e.target.value)
+              }}
             >
               <option value={'open'}>Abertas</option>
               <option value={'close'}>Finalizadas</option>
@@ -160,18 +145,18 @@ export default function TabSaleSeach() {
                 type="text"
                 placeholder="Pesquisar…"
                 onChange={e => setSearch(e.target.value)}
-                onKeyPress={e => e.key === 'Enter' ? searchSales() : null}
+                onKeyPress={e => e.key === 'Enter' ? searchMain() : null}
                 value={search}
               />
             </div>
           }
 
-        <button onClick={searchSales}>PESQUISAR</button>
+        <button onClick={searchMain}>PESQUISAR</button>
       </div>
 
       {/*Tabela de assistência*/}
       <div>
-        {maintenance.length !== 0
+        {maintThis.length !== 0
           ?<table className="tableWithoutBordRad tableMain">
             <thead>
               <tr>
@@ -184,7 +169,7 @@ export default function TabSaleSeach() {
               </tr>
             </thead>
             <tbody>
-            {maintenance.map( main => (
+            {maintThis.map( main => (
               <tr key={main.ID} onClick={e => onClickTdMain(e, main)}>
                 <td>{main.ID}</td>
                 <td>{main.ID_SALE}</td>
@@ -192,7 +177,7 @@ export default function TabSaleSeach() {
                 <td>{main.PRODUTO}</td>
                 <td>{dateSqlToReact(main.D_ENVIO)}</td>
                 {
-                  main.STATUS === 'Enviado'
+                  main.STATUS === 'Aguardando'
                     ? <td id="btnCancel">Cancelar</td>
                     : <td id="status"><Status params={styleStatus(main.STATUS)}/></td>
                 }
@@ -208,7 +193,7 @@ export default function TabSaleSeach() {
         openModal={openModalMain}
         setOpenModal={setOpenModalMain}
       >
-        <ModalMain main={mainModal}/>
+        <ModalMain maint={mainModal}/>
       </Modal>
     </>
   )

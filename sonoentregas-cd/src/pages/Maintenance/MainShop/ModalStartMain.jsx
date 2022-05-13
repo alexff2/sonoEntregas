@@ -7,8 +7,6 @@ import {
   Select,
   FormControl,
   InputLabel,
-  Checkbox,
-  FormControlLabel,
   Table,
   TableHead,
   TableRow,
@@ -61,7 +59,7 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: '1rem'
+    margin: '1rem 0'
   },
   formControl: {
     width: '24%',
@@ -78,7 +76,6 @@ const useStyles = makeStyles(theme => ({
 
 export default function ModalStartMain({ selectMain, setOpen }) {
   const [isDisabled, setIsDisabled] = useState(false)
-  const [changeProd, setChangeProd] = useState(false)
   const [idDelivMain, setIdDelivMain] = useState(0)
   const [idCar, setIdCar] = useState(0)
   const [idDriver, setidDriver] = useState(0)
@@ -103,19 +100,25 @@ export default function ModalStartMain({ selectMain, setOpen }) {
   }
 
   const selectDeliv = e => {
-    if (e.target.value !== 0) {
+    if (e.target.value !== 0 && e.target.value !== 1 ) {
       const newDev = delivery.filter(deliv => deliv.ID === e.target.value)
       setIdDelivMain(newDev[0].ID)
       setIdCar(newDev[0].ID_CAR)
       setidDriver(newDev[0].ID_DRIVER)
       setidAssist(newDev[0].ID_ASSISTANT)
       setIsDisabled(true)
-    } else {
+    } else if (e.target.value === 0) {
       setIdDelivMain(0)
       setIdCar(0)
       setidDriver(0)
       setidAssist(0)
       setIsDisabled(false)
+    } else if (e.target.value === 1){
+      setIdDelivMain(0)
+      setIdCar(0)
+      setidDriver(48)
+      setidAssist(49)
+      setIsDisabled(true)
     }
   }
 
@@ -123,14 +126,13 @@ export default function ModalStartMain({ selectMain, setOpen }) {
     e.preventDefault()
     try {
       if(validateFilds([idAssist, idDriver])){
-        const {data} = await api.post('maintenanceattempt', {
+        const {data} = await api.post('maintenancedeliv', {
+          idMaint: selectMain.ID,
           idDelivMain,
-          idCar,
-          idAssist,
           idDriver,
-          changeProd,
+          idAssist,
           obs,
-          ...selectMain
+          idUser: 0
         })
         setOpen(false)
         setMaintenance(data)
@@ -176,7 +178,10 @@ export default function ModalStartMain({ selectMain, setOpen }) {
                 required
               >
                 <MenuItem value={0}>
-                  <em>None</em>
+                  <em>Nenhum</em>
+                </MenuItem>
+                <MenuItem value={1}>
+                  Retirado no CD
                 </MenuItem>
                 {delivery.filter(deliv => deliv.STATUS === 'Em lançamento').map(deliv => (
                   <MenuItem
@@ -249,27 +254,17 @@ export default function ModalStartMain({ selectMain, setOpen }) {
               </Select>
             </FormControl>
           </div>
-          <TextField
-            id="obs"
-            label="Observação"
-            fullWidth
-            margin="normal"
-            variant="outlined"
-            defaultValue={obs}
-            onChange={(e) => setObs(e.target.value)}
-          />
-
-          <FormControl>
-            <FormControlLabel
-              control={
-                <Checkbox color='default'
-                onChange={() =>setChangeProd(!changeProd)}
-                />
-              }
-              label="Trocar Produto?"
+          {idDelivMain === 0 &&
+            <TextField
+              id="obs"
+              label="Observação"
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              defaultValue={obs}
+              onChange={(e) => setObs(e.target.value)}
             />
-          </FormControl>
-
+          }
           <TableContainer component={Paper}>
             <Table aria-label="custumezed table">
               <TableHead>

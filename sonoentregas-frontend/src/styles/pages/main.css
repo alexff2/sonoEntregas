@@ -42,29 +42,32 @@
   margin-left: 5px;
 }
 
-.prodsSale form table{
+.prodsSale table{
   margin-bottom: 1rem;
 }
+ /* Maintance visit*/
 
-.prodsSale form .btnSendMain {
-  margin-top: 1rem;
-}
+ .btnActionVisit {
+   background-color: var(--orange);
+   color: var(--white);
+   text-align: center;
+   font-weight: 700;
+   padding: 1px;
+   cursor: pointer;
+ }
+ .btnActionVisit.visit {
+  background-color: var(--green);
+ }
+ .btnActionVisit.sched {
+  background-color: var(--red);
+ }
 
-.prodsSale form .btnSendMain button {
-  width: 15%;
-  margin-top: 1rem;
-  border: none;
-  padding: 0.5rem 0;
-  border-radius: 15px;
-  color: #fff;
-  font-weight: bold;
-}
+ .formSched{
+   width: 700px;
+ }
 
-.prodsSale form .btnSendMain button:hover {
-  opacity: 0.7;
-}
-
-.prodsSale form .btnSendMain button:disabled {
-  opacity: 1;
-  cursor: no-drop;
-}
+ .bodyScheVisit {
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+ }

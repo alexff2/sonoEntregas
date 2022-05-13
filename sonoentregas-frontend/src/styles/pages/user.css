@@ -94,3 +94,26 @@
   background-color: var(--green);
   color: var(--white);
 }
+
+/** Modal Authorize*/
+
+.formAuthorize {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bodyAuthorize {
+  margin: 15px 0;
+}
+
+.bodyAuthorize label {
+  margin-right: 20px;
+}
+.bodyAuthorize div {
+  margin-bottom: 10px;
+}
+
+.formAuthorize button {
+  width: 100px;
+}

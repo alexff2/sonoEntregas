@@ -45,7 +45,7 @@ export default function BtnUpdate(){
       const { data: dataSales } = await api.get('sales/false/false/Aberta/null')
       const { data: dataDeliv } = await api.get('deliverys/open')
       const { data: dataDelivFinsh } = await api.get(`deliverys/close/${getDateSql()}`)
-      const { data: dataMain } = await api.get('/maintenance/null')
+      const { data: dataMain } = await api.get('/maintenancedeliv')
 
       setSales(dataSales)
       setDelivery(dataDeliv)

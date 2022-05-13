@@ -176,16 +176,16 @@ module.exports = {
     const delivery = req.body
 
     try {
-      const maintenances = await MainService.findMain({
+      const maints = await MainService.findMain({
         codloja: 0,
-        typeSeach: 'ID_DELIV_MAIN',
+        typeSeach: 'ID_DELIV_MAINT',
         search: delivery.ID
       })
 
       if (delivery.STATUS === 'Entregando') {
-        for(let i = 0; i < maintenances.length; i++) {
-          maintenances[i]["date"] = delivery.DATE
-          await MainService.moveToMain(maintenances[i].ID_MAIN_ATTEMP, maintenances[i])
+        for(let i = 0; i < maints.length; i++) {
+          maints[i]["date"] = delivery.DATE
+          await MainService.moveToMaint(maints[i].ID_MAINT_DELIV, maints[i])
         }
       }
 
@@ -229,7 +229,7 @@ module.exports = {
 
       await Deliverys.updateNotReturn(0, `STATUS = '${delivery.STATUS}'`, id)
 
-      res.json(delivery)
+      return res.json(delivery)
     } catch (e) {
       console.log(e)
       res.status(400).json(e)

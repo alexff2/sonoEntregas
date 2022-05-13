@@ -38,10 +38,13 @@ module.exports = {
   getHours(){
     const date = new Date()
     var hours, minutes, seconds
-    hours = date.getHours().length === 1 ?  '0'+date.getHours() : date.getHours()
-    minutes = date.getMinutes().length === 1 ?  '0'+date.getMinutes() : date.getMinutes()
-    seconds = date.getSeconds().length === 1 ?  '0'+date.getSeconds() : date.getSeconds()
+    hours = date.getHours().toString()
+    hours = hours.length === 1 ? `0${hours}` : hours
+    minutes = date.getMinutes().toString()
+    minutes = minutes.length === 1 ? `0${minutes}` : minutes
+    seconds = date.getSeconds().toString()
+    seconds = seconds.length === 1 ? `0${seconds}` : seconds
 
-    return hours+':'+minutes+':'+seconds
+    return `${hours}:${minutes}:${seconds}`
   }
 }

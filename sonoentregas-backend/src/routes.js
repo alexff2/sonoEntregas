@@ -14,6 +14,10 @@ const deliverysController = require('./controllers/deliverysController')
 const homeController = require('./controllers/homeController')
 const dashboardController = require('./controllers/dashboardController')
 const mainController = require('./controllers/mainController')
+const maintDelivController = require('./controllers/maintDelivController')
+const mainVisitController = require('./controllers/mainVisitController')
+const feedStockController = require('./controllers/feedStockController')
+const devController = require('./controllers/devController')
 
 //Routes
 //Conections
@@ -25,6 +29,7 @@ routes.get('/users/:loja', usersController.index)
 routes.post('/users', usersController.create)
 routes.put('/users/:userId', usersController.update)
 routes.delete('/users/:userId', usersController.delete)
+routes.get('/users', loginController.transformPasswordUser)
 //Produtos SCE CD
 routes.get('/products/:typesearch/:search', produtosController.index)
 //Vendas SCE
@@ -55,12 +60,24 @@ routes.get('/home', homeController.index)
 routes.get('/dashboard/:datesearch', dashboardController.index)
 //Maintenance
 routes.get('/maintenance/:codloja', mainController.index)
+routes.get('/maintenance/:idSale/:codloja', mainController.searchSaleToMaint)
 routes.post('/maintenance', mainController.create)
 routes.delete('/maintenance/:id', mainController.delete)
-routes.get('/maintenance/:idSale/:codloja', mainController.searchSaleToMain)
 routes.get('/maintenance/:typeSeach/:search/:codloja', mainController.findMain)
-routes.get('/maintenanceattempt/:idMain', mainController.findMainAttempt)
-routes.post('/maintenanceattempt', mainController.createMainAtt)
-routes.put('/maintenanceattempt/:idMainAtt', mainController.updateMainAtt)
+//Maintenance Delivery
+routes.get('/maintenancedeliv', maintDelivController.index)
+routes.get('/maintenancedeliv/:idMain', maintDelivController.findMaintId)
+routes.get('/maintenancedeliv/:typeSeach/:search', maintDelivController.findMaintDeliv)
+routes.post('/maintenancedeliv', maintDelivController.create)
+routes.put('/maintenancedeliv/:id', maintDelivController.update)
+//Maintenance Visit
+routes.post('/maintvisit', mainVisitController.create)
+routes.put('/maintvisit/start/:id', mainVisitController.startVisit)
+routes.put('/maintvisit/finish/:id', mainVisitController.finishVisit)
+// FeedStock
+routes.get('/feedstock', feedStockController.index)
+routes.get('/feedstock/:id', feedStockController.find)
+//Developer 
+routes.get('/dev/:table', devController.getTable)
 
 module.exports = routes

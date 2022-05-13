@@ -1,34 +1,18 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
-
-import api from '../services/api'
-import { getLoja } from '../services/auth'
+import React, { createContext, useContext, useState } from 'react'
 
 const UsersContext = createContext()
 
 export default function UsersProvider({ children }){
-  const [ errorUsers, setErrorUsers ] = useState()
   const [ users, setUsers ] = useState([])
 
-  const { cod } = JSON.parse(getLoja())
-
-  useEffect(() => {
-    api
-      .get(`users/${cod}`)
-      .then( resp => {
-        setUsers(resp.data)
-        setErrorUsers(false)
-      })
-      .catch( error => setErrorUsers(error))
-  }, [cod])
-
   return(
-    <UsersContext.Provider value={{ users, setUsers, errorUsers }}>
+    <UsersContext.Provider value={{ users, setUsers }}>
       {children}
     </UsersContext.Provider>
   )
 }
 
 export function useUsers(){
-  const { users, setUsers, errorUsers } = useContext(UsersContext)
-  return { users, setUsers, errorUsers }
+  const { users, setUsers } = useContext(UsersContext)
+  return { users, setUsers }
 }

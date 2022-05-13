@@ -125,7 +125,7 @@ export default function TableMain() {
 
   useEffect(() => {
     api
-      .get('/maintenance/null')
+      .get('/maintenancedeliv')
       .then( resp => setMaintenance(resp.data))
   },[setMaintenance])
 
@@ -141,10 +141,12 @@ export default function TableMain() {
       var resp
 
       if (typeSeach === 'STATUS' && typesStatus === 'open') {
-        resp = await api.get(`maintenance/null`)
-      } else {
+        resp = await api.get(`maintenancedeliv`)
+      } else  if (typeSeach === 'STATUS' && typesStatus === 'close'){
+        resp = await api.get(`maintenancedeliv/${typesStatus}/${search}`)
+      }else {
         if (search !== '') {
-          resp = await api.get(`maintenance/${typeSeach}/${search}/null`)
+          resp = await api.get(`maintenancedeliv/${typeSeach}/${search}`)
         } else {
           setOpenAlert(true)
           setChildrenModal('Preencha o campo de pesquisa!') 
@@ -242,7 +244,7 @@ export default function TableMain() {
         <Table>
           <TableHead>
             <TableRow>
-            {['Cód. Assis.', 'Cód. Venda.', 'Cliente', 'Produto', 'QTD', 'Envio', ''].map((item, i) =>(
+            {['Código', 'Cód. Venda.', 'Cliente', 'Produto', 'QTD', 'Previsão', 'Visita', ''].map((item, i) =>(
               <TableCell key={i} className={classes.headCell}>{item}</TableCell>
             ))}
             </TableRow>
@@ -255,11 +257,12 @@ export default function TableMain() {
                 <TableCell>{main.NOMECLI}</TableCell>
                 <TableCell>{main.PRODUTO}</TableCell>
                 <TableCell>{main.QUANTIDADE}</TableCell>
-                <TableCell>{getDateBr(main.D_ENVIO)}</TableCell>
+                <TableCell>{getDateBr(main.D_PREV)}</TableCell>
+                <TableCell>{main.VISITANT}</TableCell>
                 <TableCell style={{width: '15%'}}>
-                  {main.STATUS !== 'Enviado'
+                  {main.STATUS !== 'No CD'
                     ? <>
-                        { (main.ID_DELIV_MAIN && main.STATUS === 'Em lançamento')
+                        { (main.ID_DELIV_MAINT && (main.STATUS === 'Em lançamento' || main.STATUS === 'Finalizada'))
                           ? main.STATUS
                           : <div
                               style={styleStatus(main.STATUS)}
@@ -297,7 +300,7 @@ export default function TableMain() {
       >
         <ModalMain
           setOpen={setOpenModalMain}
-          main={selectMain}
+          maint={selectMain}
         />
       </Modal>
 

@@ -6,10 +6,39 @@ import { dateSqlToReact } from '../../../functions/getDate'
 import { getLoja } from '../../../services/auth'
 
 import Modal from '../../../components/Modal'
+import Status from '../../../components/Status'
 import ModalSales from './ModalSales'
+
+function TdStatus({produto}){
+  const styleStatus = status => {
+    const params = { status, type: 1, color: 1}
+
+    status === 'Entregando' && (params.color = 2)
+    status === 'Em lançamento' && (params.color = 4)
+    status === 'Finalizada' && (params.color = 1)
+    status === 'Devolvido' && (params.color = 3)
+
+    return params
+  }
+
+  if(produto.STATUS === 'Enviado'){
+    return <td id="btnCancel">Cancelar</td>
+  } else if (produto.STATUS === 'Finalizada' && produto.DOWN_EST){
+    return <td id="btnEstornar">Estornar Estoque</td>
+  } else {
+    return <td><Status params={styleStatus(produto.STATUS)}/></td>
+  }
+}
 
 function Row({ sale, modalDetalProduct, cancelSubmitSales, reverseStock }) {
   const [open, setOpen] = React.useState(false)
+
+  const clickProd = (e, prod) => {
+    //setSelectMain(main)
+    if(e.target.id === 'btnCancel') cancelSubmitSales(prod)
+    else if (e.target.id === 'btnEstornar') reverseStock(prod)
+    else modalDetalProduct(sale, prod)
+  }
   
   return (
     <React.Fragment>
@@ -41,21 +70,16 @@ function Row({ sale, modalDetalProduct, cancelSubmitSales, reverseStock }) {
               </thead>
               <tbody>
                 {sale.products.map((produto) => (
-                  <tr key={produto.CODPRODUTO}>
-                    <td onClick={() => modalDetalProduct(sale, produto)}>
-                      {produto.COD_ORIGINAL}
-                    </td>
-                    <td onClick={() => modalDetalProduct(sale, produto)}>{produto.DESCRICAO}</td>
-                    <td onClick={() => modalDetalProduct(sale, produto)}>{produto.QUANTIDADE}</td>
-                    <td onClick={() => modalDetalProduct(sale, produto)}>{
+                  <tr key={produto.CODPRODUTO} onClick={e => clickProd(e, produto)}>
+                    <td>{produto.COD_ORIGINAL}</td>
+                    <td>{produto.DESCRICAO}</td>
+                    <td>{produto.QUANTIDADE}</td>
+                    <td>{
                       Intl
                         .NumberFormat('pt-br',{style: 'currency', currency: 'BRL'})
                         .format(produto.NVTOTAL)
                     }</td>
-                    {
-                      produto.STATUS === 'Enviado' && <td id="btnCancel" onClick={() => cancelSubmitSales(produto)}>Cancelar</td>
-                    }
-                    {produto.STATUS === 'Finalizada' && produto.DOWN_EST && <td id="btnEstornar" onClick={() => reverseStock(produto)}>Estornar Estoque</td>}
+                    <TdStatus produto={produto}/>
                   </tr>
                 ))}
               </tbody>
