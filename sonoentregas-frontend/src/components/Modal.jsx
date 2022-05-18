@@ -12,9 +12,7 @@ export default function Modal({ children, openModal, styleModal, setOpenModal })
           }}
         >
           <div className="modal" style={ styleModal ? styleModal : {} }>
-            <div>
-                { children }
-            </div>
+            { children }
           </div>
         </div>
       }

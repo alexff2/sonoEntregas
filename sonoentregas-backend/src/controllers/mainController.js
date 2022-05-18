@@ -59,16 +59,19 @@ module.exports = {
    */
   async create(req, res) {
     try {
-      const { ID_DELIVERY, CODLOJA, ID_SALES, COD_ORIGINAL, WARRANTY, DEFECT, OBS, QUANTIDADE, ID_USER } = req.body
+      var { ID_DELIVERY, CODLOJA, ID_SALES, COD_ORIGINAL, WARRANTY, DEFECT, OUTHER_DEF, OBS, QUANTIDADE, ID_USER } = req.body
   
       const D_ENVIO = getDate()
       const D_PREV = setDaysInDate(D_ENVIO, 10) //Objetivo do sistema
-      const WARRANTY_ = WARRANTY ? 1 : 0
+      WARRANTY = WARRANTY ? 1 : 0
+
+      const values = { ID_DELIVERY, CODLOJA, ID_SALE: ID_SALES, COD_ORIGINAL, QUANTIDADE, STATUS: 'Aguardando', WARRANTY, ID_CAT_DEF: DEFECT, OBS, D_ENVIO, D_PREV, ID_USER, OUTHER_DEF }
+
+      OUTHER_DEF === 'NULL' && delete values.OUTHER_DEF
   
-      await Maintenance.creator(0, `${ID_DELIVERY}, ${CODLOJA}, ${ID_SALES}, '${COD_ORIGINAL}', ${QUANTIDADE}, 'Aguardando', '${WARRANTY_}','${DEFECT}','${OBS}', '${D_ENVIO}', '${D_PREV}', ${ID_USER}`)
+      await Maintenance.creatorAny(0, values)
   
-      const maint = await ViewMaintenance.findSome(0, `CODLOJA = ${CODLOJA} AND STATUS <> 'Finalizada'`)
-  
+      const maint = await ViewMaintenance.findSome(0, `STATUS <> 'Finalizada'`)
       return res.json(maint)
     } catch (error) {
       console.log(error)

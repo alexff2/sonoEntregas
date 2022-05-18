@@ -71,6 +71,35 @@ class Model {
       await this._query(loja, script, QueryTypes.INSERT)
     }
   }
+  async creatorAny(loja, values, id = false) {
+    var column, value, script
+
+    Object.entries(values).forEach(([k,v], i) =>{
+      if(i === 0){
+        column = k
+        value = `'${v}'`
+      } else {
+        column+= `, ${k}`
+        value+= `, '${v}'`
+      }
+    })
+
+    if (!id) {
+      //Seach first ID in table
+      const lastId = await this.findAll(loja, `MAX(ID) AS 'ID'`)
+      
+      const ID = lastId[0].ID ? lastId[0].ID + 1 : 1
+
+      script = `INSERT INTO ${this.tab} (ID, ${column}) VALUES (${ID}, ${value})`
+    } else {
+      script = `INSERT INTO ${this.tab} (${column}) VALUES (${value})`
+    }
+    await this._query(loja, script, QueryTypes.INSERT)
+
+    const data = await this.findAny(loja, values)
+
+    return data[0]
+  }
   async creatorNotReturn(loja, values, id = false) {
     //Buscando ultimo ID lançado na tabela se não fornecido
     if (!id) {

@@ -199,6 +199,7 @@ function Row({sendSalesProd, sale, type, setAddress}) {
   }
 
   const styleDateDeliv = () => {
+    // VERIFICAR
     var dateDeliv, dateNow, dateAlert
     dateDeliv = new Date(sale.D_ENTREGA1)
     dateDeliv.setDate(dateDeliv.getDate()+1)

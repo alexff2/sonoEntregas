@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { useMaintenance } from '../../../context/mainContext'
 
 import { useModalAlert } from '../../../context/modalAlertContext'
-import { dateSqlToReact } from '../../../functions/getDate'
+import { dateSqlToReact, dateWarranty, checkDateWarranty } from '../../../functions/getDate'
 import api from '../../../services/api'
 import { getLoja, getUser } from '../../../services/auth'
 
@@ -16,7 +16,8 @@ export default function TabSendMain(){
   const [ catDefect, setCatDefect ] = useState([{ID:1, DESCRIPTION: '------'}])
   const [ sale, setSale ] = useState({})
   const [ defect, setDefect ] = useState(1)
-  const [ warranty, setWarranty ] = useState(false)
+  const [ outherDef, setOutherDef ] = useState('NULL')
+  const [ warranty, setWarranty ] = useState(true)
   const [ obs, setObs ] = useState('')
   const [ mainProd, setMainProd ] = useState({})
   const { setMaintenance } = useMaintenance()
@@ -51,6 +52,7 @@ export default function TabSendMain(){
           if (data.length !== 0) {
             setBlockSearchSale(true)
             setSale(data[0])
+            setWarranty(checkDateWarranty(data[0].EMISSAO))
             setCatDefect(data[0].catDef)
             setBlockSale(false)
           } else {
@@ -82,6 +84,7 @@ export default function TabSendMain(){
       if (Object.keys(mainProd).length !== 0) {
         mainProd.WARRANTY = warranty
         mainProd.DEFECT = defect
+        mainProd.OUTHER_DEF = outherDef
         mainProd.OBS = obs
         mainProd.ID_USER = idUser
         const { data } = await api.post('maintenance', mainProd)
@@ -91,6 +94,8 @@ export default function TabSendMain(){
         setOpenModalAlert(true)
         setType('sucess')
         setChildrenError('Assistência enviada com sucesso!')
+        setOutherDef('NULL')
+        setDefect(1)
         cleanVar()
         document.getElementById('searchIdSale').focus()
       } else {
@@ -124,7 +129,10 @@ export default function TabSendMain(){
             value={idSale}
             type="text" 
             placeholder='Pesquise pelo código da venda' 
-            onChange={e => setIdSale(e.target.value)}
+            onChange={e => {
+              parseInt(e.target.value) === 0 && setOutherDef('NULL')
+              setIdSale(e.target.value)
+            }}
             required
             disabled={blockSearchSale}
           />
@@ -140,7 +148,7 @@ export default function TabSendMain(){
             Defeito reclamado: 
             <span>
               <select
-                onChange={e => setDefect(e.target.value)} 
+                onChange={e => setDefect(parseInt(e.target.value))} 
                 disabled={blockSale}
                 style={{
                   width: '12rem',
@@ -148,41 +156,42 @@ export default function TabSendMain(){
                   backgroundColor: 'inherit',
                   color: 'black'
                 }}
+                value={defect}
               >
-                {catDefect.map(catDef =>(
-                  <option value={catDef.ID} key={catDef.ID}>{catDef.DESCRIPTION}</option>
+              {catDefect.map(catDef =>(
+                <option value={catDef.ID} key={catDef.ID}>{catDef.DESCRIPTION}</option>
                 ))}
+                <option value="0">Outros</option>
               </select>
             </span>
           </div>
         </div>
         <div>
           <div>Emissão: <span>{sale.EMISSAO}</span></div>
-          <div>
-            Valor: 
-            <span>
-              {sale.TOTAL_PROD && Intl
-                .NumberFormat('pt-br', {style: 'currency', currency: 'BRL'})
-                .format(sale.TOTAL_PROD)
-              }
-            </span>
-          </div>
-          <div style={{display: 'flex'}}>
+          <div style={{display: 'flex', alignItems: 'center'}}>
             Garantia?: &nbsp;
-            <span style={{display: 'flex', alignItems: 'center'}}>
-              <input
-                type="radio"
-                name="warranty"
-                disabled={blockSale}
-                onChange={() => setWarranty(true)}
-              />  <div style={{marginTop: -3}}> &nbsp;sim&nbsp;&nbsp;</div>
-              <input
-                type="radio"
-                name="warranty"
-                checked
-                disabled={blockSale}
-                onChange={() => setWarranty(false)}
-              /> <div style={{marginTop: -3}}> &nbsp;não&nbsp;</div>
+            <input
+              type="radio"
+              name="warranty"
+              disabled={blockSale}
+              checked={warranty}
+              onChange={() => setWarranty(true)}
+            /> 
+            <span style={{marginTop: -3}}> &nbsp;sim&nbsp;&nbsp;</span>
+            <input
+              type="radio"
+              name="warranty"
+              checked={!warranty}
+              disabled={blockSale}
+              onChange={() => setWarranty(false)}
+            />
+            <span style={{marginTop: -3}}> &nbsp;não&nbsp;</span>
+            
+          </div>
+          <div>
+            Venc. Garantia: &nbsp;
+            <span>
+              {sale.EMISSAO && dateWarranty(sale.EMISSAO)}
             </span>
           </div>
         </div>
@@ -198,6 +207,17 @@ export default function TabSendMain(){
             ></textarea></div>
         </div>
       </div>
+
+      {defect === 0 &&
+        <div id='textArea'>
+          Outras: 
+          <textarea 
+            rows={1}
+            style={{width: '100%', marginBottom: 10}}
+            onChange={e => setOutherDef(e.target.value)}
+            ></textarea>
+        </div>
+      }
 
       <div className="prodsSale">
         <table>
@@ -226,8 +246,9 @@ export default function TabSendMain(){
                 <td
                   style={setStyleStatus(prod)}
                 >
-                  {(prod.STATUS_MAIN && prod.STATUS_MAIN !== 'Finalizada') ? prod.STATUS_MAIN
-                  :<input type="radio" name='prod' onChange={() => setMainProd(prod)}/>
+                  {(prod.STATUS_MAIN && prod.STATUS_MAIN !== 'Finalizada') 
+                    ? prod.STATUS_MAIN
+                    :<input type="radio" name='prod' onChange={() => setMainProd(prod)}/>
                   }
                 </td>
               </tr>
@@ -251,7 +272,7 @@ export default function TabSendMain(){
         >CANCELAR</button>
       </div>
 
-      <div style={{ color: 'var(--red)', marginTop: '1rem' }}>Atenção! Na assistência deve ser enviada apenas um produto, para enviar outro, deve ser criada um nova assistência para a DAV.</div>
+      <div style={{ color: 'var(--red)', marginTop: '1rem' }}>Atenção! Na assistência deve ser enviada apenas um produto. Para enviar outro produto, você deve criar uma nova assistência para a DAV.</div>
     </div>
   )
 }

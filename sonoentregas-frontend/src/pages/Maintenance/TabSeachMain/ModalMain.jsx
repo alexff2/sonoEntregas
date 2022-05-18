@@ -105,7 +105,10 @@ export default function ModalMain({ maint }) {
 
           <hr style={{margin: '0.5rem 0'}} />
 
-          <div className="info"><label>Endereço: </label>{maint.ENDE}</div>
+          <div className="info">
+            <label>Endereço: </label>
+            {maint.ENDERECO+', '+maint.BAIRRO+', '+maint.CIDADE+'-'+maint.ESTADO}
+          </div>
           <div className="info"><label>Obs: </label>{maint.OBS}</div>
           <div className="info">
             <label>Defeito reclamado: </label>{maint.CAT_DEFECT}

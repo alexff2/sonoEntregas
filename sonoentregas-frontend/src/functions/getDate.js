@@ -34,3 +34,24 @@ export function dateSqlToReact(dateSql){
   let dataAtualFormatada = (adicionaZero(dataAtual.getDate().toString()) + "/" + (adicionaZero(dataAtual.getMonth()+1).toString()) + "/" + dataAtual.getFullYear())
   return dataAtualFormatada
 }
+
+export function dateWarranty(emissao) {
+  emissao = emissao.split('/',3)
+  var ano = emissao[2]
+  ano = parseInt(ano) + 1
+  return `${emissao[0]}/${emissao[1]}/${ano}`
+}
+
+export function checkDateWarranty(emissao) {
+  emissao = emissao.split('/',3)
+  var ano = emissao[2]
+  ano = parseInt(ano) + 1
+
+  var warranty = new Date(`${ano}-${emissao[1]}-${emissao[0]}`)
+  warranty.setDate(warranty.getDate()+1)
+  warranty = warranty.setHours(0,0,0,0)
+
+  const dateNow = new Date().setHours(0,0,0,0)  
+
+  return warranty >= dateNow
+}

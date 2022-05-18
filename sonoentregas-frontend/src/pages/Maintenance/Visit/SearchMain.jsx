@@ -4,6 +4,7 @@ import '../style.css'
 
 import Modal from '../../../components/Modal'
 import ModalSchedule from "./ModalSchedule"
+import ReportMaint from "./ReportMaint"
 
 import { useMaintenance } from '../../../context/mainContext'
 import { useModalAlert } from '../../../context/modalAlertContext'
@@ -13,12 +14,15 @@ import { dateSqlToReact, getDateToSql } from '../../../functions/getDate'
 
 export default function SearchMain({ setVisit }){
   const [ openModalSch, setOpenModalSch ] = useState(false)
+  const [ openModalReport, setOpenModalReport ] = useState(false)
   const [ maintSelect, setMaintSelect ] = useState({})
+
   const [ search, setSearch ] = useState('')
   const [ typeSeach, setTypeSeach ] = useState('STATUS')
   const [ typesStatus, setTypesStatus ] = useState('open')
-  const { maintenance, setMaintenance } = useMaintenance()
   const {  setAlert } = useModalAlert()
+
+  const { maintenance, setMaintenance } = useMaintenance()
 
   const searchSales = async () => {
     try {
@@ -60,6 +64,13 @@ export default function SearchMain({ setVisit }){
       !error.response
         ? setAlert('Red')
         : setAlert('Servidor')
+    }
+  }
+
+  const clickRowMaint = (e, maint) => {
+    if(e.target.className !== 'btnActionVisit'){
+      setOpenModalReport(true)
+      setMaintSelect(maint)
     }
   }
 
@@ -145,7 +156,11 @@ export default function SearchMain({ setVisit }){
           </thead>
           <tbody>
           {maintenance.map( maint => (
-            <tr key={maint.ID}>
+            <tr
+              key={maint.ID}
+              onClick={e => clickRowMaint(e, maint)}
+              style={{}}
+            >
               <td>{maint.ID}</td>
               <td>{maint.ID_SALE}</td>
               <td>{maint.DESC_ABREV}</td>
@@ -198,5 +213,11 @@ export default function SearchMain({ setVisit }){
     <Modal openModal={openModalSch} setOpenModal={setOpenModalSch}>
       <ModalSchedule maintSelect={maintSelect} setOpenModalSch={setOpenModalSch}/>
     </Modal>
+
+    <ReportMaint
+      maint={maintSelect}
+      openModal={openModalReport}
+      setOpenModal={setOpenModalReport}
+      />
   </React.Fragment>)
 }

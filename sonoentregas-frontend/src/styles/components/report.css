@@ -1,0 +1,31 @@
+.modalReport {
+  background-color: var(--gray-bold);
+  padding: 20px;
+}
+
+.headerReport {
+  position: fixed;
+  background-color: var(--gray-line);
+  width: 800px;
+  margin: -20px;
+  padding: 0.2rem 0.5rem;
+}
+
+.headerReport button {
+  background-color: transparent;
+  border: none;
+  margin-left: 15px;
+  transition: all 0.5s;
+  border-radius: 3px;
+}
+.headerReport button:hover {
+  background-color: var(--gray-bold);
+}
+
+#report {
+  background-color: var(--white);
+  padding: 15px;
+  margin-top: 20px;
+  width: 744px; /* 248 is 10% the a4 (3*10%) */
+  height: 1052.4px; /* 350,8 is 10% the a4 (3*10%) */
+}

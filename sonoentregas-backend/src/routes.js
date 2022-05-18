@@ -18,6 +18,7 @@ const maintDelivController = require('./controllers/maintDelivController')
 const mainVisitController = require('./controllers/mainVisitController')
 const feedStockController = require('./controllers/feedStockController')
 const devController = require('./controllers/devController')
+const catDefController = require('./controllers/catDefController')
 
 //Routes
 //Conections
@@ -77,6 +78,8 @@ routes.put('/maintvisit/finish/:id', mainVisitController.finishVisit)
 // FeedStock
 routes.get('/feedstock', feedStockController.index)
 routes.get('/feedstock/:id', feedStockController.find)
+// Category Def
+routes.get('/catdef', catDefController.index)
 //Developer 
 routes.get('/dev/:table', devController.getTable)
 

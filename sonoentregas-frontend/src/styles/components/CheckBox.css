@@ -1,0 +1,16 @@
+.boxCheck {
+  width: 16px;
+  height: 16px;
+  border: 1px solid black;
+  border-radius: 2px;
+  padding: 0 !important;
+}
+
+.boxCheck div {
+  width: 8px;
+  height: 10px;
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+  transform: rotate(30deg);
+  margin-left: 3px;
+}
