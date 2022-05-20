@@ -1,7 +1,7 @@
 USE [SONOENTREGAS]
 GO
 
-/****** Object:  Table [dbo].[MAINTENANCE]    Script Date: 05/17/2022 12:04:56 ******/
+/****** Object:  Table [dbo].[MAINTENANCE]    Script Date: 05/20/2022 07:26:19 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -21,12 +21,12 @@ CREATE TABLE [dbo].[MAINTENANCE](
 	[STATUS] [varchar](15) NOT NULL,
 	[WARRANTY] [bit] NOT NULL,
 	[ID_CAT_DEF] [float] NOT NULL,
-	[OUTHER_DEF] [varchar](80) NULL,
 	[OBS] [varchar](250) NOT NULL,
 	[D_ENVIO] [datetime] NOT NULL,
 	[D_PREV] [datetime] NOT NULL,
 	[D_FINISH] [datetime] NULL,
 	[ID_USER] [float] NOT NULL,
+	[OUTHER_DEF] [varchar](80) NULL,
  CONSTRAINT [PK_MAINTENANCE] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC
@@ -40,5 +40,3 @@ GO
 
 ALTER TABLE [dbo].[MAINTENANCE] ADD  DEFAULT ((1)) FOR [ID_USER]
 GO
-
-

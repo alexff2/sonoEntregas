@@ -1,7 +1,7 @@
 USE [SONOENTREGAS]
 GO
 
-/****** Object:  View [dbo].[VIEW_MAINT_DELIV]    Script Date: 05/13/2022 16:55:08 ******/
+/****** Object:  View [dbo].[VIEW_MAINT_DELIV]    Script Date: 05/20/2022 07:33:21 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -15,6 +15,5 @@ FROM MAINTENANCE_DELIV A
 INNER JOIN USERS B ON A.ID_DRIVER = B.ID
 INNER JOIN USERS C ON A.ID_ASSISTANT = C.ID
 
+
 GO
-
-

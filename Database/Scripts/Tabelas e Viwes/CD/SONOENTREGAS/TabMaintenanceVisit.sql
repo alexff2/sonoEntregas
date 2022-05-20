@@ -1,7 +1,7 @@
 USE [SONOENTREGAS]
 GO
 
-/****** Object:  Table [dbo].[MAINTENANCE_VISIT]    Script Date: 05/13/2022 16:54:31 ******/
+/****** Object:  Table [dbo].[MAINTENANCE_VISIT]    Script Date: 05/20/2022 07:27:40 ******/
 SET ANSI_NULLS ON
 GO
 
