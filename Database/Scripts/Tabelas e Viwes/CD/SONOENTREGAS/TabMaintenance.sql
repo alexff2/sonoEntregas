@@ -16,7 +16,7 @@ CREATE TABLE [dbo].[MAINTENANCE](
 	[ID_DELIVERY] [float] NOT NULL,
 	[CODLOJA] [float] NOT NULL,
 	[ID_SALE] [float] NOT NULL,
-	[COD_ORIGINAL] [varchar](20) NOT NULL,
+	[COD_ORIGINAL] [varchar](20) COLLATE SQL_Latin1_General_CP850_CI_AI NOT NULL,
 	[QUANTIDADE] [float] NOT NULL,
 	[STATUS] [varchar](15) NOT NULL,
 	[WARRANTY] [bit] NOT NULL,
