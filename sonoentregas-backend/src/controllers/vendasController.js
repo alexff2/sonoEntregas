@@ -51,7 +51,7 @@ module.exports = {
     try {
       const { loja } = req.params
       
-      const { CODIGOVENDA, CODCLIENTE, NOMECLI, VALORPROD, DESCONTO, TOTALVENDA, EMISSAO, ENDERECO, NUMERO, BAIRRO, CIDADE, ESTADO, PONTOREF, OBS, products, USER_ID, VENDEDOR, FONE, CGC_CPF, INS_RG, FAX, orcParc, O_V , OBS2, HAVE_OBS2} = req.body //
+      const { CODIGOVENDA, CODCLIENTE, NOMECLI, VALORPROD, DESCONTO, TOTALVENDA, EMISSAO, ENDERECO, NUMERO, BAIRRO, CIDADE, ESTADO, PONTOREF, OBS, products, USER_ID, VENDEDOR, FONE, CGC_CPF, INS_RG, FAX, orcParc, O_V , OBS2, HAVE_OBS2} = req.body
 
       const D_ENVIO = getDate()
       const D_ENTREGA1 = setDaysInDate(EMISSAO, 10) //Objetivo do sistema
@@ -61,7 +61,7 @@ module.exports = {
 
       if (saleFind.length === 0) {
         
-        const valuesSales = `${CODIGOVENDA}, ${loja}, ${CODCLIENTE}, '${NOMECLI}', ${VALORPROD}, ${DESCONTO}, ${TOTALVENDA}, '${EMISSAO}', 'Aberta', '${ENDERECO}', '${NUMERO}', '${BAIRRO}', '${CIDADE}', '${ESTADO}', '${PONTOREF}', '${OBS}', NULL, ${USER_ID}, '${D_ENTREGA1}', '${D_ENVIO}', '${VENDEDOR}', '${FONE}', '${CGC_CPF}', '${INS_RG}', '${FAX}', '${O_V}', '${OBS2}', '${HAVE_OBS2}', 0, NULL` //
+        const valuesSales = `${CODIGOVENDA}, ${loja}, ${CODCLIENTE}, '${NOMECLI}', ${VALORPROD}, ${DESCONTO}, ${TOTALVENDA}, '${EMISSAO}', 'Aberta', '${ENDERECO}', '${NUMERO}', '${BAIRRO}', '${CIDADE}', '${ESTADO}', '${PONTOREF}', '${OBS}', NULL, ${USER_ID}, '${D_ENTREGA1}', '${D_ENVIO}', '${VENDEDOR}', '${FONE}', '${CGC_CPF}', '${INS_RG}', '${FAX}', '${O_V}', '${OBS2}', '${HAVE_OBS2}', 0, NULL`
   
         await Sales.creator(0, valuesSales)
   
@@ -74,30 +74,32 @@ module.exports = {
         }
   
         for (let i = 0; i < products.length; i++) {
-          const { NUMVENDA, CODPRODUTO, ALTERNATI, DESCRICAO, QUANTIDADE, UNITARIO1,NPDESC, NVTOTAL } = products[i]
-  
-          var valueProd = `${NUMVENDA}, ${loja}, ${CODPRODUTO}, '${ALTERNATI}', '${DESCRICAO}', ${QUANTIDADE}, ${UNITARIO1}, ${NPDESC}, ${NVTOTAL}, 'Enviado', ${DOWN_EST}`
-  
+          const { NUMVENDA, CODPRODUTO, ALTERNATI, DESCRICAO, QUANTIDADE, UNITARIO1,NPDESC, NVTOTAL, gift  } = products[i]
+
+          const GIFT = gift ? 1 : 0
+
+          var valueProd = `${NUMVENDA}, ${loja}, ${CODPRODUTO}, '${ALTERNATI}', '${DESCRICAO}', ${QUANTIDADE}, ${UNITARIO1}, ${NPDESC}, ${NVTOTAL}, 'Enviado', ${DOWN_EST}, ${GIFT}`
+
           await SalesProd.creator(0, valueProd, true)
-  
+
           if (O_V === '2') {
             await Sales._query(loja, `UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL + ${QUANTIDADE}, EST_LOJA = EST_LOJA + ${QUANTIDADE} WHERE CODIGO = ${CODPRODUTO} AND CODLOJA = 1`)
           }
-  
+
           await Sales._query(loja, `UPDATE NVENDI2 SET STATUS = 'Enviado' WHERE NUMVENDA = ${CODIGOVENDA} AND CODPRODUTO = ${CODPRODUTO}`)
         }
       } else {
         for (let i = 0; i < products.length; i++) {
           const { NUMVENDA, CODPRODUTO, ALTERNATI, DESCRICAO, QUANTIDADE, UNITARIO1,NPDESC, NVTOTAL } = products[i]
-  
+
           var valueProd = `${NUMVENDA}, ${loja}, ${CODPRODUTO}, '${ALTERNATI}', '${DESCRICAO}', ${QUANTIDADE}, ${UNITARIO1}, ${NPDESC}, ${NVTOTAL}, 'Enviado', ${DOWN_EST}`
-  
+
           await SalesProd.creator(0, valueProd, true)
-  
+
           if (O_V === '2') {
             await Sales._query(loja, `UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL + ${QUANTIDADE}, EST_LOJA = EST_LOJA + ${QUANTIDADE} WHERE CODIGO = ${CODPRODUTO} AND CODLOJA = 1`)
           }
-  
+
           await Sales._query(loja, `UPDATE NVENDI2 SET STATUS = 'Enviado' WHERE NUMVENDA = ${CODIGOVENDA} AND CODPRODUTO = ${CODPRODUTO}`)
         }
       }

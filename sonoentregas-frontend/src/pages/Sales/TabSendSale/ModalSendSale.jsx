@@ -6,16 +6,29 @@ import { validateObs } from '../../../functions/validateFields'
 
 import { useModalAlert } from '../../../context/modalAlertContext'
 
-function SetEstoque({ product, putProduct }) {
+function SetEstoque({ product, putProduct, sendProduct }) {
   const [ productCd, setProductCd ] = useState()
   const [ inputQtd, setInputQtd ] = useState(false)
+  const [ disable, setDisable ] = useState(true)
 
   useEffect(() => {
     api
       .get(`products/COD_ORIGINAL/${product.ALTERNATI}`)
       .then( resp => setProductCd(resp.data[0]))
   },[product])
-  
+
+  const setGift = () => {
+    sendProduct.forEach( prod => {
+      prod.codproduto === product.codproduto && (sendProduct.gift = true)
+    })
+  }
+
+  const changeSendProd = e => {
+    putProduct(e, product)
+    setInputQtd(!inputQtd)
+    setDisable(!disable)
+  }
+
   return (
   <>
     {productCd ? 
@@ -35,11 +48,16 @@ function SetEstoque({ product, putProduct }) {
         </td>
         <td>
           {!product.STATUS &&
-            <input type="checkbox" 
-              onChange={(e) =>{
-                putProduct(e, product)
-                setInputQtd(!inputQtd)
-              }}
+            <input
+              type="checkbox"
+              style={{marginRight: '3.8rem'}}
+              onChange={ e => changeSendProd(e)}
+            />
+          }{!product.STATUS &&
+            <input
+              type="checkbox" 
+              onChange={() => setGift()}
+              disabled={disable}
             />
           }
         </td>
@@ -86,6 +104,7 @@ export default function ModalSendSale({
   },[ cod, item, setChildrenError, setOpenAlert, setType ])
 
   const putProduct = (e, product) => {
+    product['gift'] =  false
     if(e.target.checked){
       setSendProduct([...sendProduct, product])
     } else {
@@ -175,7 +194,7 @@ export default function ModalSendSale({
                 <th>Estoque</th>
                 <th>Disponível</th>
                 <th>Qtd</th>
-                <th></th>
+                <th>Enviar? / Brinde?</th>
                 <th>Satus</th>
               </tr>
             </thead>
@@ -193,6 +212,7 @@ export default function ModalSendSale({
                 <SetEstoque
                   product={product}
                   putProduct={putProduct}
+                  sendProduct={sendProduct}
                 />
                 <td>{
                   !product.STATUS
