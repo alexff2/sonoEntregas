@@ -17,6 +17,7 @@ const mainController = require('./controllers/mainController')
 const maintDelivController = require('./controllers/maintDelivController')
 const mainVisitController = require('./controllers/mainVisitController')
 const feedStockController = require('./controllers/feedStockController')
+const productsController = require('./controllers/productsController')
 const devController = require('./controllers/devController')
 const catDefController = require('./controllers/catDefController')
 
@@ -31,9 +32,9 @@ routes.post('/users', usersController.create)
 routes.put('/users/:userId', usersController.update)
 routes.delete('/users/:userId', usersController.delete)
 routes.get('/users', loginController.transformPasswordUser)
-//Produtos SCE CD
-routes.get('/products/:typesearch/:search', produtosController.index)
-//Vendas SCE
+//Products SCE CD
+routes.get('/productscd/:typesearch/:search', produtosController.index)
+//Sales SCE
 routes.get('/:loja/:emissao/vendas', vendasController.vendasSce)
 routes.get('/:loja/vendas/:numvenda', vendasController.vendasSceProd)
 routes.post('/:loja/vendas/submit', vendasController.submitSale)
@@ -77,7 +78,16 @@ routes.put('/maintvisit/start/:id', mainVisitController.startVisit)
 routes.put('/maintvisit/finish/:id', mainVisitController.finishVisit)
 // FeedStock
 routes.get('/feedstock', feedStockController.index)
+routes.get('/fdund', feedStockController.findUnd)
+routes.get('/feedstock/:typeSearch/:search', feedStockController.searchFd)
 routes.get('/feedstock/:id', feedStockController.find)
+routes.post('/feedstock', feedStockController.create)
+// Product
+routes.get('/products', productsController.index)
+routes.get('/products/:typeSearch/:search', productsController.searchProd)
+routes.get('/products/create/feedstock/:id', productsController.searchFeedToCreate)
+routes.get('/products/:id', productsController.find)
+routes.post('/products', productsController.create)
 // Category Def
 routes.get('/catdef', catDefController.index)
 //Developer 

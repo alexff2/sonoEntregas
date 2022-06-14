@@ -6,9 +6,11 @@ const app = express()
 
 const routes = require('./routes')
 
+const port = 8081
+
 app
   .use(cors())
   .use(express.json())
   .use('/imgs', express.static(path.resolve(__dirname, 'imgs')))
   .use(routes)
-  .listen(8081, () => console.log('Servidor rodando na porta 8081'))
+  .listen(port, () => console.log('Servidor rodando na porta '+port))

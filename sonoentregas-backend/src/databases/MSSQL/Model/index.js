@@ -55,50 +55,68 @@ class Model {
     //Buscando ultimo ID lançado na tabela se não fornecido
     if (!id) {
       const lastId = await this.findAll(loja, `MAX(ID) AS 'ID'`)
-      
+
       const ID = lastId[0].ID ? lastId[0].ID + 1 : 1
-      
+
       const script = `INSERT INTO ${this.tab} (${this.coluns}) VALUES (${ID}, ${values})`
-      
+
       await this._query(loja, script, QueryTypes.INSERT)
-      
+
       const data = await this.findSome(loja, `ID = ${ID}`)
-  
+
       return data[0]
     } else {
       const script = `INSERT INTO ${this.tab} (${this.coluns}) VALUES (${values})`
-      
+
       await this._query(loja, script, QueryTypes.INSERT)
     }
   }
-  async creatorAny(loja, values, id = false) {
-    var column, value, script
 
-    Object.entries(values).forEach(([k,v], i) =>{
-      if(i === 0){
-        column = k
-        value = `'${v}'`
-      } else {
-        column+= `, ${k}`
-        value+= `, '${v}'`
-      }
+  setCreateValues(values, id=false){
+    var column, value
+    values.forEach((val, index) => {
+      index === 0
+        ? value ='('
+        : value+= ',('
+
+      id !== false && (value += `${id + index}, `)
+
+      Object.entries(val).forEach(([k,v], i) =>{
+        if(i === 0){
+          index === 0 && (column = k)
+          value += `'${v}'`
+        } else {
+          index === 0 && (column+= `, ${k}`)
+          value+= `, '${v}'`
+        }  
+      })  
+
+      value+= ')'
     })
+    return { column, value }
+  }
+
+  async creatorAny(loja, values, id = false) {
+    var script, ID
 
     if (!id) {
       //Seach first ID in table
       const lastId = await this.findAll(loja, `MAX(ID) AS 'ID'`)
-      
-      const ID = lastId[0].ID ? lastId[0].ID + 1 : 1
 
-      script = `INSERT INTO ${this.tab} (ID, ${column}) VALUES (${ID}, ${value})`
+      ID = lastId[0].ID ? lastId[0].ID + 1 : 1
+
+      const { column, value } = this.setCreateValues(values, ID)
+
+      script = `INSERT INTO ${this.tab} (ID, ${column}) VALUES ${value}`
+
     } else {
-      script = `INSERT INTO ${this.tab} (${column}) VALUES (${value})`
+      const { column, value } = this.setCreateValues(values)
+      
+      script = `INSERT INTO ${this.tab} (${column}) VALUES ${value}`
     }
     await this._query(loja, script, QueryTypes.INSERT)
 
-    const data = await this.findAny(loja, values)
-
-    return data[0]
+    return ID
   }
   async creatorNotReturn(loja, values, id = false) {
     //Buscando ultimo ID lançado na tabela se não fornecido
