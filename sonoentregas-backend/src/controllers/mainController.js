@@ -62,14 +62,14 @@ module.exports = {
       var { ID_DELIVERY, CODLOJA, ID_SALES, COD_ORIGINAL, WARRANTY, DEFECT, OUTHER_DEF, OBS, QUANTIDADE, ID_USER } = req.body
   
       const D_ENVIO = getDate()
-      const D_PREV = setDaysInDate(D_ENVIO, 10) //Objetivo do sistema
+      const D_PREV = setDaysInDate(D_ENVIO, 17) //Objetivo do sistema
       WARRANTY = WARRANTY ? 1 : 0
 
       const values = { ID_DELIVERY, CODLOJA, ID_SALE: ID_SALES, COD_ORIGINAL, QUANTIDADE, STATUS: 'Aguardando', WARRANTY, ID_CAT_DEF: DEFECT, OBS, D_ENVIO, D_PREV, ID_USER, OUTHER_DEF }
 
       OUTHER_DEF === 'NULL' && delete values.OUTHER_DEF
   
-      await Maintenance.creatorAny(0, values)
+      await Maintenance.creatorAny(0, [values])
   
       const maint = await ViewMaintenance.findSome(0, `STATUS <> 'Finalizada'`)
       return res.json(maint)
