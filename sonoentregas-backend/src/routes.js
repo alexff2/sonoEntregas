@@ -17,7 +17,8 @@ const mainController = require('./controllers/mainController')
 const maintDelivController = require('./controllers/maintDelivController')
 const mainVisitController = require('./controllers/mainVisitController')
 const feedStockController = require('./controllers/feedStockController')
-const productsController = require('./controllers/productsController')
+const subProdController = require('./controllers/subProdController')
+const bedsController = require('./controllers/bedsController')
 const devController = require('./controllers/devController')
 const catDefController = require('./controllers/catDefController')
 
@@ -82,12 +83,12 @@ routes.get('/fdund', feedStockController.findUnd)
 routes.get('/feedstock/:typeSearch/:search', feedStockController.searchFd)
 routes.get('/feedstock/:id', feedStockController.find)
 routes.post('/feedstock', feedStockController.create)
-// Product
-routes.get('/products', productsController.index)
-routes.get('/products/:typeSearch/:search', productsController.searchProd)
-routes.get('/products/create/feedstock/:id', productsController.searchFeedToCreate)
-routes.get('/products/:id', productsController.find)
-routes.post('/products', productsController.create)
+// Beds
+routes.get('/beds', bedsController.index)
+routes.get('/beds/:typeSearch/:search', bedsController.searchProd)
+routes.get('/beds/create/feedstock/:id', bedsController.searchFeedToCreate)
+routes.get('/beds/:id', bedsController.find)
+routes.post('/beds', bedsController.create)
 // Category Def
 routes.get('/catdef', catDefController.index)
 //Developer 

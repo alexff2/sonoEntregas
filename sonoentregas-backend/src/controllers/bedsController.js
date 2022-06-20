@@ -1,9 +1,9 @@
 //@ts-check
-const ProductsService = require('../services/ProductsService')
-const Products = require('../models/tables/Product')
-const ProdFeedStock = require('../models/tables/ProdFeedStock')
+const BedsService = require('../services/BedService')
+const Beds = require('../models/tables/Bed')
+const BedFeedStock = require('../models/tables/BedFeedStock')
 const FeedStock = require('../models/tables/FeedStock')
-const ViewProdFeed = require('../models/views/ViewProdFeed')
+const ViewBedFeed = require('../models/views/ViewBedFeed')
 
 module.exports = {
 	/**
@@ -13,9 +13,9 @@ module.exports = {
 	 */
 	async index(req, res){
 		try {
-			const Prod = await ProductsService.findProd()
+			const beds = await BedsService.findBed()
 			
-			return res.json(Prod)
+			return res.json(beds)
 		} catch (error) {
 			console.log(error)
 		}
@@ -28,9 +28,9 @@ module.exports = {
 		try {
 			const { id } = req.params
 	
-			const Prod = await Products.findSome(0, `ID = ${id}`)
+			const Prod = await Beds.findSome(0, `ID = ${id}`)
 
-      const prodFeed = await ViewProdFeed.findAny(0, {ID: Prod[0].ID})
+      const prodFeed = await ViewBedFeed.findAny(0, {ID: Prod[0].ID})
 
       if (Prod.length > 0) {
         Prod.forEach((/** @type {{ [x: string]: string; }} */ el) => {
@@ -60,7 +60,7 @@ module.exports = {
 
       const prodsFeedCreat = []
       
-      const prodId = await Products.creatorAny(0, [{
+      const prodId = await Beds.creatorAny(0, [{
         description,
         expense,
         value: valueProd
@@ -73,7 +73,7 @@ module.exports = {
         })
       })
 
-      await ProdFeedStock.creatorAny(0, prodsFeedCreat, true)
+      await BedFeedStock.creatorAny(0, prodsFeedCreat, true)
 
 			return res.status(201).json({msg: 'Cadastrado com sucesso!'})
 		} catch (error) {
@@ -90,7 +90,7 @@ module.exports = {
     console.log('teste')
 
     try {
-      const prod = await Products.findSome(0, `${typeSearch} LIKE '${search}%'`)
+      const prod = await Beds.findSome(0, `${typeSearch} LIKE '${search}%'`)
 
       return res.status(202).json(prod)
     } catch (error) {
