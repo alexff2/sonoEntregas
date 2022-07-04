@@ -2,7 +2,7 @@ const Model = require('../../databases/MSSQL/Model')
 
 class ViewFD extends Model {
   constructor(){
-    super('UND_FEEDSTOCK', '*')
+    super('VIEW_UND_FEED', '*')
   }
 }
 

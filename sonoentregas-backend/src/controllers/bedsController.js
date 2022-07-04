@@ -97,22 +97,5 @@ module.exports = {
       console.log(error)
       return res.status(400).json('Erro ao buscar produto')
     }
-	},
-	/**
-	 * @param {*} req 
-	 * @param {*} res 
-	 */
-	async searchFeedToCreate(req, res){
-		const { id } = req.params
-
-    try {
-      const prod = await FeedStock.findAny(0, { id })
-      prod[0]['ID_FEED'] = prod[0].ID
-
-      return res.status(202).json(prod)
-    } catch (error) {
-      console.log(error)
-      return res.status(400).json('Erro ao buscar produto')
-    }
 	}
 }

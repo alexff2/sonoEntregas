@@ -1,17 +1,6 @@
 //@ts-check
-const { QueryTypes } = require('sequelize')
 const ConfigBeds = require('../models/tables/ConfigBeds')
-
-/**
- * @typedef {Object} Configs
- * @property {number} ID
- * @property {string} NAME
- * @property {ConfigsBed[]} descs
- * 
- * @typedef {Object} ConfigsBed
- * @property {number} ID
- * @property {string} DESCRIPTION
- */
+const configBedServices = require('../services/configBedService')
 
 module.exports = {
 	/**
@@ -20,17 +9,7 @@ module.exports = {
 	 */
 	async index(req, res){
 		try {
-			const configs = await ConfigBeds._query(0,'SELECT ID, NAME FROM CONFIG_BED GROUP BY ID, NAME', QueryTypes.SELECT)
-			
-			const configBeds = await ConfigBeds.findAny(0, {}, 'ID, DESCRIPTION')
-			
-			//console.log(configBeds)
-			configs.forEach((/** @type {Configs} */ config) => {
-				config.descs = []
-				configBeds.forEach((/**@type {ConfigsBed} */ configBed) => {
-					config.ID === configBed.ID && config.descs.push(configBed)
-				})
-			})
+			const configs = await configBedServices.findConfigBed()
 	
 			return res.json(configs)
 		} catch (error) {
@@ -43,11 +22,30 @@ module.exports = {
 	 */
 	async create(req, res){
 		try {
-			const { description } = req.body
+			const configBad = req.body
 
-			//const configBeds = await ConfigBeds.creatorAny(0, {})
+			await configBedServices.createConfigBed(configBad)
 
-			return res.json({ ID: 1, DESCRIPTION: description})
+			const configs = await configBedServices.findConfigBed()
+
+			return res.json(configs)
+		} catch (error) {
+			console.log(error)
+		}
+	},
+	/**
+	 * @param {*} req 
+	 * @param {*} res 
+	 */
+	async inactivate(req, res) {
+		try {
+			const { ID } = req.body
+
+			await ConfigBeds.updateAny(0, { ACTIVE: 0 }, { ID })
+
+			const configs = await configBedServices.findConfigBed()
+	
+			return res.json(configs)
 		} catch (error) {
 			console.log(error)
 		}

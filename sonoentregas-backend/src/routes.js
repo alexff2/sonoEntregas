@@ -79,19 +79,19 @@ routes.put('/maintvisit/start/:id', mainVisitController.startVisit)
 routes.put('/maintvisit/finish/:id', mainVisitController.finishVisit)
 // FeedStock
 routes.get('/feedstock', feedStockController.index)
-routes.get('/fdund', feedStockController.findUnd)
-routes.get('/feedstock/:typeSearch/:search', feedStockController.searchFd)
 routes.get('/feedstock/:id', feedStockController.find)
+routes.get('/feedstock/:typeSearch/:search', feedStockController.searchFeed)
 routes.post('/feedstock', feedStockController.create)
+routes.get('/fdund', feedStockController.findUnd)
 // Beds
 routes.get('/beds', bedsController.index)
-routes.get('/beds/:typeSearch/:search', bedsController.searchProd)
-routes.get('/beds/create/feedstock/:id', bedsController.searchFeedToCreate)
 routes.get('/beds/:id', bedsController.find)
+routes.get('/beds/:typeSearch/:search', bedsController.searchProd)
 routes.post('/beds', bedsController.create)
 //Config Beds
 routes.get('/configbeds', configBedsController.index)
 routes.post('/configbeds', configBedsController.create)
+routes.put('/configbeds', configBedsController.inactivate)
 
 // Category Def
 routes.get('/catdef', catDefController.index)

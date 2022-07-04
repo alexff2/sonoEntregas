@@ -73,18 +73,18 @@ module.exports = {
 	 * @param {*} req 
 	 * @param {*} res 
 	 */
-	async findUnd(req, res){
-		return res.json( await ViewFdUnd.findAll(0))
-	},
-	/**
-	 * @param {*} req 
-	 * @param {*} res 
-	 */
-	async searchFd(req, res){
+	async searchFeed(req, res){
 		const { typeSearch, search } = req.params
 
 		const feed = await FeedStock.findSome(0, `${typeSearch} LIKE '${search}%'`)
 
 		return res.status(202).json(feed)
+	},
+	/**
+	 * @param {*} req 
+	 * @param {*} res 
+	 */
+	async findUnd(req, res){
+		return res.json( await ViewFdUnd.findAll(0))
 	}
 }
