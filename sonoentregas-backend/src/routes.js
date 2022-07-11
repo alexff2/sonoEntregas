@@ -19,6 +19,7 @@ const mainVisitController = require('./controllers/mainVisitController')
 const feedStockController = require('./controllers/feedStockController')
 const bedsController = require('./controllers/bedsController')
 const configBedsController = require('./controllers/configBedController')
+const sizesController = require('./controllers/sizesController')
 const devController = require('./controllers/devController')
 const catDefController = require('./controllers/catDefController')
 
@@ -92,7 +93,11 @@ routes.post('/beds', bedsController.create)
 routes.get('/configbeds', configBedsController.index)
 routes.post('/configbeds', configBedsController.create)
 routes.put('/configbeds', configBedsController.inactivate)
-
+//Config Size Beds
+routes.get('/sizes', sizesController.index)
+routes.get('/sizes/:find', sizesController.find)
+routes.post('/sizes', sizesController.create)
+routes.put('/sizes', sizesController.inactivate)
 // Category Def
 routes.get('/catdef', catDefController.index)
 //Developer 
