@@ -143,7 +143,7 @@ export default function TabSaleSeach({ openMOdalAlert, setChildrenAlertModal }) 
 
   const cancelSubmitSales = async produto => {
     try {
-      const {data} = await api.post(`vendas`, produto)
+      const {data} = await api.post(`salesshop`, produto)
 
       const { data: DataSales } = await api.get(`sales/STATUS/Aberta/null/${Codloja}`)
       setSales(DataSales)
@@ -159,7 +159,7 @@ export default function TabSaleSeach({ openMOdalAlert, setChildrenAlertModal }) 
 
   const reverseStock = async produto => {
     try {
-      const {data} = await api.post(`vendas/reverse`, produto)
+      const {data} = await api.post(`salesshop/reverse`, produto)
 
       const { data: DataSales } = await api.get(`sales/STATUS/Aberta/null/${Codloja}`)
       setSales(DataSales)

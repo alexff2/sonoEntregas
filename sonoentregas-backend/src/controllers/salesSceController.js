@@ -1,6 +1,28 @@
 // @ts-check
+
+/**
+ * @typedef {Object} ProductSceCd
+ * @property {string} COD_ORIGINAL
+ * @property {string} NOME
+ * @property {number} EST_ATUAL
+ * @property {number} EST_RESERVA
+ * @property {number} EST_DISPONIVEL
+ * 
+ * @typedef {Object} ProductSceShop
+ * @property {number} NUMVENDA
+ * @property {number} CODPRODUTO
+ * @property {string} ALTERNATI
+ * @property {string} DESCRICAO
+ * @property {number} QUANTIDADE
+ * @property {number} UNITARIO1
+ * @property {number} NPDESC
+ * @property {boolean} GIFT
+ * @property {number} NVTOTAL
+ */
+
 const ViewVendas = require('../models/ViewVendas')
-const ProdVenda = require('../models/ProdVenda')
+const ProductsSceShop = require('../models/ProdVenda')
+const ProductsSceCd = require('../models/ViewProdutos')
 const Sales = require('../models/Sales')
 const SalesProd = require('../models/SalesProd')
 const OrcParc = require('../models/OrcParc')
@@ -14,7 +36,7 @@ module.exports = {
    * @param {*} res 
    * @returns 
    */
-  async vendasSce(req, res) {
+  async salesSce(req, res) {
     try {
       const { loja, emissao } = req.params
 
@@ -30,14 +52,55 @@ module.exports = {
    * @param {*} res 
    * @returns 
    */
-  async vendasSceProd(req, res){
+  async salesSceProd(req, res){
     try {
-      const { loja, numvenda } = req.params
-  
-      const products = await ProdVenda.findSome(loja, `NUMVENDA = ${numvenda}`)
-      const orcparc = await ViewOrcParcLoja.findSome(loja, `TITULO = ${numvenda}`)
-  
-      return res.json({ products, orcparc })
+      const { loja, numSale } = req.params
+
+      /** @type { [ProductSceShop] } */
+      const productsSceShop = await ProductsSceShop.find({
+        loja,
+        where: {
+          NUMVENDA: numSale
+        }
+      })
+
+      const codOrigProductsSceShop = []
+
+      productsSceShop.forEach( product => {
+        product['SEND'] = false
+
+        product.ALTERNATI !== '' && codOrigProductsSceShop.push(product.ALTERNATI)
+      })
+
+      /** @type { [ProductSceCd] } */
+      const productsSceCd = await ProductsSceCd.find({
+        loja: 1,
+        where: {
+          in: {
+            COD_ORIGINAL: codOrigProductsSceShop
+          }
+        }
+      })
+
+      productsSceShop.forEach( prodSceShop => {
+        prodSceShop['CD'] = false
+        productsSceCd.forEach(prodSceCd => {
+          if (prodSceShop.ALTERNATI === prodSceCd.COD_ORIGINAL ) {
+            prodSceShop['CD'] = prodSceCd
+          }
+        })
+      })
+
+      console.log(productsSceShop)
+
+      const orcparc = await ViewOrcParcLoja.find({
+        loja,
+        where: {
+          TITULO: numSale
+        }
+      })
+
+      return res.json({ productsSceShop, orcparc })
     } catch (error) {
       return res.status(400).json(error)
     }
@@ -47,11 +110,11 @@ module.exports = {
    * @param {*} res 
    * @returns 
    */
-  async submitSale( req, res ){
+  async sendSale( req, res ){
     try {
       const { loja } = req.params
       
-      const { CODIGOVENDA, CODCLIENTE, NOMECLI, VALORPROD, DESCONTO, TOTALVENDA, EMISSAO, ENDERECO, NUMERO, BAIRRO, CIDADE, ESTADO, PONTOREF, OBS, products, USER_ID, VENDEDOR, FONE, CGC_CPF, INS_RG, FAX, orcParc, O_V , OBS2, HAVE_OBS2} = req.body
+      const { CODIGOVENDA, CODCLIENTE, NOMECLI, VALORPROD, DESCONTO, TOTALVENDA, EMISSAO, ENDERECO, NUMERO, BAIRRO, CIDADE, ESTADO, PONTOREF, OBS, products, USER_ID, VENDEDOR, FONE, CGC_CPF, INS_RG, FAX, orcParc, O_V , OBS2, HAVE_OBS2 } = req.body
 
       const D_ENVIO = getDate()
       const D_ENTREGA1 = setDaysInDate(EMISSAO, 10) //Objetivo do sistema
@@ -60,25 +123,25 @@ module.exports = {
       const saleFind = await Sales.findSome(0, `ID_SALES = ${CODIGOVENDA} AND CODLOJA = ${loja}`)
 
       if (saleFind.length === 0) {
-        
+
         const valuesSales = `${CODIGOVENDA}, ${loja}, ${CODCLIENTE}, '${NOMECLI}', ${VALORPROD}, ${DESCONTO}, ${TOTALVENDA}, '${EMISSAO}', 'Aberta', '${ENDERECO}', '${NUMERO}', '${BAIRRO}', '${CIDADE}', '${ESTADO}', '${PONTOREF}', '${OBS}', NULL, ${USER_ID}, '${D_ENTREGA1}', '${D_ENVIO}', '${VENDEDOR}', '${FONE}', '${CGC_CPF}', '${INS_RG}', '${FAX}', '${O_V}', '${OBS2}', '${HAVE_OBS2}', 0, NULL`
-  
+
         await Sales.creator(0, valuesSales)
-  
+
         for (let i = 0; i < orcParc.length; i++) {
           const { TITULO, PARCELA, VENCIMENTO, VALOR, FORMPAGTO } = orcParc[i]
   
-          var valuesOrcParc = `${TITULO}, ${loja}, ${PARCELA}, '${VENCIMENTO}', ${VALOR}, '${FORMPAGTO}'`
+          let valuesOrcParc = `${TITULO}, ${loja}, ${PARCELA}, '${VENCIMENTO}', ${VALOR}, '${FORMPAGTO}'`
   
           await OrcParc.creator(0, valuesOrcParc, true)
         }
-  
+
         for (let i = 0; i < products.length; i++) {
-          const { NUMVENDA, CODPRODUTO, ALTERNATI, DESCRICAO, QUANTIDADE, UNITARIO1,NPDESC, NVTOTAL, gift  } = products[i]
+          const { NUMVENDA, CODPRODUTO, ALTERNATI, DESCRICAO, QUANTIDADE, UNITARIO1,NPDESC, NVTOTAL, GIFT  } = products[i]
 
-          const GIFT = gift ? 1 : 0
+          const _GIFT = GIFT ? 1 : 0
 
-          var valueProd = `${NUMVENDA}, ${loja}, ${CODPRODUTO}, '${ALTERNATI}', '${DESCRICAO}', ${QUANTIDADE}, ${UNITARIO1}, ${NPDESC}, ${NVTOTAL}, 'Enviado', ${DOWN_EST}, ${GIFT}`
+          let valueProd = `${NUMVENDA}, ${loja}, ${CODPRODUTO}, '${ALTERNATI}', '${DESCRICAO}', ${QUANTIDADE}, ${UNITARIO1}, ${NPDESC}, ${NVTOTAL}, 'Enviado', ${DOWN_EST}, ${_GIFT}`
 
           await SalesProd.creator(0, valueProd, true)
 
@@ -86,13 +149,13 @@ module.exports = {
             await Sales._query(loja, `UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL + ${QUANTIDADE}, EST_LOJA = EST_LOJA + ${QUANTIDADE} WHERE CODIGO = ${CODPRODUTO} AND CODLOJA = 1`)
           }
 
-          await Sales._query(loja, `UPDATE NVENDI2 SET STATUS = 'Enviado' WHERE NUMVENDA = ${CODIGOVENDA} AND CODPRODUTO = ${CODPRODUTO}`)
+          await Sales._query(loja, `UPDATE NVENDI2 SET STATUS = 'Enviado', GIFT = ${_GIFT} WHERE NUMVENDA = ${CODIGOVENDA} AND CODPRODUTO = ${CODPRODUTO}`)
         }
       } else {
         for (let i = 0; i < products.length; i++) {
           const { NUMVENDA, CODPRODUTO, ALTERNATI, DESCRICAO, QUANTIDADE, UNITARIO1,NPDESC, NVTOTAL } = products[i]
 
-          var valueProd = `${NUMVENDA}, ${loja}, ${CODPRODUTO}, '${ALTERNATI}', '${DESCRICAO}', ${QUANTIDADE}, ${UNITARIO1}, ${NPDESC}, ${NVTOTAL}, 'Enviado', ${DOWN_EST}`
+          let valueProd = `${NUMVENDA}, ${loja}, ${CODPRODUTO}, '${ALTERNATI}', '${DESCRICAO}', ${QUANTIDADE}, ${UNITARIO1}, ${NPDESC}, ${NVTOTAL}, 'Enviado', ${DOWN_EST}`
 
           await SalesProd.creator(0, valueProd, true)
 

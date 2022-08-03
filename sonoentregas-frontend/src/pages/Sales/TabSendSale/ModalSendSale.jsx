@@ -6,67 +6,57 @@ import { validateObs } from '../../../functions/validateFields'
 
 import { useModalAlert } from '../../../context/modalAlertContext'
 
-function SetEstoque({ product, putProduct, sendProduct }) {
-  const [ productCd, setProductCd ] = useState()
-  const [ inputQtd, setInputQtd ] = useState(false)
-  const [ disable, setDisable ] = useState(true)
+function SetEstoque({ product }) {
+  const [ disabled, setDisabled ] = useState(true)
 
-  useEffect(() => {
-    api
-      .get(`products/COD_ORIGINAL/${product.ALTERNATI}`)
-      .then( resp => setProductCd(resp.data[0]))
-  },[product])
-
-  const setGift = () => {
-    sendProduct.forEach( prod => {
-      prod.codproduto === product.codproduto && (sendProduct.gift = true)
-    })
-  }
-
-  const changeSendProd = e => {
-    putProduct(e, product)
-    setInputQtd(!inputQtd)
-    setDisable(!disable)
+  const changeSendProduct = () => {
+    setDisabled(!disabled)
+    product.SEND = !product.SEND
   }
 
   return (
   <>
-    {productCd ? 
-      <>  
-        <td>{productCd.EST_ATUAL}</td>
-        <td>{productCd.EST_DISPONIVEL}</td>
-        <td>
-          <input 
-            type="number" 
-            style={{width: 40}}
-            defaultValue={product.QUANTIDADE}
-            max={product.QUANTIDADE}
-            min={1}
-            onChange={e => product.QUANTIDADE = e.target.value}
-            disabled={inputQtd}
-          />
-        </td>
-        <td>
-          {!product.STATUS &&
-            <input
-              type="checkbox"
-              style={{marginRight: '3.8rem'}}
-              onChange={ e => changeSendProd(e)}
-            />
-          }{!product.STATUS &&
-            <input
-              type="checkbox" 
-              onChange={() => setGift()}
-              disabled={disable}
-            />
-          }
-        </td>
-      </> 
+    {product.CD
+      ? <>  
+          <td>{product.CD.EST_ATUAL}</td>
+          <td>{product.CD.EST_DISPONIVEL}</td>
+          <td>
+            { !product.STATUS
+                ?<input 
+                  type="number" 
+                  style={{width: 40}}
+                  defaultValue={product.QUANTIDADE}
+                  max={product.QUANTIDADE}
+                  min={1}
+                  onChange={e => product.QUANTIDADE = e.target.value}
+                  disabled={!disabled}
+                />
+                : product.QUANTIDADE
+            }
+          </td>
+          <td>
+            {!product.STATUS &&
+              <input
+                type="checkbox"
+                style={{marginRight: '3.8rem'}}
+                onChange={ changeSendProduct }
+              />
+            }{!product.STATUS
+                ? <input
+                    type="checkbox" 
+                    onChange={() => product.GIFT = !product.GIFT}
+                    disabled={disabled}
+                  />
+                : <div style={{color: 'orange'}}>
+                  {product.GIFT ? 'Brinde' : ''}
+                </div>
+            }
+          </td>
+        </> 
       : <>
           <td>{product.QUANTIDADE}</td>
           <td colSpan="3">Produto não encontrado</td>
-        </>
-    }
+        </>}
   </>
   )
 }
@@ -79,7 +69,6 @@ export default function ModalSendSale({
  }){
   const [ orcParc, setOrcParc ] = useState([])
   const [ productSales, setProductSales ] = useState([])
-  const [ sendProduct, setSendProduct ] = useState([])
   const [ openObs, setOpenObs ] = useState(false)
   const [ obs, setObs ] = useState('')
   const { setOpen: setOpenAlert, setChildrenError, setType } = useModalAlert()
@@ -89,12 +78,14 @@ export default function ModalSendSale({
   
 
   useEffect(()=>{
-    api.get(`${cod}/vendas/${item.CODIGOVENDA}`)
+    api.get(`salesshop/products/${item.CODIGOVENDA}/${cod}`)
       .then( resp => {
-        setProductSales(resp.data.products)
-        console.log(item)
+        setProductSales(resp.data.productsSceShop)
+        console.log(resp.data.productsSceShop)
+
         setOrcParc(resp.data.orcparc)
       })
+
       .catch( err => {
         setChildrenError("Falha ao buscar produtos da venda!")
         setOpenAlert()
@@ -103,16 +94,13 @@ export default function ModalSendSale({
       })
   },[ cod, item, setChildrenError, setOpenAlert, setType ])
 
-  const putProduct = (e, product) => {
-    product['gift'] =  false
-    if(e.target.checked){
-      setSendProduct([...sendProduct, product])
-    } else {
-      setSendProduct(sendProduct.filter(item => item.codproduto !== product.codproduto))
-    }
-  }
-
   const submitSales = async sale => {
+    const sendProduct = []
+
+    productSales.forEach(product => {
+      product.SEND &&sendProduct.push(product)
+    })
+
     try {
       if(sendProduct.length > 0 && validateObs(obs, openObs)) {
         sale["products"] = sendProduct
@@ -121,12 +109,11 @@ export default function ModalSendSale({
         sale.OBS2 = obs
         sale.HAVE_OBS2 = openObs ? 1 : 0
 
-        const { data } = await api.post(`${cod}/vendas/submit`, sale)
+        const { data } = await api.post(`salesshop/${cod}`, sale)
         
         data.create && setEmissao(date)
         
         setModal([])
-        setSendProduct([])
       } else {
         if (sendProduct.length === 0) {
           setChildrenError('Selecione um produto')
@@ -148,8 +135,8 @@ export default function ModalSendSale({
   const closeModal = e => {
     if (e.target.className === 'modal-overlaw' || e.target.className === 'cancel-modal') {
       setModal([])
-      setSendProduct([])
       setOrcParc([])
+      setProductSales([])
     }
   }
 
@@ -172,13 +159,20 @@ export default function ModalSendSale({
                   .NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'})
                   .format(item.TOTALVENDA)
               }</div>
+              
               <div>
                 <div className="divObsCkeck">
-                  <span>Observação?</span><input type="checkbox" onChange={() => setOpenObs(!openObs)}/>
+                  <span>Observação?</span>
+                  <input type="checkbox" onChange={() => setOpenObs(!openObs)}/>
                 </div>
-                { openObs && <textarea cols={60} onChange={e => setObs(e.target.value)}></textarea> }
+                { openObs && <textarea
+                                cols={60}
+                                onChange={e => setObs(e.target.value)}
+                                ></textarea>
+                }
               </div>
             </div>
+
             <div className="sales-buttons">
               <button className="cancel-modal">Cancelar</button>
               <button onClick={() => submitSales(item)}>Enviar</button>
@@ -209,11 +203,7 @@ export default function ModalSendSale({
                     .format(product.NVTOTAL)
                   }
                 </td>
-                <SetEstoque
-                  product={product}
-                  putProduct={putProduct}
-                  sendProduct={sendProduct}
-                />
+                <SetEstoque product={product} />
                 <td>{
                   !product.STATUS
                     ? <div style={{color: 'var(--red)'}}>Pendente</div>

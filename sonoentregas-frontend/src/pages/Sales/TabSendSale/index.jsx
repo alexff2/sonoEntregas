@@ -23,7 +23,7 @@ export default function TabSendSale(){
     document.querySelector('#load-sales').innerHTML = 'Carregando...'
 
     api
-      .get(`${cod}/${emissao}/vendas`)
+      .get(`salesshop/${emissao}/${cod}`)
       .then( resp => {
         setSales(resp.data)
 

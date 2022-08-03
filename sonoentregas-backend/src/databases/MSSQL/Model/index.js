@@ -9,15 +9,33 @@ class Model {
     this.coluns = coluns
   }
 
-  getObj(obj, separate=', '){
-    var values = ''
+  getObj(obj, separate=', ', toCompare){
+    let values = ''
 
-    Object.entries(obj).forEach(([k,v], i, vet) =>{
-      vet.length === i + 1 
-        ? values += `${k} = '${v}'` 
-        : values += `${k} = '${v}'${separate} `
-    })
+    Object.entries(obj).forEach(([key,value], i, vet) => {
+      if (key !== 'in') {
+        let keyvalue = toCompare === '=' ? `${key} = '${value}'` : `${key} LIKE '${value}%'`
   
+        vet.length === i + 1 
+          ? values += keyvalue 
+          : values += `${keyvalue}'${separate} `
+      } else {
+        Object.entries(obj.in).forEach(([keyIn,vetValueIn]) => {
+          let valueIn
+
+          vetValueIn.forEach((el, ind) => {
+            ind === 0
+              ? valueIn = `'${el}'`
+              : valueIn += `, '${el}'`
+          })
+
+          vet.length === i + 1
+            ? values += `${keyIn} IN (${valueIn.toString()})`
+            : values += `${keyIn} IN (${valueIn.toString()})${separate} `
+        })
+      }
+    })
+
     return values
   }
 
@@ -34,8 +52,21 @@ class Model {
 
     return data
   }
+  async find({loja, where = {}, coluns = this.coluns, toCompare = '='}){
+    where = Object.keys(where).length === 0 
+      ? '' 
+      : `WHERE ${this.getObj(where, ' AND ', toCompare)}`
+
+    const script = `SELECT ${coluns} FROM ${this.tab} ${where}`
+
+    const data = await this._query(loja, script, QueryTypes.SELECT)
+
+    return data
+  }
   async findAny(loja, where = {}, coluns = this.coluns){
-    where = Object.keys(where).length === 0 ? '' : `WHERE ${this.getObj(where, ' AND ')}`
+    where = Object.keys(where).length === 0 
+      ? '' 
+      : `WHERE ${this.getObj(where, ' AND ')}`
 
     const script = `SELECT ${coluns} FROM ${this.tab} ${where}`
 
