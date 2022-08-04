@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Box, makeStyles, TextField } from '@material-ui/core'
+import { Box, TextField } from '@material-ui/core'
+import useStyles from './style'
 
 import { ButtonCancel, ButtonSucess } from '../../components/Buttons'
 import ModalAlert from '../../components/ModalAlert'
@@ -9,16 +10,6 @@ import { useCars } from '../../context/carsContext'
 import api from '../../services/api'
 
 import validateFields from '../../functions/validateFields'
-
-const useStyles = makeStyles(() => ({
-  boxfield: {
-    display: 'flex',
-    justifyContent: 'space-between'
-  },
-  field: {
-    width: '49%'
-  }
-}))
 
 function RegisterCars({ 
     selectCar, setValue, setIsDesableFind, setIsDesableRegister, setIsDesableUpdate

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import { makeStyles } from '@material-ui/core/styles'
+import useStyles from './style'
 import { AppBar, Tabs, Tab, Box, } from '@material-ui/core'
 import TableCars from './tableCars'
 import RegisterCars from './registerCars'
@@ -37,13 +37,6 @@ function a11yProps(index) {
     'aria-controls': `simple-tabpanel-${index}`,
   };
 }
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-    backgroundColor: theme.palette.background.paper,
-  }
-}))
 
 export default function SimpleTabs() {
   const classes = useStyles();
