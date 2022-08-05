@@ -135,37 +135,24 @@ module.exports = {
   
           await OrcParc.creator(0, valuesOrcParc, true)
         }
-
-        for (let i = 0; i < products.length; i++) {
-          const { NUMVENDA, CODPRODUTO, ALTERNATI, DESCRICAO, QUANTIDADE, UNITARIO1,NPDESC, NVTOTAL, GIFT  } = products[i]
-
-          const _GIFT = GIFT ? 1 : 0
-
-          let valueProd = `${NUMVENDA}, ${loja}, ${CODPRODUTO}, '${ALTERNATI}', '${DESCRICAO}', ${QUANTIDADE}, ${UNITARIO1}, ${NPDESC}, ${NVTOTAL}, 'Enviado', ${DOWN_EST}, ${_GIFT}`
-
-          await SalesProd.creator(0, valueProd, true)
-
-          if (O_V === '2') {
-            await Sales._query(loja, `UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL + ${QUANTIDADE}, EST_LOJA = EST_LOJA + ${QUANTIDADE} WHERE CODIGO = ${CODPRODUTO} AND CODLOJA = 1`)
-          }
-
-          await Sales._query(loja, `UPDATE NVENDI2 SET STATUS = 'Enviado', GIFT = ${_GIFT} WHERE NUMVENDA = ${CODIGOVENDA} AND CODPRODUTO = ${CODPRODUTO}`)
-        }
-      } else {
-        for (let i = 0; i < products.length; i++) {
-          const { NUMVENDA, CODPRODUTO, ALTERNATI, DESCRICAO, QUANTIDADE, UNITARIO1,NPDESC, NVTOTAL } = products[i]
-
-          let valueProd = `${NUMVENDA}, ${loja}, ${CODPRODUTO}, '${ALTERNATI}', '${DESCRICAO}', ${QUANTIDADE}, ${UNITARIO1}, ${NPDESC}, ${NVTOTAL}, 'Enviado', ${DOWN_EST}`
-
-          await SalesProd.creator(0, valueProd, true)
-
-          if (O_V === '2') {
-            await Sales._query(loja, `UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL + ${QUANTIDADE}, EST_LOJA = EST_LOJA + ${QUANTIDADE} WHERE CODIGO = ${CODPRODUTO} AND CODLOJA = 1`)
-          }
-
-          await Sales._query(loja, `UPDATE NVENDI2 SET STATUS = 'Enviado' WHERE NUMVENDA = ${CODIGOVENDA} AND CODPRODUTO = ${CODPRODUTO}`)
-        }
       }
+
+      for (let i = 0; i < products.length; i++) {
+        const { NUMVENDA, CODPRODUTO, ALTERNATI, DESCRICAO, QUANTIDADE, UNITARIO1,NPDESC, NVTOTAL, GIFT  } = products[i]
+
+        const _GIFT = GIFT ? 1 : 0
+
+        let valueProd = `${NUMVENDA}, ${loja}, ${CODPRODUTO}, '${ALTERNATI}', '${DESCRICAO}', ${QUANTIDADE}, ${UNITARIO1}, ${NPDESC}, ${NVTOTAL}, 'Enviado', ${DOWN_EST}, ${_GIFT}`
+
+        await SalesProd.creator(0, valueProd, true)
+
+        if (O_V === '2') {
+          await Sales._query(loja, `UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL + ${QUANTIDADE}, EST_LOJA = EST_LOJA + ${QUANTIDADE} WHERE CODIGO = ${CODPRODUTO} AND CODLOJA = 1`)
+        }
+
+        await Sales._query(loja, `UPDATE NVENDI2 SET STATUS = 'Enviado', GIFT = ${_GIFT} WHERE NUMVENDA = ${CODIGOVENDA} AND CODPRODUTO = ${CODPRODUTO}`)
+      }
+
       return res.json({create: true})
     } catch (error) {
       console.log(error)
