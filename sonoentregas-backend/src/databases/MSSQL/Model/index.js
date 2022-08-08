@@ -18,7 +18,7 @@ class Model {
   
         vet.length === i + 1 
           ? values += keyvalue 
-          : values += `${keyvalue}'${separate} `
+          : values += `${keyvalue}${separate} `
       } else {
         Object.entries(obj.in).forEach(([keyIn,vetValueIn]) => {
           let valueIn
@@ -184,6 +184,7 @@ class Model {
   async updateAny(loja, obJValues, where) {
     
     const script = `UPDATE ${this.tab} SET ${this.getObj(obJValues)} WHERE ${this.getObj(where, ' AND ')}`
+    console.log(script)
     
     await this._query(loja, script, QueryTypes.UPDATE)
   }

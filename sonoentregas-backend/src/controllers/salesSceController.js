@@ -91,8 +91,6 @@ module.exports = {
         })
       })
 
-      console.log(productsSceShop)
-
       const orcparc = await ViewOrcParcLoja.find({
         loja,
         where: {
