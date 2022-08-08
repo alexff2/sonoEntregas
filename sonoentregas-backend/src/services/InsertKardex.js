@@ -54,7 +54,10 @@ module.exports = {
         `, 'UN'`+
         `, ${ID}`+
         `, ${prod.saldo}`+
-        `, 'S')`
+        `, 'S'
+         , ${kardex.DOC}
+         , NULL 
+         , NULL)`
       await Produto._query(1, script)
     } catch (error) {
       console.log(error)
