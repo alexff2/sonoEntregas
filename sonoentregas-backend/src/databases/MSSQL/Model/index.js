@@ -9,7 +9,7 @@ class Model {
     this.coluns = coluns
   }
 
-  getObj(obj, separate=', ', toCompare){
+  getObj(obj, separate=', ', toCompare = '='){
     let values = ''
 
     Object.entries(obj).forEach(([key,value], i, vet) => {
