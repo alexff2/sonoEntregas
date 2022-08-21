@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import api from '../services/api'
+import api from '../../services/api'
 
-import ModalAlert, { openMOdalAlert } from '../components/ModalAlert'
+import ModalAlert, { openMOdalAlert } from '../../components/ModalAlert'
 
 export default function Product(){
   const [ products, setProducts ] = useState([])

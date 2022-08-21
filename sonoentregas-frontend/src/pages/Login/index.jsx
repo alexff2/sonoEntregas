@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 
-import '../styles/pages/login.css'
+import './login.css'
 
-import { authLogin, userLogin, setLoja } from '../services/auth'
-import api from '../services/api'
-import { validateFilds } from '../functions/validateFields'
-import ModalALert, { openMOdalAlert } from '../components/ModalAlert'
+import { authLogin, userLogin, setLoja } from '../../services/auth'
+import api from '../../services/api'
+import { validateFilds } from '../../functions/validateFields'
+import ModalALert, { openMOdalAlert } from '../../components/ModalAlert'
 
 const Login = ({history}) => {
   const [modalAlert, setModalAlert] = useState('')

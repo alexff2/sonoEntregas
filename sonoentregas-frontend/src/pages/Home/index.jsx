@@ -1,8 +1,8 @@
 import React from 'react'
 
-import logo from '../img/Sono1.jpeg'
+import logo from '../../img/Sono1.jpeg'
 
-import '../styles/pages/home.css'
+import '../../styles/pages/home.css'
 
 export default function Home(){
   return(

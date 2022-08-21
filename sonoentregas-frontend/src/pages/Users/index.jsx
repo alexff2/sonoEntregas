@@ -1,15 +1,15 @@
 import React, { useState } from 'react'
 import { BiEdit, BiTrash } from 'react-icons/bi'
 
-import { useUsers } from '../context/userContext'
-import { useModalAlert } from '../context/modalAlertContext'
+import { useUsers } from '../../context/userContext'
+import { useModalAlert } from '../../context/modalAlertContext'
 
-import '../styles/pages/user.css'
+import './style.css'
 
-import ModalAlert, { openMOdalAlert } from '../components/ModalAlert'
-import Modal from '../components/Modal'
-import api from '../services/api'
-import { getLoja, getUser } from '../services/auth'
+import ModalAlert, { openMOdalAlert } from '../../components/ModalAlert'
+import Modal from '../../components/Modal'
+import api from '../../services/api'
+import { getLoja, getUser } from '../../services/auth'
 
 const officeValues = ['Assistant', 'Dev', 'Driver', 'User', 'Master']
 
