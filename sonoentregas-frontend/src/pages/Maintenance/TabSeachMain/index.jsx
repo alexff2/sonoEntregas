@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react"
 import { AiOutlineSearch } from 'react-icons/ai'
 import '../style.css'
 
-import { useMaintenance } from '../../../context/mainContext'
+import { useMaintenance } from '../../../context/maintContext'
 import { useModalAlert } from '../../../context/modalAlertContext'
+import { useAuthenticate } from '../../../context/authContext'
 import api from '../../../services/api'
 import { dateSqlToReact } from '../../../functions/getDate'
-import { getLoja } from '../../../services/auth'
 import Status from "../../../components/Status"
 import ModalMain from "./ModalMain"
 import Modal from "../../../components/Modal"
@@ -19,13 +19,14 @@ export default function TabSeachMain() {
   const [ typesStatus, setTypesStatus ] = useState('open')
   const [ maintThis, setMaintThis ] = useState([])
   const { maintenance, setMaintenance } = useMaintenance()
+  const { shopAuth } = useAuthenticate()
   const { setAlert } = useModalAlert()
 
-  const { cod: Codloja } = JSON.parse(getLoja())
+  const { cod: CodLoja } = shopAuth
 
   useEffect(()=>{
-    setMaintThis(maintenance.filter(main => main.CODLOJA === Codloja))
-  },[Codloja, maintenance])
+    setMaintThis(maintenance.filter(main => main.CODLOJA === CodLoja))
+  },[maintenance, CodLoja])
 
   const styleStatus = status => {
     const params = { status, type: 1, color: 1}

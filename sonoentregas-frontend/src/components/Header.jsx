@@ -1,19 +1,12 @@
 import React from 'react'
-import { useHistory } from "react-router-dom"
 
-import { logout, getUser } from '../services/auth'
+import { useAuthenticate } from '../context/authContext'
 
 import '../styles/components/header.css'
 
 export default function Header(){
-  const { NAME } = JSON.parse(getUser())
-
-  const history = useHistory()
-
-  const logoutApp = () => {
-    logout()
-    history.push('/')
-  }
+  const { userAuth, logout } = useAuthenticate()
+  const { DESCRIPTION } = userAuth
   
   return(
     <header>
@@ -22,8 +15,8 @@ export default function Header(){
         <h2>| ENTREGAS</h2>
       </div>
       <div className="head-rigth">
-        <p>Você está conectado como <span>{NAME}</span></p>
-        <div className="btn-exit" onClick={logoutApp}>SAIR</div>
+        <p>Você está conectado como <span>{DESCRIPTION}</span></p>
+        <div className="btn-exit" onClick={logout}>SAIR</div>
       </div>
     </header>
   )

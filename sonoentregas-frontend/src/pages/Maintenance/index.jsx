@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react'
 
-import { getUser } from '../../services/auth'
-
 import TabSendMain from './TabSendMain'
 import TabSeachMain from './TabSeachMain'
 import Visit from './Visit'
 
+import { useAuthenticate } from '../../context/authContext'
+
 export default function Vendas(){
-  const { OFFICE } =  JSON.parse(getUser())
   const [ userMaster, setUserMas ] = useState(false)
+  const { userAuth } = useAuthenticate()
+
+  const { OFFICE } =  userAuth
 
   useEffect(() => {
     document.getElementById('CONSULTAR').style.display = "block"
@@ -33,12 +35,24 @@ export default function Vendas(){
     <div className="container sales-container">
 
       <div className="tab">
-        <input className="tablinks active" value="CONSULTAR" type="button" onClick={e => openTab(e)} />
-        <input className="tablinks" value="ENVIAR"  type="button" onClick={e => openTab(e)} />
-        {
-          userMaster &&
-          <input className="tablinks" value="VISITA"  type="button" onClick={e => openTab(e)} />
-        }
+        <input 
+          className="tablinks active"
+          value="CONSULTAR"
+          type="button"
+          onClick={e => openTab(e)} />
+
+        <input
+          className="tablinks"
+          value="ENVIAR"
+          type="button"
+          onClick={e => openTab(e)} />
+
+        { userMaster &&
+          <input
+            className="tablinks"
+            value="VISITA"
+            type="button"
+            onClick={e => openTab(e)} /> }
       </div>
       
       <div className="tab-body body-container">
@@ -53,6 +67,7 @@ export default function Vendas(){
           <Visit/>
         </div>
       </div>
+
     </div>
   )
 }

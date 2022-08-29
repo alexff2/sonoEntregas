@@ -1,6 +1,15 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import App from './App'
+import './styles/global.css'
 
-ReactDOM.render(<App />, document.getElementById('root'))
+import { DefaultProvider } from './context/DefaultProvider'
+
+import Routes from './routes'
+
+ReactDOM.render(
+  <DefaultProvider>
+    <Routes />
+  </DefaultProvider>,
+  document.getElementById('root')
+)

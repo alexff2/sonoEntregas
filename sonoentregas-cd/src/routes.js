@@ -1,5 +1,5 @@
 import React from 'react'
-import { Route, Redirect } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { makeStyles } from '@material-ui/core'
 
 import Home from './pages/Home'
@@ -19,22 +19,23 @@ const useStyles = makeStyles((theme) => ({
   toolbar: theme.mixins.toolbar,
 }))
 
-const RedirectHome = () => <Redirect to="/app/home"/>
-
-const Routes = () => {
+const Routess = () => {
   const classes = useStyles()
   return(
     <main className={classes.content}>
       <div className={classes.toolbar} />
-      <Route path="/" exact component={RedirectHome} />
-      <Route path="/app/home" exact component={Home} />
-      <Route path="/app/transports" exact component={Cars} />
-      <Route path="/app/delivery" exact component={Delivery} />
-      <Route path="/app/sales" exact component={Sales} />
-      <Route path="/app/products" exact component={Products} />
-      <Route path="/app/maintenance" exact component={Maintenance} />
-      <Route path="/app/users" exact component={Users} />
+      <Routes>
+
+        <Route path="/" element={<Navigate to="/app/home"/>} />
+        <Route path="/app/home" element={<Home />} />
+        <Route path="/app/transports" element={<Cars />} />
+        <Route path="/app/delivery" element={<Delivery />} />
+        <Route path="/app/sales" element={<Sales />} />
+        <Route path="/app/products" element={<Products />} />
+        <Route path="/app/maintenance" element={<Maintenance />} />
+        <Route path="/app/users" element={<Users />} />
+      </Routes>
     </main>
 )}
 
-export default Routes
+export default Routess

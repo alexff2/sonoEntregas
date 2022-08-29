@@ -1,23 +1,24 @@
 import React, { useEffect } from 'react'
 
 import api from '../services/api'
-import { getLoja, getUser } from '../services/auth'
 
 //Providers
 import { useUsers } from './userContext'
-import { useMaintenance } from './mainContext'
+import { useMaintenance } from './maintContext'
 import { useModalAlert } from './modalAlertContext'
+import { useAuthenticate } from './authContext'
 
 export default function SetContext(){
   const { setUsers } = useUsers()
   const { setMaintenance } = useMaintenance()
   const { setAlert } = useModalAlert()
+  const { shopAuth, userAuth } = useAuthenticate()
 
   useEffect(() =>{
     setTimeout(()=>{
       const setContexts =  async () =>{
-        const { cod } = JSON.parse(getLoja())
-        const { OFFICE } = JSON.parse(getUser())
+        const { cod } = shopAuth
+        const { OFFICE } = userAuth
   
         const codloja = OFFICE === 'Dev' ? OFFICE : cod
       
@@ -35,7 +36,7 @@ export default function SetContext(){
       }
       setContexts()
     },0)
-  },[setUsers, setMaintenance])
+  },[setUsers, setMaintenance, setAlert, shopAuth, userAuth])
   
   return(<React.Fragment />)
 }

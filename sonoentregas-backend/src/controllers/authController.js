@@ -1,0 +1,67 @@
+//@ts-check
+const { compare } = require('bcrypt')
+const { sign } = require('jsonwebtoken')
+const { jwt } = require('../databases/MSSQL/conections/config')
+const Users = require('../models/Users')
+
+/**
+ * @typedef {Object} User
+ * @property {number} ID
+ * @property {number} CODLOJA
+ * @property {string} DESCRIPTION
+ * @property {boolean} ACTIVE
+ * @property {string} OFFICE
+ * @property {string} PASSWORD
+ */
+
+module.exports = {
+  /**
+   * 
+   * @param {*} req 
+   * @param {*} res 
+   * @returns 
+   */
+  async create(req, res){
+    try {
+      const { userName, password, codloja } = req.body
+
+      const users = await Users.findSome(0, `DESCRIPTION = '${userName}' AND ACTIVE = 1`)
+
+      if (users.length === 0) {
+        return res.status(401).json('Senha e/ou usuário incorreto!')
+      }
+
+      let sendUser = {}
+
+      users.forEach((/**@type {User} */ user) => {
+        if (user.CODLOJA === codloja || user.CODLOJA === 0) {
+          sendUser = user
+        }
+      })
+
+      const { secret, expiresIn } = jwt
+      const token = sign({}, secret, {
+        subject: String(users.ID),
+        expiresIn
+      })
+
+      const passwordMatch =  await compare(password, sendUser.PASSWORD)
+
+      if (!passwordMatch) {
+        return res.status(401).json('Senha e/ou usuário incorreto!')
+      }
+
+      return res.status(201).json({
+        user: {
+          ID: sendUser.ID, 
+          DESCRIPTION: sendUser.DESCRIPTION, 
+          OFFICE: sendUser.OFFICE, 
+          ACTIVE: sendUser.ACTIVE
+        },
+        token
+      })
+    } catch (error) {
+      return res.status(400).json(error)
+    }
+  }
+}

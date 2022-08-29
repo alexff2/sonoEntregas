@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 
-import { getUser, getLoja } from '../../../services/auth'
 import api from '../../../services/api'
 import { validateObs } from '../../../functions/validateFields'
 
 import { useModalAlert } from '../../../context/modalAlertContext'
+import { useAuthenticate } from '../../../context/authContext'
 
 function SetEstoque({ product }) {
   const [ disabled, setDisabled ] = useState(true)
@@ -72,9 +72,10 @@ export default function ModalSendSale({
   const [ openObs, setOpenObs ] = useState(false)
   const [ obs, setObs ] = useState('')
   const { setOpen: setOpenAlert, setChildrenError, setType } = useModalAlert()
+  const { shopAuth, userAuth } = useAuthenticate()
 
-  const { cod } = JSON.parse(getLoja())
-  const { ID: USER_ID } = JSON.parse(getUser())
+  const { cod } = shopAuth
+  const { ID: USER_ID } = userAuth
   
 
   useEffect(()=>{

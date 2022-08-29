@@ -2,17 +2,18 @@ import React, { useEffect, useState } from 'react'
 
 import './login.css'
 
-import { authLogin, userLogin, setLoja } from '../../services/auth'
 import api from '../../services/api'
-import { validateFilds } from '../../functions/validateFields'
 import ModalALert, { openMOdalAlert } from '../../components/ModalAlert'
 
-const Login = ({history}) => {
+import { useAuthenticate } from '../../context/authContext'
+
+const Login = () => {
   const [modalAlert, setModalAlert] = useState('')
-  const [ user, setUser ] = useState()
+  const [ userName, setUserName ] = useState()
   const [ password, setPassword ] = useState()
   const [ shops, setShops ] = useState([])
   const [ selectShop, setSelectShop ] = useState('')
+  const { login } = useAuthenticate()
 
   useEffect(() => {
     api
@@ -36,43 +37,10 @@ const Login = ({history}) => {
     document.querySelector("#modal-shops").style.display = 'none'
   }
 
-  const login = async e => {
+  const handleLogin = async e => {
     e.preventDefault()
-    
-    try {
-      if (validateFilds([password, user])) {
-        const resp = await api.post('/login', {
-          user, password, codloja: selectShop.cod
-        })
-        const { data, status } = resp
 
-        if (status === 201) {
-          authLogin('tokenteste123')
-
-          userLogin(JSON.stringify({ID: data.ID, NAME: data.DESCRIPTION, OFFICE: data.OFFICE}))
-          
-          setLoja(JSON.stringify(selectShop))
-          
-          history.push('home')
-        } else {
-          console.log(resp)
-          openMOdalAlert()
-          setModalAlert('Usuário não encontrado, verifique seu usuário e senha novamente.')
-        }
-
-      } else {
-        openMOdalAlert()
-        setModalAlert('Preencha todos os campos corretamente.')
-      }
-    } catch (e) {
-      openMOdalAlert()
-      console.log(e.response)
-      if(!e.response)
-        setModalAlert('Erro na rede, entre em contato com Bruno!')
-      else if(e.response.status === 400)
-        setModalAlert('Erro no servidor, entre em contato com Alexadre!')
-      else setModalAlert(e.response.data)
-    }
+    await login({ userName, password, selectShop})
   }
 
   return(
@@ -80,16 +48,16 @@ const Login = ({history}) => {
       <div className="login-content">
         <h1>Sono &amp; Art Entregas</h1>
         <div id="shop">Loja: {selectShop.description}</div>
-        <form onSubmit={login}>
+        <form onSubmit={handleLogin}>
           <div className="field">
-            <input type="text" placeholder="Usuário..." onChange={e => setUser(e.target.value)}/>
+            <input type="text" placeholder="Usuário..." onChange={e => setUserName(e.target.value)}/>
           </div>
           <div className="field">
             <input
               type="password"
               placeholder="Senha..."
               onChange={e => setPassword(e.target.value)}
-              onKeyPress={e => e.key === 'Enter' ? login(e) : null}
+              onKeyPress={e => e.key === 'Enter' ? handleLogin(e) : null}
             />
           </div>
           <button type="submit">Logar</button>

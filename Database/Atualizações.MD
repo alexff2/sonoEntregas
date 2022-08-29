@@ -1,12 +1,14 @@
 ﻿# Pendências Lojas
 - CD
   * Criar usuários CD
+  * Arrumar DAV com mesma numeração
+  * Criar modulo de previsão
 
 - Lojas
   * Verificar codigos e descrição nas lojas de acordo com base de dados do CD;
-  * Verificar validação de produto cadastrado no CD e nas Lojas
-  * Separar vendas iniciadas e colocar o nome ENTREGAS
+  * Separar vendas iniciadas e colocar o nome ENTREGAS (Melhorar visualização)
   * Colocar horario de entregas
+  * Colocar loading
 
 # Atualização de banco
 

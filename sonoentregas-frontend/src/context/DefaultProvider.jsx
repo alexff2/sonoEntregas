@@ -2,17 +2,20 @@ import React from 'react'
 
 //Providers
 import UserProvider from './userContext'
-import MaintProvider from './mainContext'
+import MaintProvider from './maintContext'
 import Alert from './modalAlertContext'
+import AuthProvider from './authContext'
 
-export default function DefaultProvider({ children }){
+export function DefaultProvider({ children }){
   return (
     <Alert>
-      <UserProvider>
-        <MaintProvider>
-          {children}
-        </MaintProvider>
-      </UserProvider>
+      <AuthProvider>
+        <UserProvider>
+          <MaintProvider>
+            {children}
+          </MaintProvider>
+        </UserProvider>
+      </AuthProvider>
     </Alert>
   )
 }

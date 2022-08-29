@@ -1,11 +1,14 @@
 import React from 'react'
 
-import { getLoja } from '../services/auth'
+import { useAuthenticate } from '../context/authContext'
 
 import '../styles/components/footer.css'
 
 export default function Footer(){
- const {cod, description} = JSON.parse(getLoja())
+  const { shopAuth } = useAuthenticate()
+
+  const { cod, description } = shopAuth
+
   return(
     <footer>
       <p>Sono e Arte | Softflex</p>

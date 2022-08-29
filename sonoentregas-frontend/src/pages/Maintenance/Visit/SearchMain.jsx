@@ -6,7 +6,7 @@ import Modal from '../../../components/Modal'
 import ModalSchedule from "./ModalSchedule"
 import ReportMaint from "./ReportMaint"
 
-import { useMaintenance } from '../../../context/mainContext'
+import { useMaintenance } from '../../../context/maintContext'
 import { useModalAlert } from '../../../context/modalAlertContext'
 
 import api from '../../../services/api'

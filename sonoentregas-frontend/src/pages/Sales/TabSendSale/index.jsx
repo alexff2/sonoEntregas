@@ -3,31 +3,34 @@ import React, { useEffect, useState } from 'react'
 import '../../../styles/pages/sales.css'
 
 import api from '../../../services/api'
-import { getLoja } from '../../../services/auth'
 import { getDateToSql } from '../../../functions/getDate'
 
 import { useModalAlert } from '../../../context/modalAlertContext'
+import { useAuthenticate } from "../../../context/authContext"
 
 import ModalSendSale from './ModalSendSale'
 
 export default function TabSendSale(){
   const [ modal, setModal ] = useState([])
+  const [ loading, setLoading ] = useState(false)
   const [ sales, setSales ] = useState([])
   const [ emissao, setEmissao ] = useState(getDateToSql())
   const [ date, setDate ] = useState(getDateToSql())
+  const { shopAuth } = useAuthenticate()
   const { setOpen: setOpenAlert, setChildrenError, setType } = useModalAlert()
 
-  const { cod } = JSON.parse(getLoja())
+  const { cod } = shopAuth
 
   useEffect(() => {
-    document.querySelector('#load-sales').innerHTML = 'Carregando...'
+    setLoading(true)
+    console.log('teste')
 
     api
       .get(`salesshop/${emissao}/${cod}`)
       .then( resp => {
         setSales(resp.data)
 
-        document.querySelector('#load-sales').innerHTML = ''
+        setLoading(false)
       })
       .catch( erro => {
         console.log(erro)
@@ -36,7 +39,7 @@ export default function TabSendSale(){
         setOpenAlert()
         setType()
 
-        document.querySelector('#load-sales').innerHTML = ''
+        setLoading(false)
     })
   }, [cod, emissao, setOpenAlert, setChildrenError, setType])
 
@@ -47,7 +50,7 @@ export default function TabSendSale(){
         <button onClick={() => setEmissao(date)}>Buscar</button>
       </div>
 
-      <span id="load-sales"></span>
+      { loading && <span id="load-sales">Carregando...</span>}
 
       {/*Table Sales*/}
       <table className="tab-sales">

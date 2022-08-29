@@ -3,13 +3,13 @@ import { BiEdit, BiTrash } from 'react-icons/bi'
 
 import { useUsers } from '../../context/userContext'
 import { useModalAlert } from '../../context/modalAlertContext'
+import { useAuthenticate } from '../../context/authContext'
 
 import './style.css'
 
 import ModalAlert, { openMOdalAlert } from '../../components/ModalAlert'
 import Modal from '../../components/Modal'
 import api from '../../services/api'
-import { getLoja, getUser } from '../../services/auth'
 
 const officeValues = ['Assistant', 'Dev', 'Driver', 'User', 'Master']
 
@@ -28,9 +28,10 @@ export default function User(){
   const [childrenAlertModal, setChildrenAlertModal] = useState('Vazio')
   const [openAuthorize, setOpenAuthorize] = useState(false)
   const [disabled, setDisabled] = useState(false)
+  const { shopAuth, userAuth } = useAuthenticate()
 
-  const { cod } = JSON.parse(getLoja())
-  const { OFFICE } = JSON.parse(getUser())
+  const { cod } = shopAuth
+  const { OFFICE } = userAuth
 
   const openModalCreateUser = () => {
     document.querySelector('#modal-create-users').style.display = 'flex'

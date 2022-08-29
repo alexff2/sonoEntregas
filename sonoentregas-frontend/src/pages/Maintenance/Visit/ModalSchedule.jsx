@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 
 import api from '../../../services/api'
-import { getUser } from '../../../services/auth'
 
-import { useMaintenance } from '../../../context/mainContext'
+import { useMaintenance } from '../../../context/maintContext'
 import { useModalAlert } from '../../../context/modalAlertContext'
+import { useAuthenticate } from '../../../context/authContext'
 
 export default function ModalSchedule({ maintSelect, setOpenModalSch }){
   const [disabled, setDisabled] = useState(false)
@@ -12,7 +12,8 @@ export default function ModalSchedule({ maintSelect, setOpenModalSch }){
   const [hoursVist, setHoursVisit] = useState('')
   const { setMaintenance } = useMaintenance()
   const { setAlert } = useModalAlert()
-  const { ID: idUser } = JSON.parse(getUser())
+  const { userAuth } = useAuthenticate()
+  const { ID: idUser } = userAuth
 
   const submitScheduleVisit = async e => {
     setDisabled(true)

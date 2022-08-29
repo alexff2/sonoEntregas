@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 import { useModalAlert } from '../../../context/modalAlertContext'
-import { useMaintenance } from '../../../context/mainContext'
+import { useMaintenance } from '../../../context/maintContext'
 
 import api from '../../../services/api'
 

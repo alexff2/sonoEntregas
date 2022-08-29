@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
 
-import { useMaintenance } from '../../../context/mainContext'
-
+import { useMaintenance } from '../../../context/maintContext'
+import { useAuthenticate } from '../../../context/authContext'
 import { useModalAlert } from '../../../context/modalAlertContext'
-import { dateSqlToReact, dateWarranty, checkDateWarranty } from '../../../functions/getDate'
+import { 
+  dateSqlToReact,
+  dateWarranty,
+  checkDateWarranty } from '../../../functions/getDate'
 import api from '../../../services/api'
-import { getLoja, getUser } from '../../../services/auth'
 
 import '../../../styles/pages/main.css'
 
@@ -21,10 +23,11 @@ export default function TabSendMain(){
   const [ obs, setObs ] = useState('')
   const [ mainProd, setMainProd ] = useState({})
   const { setMaintenance } = useMaintenance()
+  const { shopAuth, userAuth } = useAuthenticate()
   const { setChildrenError, setOpen: setOpenModalAlert, setType } = useModalAlert()
 
-  const { cod: CodLoja } = JSON.parse(getLoja())
-  const { ID: idUser } = JSON.parse(getUser())
+  const { cod: CodLoja } = shopAuth
+  const { ID: idUser } = userAuth
 
   const setStyleStatus = prod => {
     if (prod.STATUS_MAIN === 'Em Lançamento') {

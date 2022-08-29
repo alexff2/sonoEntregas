@@ -3,7 +3,8 @@ import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineSearch } from 'react-ico
 
 import api from '../../../services/api'
 import { dateSqlToReact } from '../../../functions/getDate'
-import { getLoja } from '../../../services/auth'
+
+import { useAuthenticate } from '../../../context/authContext'
 
 import Modal from '../../../components/Modal'
 import Status from '../../../components/Status'
@@ -99,8 +100,9 @@ export default function TabSaleSeach({ openMOdalAlert, setChildrenAlertModal }) 
   const [ typeSeach, setTypeSeach ] = useState('ID_SALES')
   const [ saleCurrent, setSaleCurrent ] = useState([])
   const [ productCurrent, setProductCurrent ] = useState([])
+  const { shopAuth } = useAuthenticate()
 
-  const { cod: Codloja } = JSON.parse(getLoja())
+  const { cod: Codloja } = shopAuth
 
   useEffect(()=>{
     api.get(`sales/STATUS/Aberta/null/${Codloja}`)

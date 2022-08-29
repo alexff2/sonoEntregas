@@ -95,19 +95,5 @@ module.exports = {
       console.log(e)
       return res.status(400).json(e)
     }
-  },
-  /**
-   * @param {*} req 
-   * @param {*} res 
-   * @returns 
-   */
-  async delete( req, res ) {
-    try {
-      const { userId } = req.params
-      return res.json(await Users.delete(0,userId))
-    } catch (e) {
-      const { original } = e
-      return res.status(400).json(original)
-    }
   }
 }

@@ -31,6 +31,7 @@ export default function Vendas(){
       <div className="tab">
         <input className="tablinks active" type="button" value="ENVIAR" onClick={e => openTab(e)} />
         <input className="tablinks" type="button" value="CONSULTAR" onClick={e => openTab(e)} />
+        <input className="tablinks" type="button" value="PREVISÃO" onClick={e => openTab(e)} />
       </div>
       
       <div className="tab-body body-container">
@@ -47,6 +48,8 @@ export default function Vendas(){
             setChildrenAlertModal={setChildrenAlertModal}
           />
         </div>
+
+        <div id="PREVISÃO" className="tabcontent">PREV</div>
       </div>
 
       <ModalAlert>{childrenAlertModal}</ModalAlert>
