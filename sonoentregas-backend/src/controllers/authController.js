@@ -1,7 +1,7 @@
 //@ts-check
 const { compare } = require('bcrypt')
 const { sign } = require('jsonwebtoken')
-const { jwt } = require('../databases/MSSQL/conections/config')
+const { jwt } = require('../databases/MSSQL/connections/config')
 const Users = require('../models/Users')
 
 /**

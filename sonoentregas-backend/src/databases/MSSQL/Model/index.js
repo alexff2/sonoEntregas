@@ -1,7 +1,7 @@
 const { QueryTypes } = require('sequelize')
 const Sequelize  = require('sequelize')
 
-const conections = require('../conections')
+const connections = require('../connections')
 
 class Model {
   constructor(tab, coluns){
@@ -233,7 +233,7 @@ class Model {
   }
   
   async _query(loja, script, type){
-    const conection = conections[loja]
+    const conection = connections[loja]
     const sequelize = new Sequelize(conection)
 
     const results = await sequelize.query(script, { type })

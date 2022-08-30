@@ -2,7 +2,7 @@
 const bcrypt = require('bcrypt')
 const Users = require('../models/Users')
 const { findUser, findUserDev } = require('../services/UsersService')
-const { saltHash } = require('../databases/MSSQL/conections/config')
+const { saltHash } = require('../databases/MSSQL/connections/config')
 
 /**
  * @typedef {Object} User

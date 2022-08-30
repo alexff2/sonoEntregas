@@ -3,7 +3,7 @@ const { Router } = require('express')
 const routes = new Router()
 
 //Import Controllers
-const conectionsController = require('./controllers/conectionsController')
+const connectionsController = require('./controllers/connectionsController')
 const authController = require('./controllers/authController')
 const usersController = require('./controllers/usersController')
 const productsController = require('./controllers/productsController')
@@ -25,7 +25,7 @@ const catDefController = require('./controllers/catDefController')
 
 //Routes
 //Conections
-routes.get('/conections', conectionsController.findConections)
+routes.get('/conections', connectionsController.findConnections)
 //Login
 routes.post('/authenticated', authController.create)
 //Users

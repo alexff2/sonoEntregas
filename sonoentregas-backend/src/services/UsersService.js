@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt')
 const { QueryTypes } = require('sequelize')
 
 const Users = require('../models/Users')
-const { saltHash } = require('../databases/MSSQL/conections/config')
+const { saltHash } = require('../databases/MSSQL/connections/config')
 
 /**
  * @typedef {Object} User
