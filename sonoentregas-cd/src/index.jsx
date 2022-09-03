@@ -1,14 +1,15 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { CssBaseline } from '@material-ui/core'
+
 
 import DefaultContext from './context/defaultContext'
-import App from './App'
+import Routes from './routes'
 
 ReactDOM.render(
-  <React.StrictMode>
-    <DefaultContext>
-      <div>Teste</div>
-    </DefaultContext>
-  </React.StrictMode>,
+  <DefaultContext>
+    <CssBaseline />
+    <Routes />
+  </DefaultContext>,
   document.getElementById('root')
 )

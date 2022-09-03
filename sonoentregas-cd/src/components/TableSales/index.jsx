@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import {
-  makeStyles,
   Box,
   Table,
   TableBody,
@@ -16,143 +15,17 @@ import {
 } from '@material-ui/core'
 import { KeyboardArrowDown, KeyboardArrowUp} from '@material-ui/icons'
 
+import useStyles from './style'
+
 //Context
-import { useShop } from '../context/shopContext'
-import { useAddress } from '../context/addressContext'
+import { useAddress } from '../../context/addressContext'
 
 //Components
-import EnhancedTableHead from './EnhancedTableHead'
+import EnhancedTableHead from '../EnhancedTableHead'
 
 //Functions
-import { getDateBr } from '../functions/getDates'
-import { getComparator, stableSort } from '../functions/orderTable'
-
-const useStyles = makeStyles( theme =>({
-  TabContainer: {
-    borderRadius: '4px 0 0 0',
-    '& > table': {
-      '& > thead': {
-        display: 'block'
-      },
-      '& > tbody': {
-        display: 'block'
-      }
-    }
-  },
-  tableHead: {
-    background: theme.palette.primary.main
-  },
-  headUpDown: {
-    color: theme.palette.common.white,
-    fontWeight: theme.typography.fontWeightBold,
-    padding: '0 10px',
-    width: 46
-  },
-  headIdSale:{
-    color: theme.palette.common.white,
-    fontWeight: theme.typography.fontWeightBold,
-    padding: '5px 0 5px 10px',
-    width: 110
-  },
-  headName:{
-    color: theme.palette.common.white,
-    fontWeight: theme.typography.fontWeightBold,
-    padding: 0,
-    width: 280
-  },
-  headDistrict:{
-    color: theme.palette.common.white,
-    fontWeight: theme.typography.fontWeightBold,
-    padding: 0,
-    width: 130
-  },
-  headDate:{
-    color: theme.palette.common.white,
-    fontWeight: theme.typography.fontWeightBold,
-    padding: 0,
-    width: 115,
-    textAlign: 'end'
-  },
-  headShop:{
-    color: theme.palette.common.white,
-    fontWeight: theme.typography.fontWeightBold,
-    padding: '0 24px 0 0',
-    width: 118,
-    textAlign: 'end'
-  },
-  tableBody1: {
-    height: 'calc(100vh - 320px)',
-    overflowY: 'auto',
-    overflowX: 'hidden',
-    marginRight: -1
-  },
-  tableBody2: {
-    height: 'calc(100vh - 490px)',
-    overflowX: 'hidden',
-    overflowY: 'auto'
-  },
-  row: {
-    '& > *': {
-      borderBottom: 'unset'
-    },
-    '&:hover': {
-      background: theme.palette.primary.light
-    }
-  },
-  row1: {
-    '& > *': {
-      borderBottom: 'unset'
-    },
-    background: theme.palette.primary.light
-  },
-  bodyUpDown: {
-    padding: '0 10px',
-    width: 46
-  },
-  bodyIdSale:{
-    padding: '5px 0 5px 10px',
-    width: 110
-  },
-  bodyName:{
-    padding: 0,
-    width: 280,
-    fontSize: 12
-  },
-  bodyDistrict:{
-    padding: 0,
-    width: 130,
-    fontSize: 12
-  },
-  dateDelivRed: {
-    color: 'red',
-    padding: 0,
-    width: 115,
-    textAlign: 'end'
-  },
-  dateDelivBlack: {
-    color: 'black',
-    padding: 0,
-    width: 115,
-    textAlign: 'end'
-  },
-  dateDelivYellow: {
-    color: 'yellow',
-    padding: 0,
-    width: 115,
-    textAlign: 'end'
-  },
-  bodyShop:{
-    padding: 0,
-    width: 95,
-    textAlign: 'end'
-  },
-  tdCheckBox: {
-    padding: '0 10px',
-    '& > span': {
-      padding: 0
-    }
-  }
-}))
+import { getDateBr } from '../../functions/getDates'
+import { getComparator, stableSort } from '../../functions/orderTable'
 
 const CheckProd = ({ sendSalesProd, type, produto, classes }) => {
   const [ qtdDeliv, setQtdDeliv ] = useState(0)
@@ -190,13 +63,7 @@ const CheckProd = ({ sendSalesProd, type, produto, classes }) => {
 
 function Row({sendSalesProd, sale, type, setAddress}) {
   const [ open, setOpen ] = useState(false)
-  const { shop } = useShop()
   const classes = useStyles()
-
-  const setShops = codShop => {
-    const shopCurrent = shop[codShop]
-    return shopCurrent.database
-  }
 
   const styleDateDeliv = () => {
     // VERIFICAR
@@ -245,9 +112,9 @@ function Row({sendSalesProd, sale, type, setAddress}) {
         <TableCell className={classes.bodyName} onClick={() => setInformations(sale)}>{sale.NOMECLI}</TableCell>
         <TableCell className={classes.bodyDistrict} onClick={() => setInformations(sale)}>{sale.BAIRRO}</TableCell>
         <TableCell className={styleDateDeliv()}>{getDateBr(sale.D_ENTREGA1)}</TableCell>
-        <TableCell className={classes.bodyShop}>{setShops(sale.CODLOJA)}</TableCell>
+        <TableCell className={classes.bodyShop}>{sale.SHOP}</TableCell>
       </TableRow>
-  
+
       <TableRow>
         <TableCell style={{ padding: 0 }} colSpan={6}>
           <Collapse in={ type !== 'home' ? true : open} timeout="auto" unmountOnExit>
@@ -347,16 +214,16 @@ export default function TableSales({
 
   const headCell = type === 'home' ? [
     { id: '', numeric: false, label: '', class: classes.headUpDown },
-    { id: 'ID_SALES', numeric: false, label: 'Nº Venda', class: classes.headIdSale },
-    { id: 'NOMECLI', numeric: false, label: 'Nome do Cliente', class: classes.headName },
+    { id: 'ID_SALES', numeric: false, label: 'DAV', class: classes.headIdSale },
+    { id: 'NOMECLI', numeric: false, label: 'Cliente', class: classes.headName },
     { id: 'BAIRRO', numeric: false, label: 'Bairro', class: classes.headDistrict },
-    { id: 'D_ENTREGA1', numeric: true, label: 'Data Entrega', class: classes.headDate },
+    { id: 'D_ENTREGA1', numeric: true, label: 'Entrega', class: classes.headDate },
     { id: 'CODLOJA', numeric: true, label: 'Loja', class: classes.headShop }
   ] : [
-    { id: 'ID_SALES', numeric: false, label: 'Nº Venda', class: classes.headIdSale },
-    { id: 'NOMECLI', numeric: false, label: 'Nome do Cliente', class: classes.headName },
+    { id: 'ID_SALES', numeric: false, label: 'DAV', class: classes.headIdSale },
+    { id: 'NOMECLI', numeric: false, label: 'Cliente', class: classes.headName },
     { id: 'BAIRRO', numeric: false, label: 'Bairro', class: classes.headDistrict },
-    { id: 'D_ENTREGA1', numeric: true, label: 'Data Entrega', class: classes.headDate },
+    { id: 'D_ENTREGA1', numeric: true, label: 'Entrega', class: classes.headDate },
     { id: 'CODLOJA', numeric: true, label: 'Loja', class: classes.headShop }
   ]
 
@@ -374,9 +241,9 @@ export default function TableSales({
 
           <TableBody className={type === 'home' ? classes.tableBody1 : classes.tableBody2}>
             {stableSort(currentSales, getComparator(order, orderBy))
-              .map( sale => (
+              .map( (sale, i) => (
               <Row  
-                key={sale.ID_SALES} 
+                key={i} 
                 sendSalesProd={sendSalesProd} 
                 classes={classes} sale={sale} 
                 type={type}

@@ -9,6 +9,7 @@ import { useModalAlert } from '../../../context/modalAlertContext'
 import { useAuthenticate } from "../../../context/authContext"
 
 import ModalSendSale from './ModalSendSale'
+import LoadingCircle from '../../../components/LoadingCircle'
 
 export default function TabSendSale(){
   const [ modal, setModal ] = useState([])
@@ -23,7 +24,6 @@ export default function TabSendSale(){
 
   useEffect(() => {
     setLoading(true)
-    console.log('teste')
 
     api
       .get(`salesshop/${emissao}/${cod}`)
@@ -50,34 +50,36 @@ export default function TabSendSale(){
         <button onClick={() => setEmissao(date)}>Buscar</button>
       </div>
 
-      { loading && <span id="load-sales">Carregando...</span>}
-
-      {/*Table Sales*/}
-      <table className="tab-sales">
-        <thead>
-          <tr>
-            <th>Código</th>
-            <th>Cliente</th>
-            <th>Valor</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sales.map(item =>(
-            <tr 
-              key={item.CODIGOVENDA} 
-              onClick={()=> setModal([item])}
-            >
-              <td>{item.CODIGOVENDA}</td>
-              <td>{item.NOMECLI}</td>
-              <td>{
-                Intl
-                  .NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'})
-                  .format(item.TOTALVENDA)
-              }</td>
+      {loading 
+        ?<div className='loadingTable'>
+          <LoadingCircle/>
+        </div>
+        :<table className="tab-sales">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Cliente</th>
+              <th>Valor</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {sales.map(item =>(
+              <tr 
+                key={item.CODIGOVENDA} 
+                onClick={()=> setModal([item])}
+              >
+                <td>{item.CODIGOVENDA}</td>
+                <td>{item.NOMECLI}</td>
+                <td>{
+                  Intl
+                    .NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'})
+                    .format(item.TOTALVENDA)
+                }</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      }
       
       {/*Modal send sales*/
       modal.map( item =>(

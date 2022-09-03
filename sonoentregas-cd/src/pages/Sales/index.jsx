@@ -23,7 +23,6 @@ import {
 import SearchIcon from '@material-ui/icons/Search'
 import { KeyboardArrowDown, KeyboardArrowUp} from '@material-ui/icons'
 
-import { useShop } from '../../context/shopContext'
 import { useAddress } from '../../context/addressContext'
 
 import api from '../../services/api'
@@ -123,7 +122,7 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-function Row({ sale, setShops, modalDetalProduct, setOpenModalBoxInfo }) {
+function Row({ sale, modalDetalProduct, setOpenModalBoxInfo }) {
   const [open, setOpen] = useState(false)
   const [openModalUpdaDate, setOpenModalUpdaDate] = useState(false)
   const classes = useStyles()
@@ -158,7 +157,7 @@ function Row({ sale, setShops, modalDetalProduct, setOpenModalBoxInfo }) {
         <TableCell align="right" onClick={()=>setOpenModalUpdaDate(true)} className={classes.updateDateDeliv}>
           {getDateBr(sale.D_ENTREGA1)}
         </TableCell>
-        <TableCell align="right">{setShops(sale.CODLOJA)}</TableCell>
+        <TableCell align="right">{sale.SHOP}</TableCell>
       </TableRow>
 
       <TableRow>
@@ -221,7 +220,6 @@ export default function Sales() {
   const [ saleCurrent, setSaleCurrent ] = useState([])
   const [ productCurrent, setProductCurrent ] = useState([])
 
-  const { shop } = useShop()
   const classes = useStyles()
   
   const searchSales = async () => {
@@ -252,11 +250,6 @@ export default function Sales() {
         setSales([])
       }
     }
-  }
-
-  const setShops = codShop => {
-    const shopCurrent = shop[codShop]
-    return shopCurrent.database
   }
 
   const handleRequestSort = (event, property) => {
@@ -346,7 +339,6 @@ export default function Sales() {
                   key={sale.ID} 
                   modalDetalProduct={modalDetalProduct}
                   sale={sale}
-                  setShops={setShops}
                   setOpenModalBoxInfo={setOpenModalBoxInfo}
                 />
               ))}

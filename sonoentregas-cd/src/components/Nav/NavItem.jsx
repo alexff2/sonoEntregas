@@ -24,15 +24,6 @@ const useStyle = makeStyles((theme)=>({
   title: {
     marginRight: 'auto',
     fontSize: theme.typography.h6.fontSize
-  },
-  active: {
-    color: theme.palette.primary.main,
-    '& $title': {
-      fontWeight: theme.typography.fontWeightBold
-    },
-    '& $icon': {
-      color: theme.palette.primary.main
-    }
   }
 }))
 
@@ -51,7 +42,6 @@ function Navbar({
     >
       <Button
         className={classes.button}
-        activeClassName={classes.active}
         component={NavLink}
         to={href}
       >

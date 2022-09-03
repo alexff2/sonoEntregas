@@ -2,15 +2,17 @@ import React, { useState } from 'react'
 import api from '../../services/api'
 
 import ModalAlert, { openMOdalAlert } from '../../components/ModalAlert'
+import LoadingCircle from '../../components/LoadingCircle'
 
 export default function Product(){
+  const [ loading, setLoading ] = useState(false)
   const [ products, setProducts ] = useState([])
   const [ search, setSearch ] = useState()
   const [ typeSeach, setTypeSeach ] = useState('NOME')
   const [ childrenAlertModal, setChildrenAlertModal ] = useState('Vazio')
 
   const searchProduct = async () => {
-    document.querySelector('#load-product').innerHTML = 'Carregando...'
+    setLoading(true)
     try {
       if (search !== '') {
         const { data } = await api.get(`products/${typeSeach}/${search}`)
@@ -23,7 +25,7 @@ export default function Product(){
       openMOdalAlert()
       setProducts([])
     }
-    document.querySelector('#load-product').innerHTML = ''
+    setLoading(false)
   }
   
   return(
@@ -39,14 +41,18 @@ export default function Product(){
             type="text"
             placeholder="Buscar Produtos"
             onChange={e => setSearch(e.target.value)}
+            onKeyPress={e => e.key === 'Enter' && searchProduct()}
           />
           <button onClick={searchProduct}>Buscar</button>
         </div>
       </div>
 
       <div className="body-container">
-        <span id="load-product"></span>
-        <table>
+        {loading 
+          ?<div className='loadingTable'>
+            <LoadingCircle/>
+          </div>
+          :<table>
           <thead>
             <tr>
               <th>Código</th>
@@ -67,7 +73,9 @@ export default function Product(){
               </tr>
             ))}
           </tbody>
-        </table>
+          </table>
+        }
+        
       </div>
       <ModalAlert>{childrenAlertModal}</ModalAlert>
     </div>

@@ -2,6 +2,16 @@
   border: none !important;
 }
 
+.loadingTable {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.loadingTable svg {
+  width: 50%;
+}
+
 .tab {
   display: flex;
   align-items: center;
@@ -37,10 +47,6 @@
 .tab-body {
   border: solid;
   border-color: var(--gray-line);
-}
-
-.tabcontent {
-  display: none;
 }
 
 /*Modal sales ===========================*/

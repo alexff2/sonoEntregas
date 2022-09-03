@@ -26,6 +26,8 @@ const catDefController = require('./controllers/catDefController')
 //Routes
 //Conections
 routes.get('/conections', connectionsController.findConnections)
+//Shops
+routes.get('/shops', connectionsController.findShops)
 //Login
 routes.post('/authenticated', authController.create)
 //Users

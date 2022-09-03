@@ -74,11 +74,12 @@ const Item = ({classes, title, icon: Icon, value, seachHome}) => {
 
 export default function Home(){
   const [ itens, setItens ] = useState([])
+  const { sales } = useSale()
   const classes = useStyles()
 
   useEffect(()=>{
     seachHome()
-  },[])
+  },[sales])
 
   const seachHome = () => {
     api

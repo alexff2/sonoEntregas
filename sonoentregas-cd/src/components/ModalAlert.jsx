@@ -5,10 +5,15 @@ import { makeStyles } from '@material-ui/core'
 import Modal from './Modal'
 
 const useMakeStyle = makeStyles( theme => ({
+  modalAlert: {
+    minWidth: 600,
+    fontSize: 20
+  },
   headerX: {
-    backgroundColor: 'rgb(226, 116, 126)',
     padding: '2rem',
     textAlign: 'center',
+    backgroundColor: '#E83F5B',
+
     '& div': {
       border: '4px solid white',
       height: '5rem',
@@ -26,32 +31,42 @@ const useMakeStyle = makeStyles( theme => ({
   content: {
     padding: '1rem',
     textAlign: 'center',
+
     '& button': {
       marginTop: '1rem',
-      backgroundColor: 'rgb(226, 116, 126)',
+      backgroundColor: '#E83F5B',
       color: 'white',
       border: 'none',
       width: '100px',
       padding: '0.5rem 0',
       borderRadius: '20px',
+      cursor: 'pointer'
     }
   }
 }))
 
-export default function ModalALert({ children, open, setOpen }){
+export default function ModalALert({ children, open, setOpen, type }){
   const classes = useMakeStyle()
   return(
     <Modal open={open} setOpen={setOpen} title={false}>
-      <div>
-        <div className={classes.headerX}>
-          <div><AddIcon fontSize="large"/></div>
+      <div className={classes.modalAlert}>
+        <div 
+          className={classes.headerX}
+          style={type === 'sucess' ? {backgroundColor: '#5EB691'}:{}}
+        >
+          <div>
+            <AddIcon fontSize="large"/>
+          </div>
         </div>
         <div className={classes.content}>
           <h2>Atenção!</h2>
           <p>
             { children }
           </p>
-          <button onClick={() => setOpen(false)}>Fechar</button>
+          <button
+            style={type === 'sucess' ? {backgroundColor: '#5EB691'}:{}}
+            onClick={() => setOpen(false)}
+          >Fechar</button>
         </div>
       </div>
     </Modal>

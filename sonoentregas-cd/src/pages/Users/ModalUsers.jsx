@@ -15,7 +15,7 @@ import ModalAlert from '../../components/ModalAlert'
 import { useUsers } from '../../context/usersContext'
 import { useDrivers } from '../../context/driverContext'
 import { useAssistants } from '../../context/assistantContext'
-import validateFields from '../../functions/validateFields'
+import { validateFields } from '../../functions/validateFields'
 
 import api from '../../services/api'
 
@@ -62,12 +62,11 @@ export default function ModalUsers({ selectUser, setOpen }) {
           description: name,
           active: 1,
           office,
-          password: '0'
+          password: 0
         })
 
         console.log(office)
 
-        if (office === 'User') setUsers([ ...users, data ])
         if (office === 'Driver') setDrivers([ ...drivers, data ])
         if (office === 'Assistant') setAssistants([ ...assistants, data ])
 
@@ -132,9 +131,6 @@ export default function ModalUsers({ selectUser, setOpen }) {
             >
               <MenuItem value={0}>
                 <em>None</em>
-              </MenuItem>
-              <MenuItem value={'User'}>
-                <em>Usuário</em>
               </MenuItem>
               <MenuItem value={'Driver'}>
                 <em>Motorista</em>

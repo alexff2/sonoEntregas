@@ -44,18 +44,38 @@ module.exports = {
     try {
       const { codloja, description, active, office, password } = req.body
 
-      bcrypt.genSalt(saltHash, (err, salt) => {
-        if (err) return res.status(500).json({error: err})
-        bcrypt.hash(password, salt, async (errBt, hash)=>{
-          if (errBt) return res.status(500).json({error: errBt})
-          const values = `${codloja}, '${description}', ${active}, '${office}', '${hash}'`
+      const userVerify = await Users.findAny(0, { description, codloja })
 
-          return res.json(await Users.creator(0, values))
+      if (userVerify.length > 0) {
+        return res.status(401).json('Já existe um usuário com esse nome nessa loja!')
+      }
+
+      if (password === 0) {
+        const values = `${codloja}, '${description}', ${active}, '${office}', '${password}', '1'`
+
+        const user = await Users.creator(0, values)
+
+        return res.status(201).json(user)
+      }
+
+      bcrypt.genSalt(saltHash, (err, salt) => {
+        if (err) {
+          return res.status(500).json({error: err})
+        }
+        bcrypt.hash(password, salt, async (errBt, hash)=>{
+          if (errBt) {
+            return res.status(500).json({error: errBt})
+          }
+          const values = `${codloja}, '${description}', ${active}, '${office}', '${hash}', '0'`
+
+          const user = await Users.creator(0, values)
+
+          return res.status(201).json(user)
         })
       })
     } catch (error) {
       const { original } = error
-      
+
       return res.status(400).json(original)
     }
   },

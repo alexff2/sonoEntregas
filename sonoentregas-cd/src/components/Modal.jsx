@@ -21,7 +21,7 @@ const useStyles = makeStyles( theme => ({
     color: 'var(--text-light)',
     backgroundColor: '#f5f5f5',
     letterSpacing: -0.5,
-    width: 'min(95vw, 800px)',
+    minWidth: 'min(95vw, 800px)',
     maxHeight: 'calc(100vh - 50px)',
     overflow: 'auto'
   }

@@ -25,7 +25,6 @@ export default function AuthProvider({ children }){
   
       setUserAuth(userLocalHistory)
       setShopAuth(shopLocalHistory)
-      setToken(token)
     }
   }, [])
 

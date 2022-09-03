@@ -25,10 +25,14 @@ module.exports = {
     try {
       const { userName, password, codloja } = req.body
 
-      const users = await Users.findSome(0, `DESCRIPTION = '${userName}' AND ACTIVE = 1`)
+      const users = await Users.findAny(0, {
+        DESCRIPTION: userName,
+        ACTIVE: 1,
+        PRE_REG: 1
+      })
 
       if (users.length === 0) {
-        return res.status(401).json('Senha e/ou usuário incorreto!')
+        return res.status(401).json('Usuário e/ou senha inválido!')
       }
 
       let sendUser = {}
@@ -48,7 +52,7 @@ module.exports = {
       const passwordMatch =  await compare(password, sendUser.PASSWORD)
 
       if (!passwordMatch) {
-        return res.status(401).json('Senha e/ou usuário incorreto!')
+        return res.status(401).json('Usuário e/ou senha inválido!')
       }
 
       return res.status(201).json({

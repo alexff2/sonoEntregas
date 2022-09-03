@@ -9,7 +9,7 @@ import { useCars } from '../../context/carsContext'
 
 import api from '../../services/api'
 
-import validateFields from '../../functions/validateFields'
+import { validateFields } from '../../functions/validateFields'
 
 function RegisterCars({ 
     selectCar, setValue, setIsDesableFind, setIsDesableRegister, setIsDesableUpdate

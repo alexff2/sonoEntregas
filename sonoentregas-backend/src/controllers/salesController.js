@@ -1,7 +1,9 @@
+const { QueryTypes } = require('sequelize')
 const Sales = require('../models/Sales')
 const ViewSalesProd = require('../models/ViewSalesProd')
 const ViewDeliveryProd = require('../models/ViewDeliveryProd2')
 const ViewDeliverys = require('../models/ViewDeliverys')
+const Empresas = require('../models/Empresas')
 const { findSales } = require('../services/salesService')
 
 module.exports = {
@@ -21,7 +23,7 @@ module.exports = {
         const salesProd = await Sales._query(0, `SELECT ID_SALE FROM DELIVERYS_PROD WHERE ${typesearch} = '${search}'${whereCodloja}`)
 
         if (salesProd[0].length > 0 ) {
-          var idSale = ''
+          let idSale = ''
   
           for (let i = 0; i < salesProd[0].length; i++){
             if ( i === 0 ){
@@ -40,9 +42,8 @@ module.exports = {
         sales = await Sales.findSome(0, `${typesearch} = '${search}'${whereCodloja}`)
       }
 
+      let idSale = ''
       if (sales.length > 0){
-        var idSale = ''
-        
         for (let i = 0; i < sales.length; i++){
           if ( i === 0 ){
             idSale+= sales[i].ID_SALES
@@ -52,9 +53,10 @@ module.exports = {
         }
     
         const viewSalesProd = await ViewSalesProd.findSome(0, `ID_SALES IN (${idSale})`)
-    
-        sales.forEach(sale => {
-          sale["products"] = []
+        const shops = await Empresas._query(0, 'SELECT * FROM LOJAS', QueryTypes.SELECT)
+
+        const sales_prod = sales.map(sale => {
+          sale['products'] = []
     
           viewSalesProd.forEach(saleProd => {
             saleProd['checked'] = false
@@ -62,9 +64,17 @@ module.exports = {
               sale.products.push(saleProd)
             }
           })
+
+          shops.forEach( shops => {
+            if (shops.CODLOJA === sale.CODLOJA) {
+              sale['SHOP'] = shops.DESC_ABREV
+            }
+          })
+
+          return sale
         })
         
-        return res.json(sales)
+        return res.json(sales_prod)
       } else {
         return res.status(204).json('Venda não encontrada')
       }

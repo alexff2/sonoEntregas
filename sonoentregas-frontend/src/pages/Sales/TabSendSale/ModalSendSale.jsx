@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 
+import LoadingCircle from '../../../components/LoadingCircle'
+
 import api from '../../../services/api'
 import { validateObs } from '../../../functions/validateFields'
 
@@ -67,6 +69,7 @@ export default function ModalSendSale({
   date,
   setEmissao
  }){
+  const [ loading, setLoading ] = useState(false)
   const [ orcParc, setOrcParc ] = useState([])
   const [ productSales, setProductSales ] = useState([])
   const [ openObs, setOpenObs ] = useState(false)
@@ -79,12 +82,12 @@ export default function ModalSendSale({
   
 
   useEffect(()=>{
+    setLoading(true)
     api.get(`salesshop/products/${item.CODIGOVENDA}/${cod}`)
-      .then( resp => {
+    .then( resp => {
         setProductSales(resp.data.productsSceShop)
-        console.log(resp.data.productsSceShop)
-
         setOrcParc(resp.data.orcparc)
+        setLoading(false)
       })
 
       .catch( err => {
@@ -92,6 +95,7 @@ export default function ModalSendSale({
         setOpenAlert()
         setType()
         console.log(err)
+        setLoading(false)
       })
   },[ cod, item, setChildrenError, setOpenAlert, setType ])
 
@@ -180,41 +184,47 @@ export default function ModalSendSale({
             </div> 
           </div>
 
-          <table className="tab-modal-product">
-            <thead>
-              <tr>
-                <th>Código</th>
-                <th>Descrição</th>
-                <th>Valor</th>
-                <th>Estoque</th>
-                <th>Disponível</th>
-                <th>Qtd</th>
-                <th>Enviar? / Brinde?</th>
-                <th>Satus</th>
-              </tr>
-            </thead>
-            <tbody>
-            {productSales.map(product => (
-              <tr key={product.CODPRODUTO}>
-                <td>{product.ALTERNATI}</td>
-                <td>{product.DESCRICAO}</td>
-                <td>
-                  {Intl
-                    .NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'})
-                    .format(product.NVTOTAL)
-                  }
-                </td>
-                <SetEstoque product={product} />
-                <td>{
-                  !product.STATUS
-                    ? <div style={{color: 'var(--red)'}}>Pendente</div>
-                    : <div style={{color: 'var(--green)'}}>{product.STATUS}</div>
-                }</td>
-              </tr>
-            ))}
-            </tbody>
-          </table>
-        
+          {loading 
+          ?
+            <div className='loadingTable' >
+              <LoadingCircle/>
+            </div>
+          : 
+            <table className="tab-modal-product">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Descrição</th>
+                  <th>Valor</th>
+                  <th>Estoque</th>
+                  <th>Disponível</th>
+                  <th>Qtd</th>
+                  <th>Enviar? / Brinde?</th>
+                  <th>Satus</th>
+                </tr>
+              </thead>
+              <tbody>
+              {productSales.map(product => (
+                <tr key={product.CODPRODUTO}>
+                  <td>{product.ALTERNATI}</td>
+                  <td>{product.DESCRICAO}</td>
+                  <td>
+                    {Intl
+                      .NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'})
+                      .format(product.NVTOTAL)
+                    }
+                  </td>
+                  <SetEstoque product={product} />
+                  <td>{
+                    !product.STATUS
+                      ? <div style={{color: 'var(--red)'}}>Pendente</div>
+                      : <div style={{color: 'var(--green)'}}>{product.STATUS}</div>
+                  }</td>
+                </tr>
+              ))}
+              </tbody>
+            </table>
+          }
         </div>
       </div>
     </div>

@@ -25,17 +25,8 @@ import { useSale } from '../../context/saleContext'
 import api from '../../services/api'
 
 const useStyles = makeStyles(theme => ({
-  sales: {
-    marginTop: theme.spacing(1),
-    display: 'flex',
-    width: 1100
-  },
-  boxAddress: {
-    width: 509
-  },
-  //Style form select\
+  //Style form select
   divFormControl: {
-    width: '100%',
     display: 'flex',
     alignItems: 'center'
   },
@@ -65,6 +56,16 @@ const useStyles = makeStyles(theme => ({
     padding: 4,
     backgroundColor: theme.palette.error.light,
     color: '#FFF'
+  },
+  sales: {
+    marginTop: theme.spacing(1),
+    display: 'flex'
+  },
+  boxAddress: {
+    width: 500,
+    [theme.breakpoints.down('sm')]: {
+      width: 300
+    },
   },
   //Style buttons
   btnActions: {
@@ -181,22 +182,22 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
 
     const saleFound = createDevSales.find( sale => sale.ID_SALES === idSale )
 
-    if(saleFound === undefined) {
+    if(!saleFound) {
       try {
         if (idSale !== ''){
           const {data} = await api.get(`sales/ID_SALES/${idSale}/null/false`)
 
           if(data !== '' ) {
-            var isOpenSales = false
-            for (let i = 0; i < data.length; i++) {
-              if (data[i].STATUS === 'Aberta') {
-                var sale = [data[i]]
-                setCreateDevSales([...createDevSales, ...sale])
-                isOpenSales = true
-              }
-            }
-            !isOpenSales && setErrorMsg('Venda FECHADA já lançada em rota, consultar no menu VENDAS para saber STATUS da rota')
-          } else setErrorMsg('Venda não encontrada')
+            let sales = []
+
+            sales = data.filter(sale => sale.STATUS === 'Aberta')
+
+            setCreateDevSales([...createDevSales, ...sales])
+
+            sales.length === 0 && 
+              setErrorMsg('Venda FECHADA já lançada em rota, consultar no menu VENDAS para saber STATUS da rota')
+          } else 
+            setErrorMsg('Venda não encontrada')
         } else {
           setErrorMsg('Preencha o campo Código da Venda')
         }
@@ -217,7 +218,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
 
   //Component
   return(
-    <form>
+    <form style={{maxWidth: 1050}}>
       <div className={classes.divFormControl}>
         <TextField
           id="description"
@@ -323,7 +324,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
         />
 
         <Box className={classes.boxAddress}>
-          <BoxInfo loc="NotModal"/>
+          <BoxInfo />
         </Box>
       </Box>
 

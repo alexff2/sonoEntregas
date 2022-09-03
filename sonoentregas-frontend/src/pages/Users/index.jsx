@@ -56,6 +56,7 @@ export default function User(){
     }
     setDisabled(true)
   }
+
   const closeModalUpdate = e => {
     if (e.target.className === 'modal-overlaw' || e.target.className === 'cancel-modal') {
       setUpdateUser([])

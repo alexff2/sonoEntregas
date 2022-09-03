@@ -11,14 +11,12 @@ import {
   TableHead,
   TableRow
 } from '@material-ui/core'
-import { Add, Delete, Edit } from '@material-ui/icons'
+import { Add, Edit } from '@material-ui/icons'
 import { useDrivers } from '../../context/driverContext'
 import { useAssistants } from '../../context/assistantContext'
 import { useUsers } from '../../context/usersContext'
 import Modal from '../../components/Modal'
 import ModalUsers from './ModalUsers'
-
-import api from '../../services/api'
 
 const useStyles = makeStyles( theme => ({
   headerCell: {
@@ -37,22 +35,12 @@ export default function Users() {
   const [ openRegisterUser, setOpenRegisterUser ] = useState(false)
   const [ openUpdateUser, setOpenUpdateUser ] = useState(false)
   const [ userUpdate, setUserUpdate ] = useState()
-  const { drivers, setDrivers } = useDrivers()
-  const { assistants, setAssistants } = useAssistants()
-  const { users, setUsers } = useUsers()
+  const { drivers } = useDrivers()
+  const { assistants } = useAssistants()
+  const { users } = useUsers()
   const classes = useStyles()
 
   //Functions
-  const deleteUser = async (cod, cargo) => {
-    try {
-      await api.delete(`users/${cod}`)
-      if(cargo === 'User') setUsers(users.filter(item => item.ID !== cod))
-      if(cargo === 'Driver') setDrivers(drivers.filter(item => item.ID !== cod))
-      if(cargo === 'Assistant') setAssistants(assistants.filter(item => item.ID !== cod))
-    } catch (error) {
-      alert(error)
-    }
-  }
   const updateUser = (item, office) => {
     setUserUpdate({...item, office})
     setOpenUpdateUser(true)
@@ -78,7 +66,6 @@ export default function Users() {
                 <TableCell>Usuário</TableCell>
                 <TableCell>
                   <Edit onClick={() => updateUser(user, 'User')}/>
-                  <Delete onClick={() => deleteUser(user.ID, 'User')}/>
                 </TableCell>
               </TableRow>
             ))}
@@ -89,7 +76,6 @@ export default function Users() {
                 <TableCell>Motorista</TableCell>
                 <TableCell>
                   <Edit onClick={() => updateUser(driver, 'Driver')}/>
-                  <Delete onClick={() => deleteUser(driver.ID, 'Driver')}/>
                 </TableCell>
               </TableRow>
             ))}
@@ -100,7 +86,6 @@ export default function Users() {
                 <TableCell>Auxiliar</TableCell>
                 <TableCell>
                   <Edit onClick={() => updateUser(assistant, 'Assistant')}/>
-                  <Delete onClick={() => deleteUser(assistant.ID, 'Assistant')}/>
                 </TableCell>
               </TableRow>
             ))}

@@ -8,27 +8,36 @@ import { useAuthenticate } from '../../context/authContext'
 
 export default function Vendas(){
   const [ userMaster, setUserMas ] = useState(false)
+  const [ tabs, setTabs ] = useState({
+    tab1: true,
+    tab2: false,
+    tab3: false,
+  })
   const { userAuth } = useAuthenticate()
 
   const { OFFICE } =  userAuth
 
   useEffect(() => {
-    document.getElementById('CONSULTAR').style.display = "block"
     setUserMas((OFFICE === 'Dev' || OFFICE === 'Master'))
   }, [OFFICE])
 
-  const openTab = e => {
-    var i, tabcontent, tablinks;
-    tabcontent = document.getElementsByClassName("tabcontent")
-    for (i = 0; i < tabcontent.length; i++) {
-      tabcontent[i].style.display = "none"
+  const openTab = (tab, e) => {
+    // Change style buttons
+    let tablinks = document.getElementsByClassName("tablinks")
+
+    for (let i = 0; i < tablinks.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace("active", "")
     }
-    tablinks = document.getElementsByClassName("tablinks")
-    for (i = 0; i < tablinks.length; i++) {
-      tablinks[i].className = tablinks[i].className.replace(" active", "")
-    }
-    document.getElementById(e.target.value).style.display = "block"
+
     e.currentTarget.className += " active"
+
+    // Change tabs
+    let newTabs = {}
+    Object.entries(tabs).forEach(([key, value]) => {
+      key === tab ? newTabs[key] = true : newTabs[key] = false
+    })
+
+    setTabs(newTabs)
   }
 
   return(
@@ -39,33 +48,35 @@ export default function Vendas(){
           className="tablinks active"
           value="CONSULTAR"
           type="button"
-          onClick={e => openTab(e)} />
+          onClick={e => openTab('tab1',e)} />
 
         <input
           className="tablinks"
           value="ENVIAR"
           type="button"
-          onClick={e => openTab(e)} />
+          onClick={e => openTab('tab2', e)} />
 
         { userMaster &&
           <input
             className="tablinks"
             value="VISITA"
             type="button"
-            onClick={e => openTab(e)} /> }
+            onClick={e => openTab('tab3', e)} /> }
       </div>
       
       <div className="tab-body body-container">
-        <div id="CONSULTAR" className="tabcontent">
+        {tabs.tab1 &&
           <TabSeachMain />
-        </div>
+        }
 
-        <div id="ENVIAR" className="tabcontent">
+        {tabs.tab2 &&
           <TabSendMain />
-        </div>
-        <div id="VISITA" className="tabcontent">
+        }
+        
+        {tabs.tab3 &&
           <Visit/>
-        </div>
+        }
+
       </div>
 
     </div>

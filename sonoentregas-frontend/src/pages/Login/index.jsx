@@ -50,14 +50,17 @@ const Login = () => {
         <div id="shop">Loja: {selectShop.description}</div>
         <form onSubmit={handleLogin}>
           <div className="field">
-            <input type="text" placeholder="Usuário..." onChange={e => setUserName(e.target.value)}/>
+            <input type="text"
+              placeholder="Usuário..."
+              onChange={e => setUserName(e.target.value)}
+            />
           </div>
           <div className="field">
             <input
               type="password"
               placeholder="Senha..."
               onChange={e => setPassword(e.target.value)}
-              onKeyPress={e => e.key === 'Enter' ? handleLogin(e) : null}
+              onKeyPress={e => e.key === 'Enter' && handleLogin(e)}
             />
           </div>
           <button type="submit">Logar</button>

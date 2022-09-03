@@ -7,22 +7,21 @@ import '../styles/components/modalAlert.css'
 
 export default function ModalALert(){
   const { childrenError, open, setOpen, type } = useModalAlert()
+
   useEffect(()=>{
     open ?
       document.querySelector("#modal-over-alert2").style.display = 'flex'
       : document.querySelector("#modal-over-alert2").style.display = 'none'
   },[open])
 
-
   return(
     <div className="modal-overlaw" id="modal-over-alert2">
       <div className="modal-alert">
-        {type === 'sucess'?
-          <div className="headerX" style={{backgroundColor: 'var(--green)'}}>
+        {type === 'sucess'
+          ?<div className="headerX" style={{backgroundColor: 'var(--green)'}}>
             <div style={{transform: 'unset'}}><AiOutlineCheck /></div>
           </div>
-          :
-          <div className="headerX">
+          :<div className="headerX">
             <div><AiOutlinePlus /></div>
           </div>
         }

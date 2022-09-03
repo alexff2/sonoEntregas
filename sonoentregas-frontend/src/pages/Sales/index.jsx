@@ -1,55 +1,72 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 import ModalAlert, { openMOdalAlert } from '../../components/ModalAlert'
 import TabSendSale from './TabSendSale'
 import TabSaleSeach from './TabSaleSeach'
 
-export default function Vendas(){
+export default function Sales(){
   const [ childrenAlertModal, setChildrenAlertModal ] = useState('Vazio')
+  const [ tabs, setTabs ] = useState({
+    tab1: true,
+    tab2: false,
+    tab3: false,
+  })
 
-  useEffect(() => {
-    document.getElementById('ENVIAR').style.display = "block"
-  }, [])
+  const openTab = (tab, e) => {
+    // Change style buttons
+    let tablinks = document.getElementsByClassName("tablinks")
 
-  const openTab = e => {
-    var i, tabcontent, tablinks;
-    tabcontent = document.getElementsByClassName("tabcontent")
-    for (i = 0; i < tabcontent.length; i++) {
-      tabcontent[i].style.display = "none"
+    for (let i = 0; i < tablinks.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace("active", "")
     }
-    tablinks = document.getElementsByClassName("tablinks")
-    for (i = 0; i < tablinks.length; i++) {
-      tablinks[i].className = tablinks[i].className.replace(" active", "")
-    }
-    document.getElementById(e.target.value).style.display = "block"
+
     e.currentTarget.className += " active"
+
+    // Change tabs
+    let newTabs = {}
+    Object.entries(tabs).forEach(([key, value]) => {
+      key === tab ? newTabs[key] = true : newTabs[key] = false
+    })
+
+    setTabs(newTabs)
   }
 
   return(
     <div className="container sales-container">
 
       <div className="tab">
-        <input className="tablinks active" type="button" value="ENVIAR" onClick={e => openTab(e)} />
-        <input className="tablinks" type="button" value="CONSULTAR" onClick={e => openTab(e)} />
-        <input className="tablinks" type="button" value="PREVISÃO" onClick={e => openTab(e)} />
+        <input
+          className="tablinks active"
+          type="button"
+          value="ENVIAR"
+          onClick={e => openTab('tab1', e)} />
+        <input
+          className="tablinks"
+          type="button"
+          value="CONSULTAR"
+          onClick={e => openTab('tab2', e)} />
+        <input
+          className="tablinks"
+          type="button"
+          value="PREVISÕES"
+          onClick={e => openTab('tab3', e)} />
       </div>
       
       <div className="tab-body body-container">
-        <div id="ENVIAR" className="tabcontent">
+        {tabs.tab1 &&
           <TabSendSale
             openMOdalAlert={openMOdalAlert}
             setChildrenAlertModal={setChildrenAlertModal}
           />
-        </div>
+        }
 
-        <div id="CONSULTAR" className="tabcontent">
+        {tabs.tab2 && 
           <TabSaleSeach
             openMOdalAlert={openMOdalAlert}
             setChildrenAlertModal={setChildrenAlertModal}
           />
-        </div>
-
-        <div id="PREVISÃO" className="tabcontent">PREV</div>
+        }
+        {tabs.tab3 && <div>PREV</div>}
       </div>
 
       <ModalAlert>{childrenAlertModal}</ModalAlert>

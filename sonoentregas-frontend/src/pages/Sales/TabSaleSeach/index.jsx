@@ -8,6 +8,7 @@ import { useAuthenticate } from '../../../context/authContext'
 
 import Modal from '../../../components/Modal'
 import Status from '../../../components/Status'
+import LoadingCircle from '../../../components/LoadingCircle'
 import ModalSales from './ModalSales'
 
 function TdStatus({produto}){
@@ -95,6 +96,7 @@ function Row({ sale, modalDetalProduct, cancelSubmitSales, reverseStock }) {
 
 export default function TabSaleSeach({ openMOdalAlert, setChildrenAlertModal }) {
   const [ openModalProduct, setOpenModalProduct ] = useState(false)
+  const [ loading, setLoading ] = useState(false)
   const [ sales, setSales ] = useState([])
   const [ search, setSearch ] = useState('')
   const [ typeSeach, setTypeSeach ] = useState('ID_SALES')
@@ -105,11 +107,13 @@ export default function TabSaleSeach({ openMOdalAlert, setChildrenAlertModal }) 
   const { cod: Codloja } = shopAuth
 
   useEffect(()=>{
+    setLoading(true)
     api.get(`sales/STATUS/Aberta/null/${Codloja}`)
     .then(resp => {
       if(resp.data){
         setSales(resp.data)
       }
+      setLoading(false)
     })
     .catch( e => console.log(e) )
   },[Codloja])
@@ -219,7 +223,11 @@ export default function TabSaleSeach({ openMOdalAlert, setChildrenAlertModal }) 
       </div>
 
       {/*Tabela de vendas*/}
-      <div>
+      { loading
+        ? <div className="loadingTable">
+          <LoadingCircle />
+        </div>
+        :
         <table>
           <thead>
             <tr>
@@ -242,7 +250,9 @@ export default function TabSaleSeach({ openMOdalAlert, setChildrenAlertModal }) 
             ))}
           </tbody>
         </table>
-      </div>
+      }
+        
+
 
       <Modal 
         openModal={openModalProduct}

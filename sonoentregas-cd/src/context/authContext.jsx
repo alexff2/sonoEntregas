@@ -1,58 +1,92 @@
-import { useState, useContext, createContext } from "react"
+import React, { useState, useEffect, useContext, createContext } from "react"
 
 import api from "../services/api"
-import { validateFilds } from '../functions/validateFields'
-import { useModalAlert } from './modalAlertContext'
+import { validateFields } from '../functions/validateFields'
+import { useAlert } from './alertContext'
 
 const AuthContext = createContext({})
 
 const TOKEN_KEY = "@Sono-token"
 const SONO_USER = "@sono-user"
-const SONO_SHOP = "@sono-shop"
 
 export default function AuthProvider({ children }){
   const [userAuth, setUserAuth] = useState({})
-  const [shopAuth, setShopAuth] = useState({})
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const { setAlert } = useModalAlert()
+  const { setAlert } = useAlert()
+
+  useEffect(() => {
+    const token = getToken()
+    if (token) {
+      setUserAuth(getUser())
+      setIsAuthenticated(true)
+    }
+  },[])
 
   const setToken = token => localStorage.setItem(TOKEN_KEY, JSON.stringify(token))
   const setUser = user => localStorage.setItem(SONO_USER, JSON.stringify(user))
-  const setShop = shop => localStorage.setItem(SONO_SHOP, JSON.stringify(shop))
 
   const getToken = () => localStorage.getItem(TOKEN_KEY)
-  /* const getUser = () => JSON.parse(localStorage.getItem(SONO_USER))
-  const getShop = () => JSON.parse(localStorage.getItem(SONO_SHOP)) */
+  const getUser = () => JSON.parse(localStorage.getItem(SONO_USER))
 
-  const login = async ({ userName, password, selectShop }) => {
+  const login = async ({ userName, password }) => {
     try {
-      if (validateFilds([password, userName])) {
+      if (validateFields([password, userName])) {
         const { data } = await api.post('/authenticated', {
           userName,
           password,
-          codloja: selectShop.cod
+          codloja: 1
         })
 
         const { user , token } = data
 
         setToken(token)
         setUser(user)
-        setShop(selectShop)
 
         setUserAuth(user)
-        setShopAuth(selectShop)
         setIsAuthenticated(true)
 
       } else {
-        setAlert('Preencha todos os campos corretamente.')
+        return setAlert('Preencha todos os campos corretamente.')
       }
     } catch (e) {
       console.log(e.response)
-      if(!e.response)
+
+      if (!e.response)
         setAlert('Rede')
-      else if(e.response.status === 400)
+      else if (e.response.status === 400)
         setAlert('Servidor')
-      else setAlert(e.response.data)
+      else
+        setAlert(e.response.data)
+    }
+  }
+
+  const signUp = async ({ userName, password, rePassword }) => {
+    try {
+      if (validateFields([password, userName, rePassword])) {
+        if (password !== rePassword) {
+          return setAlert('Senhas não correspondem!')
+        }
+
+        await api.post('users', {
+          codloja: 1,
+          description: userName,
+          active: 1,
+          office: 'User',
+          password: password
+        })
+
+        return setAlert('Solicitação de cadastro enviada com sucesso, entre em contato com ADM para liberar acesso!', 'sucess')
+      } else {
+        return setAlert('Preencha todos os campos corretamente.')
+      }
+    } catch (e) {
+      console.log(e.response)
+      if (!e.response)
+        setAlert('Rede')
+      else if (e.response.status === 400)
+        setAlert('Servidor')
+      else
+        setAlert(e.response.data)
     }
   }
 
@@ -65,8 +99,8 @@ export default function AuthProvider({ children }){
     <AuthContext.Provider value={{
       isAuthenticated,
       userAuth,
-      shopAuth,
       login,
+      signUp,
       logout,
       getToken
     }}>
@@ -79,8 +113,8 @@ export function useAuthenticate(){
   const {
     isAuthenticated,
     userAuth,
-    shopAuth,
     login,
+    signUp,
     logout,
     getToken
   } = useContext(AuthContext)
@@ -88,8 +122,8 @@ export function useAuthenticate(){
   return {
     isAuthenticated,
     userAuth,
-    shopAuth,
     login,
+    signUp,
     logout,
     getToken
   }

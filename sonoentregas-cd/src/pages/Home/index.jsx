@@ -40,7 +40,7 @@ export default function Home(){
           type={'home'}
         />
         <Box className={classes.boxAddress}>
-          <BoxInfo loc="NotModal"/>
+          <BoxInfo />
         </Box>
       </Box>
 
