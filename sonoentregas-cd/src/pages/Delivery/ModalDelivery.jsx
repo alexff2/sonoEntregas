@@ -6,14 +6,15 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Box
+  Box,
+  FormControlLabel,
+  Checkbox
 } from "@material-ui/core"
 
 //Components
 import TableSales from '../../components/TableSales'
 import BoxInfo from '../../components/BoxInfo'
 import { ButtonCancel, ButtonSucess } from '../../components/Buttons'
-import ModalAlert from '../../components/ModalAlert'
 
 //context
 import { useCars } from '../../context/carsContext'
@@ -21,11 +22,28 @@ import { useDrivers } from '../../context/driverContext'
 import { useAssistants } from '../../context/assistantContext'
 import { useDelivery } from '../../context/deliveryContext'
 import { useSale } from '../../context/saleContext'
+import { useAlert } from '../../context/alertContext'
 
 import api from '../../services/api'
+import { getDateBr } from '../../functions/getDates'
 
 const useStyles = makeStyles(theme => ({
   //Style form select
+  form: {
+    position: 'relative',
+    maxWidth: 1050
+  },
+  checkedPred: {
+    position: "absolute",
+    top: -50,
+    right: 0,
+    fontWeight: theme.typography.fontWeightBold
+  },
+  fieldDate: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+    width: 200,
+  },
   divFormControl: {
     display: 'flex',
     alignItems: 'center'
@@ -78,6 +96,11 @@ const useStyles = makeStyles(theme => ({
 
 export default function ModalDelivery({ setOpen, selectDelivery }){
   //States
+  const [ checkedPred, setCheckedPred ] = useState(false)
+  const [ disableDrive, setDisableDrive ] = useState(false)
+  const [ disableAssist, setDisableAssist ] = useState(false)
+  const [ disableCar, setDisableCar ] = useState(false)
+  const [ datePrev, setDatePrev ] = useState()
   const [ description, setDescription ] = useState('')
   const [ codCar, setCodCar ] = useState(false)
   const [ codDriver, setCodDriver ] = useState(false)
@@ -86,8 +109,6 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
   const [ createDevSales, setCreateDevSales ] = useState([])
   const [ salesProd, setSalesProd ] = useState([])
   const [ errorMsg, setErrorMsg ] = useState('')
-  const [ openModalAlert, setOpenModalAlert ] = useState(false)
-  const [ childrenModalAlert, setChildrenModalAlert ] = useState('')
   const [ disabledBtnGrav, setDisabledBtnGrav ] = useState(false)
 
   const { cars } = useCars()
@@ -95,6 +116,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
   const { assistants } = useAssistants()
   const { setDelivery } = useDelivery()
   const { setSales } = useSale()
+  const { setAlert } = useAlert()
 
   //Styes
   const classes = useStyles()
@@ -123,32 +145,44 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
   const createDelivery = async () => {
     try {
       if (!codCar || !codDriver || !codAssistant){
-        setOpenModalAlert(true)
-        setChildrenModalAlert('Preencha todos as informações')
+        setAlert('Preencha todos as informações')
       } else {
-        setDisabledBtnGrav(true)
 
-        const data = {
-          description, codCar, codDriver, codAssistant, salesProd, status: 'Em lançamento'
+        if (typeof codCar === 'boolean' && !datePrev) {
+          return setAlert('Selecione uma data válida')
         }
-  
+
+        setDisabledBtnGrav(true)
+        const data = {
+          description: typeof codCar === 'boolean' ? `Previsão de ${getDateBr(datePrev)}`: description,
+          codCar: typeof codCar === 'boolean' ? 0: codCar,
+          codDriver: typeof codDriver === 'boolean' ? 0: codDriver,
+          codAssistant: typeof codAssistant === 'boolean' ? 0: codAssistant,
+          salesProd,
+          status: 'Em lançamento'
+        }
+
         const { data: dataDelivery } = await api.post('deliverys', data)
-  
+
         const { data: dataDeliv } = await api.get('deliverys/status/') 
         setDelivery(dataDeliv)
-  
+
         if (dataDelivery.ID) { //Tenta melhorar performace
           const { data: dataSales } = await api.get('sales/false/false/Aberta/null')
-    
+
           setSales(dataSales)
         }
-  
+
         setOpen(false)
       }
-    } catch (error) {
-      setOpenModalAlert(true)
-      setChildrenModalAlert('Erro ao cadastar Entrega, entre em contato com ADM')
-      console.log(error)
+    } catch (e) {
+      console.log(e.response)
+      if (!e.response)
+        setAlert('Rede')
+      else if (e.response.status === 400)
+        setAlert('Servidor')
+      else
+        setAlert(e.response.data)
     }
   }
 
@@ -172,8 +206,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
       setOpen(false)
     } catch (e) {
       console.log(e)
-      setOpenModalAlert(true)
-      setChildrenModalAlert('Entre em contato com Administrador')
+      setAlert('Entre em contato com Administrador')
     }
   }
 
@@ -216,80 +249,119 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
     setIdSale('')
   }
 
+  const handleChekedPrevision = e => {
+    setCheckedPred(!checkedPred)
+    setDisableDrive(!disableDrive)
+    setDisableAssist(!disableAssist)
+    setDisableCar(!disableCar)
+
+    setCodDriver(!codDriver)
+    setCodAssistant(!codAssistant)
+    setCodCar(!codCar)
+  }
+
   //Component
   return(
-    <form style={{maxWidth: 1050}}>
-      <div className={classes.divFormControl}>
-        <TextField
-          id="description"
-          label="Descrição"
-          placeholder="Descrição da entrega"
-          style={{width: '52%'}}
+    <form className={classes.form}>
+      {!selectDelivery &&
+        <FormControlLabel
+        className={classes.checkedPred}
+        control={
+          <Checkbox
+          checked={checkedPred}
+          onChange={handleChekedPrevision}
+          name="predction"
+          />
+        }
+        labelPlacement="start"
+        label="PREVISÃO"
+      />}
+
+      {!checkedPred
+        ?<div className={classes.divFormControl}>
+          <TextField
+            id="description"
+            label="Descrição"
+            placeholder="Descrição da entrega"
+            style={{width: '52%'}}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            variant="outlined"
+            defaultValue={selectDelivery ? selectDelivery.DESCRIPTION : ''}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+          />
+
+          <FormControl variant="outlined" className={classes.formControl}>
+            <InputLabel id="driverLabel">Motorista</InputLabel>
+            <Select
+              labelId="driverLabel"
+              label="Motorista"
+              id="driver"
+              defaultValue={selectDelivery ? selectDelivery.ID_DRIVER : 0}
+              onChange={(e) => setCodDriver(e.target.value)}
+              disabled={disableDrive}
+            >
+              <MenuItem value={0}>
+                <em>None</em>
+              </MenuItem>
+              {drivers.map( item => (
+                <MenuItem key={item.ID} value={item.ID}>{item.DESCRIPTION}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl variant="outlined" className={classes.formControl}>
+            <InputLabel id="assistantLabel">Auxiliar</InputLabel>
+            <Select
+              labelId="assistantLabel"
+              label="Auxiliar"
+              id="assistant"
+              defaultValue={selectDelivery ? selectDelivery.ID_ASSISTANT : 0}
+              onChange={(e) => setCodAssistant(e.target.value)}
+              disabled={disableAssist}
+            >
+              <MenuItem value={0}>
+                <em>None</em>
+              </MenuItem>
+              {assistants.map( item => (
+                <MenuItem key={item.ID} value={item.ID}>{item.DESCRIPTION}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl variant="outlined" className={classes.formControl}>
+            <InputLabel id="carLabel">Veículo</InputLabel>
+            <Select
+              labelId="carLabel"
+              id="car"
+              label="Veículo"
+              defaultValue={selectDelivery ? selectDelivery.ID_CAR : 0}
+              onChange={(e) => setCodCar(e.target.value)}
+              disabled={disableCar}
+            >
+              <MenuItem value={0}>
+                <em>None</em>
+              </MenuItem>
+              {cars.map( item => (
+                <MenuItem key={item.ID} value={item.ID}>{item.DESCRIPTION}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </div>
+
+        :<TextField
+          id="date"
+          label="Previsão"
+          type="date"
+          onChange={e => setDatePrev(e.target.value)}
+          className={classes.fieldDate}
           InputLabelProps={{
             shrink: true,
           }}
-          variant="outlined"
-          defaultValue={selectDelivery ? selectDelivery.DESCRIPTION : ''}
-          onChange={(e) => setDescription(e.target.value)}
-          required
         />
-        <FormControl variant="outlined" className={classes.formControl}>
-          <InputLabel id="driverLabel">Motorista</InputLabel>
-          <Select
-            labelId="driverLabel"
-            label="Motorista"
-            id="driver"
-            defaultValue={selectDelivery ? selectDelivery.ID_DRIVER : 0}
-            onChange={(e) => setCodDriver(e.target.value)}
-            required
-          >
-            <MenuItem value={0}>
-              <em>None</em>
-            </MenuItem>
-            {drivers.map( item => (
-              <MenuItem key={item.ID} value={item.ID}>{item.DESCRIPTION}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        
-        <FormControl variant="outlined" className={classes.formControl}>
-          <InputLabel id="assistantLabel">Auxiliar</InputLabel>
-          <Select
-            labelId="assistantLabel"
-            label="Auxiliar"
-            id="assistant"
-            defaultValue={selectDelivery ? selectDelivery.ID_ASSISTANT : 0}
-            onChange={(e) => setCodAssistant(e.target.value)}
-            required
-          >
-            <MenuItem value={0}>
-              <em>None</em>
-            </MenuItem>
-            {assistants.map( item => (
-              <MenuItem key={item.ID} value={item.ID}>{item.DESCRIPTION}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl variant="outlined" className={classes.formControl}>
-          <InputLabel id="carLabel">Veículo</InputLabel>
-          <Select
-            labelId="carLabel"
-            id="car"
-            label="Veículo"
-            defaultValue={selectDelivery ? selectDelivery.ID_CAR : 0}
-            onChange={(e) => setCodCar(e.target.value)}
-            required
-          >
-            <MenuItem value={0}>
-              <em>None</em>
-            </MenuItem>
-            {cars.map( item => (
-              <MenuItem key={item.ID} value={item.ID}>{item.DESCRIPTION}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </div>
+      }
 
       <hr style={{ marginTop: '16px' }}/>
 
@@ -341,12 +413,6 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
           className={classes.btnCancel}
         />
       </div>
-
-      <ModalAlert
-        open={openModalAlert}
-        setOpen={setOpenModalAlert}
-        children={childrenModalAlert}
-      />
     </form>
   )
 }

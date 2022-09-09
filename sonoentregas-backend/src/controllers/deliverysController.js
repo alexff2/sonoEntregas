@@ -39,9 +39,10 @@ module.exports = {
    */
   async create( req, res ){
     try {
+      const { id: user_id } = req.user
       const { description, codCar, codDriver, codAssistant, salesProd, status } = req.body
 
-      const valuesDelivery = `'${description}', ${codCar}, ${codDriver}, ${codAssistant}, '${status}'`
+      const valuesDelivery = `'${description}', ${codCar}, ${codDriver}, ${codAssistant}, '${status}', ${user_id}, NULL, NULL`
 
       const delivCreate = await Deliverys.creator(0, valuesDelivery)
 
@@ -174,6 +175,7 @@ module.exports = {
   async updateSatus( req, res ){
     const { id } = req.params
     const delivery = req.body
+    const { id: user_id } = req.user
 
     try {
       const maints = await MainService.findMain({
@@ -211,10 +213,12 @@ module.exports = {
 
             await Produtos._query(1,`UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL - ${qtd}, EST_LOJA = EST_LOJA - ${qtd} FROM PRODLOJAS A INNER JOIN PRODUTOS B ON A.CODIGO = B.CODIGO WHERE A.CODLOJA = 1 AND B.ALTERNATI = '${cod}'`)
             
+            await Deliverys.updateNotReturn(0, `STATUS = '${delivery.STATUS}', ID_USER_DELIVERING = ${user_id}`, id)
           } else if (status === 'Finalizada') {
             
             await Deliverys._query(0, `UPDATE DELIVERYS_PROD SET D_DELIVERED = '${delivery.dateDelivery}' WHERE ID_DELIVERY = ${id} AND ID_SALE = ${idSales} AND CODLOJA = ${codLoja} AND COD_ORIGINAL = '${cod}'`)
-            
+
+            await Deliverys.updateNotReturn(0, `STATUS = '${delivery.STATUS}', ID_USER_DELIVERED = ${user_id}`, id)
           } else if (DELIVERED) {
             await Deliverys._query(0, `UPDATE DELIVERYS_PROD SET DELIVERED = 1, D_DELIVERED = '${delivery.dateDelivery}', REASON_RETURN = '${reason}' WHERE ID_DELIVERY = ${id} AND ID_SALE = ${idSales} AND CODLOJA = ${codLoja} AND COD_ORIGINAL = '${cod}'`)
 
@@ -223,11 +227,11 @@ module.exports = {
             await Produtos._query(1,`UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL + ${qtd}, EST_LOJA = EST_LOJA + ${qtd} FROM PRODLOJAS A INNER JOIN PRODUTOS B ON A.CODIGO = B.CODIGO WHERE A.CODLOJA = 1 AND B.ALTERNATI = '${cod}'`)
             
             await Sales._query(0, `UPDATE SALES SET STATUS = 'Aberta' WHERE ID_SALES = ${idSales} AND CODLOJA = ${codLoja}`)
+
+            await Deliverys.updateNotReturn(0, `STATUS = '${delivery.STATUS}', ID_USER_DELIVERED = ${user_id}`, id)
           }
         }
       }
-
-      await Deliverys.updateNotReturn(0, `STATUS = '${delivery.STATUS}'`, id)
 
       return res.json(delivery)
     } catch (e) {

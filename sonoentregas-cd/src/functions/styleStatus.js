@@ -6,6 +6,8 @@ const StyleStatus = status => {
     background = '#ff9800'
   } else if (status === 'Finalizada') {
     background = '#388e3c'
+  } else if (status === 'Previsão') {
+    background = '#E83F5B'
   }
   return { 
     background,

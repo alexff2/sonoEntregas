@@ -2,6 +2,8 @@ const { Router } = require('express')
 
 const routes = new Router()
 
+const { ensureAuthenticated } = require('./middlewares/ensureAuthenticated')
+
 //Import Controllers
 const connectionsController = require('./controllers/connectionsController')
 const authController = require('./controllers/authController')
@@ -43,8 +45,8 @@ routes.put('/users/:userId', usersController.update)
   routes.post('/salesshop', salesSceController.cancelSubmitSales)
   routes.post('/salesshop/reverse', salesSceController.reverseStock)
 //Sales Sono Delivery
+routes.get('/sales/process/:codloja', salesController.salesInProcess)
 routes.get('/sales/:typesearch/:search/:status/:codloja', salesController.index)
-routes.get('/sales/:status/:where', salesController.sales)
 routes.get('/salesProdct/:idSale/:codloja/:codproduto', salesController.findProductDetals)
 routes.post('/sales/updateDate/:idSale', salesController.updaDateDeliv)
 //Cars
@@ -55,10 +57,10 @@ routes.delete('/cars/:id', carsController.delete)
 //Deliverys
 routes.get('/deliverys/:status', deliverysController.index)
 routes.get('/deliverys/:status/:date', deliverysController.index)
-routes.post('/deliverys', deliverysController.create)
-routes.put('/deliverys/:id', deliverysController.update)
-routes.delete('/deliverys/:id', deliverysController.delete)
-routes.put('/deliverys/status/:id', deliverysController.updateSatus)
+routes.post('/deliverys', ensureAuthenticated, deliverysController.create)
+routes.put('/deliverys/:id', ensureAuthenticated, deliverysController.update)
+routes.delete('/deliverys/:id', ensureAuthenticated, deliverysController.delete)
+routes.put('/deliverys/status/:id', ensureAuthenticated, deliverysController.updateSatus)
 //Homes
 routes.get('/home', homeController.index)
 routes.get('/dashboard/:datesearch', dashboardController.index)

@@ -22,7 +22,7 @@ export default function AuthProvider({ children }){
     }
   },[])
 
-  const setToken = token => localStorage.setItem(TOKEN_KEY, JSON.stringify(token))
+  const setToken = token => localStorage.setItem(TOKEN_KEY, token)
   const setUser = user => localStorage.setItem(SONO_USER, JSON.stringify(user))
 
   const getToken = () => localStorage.getItem(TOKEN_KEY)

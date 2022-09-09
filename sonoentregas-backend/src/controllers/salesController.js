@@ -4,7 +4,7 @@ const ViewSalesProd = require('../models/ViewSalesProd')
 const ViewDeliveryProd = require('../models/ViewDeliveryProd2')
 const ViewDeliverys = require('../models/ViewDeliverys')
 const Empresas = require('../models/Empresas')
-const { findSales } = require('../services/salesService')
+const { findSales, salesInProcess } = require('../services/salesService')
 
 module.exports = {
   async index( req, res ){
@@ -115,9 +115,11 @@ module.exports = {
       res.status(400).json(error)
     }
   },
-  async sales(req, res){
-    const {status, where} = req.params
-    const { sales } = await findSales(status, where)
+  async salesInProcess(req, res){
+    const { codloja } = req.params
+
+    const sales = await salesInProcess(codloja)
+
     return res.json(sales)
   }
 }

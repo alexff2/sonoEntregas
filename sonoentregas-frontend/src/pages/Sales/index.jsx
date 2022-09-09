@@ -2,7 +2,9 @@ import React, { useState } from 'react'
 
 import ModalAlert, { openMOdalAlert } from '../../components/ModalAlert'
 import TabSendSale from './TabSendSale'
-import TabSaleSeach from './TabSaleSeach'
+import TabSaleWaiting from './TabSaleWaiting'
+import { TabSalesProcess } from './TabSaleProcess'
+import { TabSalesPrev } from './TabSalesPrev'
 
 export default function Sales(){
   const [ childrenAlertModal, setChildrenAlertModal ] = useState('Vazio')
@@ -10,6 +12,7 @@ export default function Sales(){
     tab1: true,
     tab2: false,
     tab3: false,
+    tab4: false,
   })
 
   const openTab = (tab, e) => {
@@ -43,13 +46,18 @@ export default function Sales(){
         <input
           className="tablinks"
           type="button"
-          value="CONSULTAR"
+          value="AGUARDANDO"
           onClick={e => openTab('tab2', e)} />
         <input
           className="tablinks"
           type="button"
-          value="PREVISÕES"
+          value="EM PROCESSO"
           onClick={e => openTab('tab3', e)} />
+        <input
+          className="tablinks"
+          type="button"
+          value="PREVISÕES"
+          onClick={e => openTab('tab4', e)} />
       </div>
       
       <div className="tab-body body-container">
@@ -61,12 +69,13 @@ export default function Sales(){
         }
 
         {tabs.tab2 && 
-          <TabSaleSeach
+          <TabSaleWaiting
             openMOdalAlert={openMOdalAlert}
             setChildrenAlertModal={setChildrenAlertModal}
           />
         }
-        {tabs.tab3 && <div>PREV</div>}
+        {tabs.tab3 && <TabSalesProcess />}
+        {tabs.tab4 && <TabSalesPrev />}
       </div>
 
       <ModalAlert>{childrenAlertModal}</ModalAlert>

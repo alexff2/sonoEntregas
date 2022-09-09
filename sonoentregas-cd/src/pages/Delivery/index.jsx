@@ -4,6 +4,7 @@ import {
   Fab,
   fade,
   makeStyles,
+  TextField
 } from '@material-ui/core'
 import { Add } from '@material-ui/icons'
 
@@ -13,6 +14,7 @@ import ModalDelivery from './ModalDelivery'
 import ModalFinish from './ModalFinish'
 import ModalDelivering from './ModalDelivering'
 import TabDeliv from './TabDeliv'
+import TabPrevision from './TabPrevision'
 //Context
 import { useDelivery } from '../../context/deliveryContext'
 import { useDeliveryFinish } from '../../context/deliveryFinishContext'
@@ -127,7 +129,9 @@ export default function Delivery() {
   return (
     <>
       <Box>
-        <div className={classes.boxTabHeader}>
+        <TabPrevision openModals={openModals} deleteDelivery={deleteDelivery}/>
+
+        <div className={classes.boxTabHeader} style={{paddingTop: '1rem'}}>
           <span>Rotas em processo</span>
         </div>
         <TabDeliv
@@ -136,18 +140,27 @@ export default function Delivery() {
           openModals={openModals}
         />
 
-        <Box>
-          <div className={classes.boxTabHeader} style={{paddingTop: '1rem'}}>
-            <span>Rotas Finalizadas</span>
-            <div>Dia: <input type='date' onChange={seachDelivFinish}/></div>
-          </div>
-          {deliveryFinish.length > 0 &&
-            <TabDeliv
-              type="close"
-              openModals={openModals}
+        <div className={classes.boxTabHeader} style={{paddingTop: '1rem'}}>
+          <span>Rotas Finalizadas</span>
+          <div>
+            <TextField
+              id="date"
+              label="Dia"
+              type="date"
+              onChange={seachDelivFinish}
+              className={classes.fieldDate}
+              InputLabelProps={{
+                shrink: true,
+              }}
             />
-          }
-        </Box>
+          </div>
+        </div>
+        {deliveryFinish.length > 0 &&
+          <TabDeliv
+            type="close"
+            openModals={openModals}
+          />
+        }
 
         <Fab 
           color="primary"

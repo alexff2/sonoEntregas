@@ -45,7 +45,7 @@ module.exports = {
 
       const { secret, expiresIn } = jwt
       const token = sign({}, secret, {
-        subject: String(users.ID),
+        subject: String(sendUser.ID),
         expiresIn
       })
 

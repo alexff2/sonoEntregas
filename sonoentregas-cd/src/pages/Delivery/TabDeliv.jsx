@@ -46,7 +46,6 @@ export default function TabDeliv({ type, deleteDelivery, openModals }){
     type === 'open' ? setDelivery(delivOpen) : setDelivery(deliveryFinish)
   },[type, delivOpen, deliveryFinish])
 
-
   return (
     <TableContainer component={Paper}>
       <Table aria-label="custumezed table">
@@ -60,7 +59,7 @@ export default function TabDeliv({ type, deleteDelivery, openModals }){
         </TableHead>
         
         <TableBody>
-        {delivery.map( item => (
+        {delivery.filter(item => item.DRIVER).map( item => (
           <TableRow key={item.ID} className={classes.body}>
             <TableCell width={'5%'}>{item.ID}</TableCell>
             <TableCell width={'25%'}>{item.DESCRIPTION}</TableCell>

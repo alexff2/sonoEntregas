@@ -195,7 +195,9 @@ export default function TableSales({
       setInputNumber(false)
 
       setSalesProd(salesProd.filter( item => {
-        if (item.ID_SALES !== saleProd.ID_SALES) {
+        if (item.CODLOJA !== saleProd.CODLOJA) {
+          return true
+        } else if (item.ID_SALES !== saleProd.ID_SALES) {
           return true
         } else if (item.COD_ORIGINAL !== saleProd.COD_ORIGINAL) {
           return true
@@ -229,30 +231,30 @@ export default function TableSales({
 
   return(
     <TableContainer component={Paper} className={classes.TabContainer}>
-        <Table id="tableId">
+      <Table id="tableId">
 
-          <EnhancedTableHead
-            order={order}
-            orderBy={orderBy}
-            onRequestSort={handleRequestSort}
-            headCells={headCell}
-            classe={classes}
-          />
+        <EnhancedTableHead
+          order={order}
+          orderBy={orderBy}
+          onRequestSort={handleRequestSort}
+          headCells={headCell}
+          classe={classes}
+        />
 
-          <TableBody className={type === 'home' ? classes.tableBody1 : classes.tableBody2}>
-            {stableSort(currentSales, getComparator(order, orderBy))
-              .map( (sale, i) => (
-              <Row  
-                key={i} 
-                sendSalesProd={sendSalesProd} 
-                classes={classes} sale={sale} 
-                type={type}
-                setAddress={setAddress}
-              />
-            ))}
-          </TableBody>
-        
-        </Table>
-      </TableContainer>
+        <TableBody className={type === 'home' ? classes.tableBody1 : classes.tableBody2}>
+          {stableSort(currentSales, getComparator(order, orderBy))
+            .map( (sale, i) => (
+            <Row  
+              key={i} 
+              sendSalesProd={sendSalesProd} 
+              classes={classes} sale={sale} 
+              type={type}
+              setAddress={setAddress}
+            />
+          ))}
+        </TableBody>
+      
+      </Table>
+    </TableContainer>
   )
 }

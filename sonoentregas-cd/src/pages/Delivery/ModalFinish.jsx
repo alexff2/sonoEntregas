@@ -97,6 +97,7 @@ const RowProd = ({product, status, stateCheckedAllProd, type })=>{
       product.DELIVERED = true //false is zero
     }
   }
+
   return(
     <>
       <TableRow>
@@ -293,7 +294,7 @@ export default function ModalFinish({ setOpen, selectDelivery, type }){
   return(
     <form>
       <h3 className={classes.titleModalFinish}>{selectDelivery.DESCRIPTION} - {selectDelivery.sales.length} Venda(s)</h3>
-      <div className={classes.divHeader}>    
+      {selectDelivery.DRIVER && <div className={classes.divHeader}>    
         <div>
           <p><span>Motorista: </span>{selectDelivery.DRIVER}</p>
           <p><span>Auxiliar: </span> {selectDelivery.ASSISTANT}</p>
@@ -313,7 +314,7 @@ export default function ModalFinish({ setOpen, selectDelivery, type }){
           }
         </div>
         {type !== 'close' &&<span>Todos: <Checkbox onChange={checkedAllProd}/></span>}
-      </div>
+      </div>}
 
       <TableContainer component={Paper}>
         <Table aria-label="collapsible table">
@@ -327,9 +328,9 @@ export default function ModalFinish({ setOpen, selectDelivery, type }){
           </TableHead>
 
           <TableBody>
-            {selectDelivery.sales.map(sale => (
+            {selectDelivery.sales.map((sale, index) => (
               <RowSale
-                key={sale.ID_SALES}
+                key={index}
                 sale={sale}
                 classes={classes}
                 type={type}
