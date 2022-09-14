@@ -50,7 +50,7 @@ function ModalSales({ sale, product }) {
   const [ detailsDeliv, setDetailsDeliv ] = useState({})
 
   useEffect(()=>{
-    api.get(`salesProdct/${sale.ID_SALES}/${sale.CODLOJA}/${product.CODPRODUTO}`)
+    api.get(`salesProduct/${sale.ID_SALES}/${sale.CODLOJA}/${product.CODPRODUTO}`)
       .then(resp => {
         setDatePrevDeliv(getDateBr(sale.D_ENTREGA1))
         if (!resp.data) {

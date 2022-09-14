@@ -1,26 +1,27 @@
 import React, { useState } from 'react'
 
-import ModalAlert, { openMOdalAlert } from '../../components/ModalAlert'
+import './style.css'
+
 import TabSendSale from './TabSendSale'
-import TabSaleWaiting from './TabSaleWaiting'
+import SalesOpenClose from './SalesOpenClose'
 import { TabSalesProcess } from './TabSaleProcess'
 import { TabSalesPrev } from './TabSalesPrev'
 
 export default function Sales(){
-  const [ childrenAlertModal, setChildrenAlertModal ] = useState('Vazio')
   const [ tabs, setTabs ] = useState({
     tab1: true,
     tab2: false,
     tab3: false,
     tab4: false,
+    tab5: false,
   })
 
   const openTab = (tab, e) => {
     // Change style buttons
-    let tablinks = document.getElementsByClassName("tablinks")
+    let tabLinks = document.getElementsByClassName("tabLinks")
 
-    for (let i = 0; i < tablinks.length; i++) {
-      tablinks[i].className = tablinks[i].className.replace("active", "")
+    for (let i = 0; i < tabLinks.length; i++) {
+      tabLinks[i].className = tabLinks[i].className.replace("active", "")
     }
 
     e.currentTarget.className += " active"
@@ -39,46 +40,39 @@ export default function Sales(){
 
       <div className="tab">
         <input
-          className="tablinks active"
+          className="tabLinks active"
           type="button"
           value="ENVIAR"
           onClick={e => openTab('tab1', e)} />
         <input
-          className="tablinks"
+          className="tabLinks"
           type="button"
           value="AGUARDANDO"
           onClick={e => openTab('tab2', e)} />
         <input
-          className="tablinks"
+          className="tabLinks"
+          type="button"
+          value="PREVISÕES"
+          onClick={e => openTab('tab4', e)} />
+        <input
+          className="tabLinks"
           type="button"
           value="EM PROCESSO"
           onClick={e => openTab('tab3', e)} />
         <input
-          className="tablinks"
+          className="tabLinks"
           type="button"
-          value="PREVISÕES"
-          onClick={e => openTab('tab4', e)} />
+          value="FINALIZADAS"
+          onClick={e => openTab('tab5', e)} />
       </div>
       
       <div className="tab-body body-container">
-        {tabs.tab1 &&
-          <TabSendSale
-            openMOdalAlert={openMOdalAlert}
-            setChildrenAlertModal={setChildrenAlertModal}
-          />
-        }
-
-        {tabs.tab2 && 
-          <TabSaleWaiting
-            openMOdalAlert={openMOdalAlert}
-            setChildrenAlertModal={setChildrenAlertModal}
-          />
-        }
+        {tabs.tab1 && <TabSendSale />}
+        {tabs.tab2 && <SalesOpenClose type={'open'}/>}
         {tabs.tab3 && <TabSalesProcess />}
         {tabs.tab4 && <TabSalesPrev />}
+        {tabs.tab5 && <SalesOpenClose type={'close'}/>}
       </div>
-
-      <ModalAlert>{childrenAlertModal}</ModalAlert>
     </div>
   )
 }

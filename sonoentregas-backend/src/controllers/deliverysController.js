@@ -21,7 +21,7 @@ module.exports = {
     try {
       const { status, date } = req.params
       var where
-      status === 'close' ? where = `STATUS = 'Finalizada' AND D_DELIVERED = '${date}'` : where = "STATUS <> 'Finalizada'"
+      where = status === 'close' ? `STATUS = 'Finalizada' AND D_DELIVERED = '${date}'` : "STATUS <> 'Finalizada'"
 
       const deliverys = await ViewDeliverys.findSome(0, where)
       

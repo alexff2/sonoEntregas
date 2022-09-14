@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react'
 
-import '../../../styles/pages/sales.css'
-
 import api from '../../../services/api'
 import { getDateToSql } from '../../../functions/getDate'
 
@@ -18,7 +16,7 @@ export default function TabSendSale(){
   const [ emissao, setEmissao ] = useState(getDateToSql())
   const [ date, setDate ] = useState(getDateToSql())
   const { shopAuth } = useAuthenticate()
-  const { setOpen: setOpenAlert, setChildrenError, setType } = useModalAlert()
+  const { setAlert } = useModalAlert()
 
   const { cod } = shopAuth
 
@@ -35,13 +33,11 @@ export default function TabSendSale(){
       .catch( erro => {
         console.log(erro)
 
-        setChildrenError(`Não foi possível conectar com servidor, entre em contato com Administrador`)
-        setOpenAlert()
-        setType()
+        setAlert(`Não foi possível conectar com servidor, entre em contato com Administrador`)
 
         setLoading(false)
     })
-  }, [cod, emissao, setOpenAlert, setChildrenError, setType])
+  }, [cod, emissao, setAlert])
 
   return(
     <div>

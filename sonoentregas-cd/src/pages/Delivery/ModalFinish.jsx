@@ -271,7 +271,11 @@ export default function ModalFinish({ setOpen, selectDelivery, type }){
         const { data } = await api.put(`deliverys/status/${selectDelivery.ID}`, selectDelivery)
   
         if(data.ID){
-          const resp = await api.get('sales/false/false/Aberta/null')
+          const resp = await api.get('sales/', {
+            params: {
+              status: 'open'
+            }
+          })
           stateSales.setSales(resp.data)
         }
 

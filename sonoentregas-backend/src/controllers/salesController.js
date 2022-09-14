@@ -1,88 +1,46 @@
-const { QueryTypes } = require('sequelize')
 const Sales = require('../models/Sales')
-const ViewSalesProd = require('../models/ViewSalesProd')
 const ViewDeliveryProd = require('../models/ViewDeliveryProd2')
 const ViewDeliverys = require('../models/ViewDeliverys')
-const Empresas = require('../models/Empresas')
-const { findSales, salesInProcess } = require('../services/salesService')
+
+const { findSales, findFinishedSales } = require('../services/salesService')
 
 module.exports = {
-  async index( req, res ){
+  async findSales( req, res ){
     try {
-      const { typesearch, search, status, codloja } = req.params
+      const { typeSearch, search, codLoja, status } = req.query
 
-      var sales
+      let sales
+      let where = ''
 
-      const whereCodloja = codloja !== 'false' ? ` AND CODLOJA = ${codloja}` : ''
+      if (!status) {
+        where = `${typeSearch} = '${search}'`
 
-      if (typesearch === 'NOMECLI') {
-        sales = await Sales.findSome(0, `${typesearch} LIKE '${search}%'${whereCodloja}`)
-      } else if (typesearch === 'false') {
-        sales = await Sales.findSome(0, `STATUS = '${status}'`)
-      } else if (typesearch === 'D_DELIVERED' || typesearch === 'D_MOUNTING') {
-        const salesProd = await Sales._query(0, `SELECT ID_SALE FROM DELIVERYS_PROD WHERE ${typesearch} = '${search}'${whereCodloja}`)
+        sales = await findSales(where)
+      } else {
+        if (status === 'open') {
+          where = `STATUS = 'Aberta'`
+          codLoja && (where +=` AND CODLOJA = ${codLoja}`)
+          typeSearch && (where += ` AND ${typeSearch} LIKE '${search}%'`)
 
-        if (salesProd[0].length > 0 ) {
-          let idSale = ''
-  
-          for (let i = 0; i < salesProd[0].length; i++){
-            if ( i === 0 ){
-              idSale+= salesProd[0][i].ID_SALE
-            } else {
-              idSale+= `, ${salesProd[0][i].ID_SALE}`
-            }
-          }
-  
-          sales = await Sales.findSome(0, `ID_SALES IN (${idSale}) ${whereCodloja}`)
+          sales = await findSales(where)
         } else {
-          sales = []
-        }
+          typeSearch === 'D_DELIVERED'
+            ? where += ` AND ${typeSearch} = '${search}'`
+            : where += ` AND ${typeSearch} LIKE '${search}%'`
 
-      } else {
-        sales = await Sales.findSome(0, `${typesearch} = '${search}'${whereCodloja}`)
+          codLoja && (where +=` AND A.CODLOJA = ${codLoja}`)
+
+          sales = await findFinishedSales(where)
+        }
       }
 
-      let idSale = ''
-      if (sales.length > 0){
-        for (let i = 0; i < sales.length; i++){
-          if ( i === 0 ){
-            idSale+= sales[i].ID_SALES
-          } else {
-            idSale+= `, ${sales[i].ID_SALES}`
-          }
-        }
-    
-        const viewSalesProd = await ViewSalesProd.findSome(0, `ID_SALES IN (${idSale})`)
-        const shops = await Empresas._query(0, 'SELECT * FROM LOJAS', QueryTypes.SELECT)
-
-        const sales_prod = sales.map(sale => {
-          sale['products'] = []
-    
-          viewSalesProd.forEach(saleProd => {
-            saleProd['checked'] = false
-            if (sale.ID_SALES === saleProd.ID_SALES && sale.CODLOJA === saleProd.CODLOJA) {
-              sale.products.push(saleProd)
-            }
-          })
-
-          shops.forEach( shops => {
-            if (shops.CODLOJA === sale.CODLOJA) {
-              sale['SHOP'] = shops.DESC_ABREV
-            }
-          })
-
-          return sale
-        })
-        
-        return res.json(sales_prod)
-      } else {
-        return res.status(204).json('Venda não encontrada')
-      }
+      return res.json(sales)
     } catch (error) {
+      console.log(error)
       return res.status(400).json(error)
     }
   },
-  async findProductDetals(req, res){
+  async findProductDetails(req, res){
     try {
       const { idSale, codloja, codproduto } = req.params
   
@@ -103,7 +61,7 @@ module.exports = {
       return res.status(400).json(error)
     }
   },
-  async updaDateDeliv( req, res ){
+  async updateDateDeliv( req, res ){
     try {
       const { idSale } = req.params
       const { dateDeliv, CODLOJA, OBS_SCHED } = req.body
@@ -114,12 +72,5 @@ module.exports = {
     } catch (error) {
       res.status(400).json(error)
     }
-  },
-  async salesInProcess(req, res){
-    const { codloja } = req.params
-
-    const sales = await salesInProcess(codloja)
-
-    return res.json(sales)
   }
 }

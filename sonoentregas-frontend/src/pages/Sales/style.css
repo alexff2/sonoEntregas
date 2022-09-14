@@ -1,0 +1,258 @@
+.sales-container {
+  border: none !important;
+}
+
+.loadingTable {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.loadingTable svg {
+  width: 50%;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0;
+}
+
+.tab input {
+  width: 235px;
+  height: 35px;
+  background-color: inherit;
+  font-size: 1.5rem;
+  font-weight: 600;
+  padding: 0 1rem;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+  outline: 0;
+}
+
+.tab input:hover {
+  background-color: var(--gray-line);
+  border-color: var(--gray-line);
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.tab input.active {
+  background-color: var(--gray-line);
+  border-color: var(--gray-line);
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.tab-body {
+  border: solid;
+  border-color: var(--gray-line);
+}
+
+.fieldsSearchSales {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  background-color: var(--gray-headers);
+  margin-bottom: 0;
+}
+
+.selectSearchSales {
+  width: 10rem;
+  height: 2.3rem;
+  background-color: inherit;
+  border: 1px solid var(--white) !important;
+}
+
+.inputsSearchSales {
+  display: flex;
+  align-items: center;
+  
+  margin-left: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  
+  font-size: 1.5rem;
+  color: var(--white);
+  background-color: rgb(169, 174, 182);
+  border-radius: 0.3rem;
+}
+
+.inputsSearchSales input {
+  margin-left: 0.5rem;
+  background-color: transparent;
+  border: none;
+  height: 2rem;
+}
+.inputsSearchSales input::placeholder {
+  color: rgba(255, 255, 255, 0.8);
+}
+.inputsSearchSales input[type=text] {
+  width: 15rem;
+}
+.inputsSearchSales input[type=date] {
+  width: 10rem;
+}
+.inputsSearchSales input:focus {
+  outline: transparent;
+}
+
+.inputsSearchSales input:focus, .selectSearchSales:focus {
+  outline: none !important;
+  box-shadow: 0 0 5px var(--white) !important;
+}
+
+#thSales-firstItem {
+  border-radius: 0;
+}
+
+.fieldsSearchSales button {
+  margin-left: 1rem;
+  border: transparent;
+  border-radius: 0.3rem;
+  padding: 0.6rem 1rem;
+  background-color:  var(--gray-bold);
+  color: var(--white);
+}
+
+.tabProdSeach {
+  display: none;
+  margin-bottom: 1rem;
+
+  background-color: rgb(197, 194, 194);
+}
+
+.openDiv {
+  display: block;
+}
+
+#trProdId:hover {
+  background-color: rgba(230, 230, 230, 0.411);
+}
+
+#trProdId h3 {
+  padding: 1rem 0.5rem;
+}
+
+#trProd {
+  background-color: rgb(221, 221, 221);
+}
+#btnCancel {
+  text-align: center;
+  border-radius: 1.5rem;
+  background-color: var(--blue-dark);
+  color: var(--white);
+  cursor: pointer;
+}
+
+.qtdProd {
+  width: 0.5rem;
+}
+
+#btnCancel:hover {
+  opacity: .8;
+}
+
+#btnEstornar {
+  text-align: center;
+  border-radius: 1.5rem;
+  background-color: var(--blue-dark);
+  color: var(--white);
+  cursor: pointer;
+  width: 1rem;
+}
+
+#btnEstornar:hover {
+  opacity: .8;
+}
+
+
+/*Modal send sales ===========================*/
+div.sales-head {
+  margin-bottom: 0.5rem;
+
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+}
+
+div.sales-field {
+  display: flex;
+  flex-direction: column;
+}
+
+div.sales-field div span {
+  font-weight: 600;
+  margin-right: 0.25rem;
+}
+div.sales-field div input {
+  font-size: 0.5rem;
+}
+.divObsCkeck{
+  display: flex;
+  align-items: center;
+} 
+div.sales-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+div.sales-buttons button {
+  font-size: 0.7rem;
+  width: 4rem;
+  height: 4rem;
+  background-color: var(--green);
+  color: var(--white);
+  padding: 0.3rem;
+  border-color: transparent;
+  border-radius: 50%;
+
+  opacity: 1;
+  transition: 0.3s;
+}
+
+div.sales-buttons button:hover{
+  opacity: 0.6;
+}
+
+div.sales-buttons button:first-child {
+  margin-right: 0.5rem;
+  background-color: transparent;
+  border: 0.15rem solid var(--red);
+  color: var(--red);
+}
+
+/*TABLE MODAL SEND SALES ==================================*/
+
+.table-modal-product {
+  border-spacing: 0 0.5rem;
+  color: #969cb3;
+}
+
+.table-modal-product td, 
+.table-modal-product th {
+  background-color: white;
+  padding: 1rem;
+  font-weight: normal;
+  border: 0;  
+}
+
+.table-modal-product th:first-child,
+.table-modal-product td:first-child {
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+.table-modal-product th:last-child,
+.table-modal-product td:last-child {
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.table-modal-product tbody tr {
+  opacity: 0.6;
+}
+
+.table-modal-product tbody tr:hover {
+  opacity: 1;
+}
+
+.table-modal-product td {
+  color: var(--blue-dark);
+}

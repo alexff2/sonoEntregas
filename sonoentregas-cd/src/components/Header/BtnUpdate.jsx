@@ -42,7 +42,11 @@ export default function BtnUpdate(){
   const updateSys = async () => {
     setOpenLoading(true)
     try {
-      const { data: dataSales } = await api.get('sales/false/false/Aberta/null')
+      const { data: dataSales } = await api.get('sales/', {
+        params: {
+          status: 'open'
+        }
+      })
       const { data: dataDeliv } = await api.get('deliverys/open')
       const { data: dataDelivFinsh } = await api.get(`deliverys/close/${getDateSql()}`)
       const { data: dataMain } = await api.get('/maintenancedeliv')

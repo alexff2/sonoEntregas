@@ -216,7 +216,7 @@ export default function Sales() {
   const [ orderBy, setOrderBy ] = useState('idSales')
   const [ sales, setSales ] = useState([])
   const [ search, setSearch ] = useState('')
-  const [ typeSeach, setTypeSeach ] = useState('ID_SALES')
+  const [ typeSearch, setTypeSearch ] = useState('ID_SALES')
   const [ saleCurrent, setSaleCurrent ] = useState([])
   const [ productCurrent, setProductCurrent ] = useState([])
 
@@ -225,7 +225,12 @@ export default function Sales() {
   const searchSales = async () => {
     try {
       if (search !== '') {
-        const response = await api.get(`sales/${typeSeach}/${search}/null/false`)
+        const response = await api.get(`sales/`, {
+          params: {
+            typeSearch,
+            search
+          }
+        })
         if (response.data === ''){
           console.log(response)
           setChildrenAlert('Venda(s) não encontrada(s)!') 
@@ -283,16 +288,13 @@ export default function Sales() {
             labelId="fieldSeach"
             className={classes.fieldSeach}
             onChange={e => {
-              setTypeSeach(e.target.value)
+              setTypeSearch(e.target.value)
               setSearch('')
             }}
             defaultValue={'ID_SALES'}
           >
             <MenuItem value={'ID_SALES'}>Código Venda</MenuItem>
             <MenuItem value={'NOMECLI'}>Nome Cliente</MenuItem>
-            <MenuItem value={'D_DELIVERED'}>Finalizadas</MenuItem>
-            <MenuItem value={'D_MOUNTING'}>Entregando</MenuItem>
-            <MenuItem value={'EMISSAO'}>Data de Emisão</MenuItem>
           </Select>
         </FormControl>
 
@@ -300,23 +302,16 @@ export default function Sales() {
           <div className={classes.searchIcon}>
             <SearchIcon/>
           </div>
-          { typeSeach === 'D_DELIVERED' || typeSeach === 'D_MOUNTING' || typeSeach === 'EMISSAO'?
-            <input 
-              type="date" 
-              className={classes.inputDate}
-              onChange={e => setSearch(e.target.value)}
-            />:
-            <InputBase
-              placeholder="Pesquisar…"
-              classes={{
-                root: classes.inputRoot,
-                input: classes.inputInput,
-              }}
-              inputProps={{ 'aria-label': 'search' }}
-              onChange={e => setSearch(e.target.value)}
-              onKeyPress={e => e.key === 'Enter' ? searchSales() : null}
-            />
-          }
+          <InputBase
+            placeholder="Pesquisar…"
+            classes={{
+              root: classes.inputRoot,
+              input: classes.inputInput,
+            }}
+            inputProps={{ 'aria-label': 'search' }}
+            onChange={e => setSearch(e.target.value)}
+            onKeyPress={e => e.key === 'Enter' ? searchSales() : null}
+          />
         </div>
 
         <Button className={classes.btnSearch} onClick={searchSales}>Pesquisar</Button>

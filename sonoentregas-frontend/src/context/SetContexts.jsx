@@ -4,7 +4,6 @@ import api from '../services/api'
 
 //Providers
 import { useUsers } from './userContext'
-import { useSalesProcess } from './salesProcessContext'
 import { useMaintenance } from './maintContext'
 import { useModalAlert } from './modalAlertContext'
 import { useAuthenticate } from './authContext'
@@ -14,7 +13,6 @@ export default function SetContext(){
   const { setMaintenance } = useMaintenance()
   const { setAlert } = useModalAlert()
   const { shopAuth, userAuth } = useAuthenticate()
-  const { setSalesProcess } = useSalesProcess()
 
   useEffect(() =>{
     setTimeout(()=>{
@@ -26,11 +24,9 @@ export default function SetContext(){
       
         try {
           const { data: dataUser } = await api.get(`/users/${codloja}`)
-          const { data: dataSalesProcess } = await api.get(`/sales/process/${cod}`)
           const { data: dataMaint } = await api.get(`maintenance/null`)
           
           setUsers(dataUser)
-          setSalesProcess(dataSalesProcess)
           setMaintenance(dataMaint)
         } catch (error) {
           !error.response
@@ -40,7 +36,7 @@ export default function SetContext(){
       }
       setContexts()
     },0)
-  },[setUsers, setSalesProcess, setMaintenance, setAlert, shopAuth, userAuth])
+  },[setUsers, setMaintenance, setAlert, shopAuth, userAuth])
   
   return(<React.Fragment />)
 }

@@ -85,7 +85,11 @@ export default function Delivery() {
       setDelivery(dataDeliv)
 
       if (data.delete) {
-        const { data: dataSales } = await api.get('sales/false/false/Aberta/null')
+        const { data: dataSales } = await api.get('sales/', {
+          params: {
+            status: 'open'
+          }
+        })
         setSales(dataSales)
       }      
     } catch (error) {

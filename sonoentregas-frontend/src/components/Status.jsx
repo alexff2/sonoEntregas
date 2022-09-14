@@ -6,7 +6,7 @@ const styleStatus = [
     { color: 'var(--green)' },
     { color: 'var(--orange)' },
     { color: 'var(--red)' },
-    { color: 'rgb(33, 150, 243)' },
+    { color: 'var(--blue)' },
   ],
   [
     {
@@ -31,7 +31,7 @@ const styleStatus = [
     },
     {
       color: 'var(--text-inverse)',
-      backgroundColor: 'rgb(33, 150, 243)',
+      backgroundColor: 'var(--blue)',
       textAlign: 'center'
     }
   ]

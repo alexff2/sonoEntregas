@@ -26,8 +26,8 @@ const devController = require('./controllers/devController')
 const catDefController = require('./controllers/catDefController')
 
 //Routes
-//Conections
-routes.get('/conections', connectionsController.findConnections)
+//Connections
+routes.get('/connections', connectionsController.findConnections)
 //Shops
 routes.get('/shops', connectionsController.findShops)
 //Login
@@ -45,10 +45,9 @@ routes.put('/users/:userId', usersController.update)
   routes.post('/salesshop', salesSceController.cancelSubmitSales)
   routes.post('/salesshop/reverse', salesSceController.reverseStock)
 //Sales Sono Delivery
-routes.get('/sales/process/:codloja', salesController.salesInProcess)
-routes.get('/sales/:typesearch/:search/:status/:codloja', salesController.index)
-routes.get('/salesProdct/:idSale/:codloja/:codproduto', salesController.findProductDetals)
-routes.post('/sales/updateDate/:idSale', salesController.updaDateDeliv)
+routes.get('/sales', salesController.findSales)
+routes.get('/salesProduct/:idSale/:codloja/:codproduto', salesController.findProductDetails)
+routes.post('/sales/updateDate/:idSale', salesController.updateDateDeliv)
 //Cars
 routes.get('/cars', carsController.index)
 routes.post('/cars', carsController.create)

@@ -190,7 +190,7 @@ export default function ModalSendSale({
               <LoadingCircle/>
             </div>
           : 
-            <table className="tab-modal-product">
+            <table className="table-modal-product">
               <thead>
                 <tr>
                   <th>Código</th>

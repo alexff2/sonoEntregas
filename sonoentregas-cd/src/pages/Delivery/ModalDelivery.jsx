@@ -167,8 +167,12 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
         const { data: dataDeliv } = await api.get('deliverys/status/') 
         setDelivery(dataDeliv)
 
-        if (dataDelivery.ID) { //Tenta melhorar performace
-          const { data: dataSales } = await api.get('sales/false/false/Aberta/null')
+        if (dataDelivery.ID) { //Tenta melhorar performasse
+          const { data: dataSales } = await api.get('sales/', {
+            params: {
+              status: 'open'
+            }
+          })
 
           setSales(dataSales)
         }
@@ -197,8 +201,12 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
       const { data: dataDeliv } = await api.get('deliverys/status/') 
       setDelivery(dataDeliv)
 
-      if (data.ID) { //Melhorar performace
-        const { data: dataSales } = await api.get('sales/false/false/Aberta/null')
+      if (data.ID) { //Melhorar performance
+        const { data: dataSales } = await api.get('sales/', {
+          params: {
+            status: 'open'
+          }
+        })
   
         setSales(dataSales)
       }
@@ -218,7 +226,12 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
     if(!saleFound) {
       try {
         if (idSale !== ''){
-          const {data} = await api.get(`sales/ID_SALES/${idSale}/null/false`)
+          const {data} = await api.get(`sales/`, {
+            params: {
+              typeSearch: 'ID_SALES',
+              search: idSale
+            }
+          })
 
           if(data !== '' ) {
             let sales = []

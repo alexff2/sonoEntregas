@@ -1,0 +1,84 @@
+.boxSalesByStatus {
+  padding: 8px 8px;
+  border-radius: 5px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+  
+  background-color: #FFF;
+  margin-bottom: 16px;
+}
+
+.boxSalesByStatus .deliveries {
+  margin-bottom: 12px;
+  padding: 0 8px;
+}
+
+.headerSalesByStatus {
+  margin: -8px -8px;
+  padding: 8px 8px;
+  color: #FFF;
+
+  margin-bottom: 12px;
+}
+
+.headerSalesByStatus.salesMounting {
+  background-color: var(--blue);
+}
+.headerSalesByStatus.salesDelivering {
+  background-color: var(--orange);
+}
+
+.headerDeliveriesSales {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background-color: var(--gray-line);
+  color: var(--text);
+  font-weight: bold;
+
+  margin: 0 -8px;
+  padding: 4px 8px;
+}
+
+.boxSalesByStatus .salePrev {
+  margin-top: 5px;
+  border-top: 1px solid #CCC;
+}
+.boxSalesByStatus .salePrev:nth-child(2) {
+  margin-top: 5px;
+  border-top: none;
+}
+
+.boxSalesByStatus .salePrev span:nth-child(1) {
+  display: inline-block;
+  width: 10%;
+}
+.boxSalesByStatus .salePrev span:nth-child(2) {
+  display: inline-block;
+  width: 60%;
+}
+.boxSalesByStatus .salePrev span:nth-child(3) {
+  display: inline-block;
+  width: 30%;
+}
+
+.boxSalesByStatus .productPrev span {
+  font-size: 0.8rem;
+}
+.boxSalesByStatus .productPrev span:nth-child(1) {
+  display: inline-block;
+  width: 15%;
+  padding-left: 10%;
+}
+.boxSalesByStatus .productPrev span:nth-child(2) {
+  display: inline-block;
+  width: 10%;
+}
+.boxSalesByStatus .productPrev span:nth-child(3) {
+  display: inline-block;
+  width: 55%;
+}
+.boxSalesByStatus .productPrev span:nth-child(4) {
+  display: inline-block;
+  width: 20%;
+}

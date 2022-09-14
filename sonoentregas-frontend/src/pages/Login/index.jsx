@@ -17,9 +17,9 @@ const Login = () => {
 
   useEffect(() => {
     api
-      .get('conections')
+      .get('connections')
       .then( resp => {
-        const datas = resp.data.filter(shop => shop.database !== 'SONOENTREGAS' && shop.database !== 'SONO')
+        const datas = resp.data.filter((shop, i) => i > 1)
         setShops(datas)
       })
       .catch( e => {

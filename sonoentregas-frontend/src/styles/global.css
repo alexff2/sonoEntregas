@@ -8,19 +8,20 @@
 }
 
 :root{
-  --blue-logo: #012C5F;
   --white: #fff;
   --gray: #f0f2f5;
   --gray-line: #DCDDE0;
   --gray-light: #f9f9f9;
   --gray-bold: #4e5461;
+  --gray-headers: #6f7581;
   --text-inverse: #fff;
   --text: #666666;
   --texthighlight: #B3B9FF;
   --black: #2E384D;
   --red: #E83F5B;
   --green: #5EB691;
-  --blue: #5965E0;
+  --blue: #2196F3;
+  --blue-logo: #012C5F;
   --blue-dark: #363f5f;
   --orange: coral;
 }
@@ -76,9 +77,9 @@ select {
   color:#fff;
   text-indent: 0.01px; /* Remove seta padrão do FireFox */
   text-overflow: "";  /* Remove seta padrão do FireFox */
-  margin: 0 5px 0 5px;
+  margin: 0 5px;
   border-radius: 0.25rem;
-  padding: 3px 5px 3px 5px;
+  padding: 3px 5px;
 }
 
 textarea {
