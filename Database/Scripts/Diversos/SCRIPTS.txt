@@ -169,6 +169,24 @@ AND A.PCO_COMPRA <> B.PCO_COMPRA
 AND A.QUANTIDADE > 1
 AND A.CODPRODUTO <> 1672
 
+-------------------------- importar usando drive ACE OLEDB 12
+SELECT * FROM OPENROWSET('Microsoft.ACE.OLEDB.12.0', 'Excel 12.0;Database=C:\Users\User\Desktop\Produtos Sono.xlsx', [Página1$])
+
+SELECT * 
+INTO ProdutosExcel
+FROM OPENDATASOURCE('Microsoft.ACE.OLEDB.12.0', 'Data Source=C:\Users\User\Desktop\Produtos Sono.xlsx;Extended Properties=Excel 12.0')...[Página1$]
+
+TIPO ALTERNATI: ALTER TABLE ProdutosExcel ADD COD VARCHAR(20) COLLATE SQL_Latin1_General_CP850_CI_AI
+
+EXEC sp_configure 'show advanced options', 1
+RECONFIGURE
+GO
+EXEC sp_configure 'ad hoc distributed queries', 1
+RECONFIGURE
+GO
 
 
-
+SELECT ALTERNATI, NOME_TOT, TAMANHO_TOT, TAMANHO, SUB_GRUPO
+INTO PROD_IMPORT
+FROM OPENDATASOURCE('Microsoft.ACE.OLEDB.12.0', 'Data Source=C:\Users\Alexandre\Downloads\Produtos.xlsx;Extended Properties=Excel 12.0')...[Página1$]
+WHERE ALTERNATI IS NOT NULL

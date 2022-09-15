@@ -1,0 +1,137 @@
+.headerModal {
+  padding: 1rem 1.5rem;
+  position: relative;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.headerModal h2 {
+  color: blue;
+  letter-spacing: -1px;
+}
+
+.headerModal h2 span {
+  color: var(--text-light);
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: -1px;
+  margin-left: 0.5rem;
+}
+
+.headerModal h1 {
+  margin-top: -1.3rem;
+  margin-bottom: 0;
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+.infoDav {
+  padding: 1rem 1.5rem;
+  background-color: var(--gray-light);
+  color: var(--gray-bold);
+}
+
+.info label {
+  font-weight: 600;
+  margin-right: 0.4rem;
+}
+
+.devTitleStatus {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  border: 1px solid var(--white);
+  box-shadow: 0 1px 4px rgba(0,0,0,.15);
+  color: var(--gray-bold);
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 13px;
+}
+
+.statusBar {
+  padding: 1rem 1.5rem;
+
+  display: flex;
+  justify-content: center;
+}
+
+.statusFig {
+  display: flex;
+  align-items: center;
+}
+
+.startCircle {
+  width: 25px;
+  height: 25px;
+  border-style: solid;
+  border-width: 3px;
+  border-radius: 50%;
+  padding: 3px;
+}
+
+.startCircle div {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+}
+
+.bar{
+  height: 3px;
+  width: 11rem;
+}
+
+@media(max-width: 1080px){
+  .bar {
+    width: 8rem;
+  }
+}
+
+@media(max-width: 720px){
+  .bar {
+    width: 6rem;
+  }
+}
+
+.detalsStatus{
+  margin-left: -30px;
+  width: 86.5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.statusCurrent {
+  font-size: 0.9rem;
+}
+
+.statusDate {
+  font-size: 0.7rem;
+}
+
+.dataDelivery {
+  padding: 0.5rem 1.5rem 1rem;
+}
+
+.dataDeliveryContent {
+  font-size: 14px;
+  line-height: 20px;
+  color: #4e5461;
+  background: #fbfbfb;
+  box-shadow: 0 1px 2px rgba(0,0,0,.15);
+  border-radius: 3px;
+  display: flex;
+}
+.deliveryAdress {
+  padding: 0.5rem 10px;
+  width: 50%;
+}
+.deliveryTransport {
+  padding: 0.5rem 10px;
+}
+.deliveryTransport label {
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+.products {
+  padding: 0 1.5rem 1rem;
+}

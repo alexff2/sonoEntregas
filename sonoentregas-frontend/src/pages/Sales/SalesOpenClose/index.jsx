@@ -159,6 +159,22 @@ export default function TabSaleWaiting({ type }) {
     }
   }
 
+  const reverseStock = async produto => {
+    try {
+      const {data} = await api.post(`salesshop/reverse/${produto.ID_SALES}`, produto)
+
+      const { data: DataSales } = await api.get(`sales/STATUS/Aberta/null/${Codloja}`)
+      setSales(DataSales)
+
+      setChildrenAlertModal(data.msg)
+      openMOdalAlert()
+    } catch (error) {
+      setChildrenAlertModal('Erro no sistema, entrar em contato com ADM')
+      console.log(error)
+      openMOdalAlert()
+    }
+  }
+
   return(
     <>
       {/*Campo de busca de vendas*/}

@@ -43,7 +43,7 @@ routes.put('/users/:userId', usersController.update)
   routes.get('/salesshop/products/:numSale/:loja', salesSceController.salesSceProd)
   routes.post('/salesshop/:loja', salesSceController.sendSale)
   routes.post('/salesshop', salesSceController.cancelSubmitSales)
-  routes.post('/salesshop/reverse', salesSceController.reverseStock)
+  routes.post('/salesshop/reverse/:idSale', salesSceController.reverseStock)
 //Sales Sono Delivery
 routes.get('/sales', salesController.findSales)
 routes.get('/salesProduct/:idSale/:codloja/:codproduto', salesController.findProductDetails)

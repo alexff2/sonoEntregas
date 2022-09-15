@@ -194,10 +194,11 @@ module.exports = {
    */
   async reverseStock( req, res ){
     try {
-      const { ID_SALES, CODLOJA, CODPRODUTO, QUANTIDADE } = req.body
+      const { CODLOJA, CODPRODUTO, QUANTIDADE } = req.body
+      const { idSale } = req.params
 
       await Sales._query(CODLOJA, `UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL + ${QUANTIDADE}, EST_LOJA = EST_LOJA + ${QUANTIDADE} WHERE CODIGO = ${CODPRODUTO} AND CODLOJA = 1`)
-      await Sales._query(0, `UPDATE SALES_PROD SET DOWN_EST = 0 WHERE ID_SALES = ${ID_SALES} AND CODPRODUTO = ${CODPRODUTO} AND CODLOJA = ${CODLOJA}`)
+      await Sales._query(0, `UPDATE SALES_PROD SET DOWN_EST = 0 WHERE ID_SALES = ${idSale} AND CODPRODUTO = ${CODPRODUTO} AND CODLOJA = ${CODLOJA}`)
 
       return res.json({msg: 'Estoque estornado!'})
     } catch (error) {
