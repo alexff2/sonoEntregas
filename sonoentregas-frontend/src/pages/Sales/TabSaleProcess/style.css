@@ -55,11 +55,15 @@
 }
 .boxSalesByStatus .salePrev span:nth-child(2) {
   display: inline-block;
-  width: 60%;
+  width: 50%;
 }
 .boxSalesByStatus .salePrev span:nth-child(3) {
   display: inline-block;
-  width: 30%;
+  width: 15%;
+}
+.boxSalesByStatus .salePrev span:nth-child(4) {
+  display: inline-block;
+  width: 25%;
 }
 
 .boxSalesByStatus .productPrev span {

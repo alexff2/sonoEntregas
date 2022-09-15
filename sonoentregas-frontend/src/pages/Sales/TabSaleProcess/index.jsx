@@ -85,6 +85,7 @@ export function TabSalesProcess() {
                   <span>{sale.ID_SALES}</span>
                   <span>{sale.NOMECLI}</span>
                   <span>{sale.FONE}</span>
+                  <span><strong>Vendededor: </strong>{sale.VENDEDOR}</span>
                 </div>
                 {sale.products.map( product => (
                   <div key={product.COD_ORIGINAL} className="productPrev">
@@ -117,6 +118,7 @@ export function TabSalesProcess() {
                   <span>{sale.ID_SALES}</span>
                   <span>{sale.NOMECLI}</span>
                   <span>{sale.FONE}</span>
+                  <span><strong>Vendededor: </strong>{sale.VENDEDOR}</span>
                 </div>
                 {sale.products.map( product => (
                   <div key={product.COD_ORIGINAL} className="productPrev">

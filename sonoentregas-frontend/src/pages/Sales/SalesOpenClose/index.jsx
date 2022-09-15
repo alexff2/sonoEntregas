@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineSearch } from 'react-icons/ai'
 
 import api from '../../../services/api'
-import { dateSqlToReact } from '../../../functions/getDate'
+import { dateSqlToReact, getDateToSql } from '../../../functions/getDate'
 
 import { useAuthenticate } from '../../../context/authContext'
 import { useModalAlert } from '../../../context/modalAlertContext'
@@ -10,6 +10,8 @@ import { useModalAlert } from '../../../context/modalAlertContext'
 import LoadingCircle from '../../../components/LoadingCircle'
 import Status from '../../../components/Status'
 import { FormatValue } from "../../../components/FormatValue"
+
+import ModalSaleDetail from '../ModalSaleDetail'
 
 function TdStatus({product}){
   const styleStatus = status => {
@@ -25,16 +27,20 @@ function TdStatus({product}){
 
   if(product.STATUS === 'Enviado'){
     return <td id="btnCancel">Cancelar</td>
+  } else if(product.STATUS === 'Finalizada' && product.DOWN_EST){
+    return <td id="btnEstornar">Estornar estoque</td>
   } else {
     return <td><Status params={styleStatus(product.STATUS)}/></td>
   }
 }
 
-function Row({ sale, cancelSubmitSales }) {
+function Row({ sale, cancelSubmitSales, reverseStock, saleDetail }) {
   const [open, setOpen] = React.useState(false)
 
   const clickProd = (e, prod) => {
     if(e.target.id === 'btnCancel') cancelSubmitSales(prod)
+    else if(e.target.id === 'btnEstornar') reverseStock(prod)
+    else saleDetail(sale, prod)
   }
   
   return (
@@ -88,33 +94,36 @@ function Row({ sale, cancelSubmitSales }) {
 }
 
 export default function TabSaleWaiting({ type }) {
+  const [ openModalSaleDetail, setOpenModalSaleDetail ] = useState(false)
+  const [ selectedSale, setSelectedSale ] = useState({})
+  const [ selectedProduct, setSelectedProduct ] = useState({})
   const [ loading, setLoading ] = useState(false)
   const [ sales, setSales ] = useState([])
-  const [ typeSearch, setTypeSearch ] = useState(type === 'open' ? 'All': 'ID_SALES')
-  const [ search, setSearch ] = useState('')
+  const [ typeSearch, setTypeSearch ] = useState(type === 'open' ? 'All': 'D_DELIVERED')
+  const [ search, setSearch ] = useState(getDateToSql())
   const { setAlert } = useModalAlert()
   const { shopAuth } = useAuthenticate()
   const { cod: codLoja } = shopAuth
 
   useEffect(()=>{
-    if (type === 'open') {
-      setLoading(true)
+    setLoading(true)
 
-      api
-        .get(`sales/`, {
-          params: {
-            codLoja,
-            status: 'open'
-          }
-        })
-        .then(resp => {
-          if(resp.data){
-            setSales(resp.data)
-          }
-          setLoading(false)
-        })
-      .catch( e => console.log(e) )
-    }
+    api
+      .get(`sales/`, {
+        params: {
+          codLoja,
+          status: type,
+          typeSearch: type === 'open' ? undefined : 'D_DELIVERED',
+          search: type === 'open' ? undefined : getDateToSql()
+        }
+      })
+      .then(resp => {
+        if(resp.data){
+          setSales(resp.data)
+        }
+        setLoading(false)
+      })
+    .catch( e => console.log(e) )
   },[codLoja, type])
 
   const searchSales = async () => {
@@ -149,7 +158,12 @@ export default function TabSaleWaiting({ type }) {
     try {
       const {data} = await api.post(`salesshop`, produto)
 
-      const { data: DataSales } = await api.get(`sales/STATUS/Aberta/null/${codLoja}`)
+      const { data: DataSales } = await api.get(`sales/`, {
+        params: {
+          codLoja,
+          status: type
+        }
+      })
       setSales(DataSales)
 
       setAlert(data.msg)
@@ -161,16 +175,30 @@ export default function TabSaleWaiting({ type }) {
 
   const reverseStock = async produto => {
     try {
-      const {data} = await api.post(`salesshop/reverse/${produto.ID_SALES}`, produto)
+      const { data } = await api.post(`salesshop/reverse/${produto.ID_SALES}`, produto)
 
-      const { data: DataSales } = await api.get(`sales/STATUS/Aberta/null/${codLoja}`)
+      const { data: DataSales} = await api.get(`sales/`, {
+        params: {
+          codLoja,
+          status: type,
+          typeSearch: typeSearch === 'All' ? undefined : typeSearch,
+          search: search === '' ? undefined : search
+        }
+      })
+
       setSales(DataSales)
 
-      setAlert(data.msg)
+      setAlert(data.msg, 'sucess')
     } catch (error) {
       setAlert('Erro no sistema, entrar em contato com ADM')
       console.log(error)
     }
+  }
+
+  const saleDetail = (sale, product) => {
+    setSelectedSale(sale)
+    setSelectedProduct(product)
+    setOpenModalSaleDetail(true)
   }
 
   return(
@@ -187,9 +215,9 @@ export default function TabSaleWaiting({ type }) {
           }}
         >
           {type === 'open' && <option value={'All'}>Todos</option>}
+          {type !== 'open' && <option value={'D_DELIVERED'}>Data</option>}
           <option value={'ID_SALES'}>Código Venda</option>
           <option value={'NOMECLI'}>Nome Cliente</option>
-          {type !== 'open' && <option value={'D_DELIVERED'}>Data</option>}
         </select>
 
         {(typeSearch !== 'All' && typeSearch !== 'D_DELIVERED') &&
@@ -241,11 +269,20 @@ export default function TabSaleWaiting({ type }) {
                 key={sale.ID} 
                 sale={sale}
                 cancelSubmitSales={cancelSubmitSales}
+                reverseStock={reverseStock}
+                saleDetail={saleDetail}
               />
             ))}
           </tbody>
         </table>
       }
+
+      {openModalSaleDetail &&
+      <ModalSaleDetail 
+        sale={selectedSale}
+        product={selectedProduct}
+        openModal={openModalSaleDetail}
+        setOpenModal={setOpenModalSaleDetail}/>}
     </>
   )
 }
