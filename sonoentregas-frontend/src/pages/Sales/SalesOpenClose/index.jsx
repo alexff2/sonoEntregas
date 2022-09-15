@@ -163,15 +163,13 @@ export default function TabSaleWaiting({ type }) {
     try {
       const {data} = await api.post(`salesshop/reverse/${produto.ID_SALES}`, produto)
 
-      const { data: DataSales } = await api.get(`sales/STATUS/Aberta/null/${Codloja}`)
+      const { data: DataSales } = await api.get(`sales/STATUS/Aberta/null/${codLoja}`)
       setSales(DataSales)
 
-      setChildrenAlertModal(data.msg)
-      openMOdalAlert()
+      setAlert(data.msg)
     } catch (error) {
-      setChildrenAlertModal('Erro no sistema, entrar em contato com ADM')
+      setAlert('Erro no sistema, entrar em contato com ADM')
       console.log(error)
-      openMOdalAlert()
     }
   }
 
