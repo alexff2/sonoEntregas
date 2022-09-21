@@ -23,7 +23,7 @@ module.exports = {
    */
   async create(req, res){
     try {
-      const { userName, password, codloja } = req.body
+      const { userName, password, codLoja } = req.body
 
       const users = await Users.findAny(0, {
         DESCRIPTION: userName,
@@ -38,10 +38,14 @@ module.exports = {
       let sendUser = {}
 
       users.forEach((/**@type {User} */ user) => {
-        if (user.CODLOJA === codloja || user.CODLOJA === 0) {
+        if (user.CODLOJA === codLoja || user.OFFICE === 'Dev' || user.OFFICE === 'Master') {
           sendUser = user
         }
       })
+
+      if (Object.keys(sendUser).length === 0) {
+        return res.status(401).json('Usuário e/ou senha inválido!')
+      }
 
       const { secret, expiresIn } = jwt
       const token = sign({}, secret, {
@@ -65,6 +69,7 @@ module.exports = {
         token
       })
     } catch (error) {
+      console.log(error)
       return res.status(400).json(error)
     }
   }

@@ -7,7 +7,7 @@ const { findSales, findFinishedSales } = require('../services/salesService')
 module.exports = {
   async findSales( req, res ){
     try {
-      const { typeSearch, search, codLoja, status } = req.query
+      const { status, typeSearch, search, codLoja } = req.query
 
       let sales
       let where = ''
@@ -30,7 +30,7 @@ module.exports = {
 
           codLoja && (where +=` AND A.CODLOJA = ${codLoja}`)
 
-          sales = await findFinishedSales(where)
+          sales = await findFinishedSales(where, codLoja)
         }
       }
 

@@ -45,7 +45,7 @@ module.exports = {
     
     return sales_prod
   }, 
-  async findFinishedSales(where) {
+  async findFinishedSales(where, codLoja) {
     const salesDeliveriesProd = await Sales._query(0, `SELECT A.ID_SALE
     FROM DELIVERYS_PROD A
     INNER JOIN SALES B ON A.CODLOJA = B.CODLOJA AND A.ID_SALE = B.ID_SALES
@@ -65,9 +65,12 @@ module.exports = {
       }
     }
 
-    const sales = await Sales.findSome(0, `ID_SALES IN (${idSales})`)
+    let whereSale = `ID_SALES IN (${idSales})`
+    codLoja && (whereSale +=` AND CODLOJA = ${codLoja}`)
 
-    const viewSalesProd = await ViewSalesProd.findSome(0, `ID_SALES IN (${idSales})`)
+    const sales = await Sales.findSome(0, whereSale)
+
+    const viewSalesProd = await ViewSalesProd.findSome(0, whereSale)
     const shops = await Empresas._query(0, 'SELECT * FROM LOJAS', QueryTypes.SELECT)
 
     const sales_prod = sales.map(sale => {

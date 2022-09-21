@@ -42,16 +42,16 @@ module.exports = {
    */
   async create(req, res) {
     try {
-      const { codloja, description, active, office, password } = req.body
+      const { codLoja, description, active, office, password } = req.body
 
-      const userVerify = await Users.findAny(0, { description, codloja })
+      const userVerify = await Users.findAny(0, { description, codLoja })
 
       if (userVerify.length > 0) {
         return res.status(401).json('Já existe um usuário com esse nome nessa loja!')
       }
 
       if (password === 0) {
-        const values = `${codloja}, '${description}', ${active}, '${office}', '${password}', '1'`
+        const values = `${codLoja}, '${description}', ${active}, '${office}', '${password}', '1'`
 
         const user = await Users.creator(0, values)
 
@@ -66,7 +66,7 @@ module.exports = {
           if (errBt) {
             return res.status(500).json({error: errBt})
           }
-          const values = `${codloja}, '${description}', ${active}, '${office}', '${hash}', '0'`
+          const values = `${codLoja}, '${description}', ${active}, '${office}', '${hash}', '0'`
 
           const user = await Users.creator(0, values)
 
