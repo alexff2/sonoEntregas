@@ -32,7 +32,7 @@ export default function SignIn() {
   const handleSelectShop = event => {
     const shop = shops.filter((shop, i) => i === parseFloat(event.target.value))[0]
 
-    setSelectShop({cod: event.target.value+2, description: shop.database})
+    setSelectShop({cod: parseFloat(event.target.value)+2, description: shop.database})
   }
 
   const handleLogin = async e => {
