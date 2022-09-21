@@ -1,4 +1,4 @@
-function validateFilds(field) {
+function validateFields(field) {
   for (let i = 0; i < field.length; i++) {
     if (!field[i] || field[i] === "") {
       return false
@@ -10,7 +10,7 @@ function validateFilds(field) {
 function validateObs(obs, have_obs2) {
   if(!have_obs2){
     return true
-  } else if (validateFilds([obs])) {
+  } else if (validateFields([obs])) {
     return true
   } else {
     return false
@@ -18,5 +18,5 @@ function validateObs(obs, have_obs2) {
 }
 
 export {
-  validateFilds, validateObs
+  validateFields, validateObs
 }

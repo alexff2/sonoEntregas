@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, createContext } from "react"
 
 import api from "../services/api"
-import { validateFilds } from '../functions/validateFields'
+import { validateFields } from '../functions/validateFields'
 import { useModalAlert } from './modalAlertContext'
 
 const AuthContext = createContext({})
@@ -38,11 +38,11 @@ export default function AuthProvider({ children }){
 
   const login = async ({ userName, password, selectShop }) => {
     try {
-      if (validateFilds([password, userName])) {
+      if (validateFields([password, userName])) {
         const { data } = await api.post('/authenticated', {
           userName,
           password,
-          codloja: selectShop.cod
+          codLoja: selectShop.cod
         })
 
         const { user , token } = data
@@ -60,8 +60,9 @@ export default function AuthProvider({ children }){
       }
     } catch (e) {
       console.log(e.response)
-      if(!e.response)
+      if(e.response.status === 404){
         setAlert('Rede')
+      }
       else if(e.response.status === 400)
         setAlert('Servidor')
       else setAlert(e.response.data)

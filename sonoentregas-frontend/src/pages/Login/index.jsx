@@ -1,97 +1,73 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 
-import './login.css'
+import ModalALert2 from '../../components/ModalAlert2'
 
-import api from '../../services/api'
-import ModalALert, { openMOdalAlert } from '../../components/ModalAlert'
+import { useModalAlert } from '../../context/modalAlertContext'
 
-import { useAuthenticate } from '../../context/authContext'
+import SignIn from './SigIn'
+import SignUp from './SigUp'
 
-const Login = () => {
-  const [modalAlert, setModalAlert] = useState('')
-  const [ userName, setUserName ] = useState()
-  const [ password, setPassword ] = useState()
-  const [ shops, setShops ] = useState([])
-  const [ selectShop, setSelectShop ] = useState('')
-  const { login } = useAuthenticate()
+import logo3 from '../../img/Sono3.jpeg'
+import log from '../../img/log.svg'
+import register from '../../img/register.svg'
 
-  useEffect(() => {
-    api
-      .get('connections')
-      .then( resp => {
-        const datas = resp.data.filter((shop, i) => i > 1)
-        setShops(datas)
-      })
-      .catch( e => {
-        openMOdalAlert()
-        console.log(e)
-        !e.response
-          ? setModalAlert('Erro ao conectar com servidor, entre em contato com Bruno!')
-          : setModalAlert('Erro ao processar requisição ao servidor, entre em contato com Alexandre!')
-      })
-  },[])
+import './style.css'
 
-  const insertSelectShop = shop => {
-    setSelectShop(shop)
-    
-    document.querySelector("#modal-shops").style.display = 'none'
-  }
+export default function Login(){
+  const { open } = useModalAlert()
+  /* const singInSingUp = () => {
+    const container = document.querySelector(".container")
 
-  const handleLogin = async e => {
-    e.preventDefault()
+    container.classList.toggle("sign-up-mode")
+  } */
 
-    await login({ userName, password, selectShop})
-  }
+  return (
+    <>
+      <div className="containerLogin">
+        <div className="forms-container">
+          <div className="signin-signup">
 
-  return(
-    <div className="login">
-      <div className="login-content">
-        <h1>Sono &amp; Art Entregas</h1>
-        <div id="shop">Loja: {selectShop.description}</div>
-        <form onSubmit={handleLogin}>
-          <div className="field">
-            <input type="text"
-              placeholder="Usuário..."
-              onChange={e => setUserName(e.target.value)}
-            />
+          <SignIn />
+
+          <SignUp />
+
           </div>
-          <div className="field">
-            <input
-              type="password"
-              placeholder="Senha..."
-              onChange={e => setPassword(e.target.value)}
-              onKeyPress={e => e.key === 'Enter' && handleLogin(e)}
-            />
-          </div>
-          <button type="submit">Logar</button>
-        </form>
-      </div>
+        </div>
 
-      <div className="modal-overlaw" id="modal-shops">
-        <div className="modal">
-          <h2>Selecione a loja:</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Código</th>
-                <th>Descrição</th>
-              </tr>
-            </thead>
-            <tbody>
-              {shops.map( (shop, i) => (
-                <tr key={i} onClick={() => insertSelectShop({cod: i+2, description: shop.database})}>
-                  <td>{i+2}</td>
-                  <td>{shop.database}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="panels-container">
+          <div className="panel left-panel">
+            <div className="content">
+              <img src={logo3} width="200px" alt="Logo Sono e Arte" />
+              <h3>Não tem usuário?</h3>
+              <p>Clique no botão abaixou para se cadastrar!</p>
+              <button
+                className="btn transparent"
+                id="sign-up-btn"
+
+              >
+                Cadastro
+              </button>
+            </div>
+            <img src={log} className="image" alt="" />
+          </div>
+          <div className="panel right-panel">
+            <div className="content">
+              <h3>Digite seus dados ao lado</h3>
+              <p>
+                Atenção! Após se cadatrar, seu usuário deve-rá ser liberado pelo departamento de TI, entre em contato solicitando.
+              </p>
+              <button
+                className="btn transparent"
+                id="sign-in-btn"
+
+              >Acessar
+              </button>
+            </div>
+            <img src={register} className="image" alt="" />
+          </div>
         </div>
       </div>
-
-      <ModalALert>{modalAlert}</ModalALert>
-    </div>
+      {open && <ModalALert2 />}
+    </>
   )
 }
-
-export default Login

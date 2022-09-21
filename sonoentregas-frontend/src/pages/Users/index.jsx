@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { BiEdit, BiTrash } from 'react-icons/bi'
+import { BiEdit } from 'react-icons/bi'
 
 import { useUsers } from '../../context/userContext'
 import { useModalAlert } from '../../context/modalAlertContext'
@@ -7,31 +7,29 @@ import { useAuthenticate } from '../../context/authContext'
 
 import './style.css'
 
-import ModalAlert, { openMOdalAlert } from '../../components/ModalAlert'
 import Modal from '../../components/Modal'
 import api from '../../services/api'
 
 const officeValues = ['Assistant', 'Dev', 'Driver', 'User', 'Master']
 
 export default function User(){
-  const { users, setUsers } = useUsers()
-  const { setAlert } = useModalAlert()
-
   const [userAuthorize, setUserAuthorize] = useState({})
   const [passAuthorize, setPassAuthorize] = useState('')
   const [updateUser, setUpdateUser] = useState([])
   const [nameUser, setNameUser] = useState()
-  const [offic, setOffic] = useState('User')
-  const [passwordUser, setpasswordUser] = useState()
+  const [office, setOffice] = useState('User')
+  const [passwordUser, setPasswordUser] = useState()
   const [rePasswordUser, setRePasswordUser] = useState()
   const [status, setStatus] = useState()
-  const [childrenAlertModal, setChildrenAlertModal] = useState('Vazio')
   const [openAuthorize, setOpenAuthorize] = useState(false)
   const [disabled, setDisabled] = useState(false)
   const { shopAuth, userAuth } = useAuthenticate()
 
+  const { users, setUsers } = useUsers()
+  const { setAlert } = useModalAlert()
+
   const { cod } = shopAuth
-  const { OFFICE } = userAuth
+  const { OFFICE: userAuthOffice } = userAuth
 
   const openModalCreateUser = () => {
     document.querySelector('#modal-create-users').style.display = 'flex'
@@ -42,7 +40,7 @@ export default function User(){
     setStatus(user.ACTIVE)
     setDisabled(false)
 
-    if (OFFICE === 'Dev') {
+    if (userAuthOffice === 'Dev') {
       setUpdateUser([user])
     } else {
       setUserAuthorize(user)
@@ -69,15 +67,16 @@ export default function User(){
   const submitAuthorize = async e => {
     e.preventDefault()
     setOpenAuthorize(false)
-    setUserAuthorize({})
 
     try {
-      await api.post('/login', {
-        user: userAuthorize.DESCRIPTION , 
+      await api.post('/authenticated', {
+        userName: userAuthorize.DESCRIPTION,
         password: passAuthorize,
-        codloja: userAuthorize.CODLOJA
+        codLoja: userAuthorize.CODLOJA
       })
+
       setUpdateUser([userAuthorize])
+      setUserAuthorize({})
     } catch (error) {
       console.log(error)
       if(!error.response)
@@ -94,10 +93,10 @@ export default function User(){
     
     try {
       if (rePasswordUser === passwordUser){
-        const codloja = (offic === 'Dev' || offic === 'Master') ? 0 : cod
-        const password = (offic === 'Assistant' || offic === 'Driver') ? 0 : passwordUser
+        const codLoja = (office === 'Dev' || office === 'Master') ? 0 : cod
+        const password = (office === 'Assistant' || office === 'Driver') ? 0 : passwordUser
 
-        const dataUser = { codloja, description: nameUser, active: 1, office: offic, password }
+        const dataUser = { codLoja, description: nameUser, active: 1, office, password }
         
         const { data } = await api.post('/users', dataUser)
         
@@ -105,26 +104,25 @@ export default function User(){
         
         document.querySelector('.modal-overlaw').style.display = 'none'
       } else {
-        setChildrenAlertModal('Senhas incompatíveis')
-
-        openMOdalAlert()
+        setAlert('Senhas incompatíveis')
       }
     } catch (error) {
       console.log(error)
-
-      setChildrenAlertModal('Erro ao criar usuário, entre em contato com ADM')
-
-      openMOdalAlert()
+      if(!error.response)
+        setAlert('Rede')
+      else if(error.response.status === 400)
+        setAlert('Servidor')
+      else setAlert(error.response.data)
     }
   }
-  
+
   const submitUpdateUser = async ( e, user ) => {
     e.preventDefault()
     setDisabled(true)
 
     try {
       if (rePasswordUser === passwordUser){
-        const userUpd = {...user}
+        const userUpd = {...user }
         userUpd.DESCRIPTION = nameUser
         userUpd.ACTIVE = status
         userUpd.PASSWORD = passwordUser
@@ -137,36 +135,15 @@ export default function User(){
         
         setUpdateUser([])
       } else {
-        setChildrenAlertModal('Senhas incompatíveis')
-        openMOdalAlert()
+        setAlert('Senhas incompatíveis')
       }
     } catch (error) {
       console.log(error)
-      openMOdalAlert()
-
-      if (!error.response){
-        setChildrenAlertModal('Erro na rede, entre em contato com Bruno')
-      } else {
-        if (error.response.status === 401){
-          setChildrenAlertModal(error.response.data)
-        } else {
-          setChildrenAlertModal('Erro na atualização, entre em contato com ADM')
-        }
-      }
-    }
-  }
-
-  const deletetUser = async id => {
-    try {
-      await api.delete(`/users/${id}`)
-
-      setUsers( users.filter( user => user.ID !== id ))
-    } catch (error) {
-      console.log(error)
-
-      setChildrenAlertModal('Erro na deletar, entre em contato com ADM')
-      
-      openMOdalAlert()
+      if(!error.response)
+        setAlert('Rede')
+      else if(error.response.status === 400)
+        setAlert('Servidor')
+      else setAlert(error.response.data)
     }
   }
 
@@ -198,19 +175,13 @@ export default function User(){
                     color="#5965E0"
                     onClick={() => openModalAuthorize(item)}
                     /> 
-                  {OFFICE === 'Dev' &&
-                    <BiTrash
-                      color="#E83F5B"
-                      onClick={() => deletetUser(item.ID)}
-                      />
-                  }
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
 
-        { OFFICE === 'Dev' &&
+        {userAuthOffice === 'Dev' &&
           <button 
             className="circle-add"
             onClick={openModalCreateUser}
@@ -233,7 +204,7 @@ export default function User(){
                 style={{textTransform: 'uppercase'}}
               />
             </div>
-            {!(offic === 'Assistant' || offic === 'Driver') &&
+            {!(office === 'Assistant' || office === 'Driver') &&
               <div className="field-input">
                 <input 
                   type="password" 
@@ -241,7 +212,7 @@ export default function User(){
                   maxLength="6" 
                   required 
                   placeholder="Senha..."
-                  onChange={e => setpasswordUser(e.target.value)}
+                  onChange={e => setPasswordUser(e.target.value)}
                 />
               </div>
             }
@@ -255,8 +226,8 @@ export default function User(){
                 onChange={e => setRePasswordUser(e.target.value)}
               />
             </div>
-            <div className="field-input" onChange={e => setOffic(e.target.value)}>
-              <select defaultValue={offic} className='selectTransparent'>
+            <div className="field-input" onChange={e => setOffice(e.target.value)}>
+              <select defaultValue={office} className='selectTransparent'>
                 {officeValues.map( value => (
                   <option value={value} key={value}>{value}</option>
                 ))}
@@ -292,7 +263,7 @@ export default function User(){
                   maxLength="6" 
                   required 
                   placeholder="Senha..."
-                  onChange={e => setpasswordUser(e.target.value)}
+                  onChange={e => setPasswordUser(e.target.value)}
                 />
               </div>
               <div className="field-input">
@@ -305,7 +276,7 @@ export default function User(){
                   onChange={e => setRePasswordUser(e.target.value)}
                 />
               </div>
-              {OFFICE === 'Dev' &&
+              {userAuthOffice === 'Dev' &&
                 <div className="field-input-checkbox">
                   <p>Ativo? </p>
                   <div>
@@ -366,7 +337,6 @@ export default function User(){
         </form>
       </Modal>
 
-      <ModalAlert>{childrenAlertModal}</ModalAlert>
     </div>
   )
 }
