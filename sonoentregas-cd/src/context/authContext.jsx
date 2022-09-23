@@ -34,7 +34,7 @@ export default function AuthProvider({ children }){
         const { data } = await api.post('/authenticated', {
           userName,
           password,
-          codloja: 1
+          codLoja: 1
         })
 
         const { user , token } = data

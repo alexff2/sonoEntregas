@@ -172,7 +172,7 @@ module.exports = {
    * @param {*} req 
    * @param {*} res 
    */
-  async updateSatus( req, res ){
+  async updateStatus( req, res ){
     const { id } = req.params
     const delivery = req.body
     const { id: user_id } = req.user
@@ -238,5 +238,13 @@ module.exports = {
       console.log(e)
       res.status(400).json(e)
     }
+  },
+  /**
+   * @param {*} req 
+   * @param {*} res 
+   */
+  async updateSalePrevision(req, res) {
+    const { id } = req.params
+    return res.send(id)
   }
 }
