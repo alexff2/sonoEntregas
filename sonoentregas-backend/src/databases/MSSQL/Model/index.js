@@ -4,9 +4,9 @@ const Sequelize  = require('sequelize')
 const connections = require('../connections')
 
 class Model {
-  constructor(tab, coluns){
+  constructor(tab, columns){
     this.tab = tab,
-    this.coluns = coluns
+    this.columns = columns
   }
 
   getObj(obj, separate=', ', toCompare = '='){
@@ -39,36 +39,36 @@ class Model {
     return values
   }
 
-  async findAll(loja, coluns = this.coluns){
-    const script = `SELECT ${coluns} FROM ${this.tab}`
+  async findAll(loja, columns = this.columns){
+    const script = `SELECT ${columns} FROM ${this.tab}`
 
     const data = await this._query(loja, script, QueryTypes.SELECT)
     return data
   }
-  async findSome(loja, where, coluns = this.coluns){
-    const script = `SELECT ${coluns} FROM ${this.tab} WHERE ${where}`
+  async findSome(loja, where, columns = this.columns){
+    const script = `SELECT ${columns} FROM ${this.tab} WHERE ${where}`
 
     const data = await this._query(loja, script, QueryTypes.SELECT)
 
     return data
   }
-  async find({loja, where = {}, coluns = this.coluns, toCompare = '='}){
+  async find({loja, where = {}, columns = this.columns, toCompare = '='}){
     where = Object.keys(where).length === 0 
       ? '' 
       : `WHERE ${this.getObj(where, ' AND ', toCompare)}`
 
-    const script = `SELECT ${coluns} FROM ${this.tab} ${where}`
+    const script = `SELECT ${columns} FROM ${this.tab} ${where}`
 
     const data = await this._query(loja, script, QueryTypes.SELECT)
 
     return data
   }
-  async findAny(loja, where = {}, coluns = this.coluns){
+  async findAny(loja, where = {}, columns = this.columns){
     where = Object.keys(where).length === 0 
       ? '' 
       : `WHERE ${this.getObj(where, ' AND ')}`
 
-    const script = `SELECT ${coluns} FROM ${this.tab} ${where}`
+    const script = `SELECT ${columns} FROM ${this.tab} ${where}`
 
     const data = await this._query(loja, script, QueryTypes.SELECT)
 
@@ -76,7 +76,7 @@ class Model {
   }
 
   /*async innerJoin(loja, where, ){
-    const script = `SELECT ${coluns} FROM ${this.tab} WHERE ${where}`
+    const script = `SELECT ${columns} FROM ${this.tab} WHERE ${where}`
 
     const data = await this._query(loja, script)
     return data
@@ -89,7 +89,7 @@ class Model {
 
       const ID = lastId[0].ID ? lastId[0].ID + 1 : 1
 
-      const script = `INSERT INTO ${this.tab} (${this.coluns}) VALUES (${ID}, ${values})`
+      const script = `INSERT INTO ${this.tab} (${this.columns}) VALUES (${ID}, ${values})`
 
       await this._query(loja, script, QueryTypes.INSERT)
 
@@ -97,7 +97,7 @@ class Model {
 
       return data[0]
     } else {
-      const script = `INSERT INTO ${this.tab} (${this.coluns}) VALUES (${values})`
+      const script = `INSERT INTO ${this.tab} (${this.columns}) VALUES (${values})`
 
       await this._query(loja, script, QueryTypes.INSERT)
     }
@@ -105,6 +105,7 @@ class Model {
 
   setCreateValues(values, id=false){
     var column, value
+
     values.forEach((val, index) => {
       index === 0
         ? value ='('
@@ -156,12 +157,12 @@ class Model {
       
       const ID = lastId[0].ID ? lastId[0].ID + 1 : 1
       
-      const script = `INSERT INTO ${this.tab} (${this.coluns}) VALUES (${ID}, ${values})`
+      const script = `INSERT INTO ${this.tab} (${this.columns}) VALUES (${ID}, ${values})`
       
       await this._query(loja, script, QueryTypes.INSERT)
       
     } else {
-      const script = `INSERT INTO ${this.tab} (${this.coluns}) VALUES (${values})`
+      const script = `INSERT INTO ${this.tab} (${this.columns}) VALUES (${values})`
       
       await this._query(loja, script, QueryTypes.INSERT)
     }
@@ -233,8 +234,8 @@ class Model {
   }
   
   async _query(loja, script, type){
-    const conection = connections[loja]
-    const sequelize = new Sequelize(conection)
+    const connection = connections[loja]
+    const sequelize = new Sequelize(connection)
 
     const results = await sequelize.query(script, { type })
     return results

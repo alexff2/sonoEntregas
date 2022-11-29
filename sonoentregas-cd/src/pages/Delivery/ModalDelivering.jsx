@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { ButtonSucess } from "../../components/Buttons"
+import { ButtonSuccess } from "../../components/Buttons"
 import { makeStyles } from '@material-ui/core'
 
 import api from "../../services/api"
@@ -18,7 +18,7 @@ export default function ModalDelivering({ setOpen, selectDelivery }){
   const [ date, setDate ] = useState('')
   const [ error, setError ] = useState(false)
   const [ childrenError, setChildrenError ] = useState('')
-  const [ disabledBtnGrav, setDisabledBtnGrav ] = useState(false)
+  const [ disabledBtnSave, setDisabledBtnSave ] = useState(false)
   const { setDelivery } = useDelivery()
   const { errorDiv } = useStyle()
 
@@ -28,7 +28,7 @@ export default function ModalDelivering({ setOpen, selectDelivery }){
 
       setChildrenError('Selecione uma data válida!')
     } else {
-      setDisabledBtnGrav(true)
+      setDisabledBtnSave(true)
 
       selectDelivery.STATUS = 'Entregando'
       selectDelivery['DATE'] = date
@@ -54,7 +54,7 @@ export default function ModalDelivering({ setOpen, selectDelivery }){
       <hr />
       Selecione a data de saída: &nbsp;
       <input type="date" onChange={e => setDate(e.target.value)}/>&nbsp;
-      <ButtonSucess children={'SALVAR'} onClick={delivering} disabled={disabledBtnGrav}/><br/><br/>
+      <ButtonSuccess children={'SALVAR'} onClick={delivering} disabled={disabledBtnSave}/><br/><br/>
       {error && <div className={errorDiv}><span>{childrenError}</span></div>}
     </div>
   )

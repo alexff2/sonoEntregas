@@ -16,7 +16,7 @@ import {
   Paper,
 } from '@material-ui/core'
 
-import { ButtonCancel, ButtonSucess } from '../../../components/Buttons'
+import { ButtonCancel, ButtonSuccess } from '../../../components/Buttons'
 
 import { useCars } from '../../../context/carsContext'
 import { useDrivers } from '../../../context/driverContext'
@@ -285,7 +285,7 @@ export default function ModalStartMain({ selectMain, setOpen }) {
           </TableContainer>
 
           <Box mt={2}>
-            <ButtonSucess
+            <ButtonSuccess
               children="Processar"
               type="submit"
             />

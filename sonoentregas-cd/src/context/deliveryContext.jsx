@@ -9,7 +9,9 @@ export default function DeliveryProvider({ children }){
   const [delivery, setDelivery] = useState([])
 
   useEffect(()=>{
-    api.get('deliverys/open').then( resp => setDelivery(resp.data))
+    api
+      .get('deliverys/open')
+      .then( resp => setDelivery(resp.data))
   },[])
 
   return (

@@ -7,7 +7,7 @@ const Prodlojas = require('../services/ProdLojaService')
 const { setDaysInDate } = require('../functions/getDate')
 
 /**
- * @typedef {Object} Condicions
+ * @typedef {Object} Conditions
  * @property {string} typeSeach
  * @property {string} search
  * @property {number} codloja
@@ -16,11 +16,11 @@ const { setDaysInDate } = require('../functions/getDate')
 module.exports = {
   /**
 
-   * @param {Condicions} condicions 
+   * @param {Conditions} conditions 
    * @returns {Promise<Object[]>}
    */
-  async findMain(condicions, cd = false) {
-    const { codloja, search, typeSeach } = condicions
+  async findMain(conditions, cd = false) {
+    const { codloja, search, typeSeach } = conditions
     var maint
 
     const codLoja = codloja === 0 ? '' : ` AND CODLOJA = ${codloja}`

@@ -12,6 +12,7 @@ const productsController = require('./controllers/productsController')
 const salesSceController = require('./controllers/salesSceController')
 const salesController = require('./controllers/salesController')
 const carsController = require('./controllers/carsController')
+const previsionController = require('./controllers/PrevisionController')
 const deliverysController = require('./controllers/deliverysController')
 const homeController = require('./controllers/homeController')
 const dashboardController = require('./controllers/dashboardController')
@@ -52,7 +53,10 @@ routes.post('/sales/updateDate/:idSale', salesController.updateDateDeliv)
 routes.get('/cars', carsController.index)
 routes.post('/cars', carsController.create)
 routes.put('/cars/:id', carsController.update)
-//Deliverys
+// Previsions
+routes.post('/prevision', ensureAuthenticated, previsionController.create)
+
+//Deliveries
 routes.get('/deliverys/:status', deliverysController.index)
 routes.get('/deliverys/:status/:date', deliverysController.index)
 routes.post('/deliverys', ensureAuthenticated, deliverysController.create)

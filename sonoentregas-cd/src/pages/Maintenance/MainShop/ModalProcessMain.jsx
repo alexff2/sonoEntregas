@@ -5,7 +5,7 @@ import { useMaintenance } from '../../../context/maintenanceContext'
 
 import api from '../../../services/api'
 
-import { ButtonSucess } from '../../../components/Buttons'
+import { ButtonSuccess } from '../../../components/Buttons'
 
 const useStyle = makeStyles(theme => ({
   head: {
@@ -88,7 +88,7 @@ export default function ModalProcessMain({ main, setOpen }) {
       {main.STATUS === 'Em lançamento' && (<>
         <span>Selecione a data do deslocamento: </span>
         <input type="date" onChange={e => setDate(e.target.value)}/> &nbsp;
-        <ButtonSucess onClick={moveToMain} disabled={disabledBtnGrav}>Deslocar</ButtonSucess>
+        <ButtonSuccess onClick={moveToMain} disabled={disabledBtnGrav}>Deslocar</ButtonSuccess>
       </>)}
       {main.STATUS === 'Em deslocamento' && (<>
         <div>
@@ -109,7 +109,7 @@ export default function ModalProcessMain({ main, setOpen }) {
         </div>
         <span>Selecione a data de finalização: </span>
         <input type="date" onChange={e => setDate(e.target.value)}/> &nbsp;
-        <ButtonSucess onClick={finishToMain} disabled={disabledBtnGrav}>Finalizar</ButtonSucess>
+        <ButtonSuccess onClick={finishToMain} disabled={disabledBtnGrav}>Finalizar</ButtonSuccess>
       </>)}
       {error && <div className={classe.errorDiv}><span>{childrenError}</span></div>}
     </div>

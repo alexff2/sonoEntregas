@@ -34,21 +34,21 @@ const useStyle = makeStyles(theme => ({
   }
 }))
 
-export default function TabDeliv({ type, deleteDelivery, openModals }){
+export default function TableDelivery({ type, deleteDelivery, openModals }){
   const [ delivery, setDelivery ] = useState([])
   
-  const { delivery: delivOpen } = useDelivery()
+  const { delivery: deliveryOpen } = useDelivery()
   const { deliveryFinish } = useDeliveryFinish()
 
   const classes = useStyle()
 
   useEffect(()=>{
-    type === 'open' ? setDelivery(delivOpen) : setDelivery(deliveryFinish)
-  },[type, delivOpen, deliveryFinish])
+    type === 'open' ? setDelivery(deliveryOpen) : setDelivery(deliveryFinish)
+  },[type, deliveryOpen, deliveryFinish])
 
   return (
     <TableContainer component={Paper}>
-      <Table aria-label="custumezed table">
+      <Table aria-label="customized table">
         <TableHead>
           <TableRow>
           {['Código', 'Descrição', 'Motorista', 'Auxiliar', 'Veículo', 'Status'].map((value, index) => (

@@ -9,7 +9,7 @@ import {
   MenuItem
 } from "@material-ui/core"
 
-import { ButtonCancel, ButtonSucess } from '../../components/Buttons'
+import { ButtonCancel, ButtonSuccess } from '../../components/Buttons'
 import ModalAlert from '../../components/ModalAlert'
 
 import { useUsers } from '../../context/usersContext'
@@ -144,7 +144,7 @@ export default function ModalUsers({ selectUser, setOpen }) {
         }
 
         <div className={classes.btnActions}>
-        <ButtonSucess 
+        <ButtonSuccess 
           children={selectUser ? "Editar" : "Lançar"}
           className={classes.btnSucess}
           onClick={selectUser ? updateUser : createUser}

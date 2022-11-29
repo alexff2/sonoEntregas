@@ -9,9 +9,11 @@ import {
   TableHead,
   TableRow
 } from '@material-ui/core'
-import { Delete } from '@material-ui/icons'
+import { Edit } from '@material-ui/icons'
 
 import { useDelivery } from '../../context/deliveryContext'
+
+import { getDateBr } from '../../functions/getDates'
 
 import StyleStatus from '../../functions/styleStatus'
 
@@ -58,7 +60,7 @@ export default function TabPrevision({ openModals, deleteDelivery }){
         <span>Previsões</span>
       </div>
       <TableContainer component={Paper}>
-        <Table aria-label="custumezed table">
+        <Table aria-label="customized table">
           <TableHead>
             <TableRow>
             {['Código', 'Descrição', 'Status'].map((value, index) => (
@@ -72,7 +74,9 @@ export default function TabPrevision({ openModals, deleteDelivery }){
           {previsions.map( item => (
             <TableRow key={item.ID} className={classes.body}>
               <TableCell>{item.ID}</TableCell>
-              <TableCell>{item.DESCRIPTION}</TableCell>
+              <TableCell>
+                {`${item.DESCRIPTION} ${getDateBr(item.D_PREVISION)}`}
+              </TableCell>
               <TableCell width={'15%'}>
                 <div 
                   style={StyleStatus('Previsão')}
@@ -81,7 +85,7 @@ export default function TabPrevision({ openModals, deleteDelivery }){
               </TableCell>
 
               <TableCell>
-                <Delete onClick={()=> deleteDelivery(item.ID)}/>
+                <Edit onClick={()=> openModals(item, 'update')}/>
               </TableCell>
             </TableRow>
           ))}

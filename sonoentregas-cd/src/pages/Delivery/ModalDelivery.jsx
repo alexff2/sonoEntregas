@@ -14,7 +14,7 @@ import {
 //Components
 import TableSales from '../../components/TableSales'
 import BoxInfo from '../../components/BoxInfo'
-import { ButtonCancel, ButtonSucess } from '../../components/Buttons'
+import { ButtonCancel, ButtonSuccess } from '../../components/Buttons'
 
 //context
 import { useCars } from '../../context/carsContext'
@@ -25,7 +25,7 @@ import { useSale } from '../../context/saleContext'
 import { useAlert } from '../../context/alertContext'
 
 import api from '../../services/api'
-import { getDateBr } from '../../functions/getDates'
+import { getDateSql } from '../../functions/getDates'
 
 const useStyles = makeStyles(theme => ({
   //Style form select
@@ -100,16 +100,16 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
   const [ disableDrive, setDisableDrive ] = useState(false)
   const [ disableAssist, setDisableAssist ] = useState(false)
   const [ disableCar, setDisableCar ] = useState(false)
-  const [ datePrev, setDatePrev ] = useState()
+  const [ datePrev, setDatePrev ] = useState('')
   const [ description, setDescription ] = useState('')
   const [ codCar, setCodCar ] = useState(false)
   const [ codDriver, setCodDriver ] = useState(false)
   const [ codAssistant, setCodAssistant ] = useState(false)
   const [ idSale, setIdSale ] = useState('')
-  const [ createDevSales, setCreateDevSales ] = useState([])
+  const [ deliverySales, setDeliverySales ] = useState([])
   const [ salesProd, setSalesProd ] = useState([])
   const [ errorMsg, setErrorMsg ] = useState('')
-  const [ disabledBtnGrav, setDisabledBtnGrav ] = useState(false)
+  const [ disabledBtnSave, setDisabledBtnSave ] = useState(false)
 
   const { cars } = useCars()
   const { drivers } = useDrivers()
@@ -124,16 +124,28 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
   //Start component
   useEffect(() => {
     if (selectDelivery){
+      if (selectDelivery.ID_DRIVER !== 0) {
+        setCodCar(selectDelivery.ID_CAR)
+        setCodDriver(selectDelivery.ID_DRIVER)
+        setCodAssistant(selectDelivery.ID_ASSISTANT)
+      } else {
+        setDatePrev(getDateSql(selectDelivery.D_PREVISION), -1)
+        setCheckedPred(true)
+      }
+      
       setDescription(selectDelivery.DESCRIPTION)
-      setCodCar(selectDelivery.ID_CAR)
-      setCodDriver(selectDelivery.ID_DRIVER)
-      setCodAssistant(selectDelivery.ID_ASSISTANT)
-      setCreateDevSales(selectDelivery.sales)
+      setDeliverySales(selectDelivery.sales)
+
       var salesProdTemp = []
       selectDelivery.sales.forEach(sale => {
         sale.products.forEach(product => {
+          if (selectDelivery.ID_DRIVER === 0) {
+            product.STATUS = 'Previsão'
+          }
+
           product['qtdDeliv'] = product.QTD_DELIV
           product['checked'] = true
+
           salesProdTemp.push(product)
         })
       })
@@ -141,7 +153,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
     }
   }, [selectDelivery])
 
-  //Functions Outher
+  //Functions Other
   const createDelivery = async () => {
     try {
       if (!codCar || !codDriver || !codAssistant){
@@ -152,17 +164,21 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
           return setAlert('Selecione uma data válida')
         }
 
-        setDisabledBtnGrav(true)
-        const data = {
-          description: typeof codCar === 'boolean' ? `Previsão de ${getDateBr(datePrev)}`: description,
-          codCar: typeof codCar === 'boolean' ? 0: codCar,
-          codDriver: typeof codDriver === 'boolean' ? 0: codDriver,
-          codAssistant: typeof codAssistant === 'boolean' ? 0: codAssistant,
-          salesProd,
-          status: 'Em lançamento'
-        }
+        setDisabledBtnSave(true)
 
-        const { data: dataDelivery } = await api.post('deliverys', data)
+        const { data: dataDelivery } = await api.post('deliverys', {
+          description: typeof codCar === 'boolean' 
+            ? 'Previsão de'
+            : description,
+          ID_CAR: typeof codCar === 'boolean' ? 0: codCar,
+          ID_DRIVER: typeof codDriver === 'boolean' ? 0: codDriver,
+          ID_ASSISTANT: typeof codAssistant === 'boolean' 
+            ? 0
+            : codAssistant,
+          D_PREVISION: datePrev,
+          salesProd,
+          STATUS: 'Em lançamento'
+        })
 
         const { data: dataDeliv } = await api.get('deliverys/status/') 
         setDelivery(dataDeliv)
@@ -192,14 +208,23 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
 
   const updateDelivery = async () => {
     try {
-      setDisabledBtnGrav(true)
+      setDisabledBtnSave(true)
 
-      const dataDelivery = { description, codCar, codDriver, codAssistant, salesProd }
+      const { data } = await api.put(`deliverys/${selectDelivery.ID}`, {
+        description: typeof codCar === 'boolean' 
+          ? 'Previsão de'
+          : description,
+        ID_CAR: typeof codCar === 'boolean' ? 0: codCar,
+        ID_DRIVER: typeof codDriver === 'boolean' ? 0: codDriver,
+        ID_ASSISTANT: typeof codAssistant === 'boolean' 
+          ? 0
+          : codAssistant,
+        D_PREVISION: datePrev,
+        salesProd 
+      })
 
-      const { data } = await api.put(`deliverys/${selectDelivery.ID}`, dataDelivery)
-
-      const { data: dataDeliv } = await api.get('deliverys/status/') 
-      setDelivery(dataDeliv)
+      const { data: dataDelivery } = await api.get('deliverys/status/') 
+      setDelivery(dataDelivery)
 
       if (data.ID) { //Melhorar performance
         const { data: dataSales } = await api.get('sales/', {
@@ -221,7 +246,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
   const setSalesInModal = async e => {
     e.preventDefault()
 
-    const saleFound = createDevSales.find( sale => sale.ID_SALES === idSale )
+    const saleFound = deliverySales.find( sale => sale.ID_SALES === idSale )
 
     if(!saleFound) {
       try {
@@ -238,7 +263,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
 
             sales = data.filter(sale => sale.STATUS === 'Aberta')
 
-            setCreateDevSales([...createDevSales, ...sales])
+            setDeliverySales([...deliverySales, ...sales])
 
             sales.length === 0 && 
               setErrorMsg('Venda FECHADA já lançada em rota, consultar no menu VENDAS para saber STATUS da rota')
@@ -262,7 +287,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
     setIdSale('')
   }
 
-  const handleChekedPrevision = e => {
+  const handleCheckedPrevision = e => {
     setCheckedPred(!checkedPred)
     setDisableDrive(!disableDrive)
     setDisableAssist(!disableAssist)
@@ -278,17 +303,16 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
     <form className={classes.form}>
       {!selectDelivery &&
         <FormControlLabel
-        className={classes.checkedPred}
-        control={
-          <Checkbox
-          checked={checkedPred}
-          onChange={handleChekedPrevision}
-          name="predction"
-          />
-        }
-        labelPlacement="start"
-        label="PREVISÃO"
-      />}
+          className={classes.checkedPred}
+          control={
+            <Checkbox
+            checked={checkedPred}
+            onChange={handleCheckedPrevision}
+            />
+          }
+          labelPlacement="start"
+          label="PREVISÃO"
+        />}
 
       {!checkedPred
         ?<div className={classes.divFormControl}>
@@ -367,6 +391,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
         :<TextField
           id="date"
           label="Previsão"
+          defaultValue={datePrev}
           type="date"
           onChange={e => setDatePrev(e.target.value)}
           className={classes.fieldDate}
@@ -402,7 +427,7 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
 
       <Box className={classes.sales}>
         <TableSales 
-          selectSales={createDevSales} 
+          selectSales={deliverySales} 
           setSalesProd={setSalesProd}
           salesProd={salesProd}
           type={ selectDelivery ? 'update' : 'create' }
@@ -414,11 +439,10 @@ export default function ModalDelivery({ setOpen, selectDelivery }){
       </Box>
 
       <div className={classes.btnActions}>
-        <ButtonSucess 
+        <ButtonSuccess 
           children={selectDelivery ? "Editar" : "Lançar"}
-          className={classes.btnSucess}
           onClick={selectDelivery ? updateDelivery : createDelivery}
-          disabled={disabledBtnGrav}
+          disabled={disabledBtnSave}
         />
         <ButtonCancel 
           children="Cancelar"

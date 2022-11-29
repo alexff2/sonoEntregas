@@ -9,7 +9,9 @@ export default function DeliveryFinishProvider({ children }){
   const [deliveryFinish, setDeliveryFinish] = useState([])
 
   useEffect(()=>{
-    api.get(`deliverys/close/${getDateSql()}`).then( resp => setDeliveryFinish(resp.data))
+    api
+      .get(`deliverys/close/${getDateSql()}`)
+      .then( resp => setDeliveryFinish(resp.data))
   },[])
 
   return (

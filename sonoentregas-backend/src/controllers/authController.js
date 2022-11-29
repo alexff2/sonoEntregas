@@ -47,17 +47,17 @@ module.exports = {
         return res.status(401).json('Usuário e/ou senha inválido!')
       }
 
-      const { secret, expiresIn } = jwt
-      const token = sign({}, secret, {
-        subject: String(sendUser.ID),
-        expiresIn
-      })
-
       const passwordMatch =  await compare(password, sendUser.PASSWORD)
 
       if (!passwordMatch) {
         return res.status(401).json('Usuário e/ou senha inválido!')
       }
+
+      const { secret, expiresIn } = jwt
+      const token = sign({}, secret, {
+        subject: String(sendUser.ID),
+        expiresIn
+      })
 
       return res.status(201).json({
         user: {

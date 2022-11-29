@@ -28,12 +28,16 @@ import { getDateBr } from '../../functions/getDates'
 import { getComparator, stableSort } from '../../functions/orderTable'
 
 const CheckProd = ({ sendSalesProd, type, produto, classes }) => {
-  const [ qtdDeliv, setQtdDeliv ] = useState(0)
+  let qtdDefault = (type === 'update' && produto.checked) 
+    ? produto.QTD_DELIV 
+    : produto.QUANTIDADE - produto.QTD_DELIV
+
+  const [ qtdDeliv, setQtdDeliv ] = useState(qtdDefault)
   const [ inputNumber, setInputNumber ] = useState(produto.checked)
 
   if (type === 'home') {
     return null
-  } else if ((produto.STATUS === 'Em lançamento' && type !== 'update') || produto.STATUS === 'Finalizada' || produto.STATUS === 'Entregando') {
+  } else if ((produto.STATUS === 'Em lançamento' && type !== 'update') || produto.STATUS === 'Finalizada' || produto.STATUS === 'Entregando' || produto.STATUS === 'Previsão') {
     return <TableCell style={{padding: '0px 10px'}}>{produto.STATUS}</TableCell>
   } else {
     return (
@@ -42,7 +46,7 @@ const CheckProd = ({ sendSalesProd, type, produto, classes }) => {
           <input 
             type="number" 
             style={{width: 40}}
-            defaultValue={(type === 'update' && produto.checked) ? produto.QTD_DELIV : produto.QUANTIDADE - produto.QTD_DELIV}
+            defaultValue={qtdDefault}
             max={(type === 'update' && produto.checked) ? produto.QUANTIDADE - (produto.QTD_MOUNTING - produto.QTD_DELIV) : produto.QUANTIDADE - produto.QTD_DELIV}
             min={1}
             onChange={e => setQtdDeliv(parseInt(e.target.value))}

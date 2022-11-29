@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Box, TextField } from '@material-ui/core'
 import useStyles from './style'
 
-import { ButtonCancel, ButtonSucess } from '../../components/Buttons'
+import { ButtonCancel, ButtonSuccess } from '../../components/Buttons'
 import ModalAlert from '../../components/ModalAlert'
 
 import { useCars } from '../../context/carsContext'
@@ -14,7 +14,7 @@ import { validateFields } from '../../functions/validateFields'
 function RegisterCars({ 
     selectCar, setValue, setIsDesableFind, setIsDesableRegister, setIsDesableUpdate
   }) {
-  const [ openMOdalAlert, setOpenModalAlert ] = useState()
+  const [ openMOdalAlert, setOpenModalAlert ] = useState(false)
   const [ childrenAlert, setChildrenAlert ] = useState()
   const [ description, setDescription ] = useState()
   const [ plate, setPlate ] = useState()
@@ -114,7 +114,7 @@ function RegisterCars({
           />
         </Box>
         <Box mt={2}>
-          <ButtonSucess
+          <ButtonSuccess
             children={selectCar ? "Alterar" : "Cadastrar"}
             onClick={selectCar ? updateCar : registerCar}
           />

@@ -11,10 +11,10 @@ import { Add } from '@material-ui/icons'
 //Components
 import Modal from '../../components/Modal'
 import ModalDelivery from './ModalDelivery'
-import ModalFinish from './ModalFinish'
+import ModalView from './ModalView'
 import ModalDelivering from './ModalDelivering'
-import TabDeliv from './TabDeliv'
-import TabPrevision from './TabPrevision'
+import TableDelivery from './TableDelivery'
+import TablePrevision from './TablePrevision'
 //Context
 import { useDelivery } from '../../context/deliveryContext'
 import { useDeliveryFinish } from '../../context/deliveryFinishContext'
@@ -62,15 +62,15 @@ const useStyle = makeStyles(theme => ({
 
 export default function Delivery() {
   //Modals Open States
-  const [ openCreateDeliv, setOpenCreateDeliv ] = useState(false)
+  const [ openCreateDelivery, setOpenCreateDelivery ] = useState(false)
   const [ openUpdateDelivery, setOpenUpdateDelivery ] = useState(false)
   const [ openModalDelivering, setOpenModalDelivering ] = useState(false)
   const [ openFinish, setOpenFinish ] = useState(false)
-  const [ openViewFinish, setOpenViewFinish ] = useState(false)
+  const [ openView, setOpenView ] = useState(false)
 
   //States
   const [ selectDelivery, setSelectDelivery ] = useState({})
-   const { delivery, setDelivery } = useDelivery()
+  const { delivery, setDelivery } = useDelivery()
   const { deliveryFinish, setDeliveryFinish } = useDeliveryFinish()
   const { setSales } = useSale()
 
@@ -97,6 +97,7 @@ export default function Delivery() {
       console.log(error)
     }
   }
+
   const openModals = (item, modal) => {
     switch (modal) {
       case 'update':
@@ -105,7 +106,7 @@ export default function Delivery() {
         break;
       case 'view':
         setSelectDelivery(item)
-        setOpenViewFinish(true)
+        setOpenView(true)
         break;
       case 'finish':
         setSelectDelivery(item)
@@ -125,7 +126,8 @@ export default function Delivery() {
     }
     
   }
-  const seachDelivFinish = async e => {
+
+  const searchDeliveryFinished = async e => {
     const { data } = await api.get(`deliverys/close/${e.target.value}`)
     setDeliveryFinish(data)
   }
@@ -133,12 +135,15 @@ export default function Delivery() {
   return (
     <>
       <Box>
-        <TabPrevision openModals={openModals} deleteDelivery={deleteDelivery}/>
+        <TablePrevision
+          openModals={openModals}
+          deleteDelivery={deleteDelivery}
+        />
 
         <div className={classes.boxTabHeader} style={{paddingTop: '1rem'}}>
           <span>Rotas em processo</span>
         </div>
-        <TabDeliv
+        <TableDelivery
           type="open"
           deleteDelivery={deleteDelivery}
           openModals={openModals}
@@ -151,7 +156,7 @@ export default function Delivery() {
               id="date"
               label="Dia"
               type="date"
-              onChange={seachDelivFinish}
+              onChange={searchDeliveryFinished}
               className={classes.fieldDate}
               InputLabelProps={{
                 shrink: true,
@@ -159,8 +164,9 @@ export default function Delivery() {
             />
           </div>
         </div>
+
         {deliveryFinish.length > 0 &&
-          <TabDeliv
+          <TableDelivery
             type="close"
             openModals={openModals}
           />
@@ -169,7 +175,7 @@ export default function Delivery() {
         <Fab 
           color="primary"
           className={classes.btnAdd}
-          onClick={() => setOpenCreateDeliv(true)}
+          onClick={() => setOpenCreateDelivery(true)}
         >
           <Add />
         </Fab>
@@ -177,12 +183,12 @@ export default function Delivery() {
       
       {/* Modais*/}
       <Modal 
-        open={openCreateDeliv}
-        setOpen={setOpenCreateDeliv}
+        open={openCreateDelivery}
+        setOpen={setOpenCreateDelivery}
         title="Lançar Entrega"
       >
         <ModalDelivery
-          setOpen={setOpenCreateDeliv}
+          setOpen={setOpenCreateDelivery}
           selectDelivery={false}
           delivery={delivery}
           setDelivery={setDelivery}
@@ -205,7 +211,7 @@ export default function Delivery() {
         setOpen={setOpenFinish}
         title={"Finalizar Entrega"}
       >
-        <ModalFinish 
+        <ModalView 
           setOpen={setOpenFinish}
           selectDelivery={selectDelivery}
           type={'open'}
@@ -213,12 +219,12 @@ export default function Delivery() {
       </Modal>
 
       <Modal
-        open={openViewFinish}
-        setOpen={setOpenViewFinish}
+        open={openView}
+        setOpen={setOpenView}
         title={"Visualização"}
       >
-        <ModalFinish 
-          setOpen={setOpenViewFinish}
+        <ModalView 
+          setOpen={setOpenView}
           selectDelivery={selectDelivery}
           type={'close'}
         />

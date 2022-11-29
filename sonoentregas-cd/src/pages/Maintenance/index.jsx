@@ -1,47 +1,15 @@
 import React, { useState } from 'react'
-import PropTypes from 'prop-types'
-import { 
-  Box, 
+import {
   makeStyles, 
   AppBar,
   Tabs,
   Tab
 } from "@material-ui/core"
+
+import { TabPanel, a11yProps } from '../../components/TabPanel'
+
 import MainShop from './MainShop'
 import MainCd from './MainCd'
-
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box paddingY={0.5}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
-}
-
-TabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.any.isRequired,
-  value: PropTypes.any.isRequired,
-};
-
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -54,16 +22,12 @@ export default function Maintenance() {
   const classes = useStyles()
   const [value, setValue] = useState(0)
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue)
-  }
-
   return (
     <div className={classes.root}>
       <AppBar position="static">
         <Tabs
           value={value}
-          onChange={handleChange}
+          onChange={(event, newValue) => setValue(newValue)}
           aria-label="simple tabs example"
           variant="fullWidth"
         >
@@ -80,5 +44,5 @@ export default function Maintenance() {
         <MainCd/>
       </TabPanel>
     </div>
-  );
+  )
 }

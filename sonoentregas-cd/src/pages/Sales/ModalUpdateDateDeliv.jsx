@@ -3,7 +3,7 @@ import { Box, InputBase, makeStyles } from '@material-ui/core'
 
 import { useSale } from '../../context/saleContext'
 import Modal from '../../components/Modal'
-import { ButtonSucess, ButtonCancel } from '../../components/Buttons'
+import { ButtonSuccess, ButtonCancel } from '../../components/Buttons'
 
 import api from '../../services/api'
 
@@ -89,7 +89,7 @@ export default function ModalUpdateDateDev({open, setOpen, saleCurrent}){
       <hr />
 
       <Box className={classes.boxButton}>
-        <ButtonSucess children="Salvar" onClick={updateDateDeliv}/>
+        <ButtonSuccess children="Salvar" onClick={updateDateDeliv}/>
         <ButtonCancel children="Cancelar" onClick={() => setOpen(false)}/>
       </Box>
     </Modal>
