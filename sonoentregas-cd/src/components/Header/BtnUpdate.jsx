@@ -5,6 +5,7 @@ import { Cached } from '@material-ui/icons'
 import { useSale } from '../../context/saleContext'
 import { useDelivery } from '../../context/deliveryContext'
 import { useDeliveryFinish } from '../../context/deliveryFinishContext'
+import { useForecasts } from '../../context/forecastsContext'
 import { useMaintenance } from '../../context/maintenanceContext'
 
 import { getDateSql } from '../../functions/getDates'
@@ -36,6 +37,7 @@ export default function BtnUpdate(){
   const { setSales } = useSale()
   const { setDelivery } = useDelivery()
   const { setDeliveryFinish } = useDeliveryFinish()
+  const { setForecasts } = useForecasts()
   const { setMaintenance } = useMaintenance()
   const classes = useStyles()
 
@@ -47,13 +49,15 @@ export default function BtnUpdate(){
           status: 'open'
         }
       })
-      const { data: dataDeliv } = await api.get('deliverys/open')
-      const { data: dataDelivFinsh } = await api.get(`deliverys/close/${getDateSql()}`)
+      const { data: dataDeliveries } = await api.get('deliverys/open')
+      const { data: dataDeliveriesFinished } = await api.get(`deliverys/close/${getDateSql()}`)
+      const { data: dataForecasts } = await api.get('forecast')
       const { data: dataMain } = await api.get('/maintenancedeliv')
       
       setSales(dataSales)
-      setDelivery(dataDeliv)
-      setDeliveryFinish(dataDelivFinsh)
+      setDelivery(dataDeliveries)
+      setDeliveryFinish(dataDeliveriesFinished)
+      setForecasts(dataForecasts)
       setMaintenance(dataMain)
 
       setOpenLoading(false)
@@ -72,7 +76,7 @@ export default function BtnUpdate(){
         <Cached />
       </button>
 
-      <LoadingCircleModal open={openLoading} setOpen={setOpenLoading} />
+      <LoadingCircleModal open={openLoading} />
 
       <ModalALert
         children={childrenModalAlert}

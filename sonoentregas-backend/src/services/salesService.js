@@ -1,18 +1,67 @@
+//@ts-check
+/**
+ * @typedef {Object} IProduct
+ * @property {number} CODPRODUTO
+ * @property {string} COD_ORIGINAL
+ * @property {number} CODLOJA
+ * @property {string} DESCRICAO
+ * @property {number} ID_SALES
+ * @property {number} ID_SALE_ID
+ * 
+ * @typedef {Object} ISales
+ * @property {number} idForecastSale
+ * @property {boolean} validationStatus
+ * @property {number} ID
+ * @property {number} ID_SALES
+ * @property {number} CODLOJA
+ * @property {string} STATUS
+ * @property {IProduct[] | []} products
+ * 
+ * @typedef {Object} IForecast
+ * @property {number} id
+ * @property {string} date
+ * @property {'INICIADA' | 'FINALIZADA'} status
+ */
 const { QueryTypes } = require('sequelize')
 const Sales = require('../models/Sales')
 const ViewSalesProd = require('../models/ViewSalesProd')
 const Empresas = require('../models/Empresas')
+const Forecast = require('../models/tables/Forecast')
 
-module.exports = {
-  async findSales(where) {
-    const sales = await Sales.findSome(0, where)
+/**
+ * @typedef {Object} PropAddProductSale
+ * @property {ISales[]} sales
+ * @property {IProduct[]} products
+ * @param {PropAddProductSale} param0 
+ * @returns 
+ */
+const addProductInSale = async ({ sales , products }) => {
+  const shops = await Empresas._query(0, 'SELECT * FROM LOJAS', QueryTypes.SELECT)
 
-    if (sales.length === 0) {
-      return []
-    }
+  const sales_prod = sales.map(sale => {
+    sale['products'] = []
 
+    products.forEach((/** @type {IProduct} */ product) => {
+      if (sale.ID_SALES === product.ID_SALES && sale.CODLOJA === product.CODLOJA) {
+        sale.products = [...sale.products, product]
+      }
+    })
+
+    shops.forEach( shops => {
+      if (shops.CODLOJA === sale.CODLOJA) {
+        sale['SHOP'] = shops.DESC_ABREV
+      }
+    })
+
+    return sale
+  })
+
+  return sales_prod
+}
+
+const setUpSalesProduct = async (/** @type {ISales[]} */ sales, where = '') => {
+  if (where === '') {
     let idSales = ''
-
     for (let i = 0; i < sales.length; i++){
       if ( i === 0 ){
         idSales+= sales[i].ID_SALES
@@ -21,30 +70,34 @@ module.exports = {
       }
     }
 
-    const viewSalesProd = await ViewSalesProd.findSome(0, `ID_SALES IN (${idSales})`)
-    const shops = await Empresas._query(0, 'SELECT * FROM LOJAS', QueryTypes.SELECT)
+    where = `ID_SALES IN (${idSales})`
+  }
 
-    const sales_prod = sales.map(sale => {
-      sale['products'] = []
+  /**@type {IProduct[]} */
+  const viewSalesProd = await ViewSalesProd.findSome(0, where)
 
-      viewSalesProd.forEach(product => {
-        product['checked'] = false
-        if (sale.ID_SALES === product.ID_SALES && sale.CODLOJA === product.CODLOJA) {
-          sale.products = [...sale.products, product]
-        }
-      })
+  return addProductInSale({ sales, products: viewSalesProd })
+}
 
-      shops.forEach( shops => {
-        if (shops.CODLOJA === sale.CODLOJA) {
-          sale['SHOP'] = shops.DESC_ABREV
-        }
-      })
+module.exports = {
+  /**
+   * @param {*} where 
+   * @returns 
+   */
+  async findSales(where) {
+    const sales = await Sales.findSome(0, where)
 
-      return sale
-    })
-    
-    return sales_prod
-  }, 
+    if (sales.length === 0) {
+      return []
+    }
+
+    return setUpSalesProduct(sales)
+  },
+  /**
+   * @param {*} where 
+   * @param {*} codLoja 
+   * @returns 
+   */
   async findFinishedSales(where, codLoja) {
     const salesDeliveriesProd = await Sales._query(0, `SELECT A.ID_SALE
     FROM DELIVERYS_PROD A
@@ -69,29 +122,96 @@ module.exports = {
     codLoja && (whereSale +=` AND CODLOJA = ${codLoja}`)
 
     const sales = await Sales.findSome(0, whereSale)
-
-    const viewSalesProd = await ViewSalesProd.findSome(0, whereSale)
-    const shops = await Empresas._query(0, 'SELECT * FROM LOJAS', QueryTypes.SELECT)
-
-    const sales_prod = sales.map(sale => {
-      sale['products'] = []
-
-      viewSalesProd.forEach(product => {
-        product['checked'] = false
-        if (sale.ID_SALES === product.ID_SALES && sale.CODLOJA === product.CODLOJA) {
-          sale.products = [...sale.products, product]
-        }
-      })
-
-      shops.forEach( shops => {
-        if (shops.CODLOJA === sale.CODLOJA) {
-          sale['SHOP'] = shops.DESC_ABREV
-        }
-      })
-
-      return sale
-    })
     
-    return sales_prod
+    return setUpSalesProduct(sales)
+  },
+  /**
+   * @param {number} idSale 
+   * @returns 
+   */
+  async findToCreateForecast(idSale){
+    /**@type {ISales[] | []} */
+    let sales = await Sales.findAny(0, { ID_SALES: idSale })
+
+    if (sales.length === 0) {
+      return ''
+    }
+
+    sales = sales.filter( sale => sale.STATUS === 'Aberta' )
+
+    if (sales.length === 0) {
+      return []
+    }
+
+    return setUpSalesProduct(sales)
+  },
+  async findToCreateRoutes({ idSale }){
+    /**@type {IForecast[]} */
+    const forecasts = await Forecast.findAny(0, { STATUS: 'INICIADA  ' })
+
+    if (forecasts.length === 0) {
+      return {
+        notFound: {
+          message: 'Nenhuma previsão criada!'
+        }
+      }
+    }
+
+    let sales = await Sales.findAny(0, { ID_SALES: idSale })
+
+    if (sales.length === 0) {
+      return ''
+    }
+
+    const scriptSales = 
+    `SELECT A.id as idForecastSale, A.validationStatus, C.[date], B.*
+    FROM FORECAST_SALES A
+    INNER JOIN SALES B ON A.idSale = B.ID
+    INNER JOIN FORECAST C ON A.idForecast = C.id
+    WHERE A.idForecast in (${forecasts.map(forecast => forecast.id)}) AND B.ID_SALES = ${idSale}`
+
+    /**@type {ISales[]} */
+    const forecastSales = await Forecast._query(0, scriptSales, QueryTypes.SELECT)
+
+    if (forecastSales.length === 0) {
+      return {
+        notFound: {
+          message: 'Venda requisitada não está em uma previsão aberta!'
+        }
+      }
+    }
+
+    const validationSales = forecastSales.filter(sale => typeof sale.validationStatus === 'boolean')
+
+    if (validationSales.length === 0) {
+      return {
+        notFound: {
+           message: 'Venda não validada, solicite que a loja entre em contato com cliente!'
+        }
+      }
+    }
+
+    const confirmedSales = forecastSales.filter(sale => sale.validationStatus)
+
+    if (confirmedSales.length === 0) {
+      return {
+        notFound: {
+           message: 'A entrega desta venda foi recusada pelo cliente, acesse a previsão para ver o motivo!'
+        }
+      }
+    }
+
+    const scriptProduct = 
+    `SELECT B.*, A.quantityForecast FROM VIEW_SALES_PROD B
+    INNER JOIN (SELECT A.*, B.idSale
+                FROM FORECAST_PRODUCT A
+                INNER JOIN FORECAST_SALES B ON A.idForecastSale = B.id) A
+    ON A.idSale = B.ID_SALE_ID AND A.COD_ORIGINAL = B.COD_ORIGINAL
+    WHERE A.idForecastSale in (${forecastSales.map(sale => sale.idForecastSale)})`
+
+    /**@type {IProduct[]} */
+    const forecastProduct = await Forecast._query(0, scriptProduct, QueryTypes.SELECT)
+
+    return addProductInSale({sales: forecastSales, products: forecastProduct })
   }
 }

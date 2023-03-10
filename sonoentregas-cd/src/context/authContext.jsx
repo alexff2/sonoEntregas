@@ -9,24 +9,53 @@ const AuthContext = createContext({})
 const TOKEN_KEY = "@Sono-token"
 const SONO_USER = "@sono-user"
 
+const setToken = token => localStorage.setItem(TOKEN_KEY, token)
+const setUser = user => localStorage.setItem(SONO_USER, JSON.stringify(user))
+
+const getToken = () => localStorage.getItem(TOKEN_KEY)
+const getUser = () => JSON.parse(localStorage.getItem(SONO_USER))
+
+const token = getToken()
+
 export default function AuthProvider({ children }){
   const [userAuth, setUserAuth] = useState({})
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(token ? true : false)
   const { setAlert } = useAlert()
 
   useEffect(() => {
-    const token = getToken()
-    if (token) {
-      setUserAuth(getUser())
-      setIsAuthenticated(true)
+    const validations = async () => {
+      try {
+        if (!token) {
+          return
+        }
+
+        await api.get('token/validation', {
+          params: {
+            token
+          }
+        })
+
+        setUserAuth(getUser())
+      } catch (e) {
+        if (!e.response){
+          console.log(e)
+          setAlert('Rede')
+        } else if (e.response.status === 401){
+          console.log(e.response.data)
+          setAlert('Sua senha venceu, entre novamente na aplicação!')
+          setIsAuthenticated(false)
+          localStorage.clear()
+        } else if (e.response.status === 400){
+          console.log(e.response.data)
+          setAlert('Servidor')
+        } else {
+          console.log(e.response.data)
+        }
+      }
     }
-  },[])
 
-  const setToken = token => localStorage.setItem(TOKEN_KEY, token)
-  const setUser = user => localStorage.setItem(SONO_USER, JSON.stringify(user))
-
-  const getToken = () => localStorage.getItem(TOKEN_KEY)
-  const getUser = () => JSON.parse(localStorage.getItem(SONO_USER))
+    validations()
+  },[setAlert])
 
   const login = async ({ userName, password }) => {
     try {
@@ -102,7 +131,6 @@ export default function AuthProvider({ children }){
       login,
       signUp,
       logout,
-      getToken
     }}>
       { children }
     </AuthContext.Provider>
@@ -115,8 +143,7 @@ export function useAuthenticate(){
     userAuth,
     login,
     signUp,
-    logout,
-    getToken
+    logout
   } = useContext(AuthContext)
 
   return {
@@ -124,7 +151,6 @@ export function useAuthenticate(){
     userAuth,
     login,
     signUp,
-    logout,
-    getToken
+    logout
   }
 }

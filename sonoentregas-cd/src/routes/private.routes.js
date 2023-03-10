@@ -7,6 +7,7 @@ import App from '../Templates/App'
 //Pages
 import Home from '../pages/Home'
 import Delivery from '../pages/Delivery'
+import UpdateDelivery from '../pages/Delivery/Update'
 import Cars from '../pages/Cars'
 import Users from '../pages/Users'
 import Products from '../pages/Product'
@@ -14,7 +15,7 @@ import Sales from '../pages/Sales'
 import Maintenance from '../pages/Maintenance'
 //import Error from './pages/Error'
 
-export default function PriveteRoutes(){
+export default function PrivateRoutes(){
   return(
     <Routes>
       <Route path="/" element={<App />}>
@@ -22,6 +23,7 @@ export default function PriveteRoutes(){
         <Route path="/app/home" element={<Home />} />
         <Route path="/app/transports" element={<Cars />} />
         <Route path="/app/delivery" element={<Delivery />} />
+        <Route path="/app/delivery/update/:type/:id" element={<UpdateDelivery />}/>
         <Route path="/app/sales" element={<Sales />} />
         <Route path="/app/products" element={<Products />} />
         <Route path="/app/maintenance" element={<Maintenance />} />

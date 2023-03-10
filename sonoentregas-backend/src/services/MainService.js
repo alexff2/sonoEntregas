@@ -4,7 +4,7 @@ const Maintenance = require('../models/tables/Maintenance')
 const ViewMaintenance = require('../models/views/ViewMaintenance')
 
 const Prodlojas = require('../services/ProdLojaService')
-const { setDaysInDate } = require('../functions/getDate')
+const ObjDate = require('../functions/getDate')
 
 /**
  * @typedef {Object} Conditions
@@ -129,8 +129,8 @@ module.exports = {
     const maint = await ViewMaintenance.findSome(0, `STATUS <> 'Finalizada'${codloja}${loc} ORDER BY ID`)
 
     for(var i in maint){
-      maint[i].DATE_PREV = maint[i].DATE_PREV !== null && setDaysInDate(maint[i].DATE_PREV,2)
-      maint[i].DATE_VISIT = maint[i].DATE_VISIT !== null && setDaysInDate(maint[i].DATE_VISIT,2)
+      maint[i].DATE_PREV = maint[i].DATE_PREV !== null && ObjDate.setDaysInDate(maint[i].DATE_PREV,2)
+      maint[i].DATE_VISIT = maint[i].DATE_VISIT !== null && ObjDate.setDaysInDate(maint[i].DATE_VISIT,2)
     }
     return maint
   },

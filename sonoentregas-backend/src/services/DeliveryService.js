@@ -1,8 +1,9 @@
+const { QueryTypes } = require('sequelize')
 const Delivery = require('../models/Deliverys')
 const ViewDeliverySales = require('../models/ViewDeliverySales')
 const ViewDeliveryProd2 = require('../models/ViewDeliveryProd2')
-const PrevisionSales = require('../models/tables/Prevision/PrevisionSales')
 const MainService = require('../services/MainService')
+const Empresas = require('../models/Empresas')
 
 module.exports = {
   async findSalesOfDelivery(deliveries){
@@ -22,6 +23,8 @@ module.exports = {
 
         const vDeliveryProd2 = await ViewDeliveryProd2.findSome(0, `ID_DELIVERY IN (${idDelivery})`)
 
+        const shops = await Empresas._query(0, 'SELECT * FROM LOJAS', QueryTypes.SELECT)
+
         deliveries.forEach(delivery => {
           delivery['sales'] = []
 
@@ -38,6 +41,12 @@ module.exports = {
             if (sale.ID_DELIVERY === delivery.ID) {
               delivery.sales.push(sale)
             }
+
+            shops.forEach( shops => {
+              if (shops.CODLOJA === sale.CODLOJA) {
+                sale['SHOP'] = shops.DESC_ABREV
+              }
+            })
           })
         })
 

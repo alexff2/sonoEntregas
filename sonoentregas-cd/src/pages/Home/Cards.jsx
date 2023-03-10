@@ -7,9 +7,9 @@ import {
   makeStyles
 } from '@material-ui/core'
 import { LocalShipping, ShoppingCart } from '@material-ui/icons'
-import api from '../../services/api'
+//import api from '../../services/api'
 
-import { useSale } from '../../context/saleContext'
+//import { useSale } from '../../context/saleContext'
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -40,18 +40,18 @@ const useStyles = makeStyles((theme) => ({
   text: {}
 }));
 
-const Item = ({classes, title, icon: Icon, value, seachHome}) => {
-  const { setSales }  = useSale()
+const Item = ({classes, title, icon: Icon, value, searchHome}) => {
+  //const { setSales }  = useSale()
   
-  const seachSales = async () => {
-    const { data } = await api.get('sales/false/false/Aberta/null')
-    setSales(data)
-    seachHome()
+  const searchSales = async () => {
+    /* const { data } = await api.get('sales/false/false/Aberta/null')
+    setSales(data) */
+    searchHome()
   }
   
   return (
   <Grid item lg={3} sm={6} xl={3} xs={12}>
-    <Paper className={classes.card} onClick={seachSales}>
+    <Paper className={classes.card} onClick={searchSales}>
       <Box className={classes.boxContent}>
       {Icon && (
         <Icon
@@ -74,41 +74,38 @@ const Item = ({classes, title, icon: Icon, value, seachHome}) => {
 
 export default function Home(){
   const [ itens, setItens ] = useState([])
-  const { sales } = useSale()
+  //const { sales } = useSale()
   const classes = useStyles()
 
   useEffect(()=>{
-    seachHome()
-  },[sales])
+    searchHome()
+  },[])
 
-  const seachHome = () => {
-    api
-      .get('/home')
-      .then(resp => {
+  const searchHome = () => {
+    
         setItens([
           {
             icon: ShoppingCart,
-            value: resp.data.salesPending,
+            value: 1,
             title: 'Vendas Pendentes',
           },
           {
             icon: ShoppingCart,
-            value: (resp.data.salesOnRelease + resp.data.salesOnDelivring),
+            value: 1,
             title: 'Vendas em processo',
           },
           {
             icon: LocalShipping,
-            value: resp.data.devOnRelease,
+            value: 1,
             title: 'Rotas em lançamento',
           },
           {
             icon: LocalShipping,
-            value: resp.data.delivering,
+            value: 1,
             title: 'Rotas em deslocamento',
           }
         ])
-      })
-      .catch(e => console.log(e))
+      
   }
 
   return(
@@ -121,7 +118,7 @@ export default function Home(){
           title={item.title}
           icon={item.icon}
           value={item.value}
-          seachHome={seachHome}
+          searchHome={searchHome}
         />
       ))}
     

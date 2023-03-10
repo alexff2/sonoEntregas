@@ -1,6 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react'
 
-//import { useDate } from './dateContext'
 import api from '../services/api'
 
 const DeliveryContext = createContext()

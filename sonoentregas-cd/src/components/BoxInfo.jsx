@@ -17,8 +17,10 @@ const useStyles = makeStyles( theme => ({
     color: theme.palette.common.white,
     fontWeight: theme.typography.fontWeightBold,
     backgroundColor: theme.palette.primary.main,
-    padding: '8px 10px'
-  
+    height: 33,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   bodyBox: {
     padding: 10,
@@ -37,7 +39,9 @@ export default function BoxInfo(){
 
   return(
     <Box component={Paper} className={classes.container}>
-      <Box className={classes.headBox}>Endereços e Observações</Box>
+      <Box className={classes.headBox}>
+        <span>Endereços e Observações</span>
+      </Box>
       
       { address 
         ?<Box className={classes.bodyBox}>

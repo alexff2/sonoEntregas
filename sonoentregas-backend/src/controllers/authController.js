@@ -1,7 +1,10 @@
 //@ts-check
+const { request, response } = require('express')
 const { compare } = require('bcrypt')
 const { sign } = require('jsonwebtoken')
+const { verify } = require('jsonwebtoken')
 const { jwt } = require('../databases/MSSQL/connections/config')
+
 const Users = require('../models/Users')
 
 /**
@@ -16,9 +19,8 @@ const Users = require('../models/Users')
 
 module.exports = {
   /**
-   * 
-   * @param {*} req 
-   * @param {*} res 
+   * @param {request} req 
+   * @param {response} res 
    * @returns 
    */
   async create(req, res){
@@ -71,6 +73,22 @@ module.exports = {
     } catch (error) {
       console.log(error)
       return res.status(400).json(error)
+    }
+  },
+  /**
+   * @param {request} req 
+   * @param {response} res 
+   */
+  async validationToken(req, res){
+    try {
+      const { token } = req.query
+
+      verify(token, jwt.secret)
+
+      return res.json('Ok')
+    } catch (error) {
+      console.log(error)
+      return res.status(401).json('JWT token inválido!')
     }
   }
 }

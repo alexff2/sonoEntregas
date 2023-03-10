@@ -34,9 +34,7 @@ export default function Home(){
       
       <Box className={classes.sales}>
         <Sales
-          selectSales={sales}
-          salesProd={[]}
-          setSalesProd={[]}
+          sales={sales}
           type={'home'}
         />
         <Box className={classes.boxAddress}>

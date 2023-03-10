@@ -11,7 +11,7 @@
  
  const MainService = require('../services/MainService')
  
- const { getDate } = require('../functions/getDate')
+ const ObjDate = require('../functions/getDate')
  
  module.exports = {
    /**
@@ -74,7 +74,7 @@
      try {
        var { idMaint, idDriver, idAssist, idDelivMain, idUser, obs } = req.body
  
-       const D_MOUNTING = getDate()
+       const D_MOUNTING = ObjDate.getDate()
  
        idDelivMain =  idDelivMain === 0 ? 'NULL' : idDelivMain
        obs =  obs === '' ? 'NULL' : `'${obs}'`

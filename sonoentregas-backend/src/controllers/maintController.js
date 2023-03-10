@@ -13,7 +13,7 @@ const ViewCatDef = require('../models/views/ViewCatDefect')
 
 const MainService = require('../services/MainService')
 
-const { getDate, setDaysInDate } = require('../functions/getDate')
+const ObjDate = require('../functions/getDate')
 
 module.exports = {
   /**
@@ -61,8 +61,8 @@ module.exports = {
     try {
       var { ID_DELIVERY, CODLOJA, ID_SALES, COD_ORIGINAL, WARRANTY, DEFECT, OUTHER_DEF, OBS, QUANTIDADE, ID_USER } = req.body
   
-      const D_ENVIO = getDate()
-      const D_PREV = setDaysInDate(D_ENVIO, 17) //Objetivo do sistema
+      const D_ENVIO = ObjDate.getDate()
+      const D_PREV = ObjDate.setDaysInDate(D_ENVIO, 17) //Objetivo do sistema
       WARRANTY = WARRANTY ? 1 : 0
 
       const values = { ID_DELIVERY, CODLOJA, ID_SALE: ID_SALES, COD_ORIGINAL, QUANTIDADE, STATUS: 'Aguardando', WARRANTY, ID_CAT_DEF: DEFECT, OBS, D_ENVIO, D_PREV, ID_USER, OUTHER_DEF }

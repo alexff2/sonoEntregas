@@ -7,7 +7,7 @@ import {
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   visuallyHidden: {
     border: 0,
     clip: 'rect(0 0 0 0)',
@@ -30,11 +30,14 @@ export default function EnhancedTableHead(props) {
   return (
     <TableHead>
       <TableRow className={classe ? classe.tableHead : classes.default}>
-        {headCells.map(headCell => (
-          <TableCell
+        {headCells.map((headCell, i) => {
+          if (headCell.id === '') {
+            return <TableCell key={i}></TableCell>
+          }
+          return (<TableCell
             key={headCell.id}
-            align={headCell.numeric ? 'right' : 'left'}
-            sortDirection={orderBy === headCell.id ? order : false}
+            align={headCell.align ? headCell.align : 'left'}
+            sortDirection={orderBy === headCell.id && order }
             className={headCell.class}
           >
             <TableSortLabel
@@ -43,14 +46,14 @@ export default function EnhancedTableHead(props) {
               onClick={createSortHandler(headCell.id)}
             >
               {headCell.label}
-              {orderBy === headCell.id ? (
+              {orderBy === headCell.id && (
                 <span className={classes.visuallyHidden}>
                   {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
                 </span>
-              ) : null}
+              )}
             </TableSortLabel>
-          </TableCell>
-        ))}
+          </TableCell>)
+        })}
       </TableRow>
     </TableHead>
   )

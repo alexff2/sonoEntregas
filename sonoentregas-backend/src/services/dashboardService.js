@@ -1,7 +1,8 @@
-const Sales = require('../models/Sales')
+//@ts-check
 const { QueryTypes } = require('sequelize')
+const Sales = require('../models/Sales')
 
-const { getDate } = require('../functions/getDate')
+const ObjDate = require('../functions/getDate')
 const { decimalAdjust } = require('../functions/roundNumber')
 
 module.exports = {
@@ -19,7 +20,7 @@ module.exports = {
     issue.sort( (a,b) => a - b )
     
     for (let i = 0; i < issue.length; i++) {
-      issue[i] = getDate(issue[i]) 
+      issue[i] = ObjDate.getDate(issue[i]) 
     }
     return issue
   },
@@ -35,10 +36,10 @@ module.exports = {
     const deliv = await Sales._query(0, `SELECT * FROM VIEW_DELIVERED_BY_DAYS WHERE D_DELIVERED BETWEEN '${issueStart}' AND '${issueEnd}'`)
     
     issue.forEach(elEmis => {
-      const foundSale = sales.find(elSales => getDate(elSales.EMISSAO) === elEmis )
+      const foundSale = sales.find(elSales => ObjDate.getDate(elSales.EMISSAO) === elEmis )
       foundSale ? salesArray.push(foundSale.SALES) : salesArray.push(0)
       
-      const foundDeliv = deliv[0].find(elDeliv => getDate(elDeliv.D_DELIVERED) === elEmis )
+      const foundDeliv = deliv[0].find(elDeliv => ObjDate.getDate(elDeliv.D_DELIVERED) === elEmis )
       foundDeliv ? delivArray.push(foundDeliv.QTD_SALES) : delivArray.push(0)
     })
 
@@ -68,7 +69,7 @@ module.exports = {
     const totSalesOpen = sales.length
     var salesLate = 0, salesAwait = 0, scheduledSales = 0
     sales.forEach(sale => {
-      if (getDate(sale.D_ENTREGA1) < getDate()){
+      if (ObjDate.getDate(sale.D_ENTREGA1) < ObjDate.getDate()){
         salesLate++
       } else if (sale.SCHEDULED) {
         scheduledSales++

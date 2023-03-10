@@ -6,14 +6,25 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Typography
+  Typography,
+  makeStyles
  } from '@material-ui/core'
 
 import RowProd from './RowProd'
 
-import { getDateBr } from '../../../functions/getDates'
+import { getDateBr } from '../../../../functions/getDates'
 
-const RowSale = ({ sale, classes, type, status, stateCheckedAllProd }) => {
+const useStyles = makeStyles(theme => ({
+  root: {
+    '& > *': {
+      borderBottom: 'unset'
+    },
+    background: theme.palette.primary.light
+  }
+}))
+
+const RowSale = ({ sale, type, status }) => {
+  const classes = useStyles()
   return(
     <React.Fragment>
       <TableRow className={classes.root}>
@@ -27,6 +38,7 @@ const RowSale = ({ sale, classes, type, status, stateCheckedAllProd }) => {
           .format(sale.TOTAL)
         }</TableCell>
         <TableCell align="right">{getDateBr(sale.EMISSAO)}</TableCell>
+        <TableCell align="right">{sale.SHOP}</TableCell>
       </TableRow>
 
       <TableRow>
@@ -53,7 +65,6 @@ const RowSale = ({ sale, classes, type, status, stateCheckedAllProd }) => {
                   <RowProd key={product.CODPRODUTO}
                     product={product}
                     status={status}
-                    stateCheckedAllProd={stateCheckedAllProd}
                     type={type}
                   />
                 ))}

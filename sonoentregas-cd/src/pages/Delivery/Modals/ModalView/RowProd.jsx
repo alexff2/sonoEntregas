@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { 
   Box,
   TableRow,
@@ -6,12 +6,8 @@ import {
   Checkbox
  } from '@material-ui/core'
 
-const RowProd = ({product, status, stateCheckedAllProd, type })=>{
+const RowProd = ({product, status, type })=>{
   const [ checkProd, setCheckProd ] = useState(false)
-
-  useEffect(()=>{
-    setCheckProd(stateCheckedAllProd)
-  },[stateCheckedAllProd])
 
   const checkedPro = e => {
     if (e.target.checked) {
@@ -30,10 +26,10 @@ const RowProd = ({product, status, stateCheckedAllProd, type })=>{
     <>
       <TableRow>
         <TableCell component="th" scope="row">
-          {product.CODPRODUTO}
+          {product.COD_ORIGINAL}
         </TableCell>
-        <TableCell>{product.DESCRICAO}</TableCell>
-        <TableCell>{product.QTD_DELIV}</TableCell>
+        <TableCell>{product.NOME}</TableCell>
+        <TableCell>{product.quantityForecast ? product.quantityForecast : product.QTD_DELIV}</TableCell>
         <TableCell align="right">{
           Intl
             .NumberFormat('pt-br',{style: 'currency', currency: 'BRL'})

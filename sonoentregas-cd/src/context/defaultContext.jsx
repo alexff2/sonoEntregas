@@ -1,9 +1,10 @@
 import React from 'react'
-//Proveiders Context
+//Providers Context
 import AuthProvider from './authContext'
 import ShopProvider from './shopContext'
 import DateProvider from './dateContext'
 import DeliveryProvider from './deliveryContext'
+import ForecastsProvider from './forecastsContext'
 import DeliveryFinishProvider from './deliveryFinishContext'
 import SaleProvider from './saleContext'
 import CarsProvider from './carsContext'
@@ -23,19 +24,21 @@ export default function DefaultContext({children}){
             <UsersProvider>
               <DeliveryProvider>
                 <DeliveryFinishProvider>
-                  <AssistantProvider>
-                    <SaleProvider>
-                      <AddressProvider>
-                        <CarsProvider>
-                          <DriverProvider>
-                            <MaintenanceProvider>
-                              {children}
-                            </MaintenanceProvider>
-                          </DriverProvider>
-                        </CarsProvider>
-                      </AddressProvider>
-                    </SaleProvider>
-                  </AssistantProvider>
+                  <ForecastsProvider>
+                    <AssistantProvider>
+                      <SaleProvider>
+                        <AddressProvider>
+                          <CarsProvider>
+                            <DriverProvider>
+                              <MaintenanceProvider>
+                                {children}
+                              </MaintenanceProvider>
+                            </DriverProvider>
+                          </CarsProvider>
+                        </AddressProvider>
+                      </SaleProvider>
+                    </AssistantProvider>
+                  </ForecastsProvider>
                 </DeliveryFinishProvider>
               </DeliveryProvider>
             </UsersProvider>

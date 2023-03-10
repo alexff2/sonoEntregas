@@ -1,10 +1,15 @@
+//@ts-check
 const Sales = require('../models/Sales')
 const ViewDeliveryProd = require('../models/ViewDeliveryProd2')
 const ViewDeliverys = require('../models/ViewDeliverys')
 
-const { findSales, findFinishedSales } = require('../services/salesService')
+const SalesService = require('../services/salesService')
 
 module.exports = {
+  /**
+   * @param {*} req 
+   * @param {*} res 
+   */
   async findSales( req, res ){
     try {
       const { status, typeSearch, search, codLoja } = req.query
@@ -15,14 +20,14 @@ module.exports = {
       if (!status) {
         where = `${typeSearch} = '${search}'`
 
-        sales = await findSales(where)
+        sales = await SalesService.findSales(where)
       } else {
         if (status === 'open') {
           where = `STATUS = 'Aberta'`
           codLoja && (where +=` AND CODLOJA = ${codLoja}`)
           typeSearch && (where += ` AND ${typeSearch} LIKE '${search}%'`)
 
-          sales = await findSales(where)
+          sales = await SalesService.findSales(where)
         } else {
           typeSearch === 'D_DELIVERED'
             ? where += ` AND ${typeSearch} = '${search}'`
@@ -30,7 +35,7 @@ module.exports = {
 
           codLoja && (where +=` AND A.CODLOJA = ${codLoja}`)
 
-          sales = await findFinishedSales(where, codLoja)
+          sales = await SalesService.findFinishedSales(where, codLoja)
         }
       }
 
@@ -40,11 +45,65 @@ module.exports = {
       return res.status(400).json(error)
     }
   },
+  /**
+   * @param {*} req 
+   * @param {*} res 
+   */
+  async findSalesToCreatedForecast(req, res){
+    try {
+      const { idSale } = req.params
+      
+      if(isNaN(parseInt(idSale))) {
+        console.log(idSale)
+        throw new Error('Param idSale is not number!')
+      }
+
+      const sales = await SalesService.findToCreateForecast(parseInt(idSale))
+
+      return res.json(sales)
+    } catch (e) {
+      console.log(e)
+
+      let status = e.status ? e.status : 400
+      let error = e.error ? e.error : e
+
+      return res.status(status).json(error)
+    }
+  },
+  /**
+   * @param {*} req 
+   * @param {*} res 
+   */
+  async findSalesToCreatedDelivery(req, res){
+    try {
+      const { idSale } = req.params
+
+      if(isNaN(parseInt(idSale))) {
+        console.log(idSale)
+        throw new Error('Param idSale is not number!')
+      }
+
+      const sales = await SalesService.findToCreateRoutes({ idSale: parseInt(idSale) })
+
+      return res.json(sales)
+    } catch (e) {
+      console.log(e)
+
+      let status = e.status ? e.status : 400
+      let error = e.error ? e.error : e
+
+      return res.status(status).json(error)
+    }
+  },
+  /**
+   * @param {*} req 
+   * @param {*} res 
+   */
   async findProductDetails(req, res){
     try {
-      const { idSale, codloja, codproduto } = req.params
+      const { idSale, idLoja, idProduct } = req.params
   
-      const products = await ViewDeliveryProd.findSome(0, `ID_SALES = ${idSale} AND CODLOJA = ${codloja} AND CODPRODUTO = ${codproduto} ORDER BY ID_DELIVERY`)
+      const products = await ViewDeliveryProd.findSome(0, `ID_SALES = ${idSale} AND CODLOJA = ${idLoja} AND CODPRODUTO = ${idProduct} ORDER BY ID_DELIVERY`)
 
       var resp
   
@@ -61,7 +120,11 @@ module.exports = {
       return res.status(400).json(error)
     }
   },
-  async updateDateDeliv( req, res ){
+  /**
+   * @param {*} req 
+   * @param {*} res 
+   */
+  async updateDateDelivery( req, res ){
     try {
       const { idSale } = req.params
       const { dateDeliv, CODLOJA, OBS_SCHED } = req.body

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import {
   Box,
   Table,
@@ -13,7 +13,7 @@ import {
   Paper,
   Checkbox
 } from '@material-ui/core'
-import { KeyboardArrowDown, KeyboardArrowUp} from '@material-ui/icons'
+import { KeyboardArrowDown, KeyboardArrowUp, Cancel } from '@material-ui/icons'
 
 import useStyles from './style'
 
@@ -27,37 +27,39 @@ import EnhancedTableHead from '../EnhancedTableHead'
 import { getDateBr } from '../../functions/getDates'
 import { getComparator, stableSort } from '../../functions/orderTable'
 
-const CheckProd = ({ sendSalesProd, type, produto, classes }) => {
-  let qtdDefault = (type === 'update' && produto.checked) 
-    ? produto.QTD_DELIV 
-    : produto.QUANTIDADE - produto.QTD_DELIV
+const CheckProd = ({ product, classes }) => {
+  const [ qtdDelivery, setQtdDelivery ] = useState(product.openQuantity)
+  const [ inputNumber, setInputNumber ] = useState(false)
 
-  const [ qtdDeliv, setQtdDeliv ] = useState(qtdDefault)
-  const [ inputNumber, setInputNumber ] = useState(produto.checked)
-
-  if (type === 'home') {
-    return null
-  } else if ((produto.STATUS === 'Em lançamento' && type !== 'update') || produto.STATUS === 'Finalizada' || produto.STATUS === 'Entregando' || produto.STATUS === 'Previsão') {
-    return <TableCell style={{padding: '0px 10px'}}>{produto.STATUS}</TableCell>
+  if ( product.STATUS !== 'Enviado' ) {
+    return (
+      <>
+        <TableCell>{product.STATUS}</TableCell>
+        <TableCell></TableCell>
+      </>
+    )
   } else {
     return (
       <>
-        <TableCell  style={{padding: '0px 10px'}}>
+        <TableCell>
           <input 
             type="number" 
             style={{width: 40}}
-            defaultValue={qtdDefault}
-            max={(type === 'update' && produto.checked) ? produto.QUANTIDADE - (produto.QTD_MOUNTING - produto.QTD_DELIV) : produto.QUANTIDADE - produto.QTD_DELIV}
+            defaultValue={product.openQuantity}
+            max={ product.openQuantity }
             min={1}
-            onChange={e => setQtdDeliv(parseInt(e.target.value))}
+            onChange={e => setQtdDelivery(parseInt(e.target.value))}
             disabled={inputNumber}
           />
         </TableCell>
 
         <TableCell align="right" className={classes.tdCheckBox}>
           <Checkbox
-            onChange={(e) => sendSalesProd(e, produto, qtdDeliv, setInputNumber)}
-            defaultChecked={produto.checked}
+            onChange={ e => {
+              product['qtdDelivery'] = qtdDelivery
+              product['check'] = e.target.checked
+              setInputNumber(!inputNumber)
+            }}
           />
         </TableCell>
       </>
@@ -65,16 +67,17 @@ const CheckProd = ({ sendSalesProd, type, produto, classes }) => {
   }
 }
 
-function Row({sendSalesProd, sale, type, setAddress}) {
+function Row({ sale, type, setSales}) {
   const [ open, setOpen ] = useState(false)
   const classes = useStyles()
+  const { setAddress } = useAddress()
 
-  const styleDateDeliv = () => {
+  const styleDateDelivery = () => {
     // VERIFICAR
-    var dateDeliv, dateNow, dateAlert
-    dateDeliv = new Date(sale.D_ENTREGA1)
-    dateDeliv.setDate(dateDeliv.getDate()+1)
-    dateDeliv.setHours(0,0,0,0)
+    var dateDelivery, dateNow, dateAlert
+    dateDelivery = new Date(sale.D_ENTREGA1)
+    dateDelivery.setDate(dateDelivery.getDate()+1)
+    dateDelivery.setHours(0,0,0,0)
 
     dateNow = new Date().setHours(0,0,0,0)
 
@@ -82,16 +85,16 @@ function Row({sendSalesProd, sale, type, setAddress}) {
     dateAlert.setDate(dateAlert.getDate()+2)
     dateAlert.setHours(0,0,0,0)
 
-    if (dateDeliv < dateNow) {
-      return classes.dateDelivRed
-    } else if (dateDeliv >= dateNow && dateDeliv <= dateAlert){
-      return classes.dateDelivYellow
+    if (dateDelivery < dateNow) {
+      return { color: 'red' }
+    } else if (dateDelivery >= dateNow && dateDelivery <= dateAlert){
+      return { color: 'yellow' }
     } else {
-      return classes.dateDelivBlack
+      return { color: 'black' }
     }
   }
 
-  const setInformations = sale => {
+  const setInformation = () => {
     setAddress({
       OBS2: sale.OBS2,
       ENDERECO: sale.ENDERECO,
@@ -102,21 +105,32 @@ function Row({sendSalesProd, sale, type, setAddress}) {
     })
   }
 
+  const clickRowTable = e => {
+    if (e.target.localName !== 'path' && e.target.id !== 'svgRmvSale') {
+      setInformation()
+    } else {
+      setSales(sales => sales.filter( saleCurrent => saleCurrent.ID !== sale.ID) )
+    }
+  }
+
   return(
     <React.Fragment>
-      <TableRow className={ type === 'home' ? classes.row : classes.row1 }>
-        {type === 'home' &&
-        <TableCell className={classes.bodyUpDown}>
-          <IconButton aria-label="expand row" style={{padding: 0}} onClick={() => setOpen(!open)}>
+      <TableRow className={ type === 'home' ? classes.row : classes.row1 } onClick={clickRowTable}>
+        <TableCell>
+          {type === 'home' && <IconButton aria-label="expand row" style={{padding: 0}} onClick={() => setOpen(!open)}>
             {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-          </IconButton>
-        </TableCell> 
+          </IconButton>}
+        </TableCell>
+        <TableCell>{sale.ID_SALES}</TableCell>
+        <TableCell>{sale.NOMECLI}</TableCell>
+        <TableCell>{sale.BAIRRO}</TableCell>
+        <TableCell style={styleDateDelivery()}>{getDateBr(sale.D_ENTREGA1)}</TableCell>
+        <TableCell>{sale.SHOP}</TableCell>
+        { type === 'delivery' && 
+          <TableCell style={{ cursor: 'pointer' }}>
+            <Cancel color='secondary' id="svgRmvSale"/>
+          </TableCell>
         }
-        <TableCell className={classes.bodyIdSale} onClick={() => setInformations(sale)}>{sale.ID_SALES}</TableCell>
-        <TableCell className={classes.bodyName} onClick={() => setInformations(sale)}>{sale.NOMECLI}</TableCell>
-        <TableCell className={classes.bodyDistrict} onClick={() => setInformations(sale)}>{sale.BAIRRO}</TableCell>
-        <TableCell className={styleDateDeliv()}>{getDateBr(sale.D_ENTREGA1)}</TableCell>
-        <TableCell className={classes.bodyShop}>{sale.SHOP}</TableCell>
       </TableRow>
 
       <TableRow>
@@ -126,38 +140,47 @@ function Row({sendSalesProd, sale, type, setAddress}) {
               <Typography variant="h6" gutterBottom component="div" style={{padding: '0 10px', margin: 0}}>
                 Produtos
               </Typography>
-              <Table size="small" aria-label="purchases">
+              <Table size="small" aria-label="products">
                 <TableHead>
-                  <TableRow>
-                    <TableCell style={{padding: '0px 10px'}}>Código</TableCell>
-                    <TableCell style={{padding: '0px 10px'}}>Descrição</TableCell>
-                    <TableCell style={{padding: '0px 10px'}}>Qtd. Tot.</TableCell>
-                    <TableCell style={{padding: '0px 10px'}}>Qtd. Entregue</TableCell>
-                    {type !== 'home' &&
+                  <TableRow className={classes.tableProductsCells}>
+                    <TableCell>Código</TableCell>
+                    <TableCell>Descrição</TableCell>
+                    <TableCell>Qtd. Tot.</TableCell>
+                    <TableCell>Qtd. Entr.</TableCell>
+                    {type === 'forecast' &&
                       <>
-                        <TableCell style={{padding: '0px 10px'}} align="right">Qtd</TableCell>
-                        <TableCell style={{padding: '0px 10px'}}></TableCell>
+                        <TableCell>Qtd</TableCell>
+                        <TableCell></TableCell>
+                      </>
+                    }
+                    {type === 'delivery' &&
+                      <>
+                        <TableCell>Qtd</TableCell>
                       </>
                     }
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {sale.products.map((produto) => (
-                    <TableRow key={produto.CODPRODUTO}>
-                      <TableCell  style={{padding: '0px 10px'}} component="th" scope="row">
-                        {produto.COD_ORIGINAL}
+                  {sale.products.map((product) => (
+                    <TableRow key={product.CODPRODUTO} className={classes.tableProductsCells}>
+                      <TableCell>
+                        {product.COD_ORIGINAL}
                       </TableCell>
-                      <TableCell style={{padding: '0px 10px'}}>{produto.DESCRICAO}</TableCell>
-                      <TableCell style={{padding: '0px 10px'}}>{produto.QUANTIDADE}</TableCell>
-                      <TableCell style={{padding: '0px 10px'}}>{(type === 'update' && produto.checked) ? produto.QTD_MOUNTING - produto.QTD_DELIV : produto.QTD_DELIV}</TableCell>
+                      <TableCell>{product.DESCRICAO}</TableCell>
+                      <TableCell>{product.QUANTIDADE}</TableCell>
+                      <TableCell>{product.QTD_MOUNTING}</TableCell>
 
-                      <CheckProd 
-                        sendSalesProd={sendSalesProd} 
-                        type={type}
-                        produto={produto}
-                        classes={classes}
-                      />
-                      
+                      {type === 'forecast' && 
+                        <CheckProd 
+                          product={product}
+                          classes={classes}
+                        />
+                      }
+                      {type === 'delivery' &&
+                        <>
+                          <TableCell>{product.quantityForecast}</TableCell>
+                        </>
+                      }
                     </TableRow>
                   ))}
                 </TableBody>
@@ -171,46 +194,15 @@ function Row({sendSalesProd, sale, type, setAddress}) {
 }
 
 export default function TableSales({ 
-  selectSales,
-  salesProd,
-  setSalesProd,
+  sales,
+  setSales,
   type
 }){
   const [ order, setOrder ] = useState('asc')
   const [ orderBy, setOrderBy ] = useState('idSales')
-  const [currentSales, setCurrentSales] = useState([])
-  const { setAddress } = useAddress()
   const classes = useStyles()
 
-  //Start Component
-  useEffect(()=>{
-    setCurrentSales(selectSales)
-  },[selectSales])
-
   //Functions
-  const sendSalesProd = (e, saleProd, qtdDeliv, setInputNumber) => {
-    if (e.target.checked){
-      setInputNumber(true)
-
-      saleProd['qtdDeliv'] = qtdDeliv
-
-      setSalesProd([...salesProd, saleProd])
-    } else {
-      setInputNumber(false)
-
-      setSalesProd(salesProd.filter( item => {
-        if (item.CODLOJA !== saleProd.CODLOJA) {
-          return true
-        } else if (item.ID_SALES !== saleProd.ID_SALES) {
-          return true
-        } else if (item.COD_ORIGINAL !== saleProd.COD_ORIGINAL) {
-          return true
-        } else {
-          return false
-        }
-      }))
-    }
-  }
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc'
@@ -218,24 +210,23 @@ export default function TableSales({
     setOrderBy(property)
   }
 
-  const headCell = type === 'home' ? [
-    { id: '', numeric: false, label: '', class: classes.headUpDown },
-    { id: 'ID_SALES', numeric: false, label: 'DAV', class: classes.headIdSale },
-    { id: 'NOMECLI', numeric: false, label: 'Cliente', class: classes.headName },
-    { id: 'BAIRRO', numeric: false, label: 'Bairro', class: classes.headDistrict },
-    { id: 'D_ENTREGA1', numeric: true, label: 'Entrega', class: classes.headDate },
-    { id: 'CODLOJA', numeric: true, label: 'Loja', class: classes.headShop }
-  ] : [
-    { id: 'ID_SALES', numeric: false, label: 'DAV', class: classes.headIdSale },
-    { id: 'NOMECLI', numeric: false, label: 'Cliente', class: classes.headName },
-    { id: 'BAIRRO', numeric: false, label: 'Bairro', class: classes.headDistrict },
-    { id: 'D_ENTREGA1', numeric: true, label: 'Entrega', class: classes.headDate },
-    { id: 'CODLOJA', numeric: true, label: 'Loja', class: classes.headShop }
+  const headCell = [
+    { id: '', label: '' },
+    { id: 'ID_SALES', label: 'DAV' },
+    { id: 'NOMECLI', label: 'Cliente' },
+    { id: 'BAIRRO', label: 'Bairro' },
+    { id: 'D_ENTREGA1', label: 'Entrega' },
+    { id: 'CODLOJA', label: 'Loja' },
+    { id: '', label: '' }
   ]
 
   return(
-    <TableContainer component={Paper} className={classes.TabContainer}>
-      <Table id="tableId">
+    <TableContainer
+      component={Paper}
+      className={classes.tabContainer}
+      style={type === 'home' ? { maxHeight: '600px' } : { height: 'calc(100vh - 490px)' }}
+    >
+      <Table>
 
         <EnhancedTableHead
           order={order}
@@ -245,16 +236,16 @@ export default function TableSales({
           classe={classes}
         />
 
-        <TableBody className={type === 'home' ? classes.tableBody1 : classes.tableBody2}>
-          {stableSort(currentSales, getComparator(order, orderBy))
+        <TableBody>
+          {stableSort(sales, getComparator(order, orderBy))
             .map( (sale, i) => (
-            <Row  
-              key={i} 
-              sendSalesProd={sendSalesProd} 
-              classes={classes} sale={sale} 
-              type={type}
-              setAddress={setAddress}
-            />
+              <Row  
+                key={i}
+                sale={sale}
+                setSales={setSales}
+                classes={classes}
+                type={type}
+              />
           ))}
         </TableBody>
       

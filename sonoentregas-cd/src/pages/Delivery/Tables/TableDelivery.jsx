@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
+import { NavLink } from 'react-router-dom'
 import {
   Button,
   makeStyles,
@@ -12,10 +13,10 @@ import {
 } from '@material-ui/core'
 import { Delete, Edit } from '@material-ui/icons'
 
-import { useDelivery } from '../../context/deliveryContext'
-import { useDeliveryFinish } from '../../context/deliveryFinishContext'
+import { useDelivery } from '../../../context/deliveryContext'
+import { useDeliveryFinish } from '../../../context/deliveryFinishContext'
 
-import StyleStatus from '../../functions/styleStatus'
+import StyleStatus from '../../../functions/styleStatus'
 
 const useStyle = makeStyles(theme => ({
   headCell: {
@@ -31,20 +32,20 @@ const useStyle = makeStyles(theme => ({
     '& td': {
       padding: '4px 16px'
     }
+  },
+  link: {
+    textDecoration: 'none',
+    color: theme.palette.text.primary
   }
 }))
 
 export default function TableDelivery({ type, deleteDelivery, openModals }){
-  const [ delivery, setDelivery ] = useState([])
-  
   const { delivery: deliveryOpen } = useDelivery()
   const { deliveryFinish } = useDeliveryFinish()
 
-  const classes = useStyle()
+  const delivery = type === 'open' ? deliveryOpen : deliveryFinish
 
-  useEffect(()=>{
-    type === 'open' ? setDelivery(deliveryOpen) : setDelivery(deliveryFinish)
-  },[type, deliveryOpen, deliveryFinish])
+  const classes = useStyle()
 
   return (
     <TableContainer component={Paper}>
@@ -73,20 +74,22 @@ export default function TableDelivery({ type, deleteDelivery, openModals }){
               >{item.STATUS}</div>
             </TableCell>
             <TableCell width={'10%'} align="right">
-              {(item.STATUS === 'Em lançamento') && (
-              <>
-                <Edit onClick={()=> openModals(item, 'update')}/>
-                <Delete onClick={()=> deleteDelivery(item.ID)}/>
-              </>
-              )}
+              {item.STATUS === 'Em lançamento' &&
+                <>
+                  <NavLink to={`update/delivery/${item.ID}`} className={classes.link}>
+                    <Edit />
+                  </NavLink>
+                  <Delete onClick={()=> deleteDelivery(item.ID)}/>
+                </>
+              }
             </TableCell>
             <TableCell width={'7%'}>
-              {item.STATUS !== 'Finalizada' && (
+              {item.STATUS !== 'Finalizada' &&
               <Button
                 onClick={() => openModals(item, 'status')}
                 children={item.STATUS === 'Em lançamento' ? 'Entregar' : 'Finalizar'}
               />
-              )}
+              }
             </TableCell>
           </TableRow>
         ))}

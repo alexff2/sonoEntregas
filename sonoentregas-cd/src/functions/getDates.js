@@ -1,3 +1,27 @@
+export function getObjDate(date){
+  const arrayDate = date.split('-')
+
+  const dateObj = new Date(`${arrayDate[1]}/${arrayDate[2]}/${arrayDate[0]}`)
+
+  const dayFinal = new Date(parseInt(arrayDate[0]), parseInt(arrayDate[1]), 0)
+
+  if (parseInt(arrayDate[2]) < 1 || parseInt(arrayDate[2]) > dayFinal.getDate()) {
+    throw new Error('Invalid day for selected month!')
+  }
+
+  if (
+    !(arrayDate.length === 3 &&
+    arrayDate[0].length === 4 &&
+    arrayDate[1].length === 2 &&
+    arrayDate[2].length === 2 &&
+    dateObj.setHours(0,0,0,0))
+  ) {
+    throw new Error('Enter the date in format: year(4 char)/month(2 char)/day(2 char). Example: 2000-12-01')
+  }
+
+  return dateObj
+}
+
 export function convertDate(date=false, days = 0){
   let data, dia, diaF, mes, mesF, anoF
   if (date) {

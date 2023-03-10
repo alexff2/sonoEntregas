@@ -4,21 +4,25 @@ import {
   Fab,
   fade,
   makeStyles,
-  TextField
+  Paper,
+  TextField,
+  Typography
 } from '@material-ui/core'
 import { Add } from '@material-ui/icons'
 
 //Components
 import Modal from '../../components/Modal'
-import ModalDelivery from './ModalDelivery'
-import ModalView from './ModalView'
-import ModalDelivering from './ModalDelivering'
-import TableDelivery from './TableDelivery'
-import TablePrevision from './TablePrevision'
+import ModalDelivery from './Modals/ModalDelivery'
+import ModalView from './Modals/ModalView'
+import ModalDelivering from './Modals/ModalDelivering'
+import TableDelivery from './Tables/TableDelivery'
+import TableForecast from './Tables/TableForecast'
 //Context
 import { useDelivery } from '../../context/deliveryContext'
 import { useDeliveryFinish } from '../../context/deliveryFinishContext'
+import { useForecasts } from '../../context/forecastsContext'
 import { useSale } from '../../context/saleContext'
+import { useAlert } from '../../context/alertContext'
 
 import api from '../../services/api'
 
@@ -57,22 +61,40 @@ const useStyle = makeStyles(theme => ({
         border: 'none'
       }
     }
-  }
+  },
+  card: {
+    height: '100%',
+    width: '100%',
+    padding: 40,
+    '&:hover': {
+      backgroundColor: theme.palette.primary.main,
+      boxShadow: '0px 3.21306px 5.3551px rgba(0, 0, 0, 0.2), 0px 1.07102px 19.2783px rgba(0, 0, 0, 0.12), 0px 6.42612px 10.7102px rgba(0, 0, 0, 0.14)',
+      cursor: 'pointer',
+      '& $text': {
+        color: 'white'
+      }
+    }
+  },
+  text: {}
 }))
 
 export default function Delivery() {
   //Modals Open States
-  const [ openCreateDelivery, setOpenCreateDelivery ] = useState(false)
-  const [ openUpdateDelivery, setOpenUpdateDelivery ] = useState(false)
+  const [ openModalSelectForecastDelivery, setOpenModalSelectForecastDelivery ] = useState(false)
+  const [ openModalCreateForecastDelivery, setOpenModalCreateForecastDelivery ] = useState(false)
   const [ openModalDelivering, setOpenModalDelivering ] = useState(false)
   const [ openFinish, setOpenFinish ] = useState(false)
   const [ openView, setOpenView ] = useState(false)
 
   //States
   const [ selectDelivery, setSelectDelivery ] = useState({})
-  const { delivery, setDelivery } = useDelivery()
-  const { deliveryFinish, setDeliveryFinish } = useDeliveryFinish()
+  const [ typeForecasDelivery, setTypeForecasDelivery ] = useState('')
+
+  const { setDelivery } = useDelivery()
+  const { setDeliveryFinish } = useDeliveryFinish()
+  const { forecasts } = useForecasts()
   const { setSales } = useSale()
+  const { setAlert } = useAlert()
 
   const classes = useStyle()
 
@@ -92,17 +114,25 @@ export default function Delivery() {
         })
         setSales(dataSales)
       }      
-    } catch (error) {
-      alert('Erro ao deletar, entre em contato com Administrador')
-      console.log(error)
+    } catch (e) {
+      if (!e.response){
+        console.log(e)
+        setAlert('Rede')
+      } else if (e.response.status === 400){
+        console.log(e.response.data)
+        setAlert('Servidor')
+      } else {
+        console.log(e.response.data)
+      }
     }
   }
 
   const openModals = (item, modal) => {
     switch (modal) {
-      case 'update':
-        setSelectDelivery(item)
-        setOpenUpdateDelivery(true)
+      case 'create':
+        setOpenModalSelectForecastDelivery(false)
+        setOpenModalCreateForecastDelivery(true)
+        setTypeForecasDelivery(item)
         break;
       case 'view':
         setSelectDelivery(item)
@@ -128,21 +158,70 @@ export default function Delivery() {
   }
 
   const searchDeliveryFinished = async e => {
-    const { data } = await api.get(`deliverys/close/${e.target.value}`)
-    setDeliveryFinish(data)
+    try {
+      const { data } = await api.get(`deliverys/close/${e.target.value}`)
+      setDeliveryFinish(data)
+    } catch (e) {
+      if (!e.response){
+        console.log(e)
+        setAlert('Rede')
+      } else if (e.response.status === 400){
+        console.log(e.response.data)
+        setAlert('Servidor')
+      } else {
+        console.log(e.response.data)
+      }
+    }
+  }
+
+  const searchForecastFinished = async e => {
+    try {
+      const { data } = await api.get(`forecast/closed`, {
+        params: {
+          typeSearch: 'date',
+          search: e.target.value,
+        }
+      })
+
+      setDeliveryFinish(data)
+    } catch (e) {
+      if (!e.response){
+        console.log(e)
+        setAlert('Rede')
+      } else if (e.response.status === 400){
+        console.log(e.response.data)
+        setAlert('Servidor')
+      } else {
+        console.log(e.response.data)
+      }
+    }
   }
 
   return (
     <>
       <Box>
-        <TablePrevision
-          openModals={openModals}
-          deleteDelivery={deleteDelivery}
-        />
+        <div className={classes.boxTabHeader} style={{paddingTop: '1rem'}}>
+          <span>Previsões</span>
+          <div>
+            <TextField
+              id="date"
+              label="Dia"
+              type="date"
+              onChange={searchForecastFinished}
+              className={classes.fieldDate}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </div>
+        </div>
+
+        <TableForecast />
 
         <div className={classes.boxTabHeader} style={{paddingTop: '1rem'}}>
           <span>Rotas em processo</span>
         </div>
+
         <TableDelivery
           type="open"
           deleteDelivery={deleteDelivery}
@@ -165,44 +244,58 @@ export default function Delivery() {
           </div>
         </div>
 
-        {deliveryFinish.length > 0 &&
-          <TableDelivery
-            type="close"
-            openModals={openModals}
-          />
-        }
+        <TableDelivery
+          type="close"
+          openModals={openModals}
+        />
 
         <Fab 
           color="primary"
           className={classes.btnAdd}
-          onClick={() => setOpenCreateDelivery(true)}
+          onClick={() => setOpenModalSelectForecastDelivery(true)}
         >
           <Add />
         </Fab>
       </Box>
       
       {/* Modais*/}
-      <Modal 
-        open={openCreateDelivery}
-        setOpen={setOpenCreateDelivery}
-        title="Lançar Entrega"
+      <Modal
+        open={openModalSelectForecastDelivery}
+        setOpen={setOpenModalSelectForecastDelivery}
+        title={"Selecione:"}
       >
-        <ModalDelivery
-          setOpen={setOpenCreateDelivery}
-          selectDelivery={false}
-          delivery={delivery}
-          setDelivery={setDelivery}
-        />
+        <Box display="flex" flexDirection="row">
+          <Paper className={classes.card}  onClick={() => openModals('forecast', 'create')}>
+            <Box>
+              <Typography
+                variant="h6"
+                color="textSecondary"
+                className={classes.text}
+              >Previsão</Typography>
+            </Box>
+          </Paper>
+          {forecasts.length > 0 &&
+            <Paper className={classes.card}  onClick={() => openModals('delivery', 'create')}>
+              <Box>
+                <Typography
+                  variant="h6"
+                  color="textSecondary"
+                  className={classes.text}
+                >Entrega</Typography>
+              </Box>
+            </Paper>
+          }
+        </Box>
       </Modal>
 
       <Modal 
-        open={openUpdateDelivery}
-        setOpen={setOpenUpdateDelivery}
-        title="Editar Entrega"
+        open={openModalCreateForecastDelivery}
+        setOpen={setOpenModalCreateForecastDelivery}
+        title={`Lançar ${typeForecasDelivery === 'forecast' ? 'Previsão' : 'Entrega'}`}
       >
-        <ModalDelivery 
-          setOpen={setOpenUpdateDelivery} 
-          selectDelivery={selectDelivery}
+        <ModalDelivery
+          setOpen={setOpenModalCreateForecastDelivery}
+          type={typeForecasDelivery}
         />
       </Modal>
 
@@ -240,7 +333,6 @@ export default function Delivery() {
           selectDelivery={selectDelivery}
         />
       </Modal>
-
     </>
   )
 }

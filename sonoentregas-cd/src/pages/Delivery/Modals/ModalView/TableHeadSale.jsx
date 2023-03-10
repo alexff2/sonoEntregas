@@ -30,6 +30,7 @@ const TableHeadSale = () => {
         <TableCell className={classes.tableHeadCellStart}>Nome do Cliente</TableCell>
         <TableCell className={classes.tableHeadCell}>Valor Total</TableCell>
         <TableCell className={classes.tableHeadCell}>Emissão</TableCell>
+        <TableCell className={classes.tableHeadCell}>Loja</TableCell>
       </TableRow>
     </TableHead>
   )

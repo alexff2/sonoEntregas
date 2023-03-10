@@ -1,29 +1,20 @@
 import React from 'react'
-import { Dialog, makeStyles } from '@material-ui/core'
+import { CircularProgress, makeStyles, Backdrop } from '@material-ui/core'
 
-import LoadingCircle from './LoadingCircle'
-
-const useStyles = makeStyles(() => ({
-  modal: {
-    display: 'grid',
-    placeItems: 'center'
-  },
-  loading: {
-    width: '100%'
+const useStyles = makeStyles(theme => ({
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+    marginLeft: 256
   }
 }))
 
-export default function LoadingCircleModal({ open, setOpen }){
+export default function LoadingCircleModal({ open }){
   const classes = useStyles()
 
   return (
-    <Dialog
-      aria-labelledby="simple-dialog-title"
-      open={open}
-      onClose={setOpen}
-      className={classes.modal}
-    >
-      <LoadingCircle className={classes.loading}/>
-    </Dialog>
+    <Backdrop className={classes.backdrop} open={open}>
+      <CircularProgress color='inherit' size={80}/>
+    </Backdrop>
   )
 }

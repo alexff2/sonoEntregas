@@ -3,7 +3,7 @@ const MaintenanceVisit = require('../models/tables/MaintenanceVisit')
 const Maintenance = require('../models/tables/Maintenance')
 const { getViewMaint } = require('../services/MainService')
 
-const { getDate } = require('../functions/getDate')
+const ObjDate = require('../functions/getDate')
 
 module.exports = {
   /**
@@ -63,7 +63,7 @@ module.exports = {
 
         await Maintenance.updateAny(0, { 
           STATUS: 'Finalizada',
-          D_FINISH: getDate()
+          D_FINISH: ObjDate.getDate()
         }, { ID: id })
         
         msg = 'Assistência finalizada com sucesso'

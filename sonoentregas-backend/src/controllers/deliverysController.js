@@ -1,4 +1,11 @@
 // @ts-check
+
+/**
+ * @typedef {Object} ISaleProd
+ * @property {number} ID_SALES
+ * @property {number} CODLOJA
+ */
+
 const Deliverys = require('../models/Deliverys')
 const ViewDeliverys = require('../models/ViewDeliverys')
 const DeliveryProd = require('../models/DeliveryProd')
@@ -8,7 +15,7 @@ const SalesProd = require('../models/SalesProd')
 const DeliveryService = require('../services/DeliveryService')
 const MainService = require('../services/MainService')
 
-const { getDate } = require('../functions/getDate')
+const ObjDate = require('../functions/getDate')
 
 module.exports = {
   /**
@@ -43,31 +50,30 @@ module.exports = {
   async create( req, res ){
     try {
       const { id: user_id } = req.user
-      const { description, ID_CAR, ID_DRIVER, ID_ASSISTANT, D_PREVISION, salesProd, STATUS } = req.body
+      const { description, ID_CAR, ID_DRIVER, ID_ASSISTANT, salesProd } = req.body
 
       const deliveryCreateId = await Deliverys.creatorAny(0, [{
         description,
         ID_CAR,
         ID_DRIVER,
         ID_ASSISTANT,
-        STATUS,
+        STATUS: 'Em lançamento',
         ID_USER_MOUNT: user_id,
-        D_PREVISION
       }])
 
       const dataDelivery = await ViewDeliverys.findSome(0, `ID = ${deliveryCreateId}`)
 
-      const dataTime = getDate()
+      const dataTime = ObjDate.getDate()
 
       for(let i = 0; i < salesProd.length; i++) {
-        var { ID_SALES, CODLOJA, COD_ORIGINAL, QUANTIDADE, QTD_DELIV, qtdDeliv } = salesProd[i]
+        var { ID_SALES, CODLOJA, COD_ORIGINAL, QUANTIDADE, QTD_DELIV, qtdDelivery } = salesProd[i]
 
-        var valueProd = `${dataDelivery[0].ID}, ${ID_SALES}, ${CODLOJA}, ${qtdDeliv}, '${COD_ORIGINAL}', '${dataTime}', NULL, NULL`
+        var valueProd = `${dataDelivery[0].ID}, ${ID_SALES}, ${CODLOJA}, ${qtdDelivery}, '${COD_ORIGINAL}', '${dataTime}', NULL, NULL`
 
         await DeliveryProd.creatorNotReturn(0, valueProd, true)
 
-        if ((qtdDeliv + QTD_DELIV) === QUANTIDADE) {
-          await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = '${STATUS}' WHERE ID_SALES = ${ID_SALES} AND COD_ORIGINAL = '${COD_ORIGINAL}' AND CODLOJA = ${CODLOJA}`)
+        if ((qtdDelivery + QTD_DELIV) === QUANTIDADE) {
+          await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = 'Em lançamento' WHERE ID_SALES = ${ID_SALES} AND COD_ORIGINAL = '${COD_ORIGINAL}' AND CODLOJA = ${CODLOJA}`)
         }
 
         const prod = await SalesProd.findSome(0, `ID_SALES = ${ID_SALES} and STATUS = 'Enviado' AND CODLOJA = ${CODLOJA}`)
@@ -79,10 +85,6 @@ module.exports = {
       
       const dataDeliverys = await DeliveryService.findSalesOfDelivery([dataDelivery[0]])
 
-      if (ID_CAR === 0) {
-        await DeliveryService.createSaleOfPrevision(dataDeliverys[0].sales)
-      }
-
       return res.json(dataDeliverys[0])
     } catch (error) {
       console.log(error)
@@ -93,62 +95,20 @@ module.exports = {
    * @param {*} req 
    * @param {*} res 
    */
-  async update( req, res ) {
+  async updateHeader( req, res ) {
     try {
       const { id } = req.params
-      const { description, ID_CAR, ID_DRIVER, ID_ASSISTANT, D_PREVISION, salesProd } = req.body
+      const { id: user_id } = req.user
+      const { description, ID_CAR, ID_DRIVER, ID_ASSISTANT } = req.body
 
       await Deliverys.updateAny(0, {
         description,
         ID_CAR,
         ID_DRIVER,
-        ID_ASSISTANT,
-        D_PREVISION
+        ID_ASSISTANT
       }, id)
 
-      const dataDelivery = await ViewDeliverys.findSome(0, `ID = ${id}`)
-
-      //Buscando todas as vendas de deliveryProd para abri-las e deleta-las de deliveryProd
-      const productsDelivery = await DeliveryProd.findSome(0, `ID_DELIVERY = ${id}`)
-
-      for (let i = 0; i < productsDelivery.length; i++) {
-        await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = 'Enviado' WHERE ID_SALES = ${productsDelivery[i].ID_SALE} AND COD_ORIGINAL = '${productsDelivery[i].COD_ORIGINAL}' AND CODLOJA = ${productsDelivery[i].CODLOJA}`)
-
-        await Sales._query(0, `UPDATE SALES SET STATUS = 'Aberta' WHERE ID_SALES = ${productsDelivery[i].ID_SALE} AND CODLOJA = ${productsDelivery[i].CODLOJA}`)
-      }
-
-      await DeliveryProd.deleteNotReturn(0, id, 'ID_DELIVERY')
-
-      //Inserindo novas vendas em deliveryProd e fechando as vendas
-      const dataTime = getDate()
-
-      for (let i = 0; i < salesProd.length; i++) {
-        let { ID_SALES, CODLOJA, COD_ORIGINAL, QUANTIDADE, QTD_DELIV, QTD_MOUNTING, qtdDeliv: newQtdDelivery, checked } = salesProd[i]
-       
-        let valueProd = `${dataDelivery[0].ID}, ${ID_SALES}, ${CODLOJA}, ${newQtdDelivery}, '${COD_ORIGINAL}', '${dataTime}', NULL, NULL, 0`
-
-        await DeliveryProd.creatorNotReturn(0, valueProd, true)
-
-        if (checked){
-          if (((QTD_MOUNTING - QTD_DELIV) + newQtdDelivery) === QUANTIDADE) {
-            await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = 'Em lançamento' WHERE ID_SALES = ${ID_SALES} AND COD_ORIGINAL = '${COD_ORIGINAL}' AND CODLOJA = ${CODLOJA}`)
-          }
-        } else {
-          if ((QUANTIDADE - QTD_DELIV) === newQtdDelivery) {
-            await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = 'Em lançamento' WHERE ID_SALES = ${ID_SALES} AND COD_ORIGINAL = '${COD_ORIGINAL}' AND CODLOJA = ${CODLOJA}`)
-          }
-        }
-
-        const prod = await SalesProd.findSome(0, `CODLOJA = ${CODLOJA} AND ID_SALES = ${ID_SALES} and STATUS = 'Enviado'`)
-
-        if (prod.length === 0) {
-          await Sales._query(0, `UPDATE SALES SET STATUS = 'Fechada' WHERE ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`)
-        }
-      }
-
-      const dataDeliverys = await DeliveryService.findSalesOfDelivery([dataDelivery[0]])
-
-      return res.json(dataDeliverys[0])
+      return res.json({ message: `Update by${user_id}` })
     } catch (e) {
       console.log(e)
 
@@ -210,13 +170,5 @@ module.exports = {
       console.log(e)
       res.status(400).json(e)
     }
-  },
-  /**
-   * @param {*} req 
-   * @param {*} res 
-   */
-  async updateSalePrevision(req, res) {
-    const { id } = req.params
-    return res.send(id)
   }
 }

@@ -1,7 +1,40 @@
-module.exports = {
+class objDate {
+  getObjDate(date){
+    const arrayDate = date.split('-')
+
+    const dateObj = new Date(`${arrayDate[1]}/${arrayDate[2]}/${arrayDate[0]}`)
+
+    const dayFinal = new Date(parseInt(arrayDate[0]), parseInt(arrayDate[1]), 0)
+
+    if (parseInt(arrayDate[2]) < 1 || parseInt(arrayDate[2]) > dayFinal.getDate()) {
+      throw {
+        status: 400,
+        error: {
+          message: 'Invalid day for selected month!',
+        },
+      }
+    }
+
+    if (
+      !(arrayDate.length === 3 &&
+      arrayDate[0].length === 4 &&
+      arrayDate[1].length === 2 &&
+      arrayDate[2].length === 2 &&
+      dateObj.setHours(0,0,0,0))
+    ) {
+      throw {
+        status: 400,
+        error: {
+          message: 'Enter the date in format: year(4 char)/month(2 char)/day(2 char). Example: 2000-12-01',
+        },
+      }
+    }
+
+    return dateObj
+  }
   getDate(date = false) {
     if (date) {
-      var data = new Date(date)
+      var data = this.getObjDate(date)
       data.setDate(data.getDate()+1)
       var dia  = data.getDate().toString(),
         diaF = (dia.length === 1) ? '0'+dia : dia,
@@ -20,11 +53,11 @@ module.exports = {
         date = `${anoF}-${mesF}-${diaF}`;
       return date
     }
-  },
+  }
   setDaysInDate(date, days) {
     var data, dia, diaF, mes, mesF, anoF
   
-    data = new Date(date)
+    data = this.getObjDate(date)
     data.setDate(data.getDate() + days)
     dia  = data.getDate().toString()
     diaF = (dia.length === 1) ? '0'+dia : dia
@@ -34,7 +67,7 @@ module.exports = {
     date = `${anoF}-${mesF}-${diaF}`
   
     return date
-  },
+  }
   getHours(){
     const date = new Date()
     var hours, minutes, seconds
@@ -48,3 +81,5 @@ module.exports = {
     return `${hours}:${minutes}:${seconds}`
   }
 }
+
+module.exports = new objDate()

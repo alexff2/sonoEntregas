@@ -61,12 +61,12 @@ const itens = [
   },
 ]
 
-const useStyle = makeStyles(() => ({
+const useStyle = makeStyles(theme => ({
   drawer: {
     width: widthDrawer,
     flexShrink: 0
   },
-  drawerPapper: {
+  drawerPaper: {
     width: widthDrawer
   },
   logo: {
@@ -79,11 +79,10 @@ function Nav() {
   return (
     <Drawer
       anchor="left"
-      variant="persistent"
-      open
+      variant="permanent"
       className={classes.drawer}
       classes={{
-        paper: classes.drawerPapper
+        paper: classes.drawerPaper
       }}
     >
       <Box

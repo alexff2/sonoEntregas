@@ -11,7 +11,7 @@ const useStyles = makeStyles(theme => ({
     width: `calc(100% - ${256}px)`,
     marginLeft: 256,
   },
-  toobar: {
+  toolbar: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -56,9 +56,9 @@ function Header() {
 
   return(
     <AppBar position="fixed" className={classes.root}>
-      <Toolbar className={classes.toobar}>
+      <Toolbar className={classes.toolbar}>
         <BtnUpdate />
-        <p className={classes.toobar}>
+        <p className={classes.toolbar}>
           Seja bem vindo(a), 
           <strong>{userAuth.DESCRIPTION}</strong>
           <AccountCircle onClick={openSm}/>

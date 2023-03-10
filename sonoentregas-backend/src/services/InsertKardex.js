@@ -1,6 +1,6 @@
 // @ts-check
 const Produto = require('../models/Produtos')
-const { getDate, getHours } = require('../functions/getDate')
+const ObjDate = require('../functions/getDate')
 
 /**
  * @typedef {Object} Kardex
@@ -24,8 +24,8 @@ module.exports = {
 
       const ID = KardexId[0][0].CODIGO + 1
       const SEQ = KardexSeq[0][0].SEQUENCIA + 1
-      const dateNow = getDate()
-      const horasNow = getHours()
+      const dateNow = ObjDate.getDate()
+      const horasNow = ObjDate.getHours()
       const qtdEntra = kardex.tipo === 'E' ? prod.QUANTIDADE : 0
       const qtdSai = kardex.tipo === 'S' ? prod.QUANTIDADE : 0
 

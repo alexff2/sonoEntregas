@@ -1,3 +1,4 @@
+
 const { QueryTypes } = require('sequelize')
 const Sequelize  = require('sequelize')
 
@@ -14,11 +15,16 @@ class Model {
 
     Object.entries(obj).forEach(([key,value], i, vet) => {
       if (key !== 'in') {
-        let keyvalue = toCompare === '=' ? `${key} = '${value}'` : `${key} LIKE '${value}%'`
+        let keyValue
+        if (value === 'CURRENT_TIMESTAMP'){
+          keyValue = toCompare === '=' ? `${key} = ${value}` : `${key} LIKE ${value}%`
+        } else {
+          keyValue = toCompare === '=' ? `${key} = '${value}'` : `${key} LIKE '${value}%'`
+        }
   
         vet.length === i + 1 
-          ? values += keyvalue 
-          : values += `${keyvalue}${separate} `
+          ? values += keyValue 
+          : values += `${keyValue}${separate} `
       } else {
         Object.entries(obj.in).forEach(([keyIn,vetValueIn]) => {
           let valueIn
@@ -39,38 +45,38 @@ class Model {
     return values
   }
 
-  async findAll(loja, columns = this.columns){
+  async findAll(loja, columns = this.columns, log=false){
     const script = `SELECT ${columns} FROM ${this.tab}`
 
-    const data = await this._query(loja, script, QueryTypes.SELECT)
+    const data = await this._query(loja, script, QueryTypes.SELECT, log)
     return data
   }
-  async findSome(loja, where, columns = this.columns){
+  async findSome(loja, where, columns = this.columns, log=false){
     const script = `SELECT ${columns} FROM ${this.tab} WHERE ${where}`
 
-    const data = await this._query(loja, script, QueryTypes.SELECT)
+    const data = await this._query(loja, script, QueryTypes.SELECT, log)
 
     return data
   }
-  async find({loja, where = {}, columns = this.columns, toCompare = '='}){
+  async find({loja, where = {}, columns = this.columns, toCompare = '='}, log=false){
     where = Object.keys(where).length === 0 
       ? '' 
       : `WHERE ${this.getObj(where, ' AND ', toCompare)}`
 
     const script = `SELECT ${columns} FROM ${this.tab} ${where}`
 
-    const data = await this._query(loja, script, QueryTypes.SELECT)
+    const data = await this._query(loja, script, QueryTypes.SELECT, log)
 
     return data
   }
-  async findAny(loja, where = {}, columns = this.columns){
+  async findAny(loja, where = {}, columns = this.columns, log=false){
     where = Object.keys(where).length === 0 
       ? '' 
       : `WHERE ${this.getObj(where, ' AND ')}`
 
     const script = `SELECT ${columns} FROM ${this.tab} ${where}`
 
-    const data = await this._query(loja, script, QueryTypes.SELECT)
+    const data = await this._query(loja, script, QueryTypes.SELECT, log)
 
     return data
   }
@@ -78,11 +84,11 @@ class Model {
   /*async innerJoin(loja, where, ){
     const script = `SELECT ${columns} FROM ${this.tab} WHERE ${where}`
 
-    const data = await this._query(loja, script)
+    const data = await this._query(loja, script, log)
     return data
   }*/
 
-  async creator(loja, values, id = false) {
+  async creator(loja, values, id = false, log=false) {
     //Buscando ultimo ID lançado na tabela se não fornecido
     if (!id) {
       const lastId = await this.findAll(loja, `MAX(ID) AS 'ID'`)
@@ -91,7 +97,7 @@ class Model {
 
       const script = `INSERT INTO ${this.tab} (${this.columns}) VALUES (${ID}, ${values})`
 
-      await this._query(loja, script, QueryTypes.INSERT)
+      await this._query(loja, script, QueryTypes.INSERT, log)
 
       const data = await this.findSome(loja, `ID = ${ID}`)
 
@@ -99,7 +105,7 @@ class Model {
     } else {
       const script = `INSERT INTO ${this.tab} (${this.columns}) VALUES (${values})`
 
-      await this._query(loja, script, QueryTypes.INSERT)
+      await this._query(loja, script, QueryTypes.INSERT, log)
     }
   }
 
@@ -128,11 +134,11 @@ class Model {
     return { column, value }
   }
 
-  async creatorAny(loja, values, id = false) {
+  async creatorAny(loja, values, id = false, log=false) {
     var script, ID
 
     if (!id) {
-      //Seach first ID in table
+      //Search first ID in table
       const lastId = await this.findAll(loja, `MAX(ID) AS 'ID'`)
 
       ID = lastId[0].ID ? lastId[0].ID + 1 : 1
@@ -146,11 +152,11 @@ class Model {
       
       script = `INSERT INTO ${this.tab} (${column}) VALUES ${value}`
     }
-    await this._query(loja, script, QueryTypes.INSERT)
+    await this._query(loja, script, QueryTypes.INSERT, log)
 
     return ID
   }
-  async creatorNotReturn(loja, values, id = false) {
+  async creatorNotReturn(loja, values, id = false, log=false) {
     //Buscando ultimo ID lançado na tabela se não fornecido
     if (!id) {
       const lastId = await this.findAll(loja, `MAX(ID) AS 'ID'`)
@@ -159,35 +165,34 @@ class Model {
       
       const script = `INSERT INTO ${this.tab} (${this.columns}) VALUES (${ID}, ${values})`
       
-      await this._query(loja, script, QueryTypes.INSERT)
+      await this._query(loja, script, QueryTypes.INSERT, log)
       
     } else {
       const script = `INSERT INTO ${this.tab} (${this.columns}) VALUES (${values})`
       
-      await this._query(loja, script, QueryTypes.INSERT)
+      await this._query(loja, script, QueryTypes.INSERT, log)
     }
   }
 
-  async update(loja, values, id, colum = 'ID') {
+  async update(loja, values, id, colum = 'ID', log=false) {
     const script = `UPDATE ${this.tab} SET ${values} WHERE ${colum} = ${id}`
     
-    await this._query(loja, script, QueryTypes.UPDATE)
+    await this._query(loja, script, QueryTypes.UPDATE, log)
     
     const data = await this.findSome(loja, `${colum} = ${id}`)
     
     return data[0]
   }
-  async updateNotReturn(loja, values, id, colum = 'ID') {
+  async updateNotReturn(loja, values, id, colum = 'ID', log=false) {
     const script = `UPDATE ${this.tab} SET ${values} WHERE ${colum} = ${id}`
     
-    await this._query(loja, script, QueryTypes.UPDATE)
+    await this._query(loja, script, QueryTypes.UPDATE, log)
   }
-  async updateAny(loja, obJValues, where) {
+  async updateAny(loja, obJValues, where, log=false) {
     
     const script = `UPDATE ${this.tab} SET ${this.getObj(obJValues)} WHERE ${this.getObj(where, ' AND ')}`
-    console.log(script)
     
-    await this._query(loja, script, QueryTypes.UPDATE)
+    await this._query(loja, script, QueryTypes.UPDATE, log)
   }
   updateTw() {
 
@@ -211,29 +216,30 @@ class Model {
     return obj
   }
   
-  async delete(loja, id, colum = 'ID') {
+  async delete(loja, id, colum = 'ID', log=false) {
     const script = `DELETE FROM ${this.tab} WHERE ${colum} = ${id}`
     
-    const data = await this._query(loja, script, QueryTypes.DELETE)
+    const data = await this._query(loja, script, QueryTypes.DELETE, log)
     
     return data
   }
-  async deleteNotReturn(loja, id, colum = 'ID') {
+  async deleteNotReturn(loja, id, colum = 'ID', log=false) {
     const script = `DELETE FROM ${this.tab} WHERE ${colum} = ${id}`
     
-    await this._query(loja, script, QueryTypes.DELETE)
+    await this._query(loja, script, QueryTypes.DELETE, log)
   }
 
-  async count(loja, where = '', groupBy = ''){
+  async count(loja, where = '', groupBy = '', log=false){
     const group = groupBy === '' ? groupBy : `, ${groupBy}`
     const groupby = groupBy === '' ? groupBy : `GROUP BY ${groupBy}`
 
     const script = `SELECT COUNT(*) AS ${this.tab}${group} FROM ${this.tab} ${where} ${groupby}`
 
-    return await this._query(loja, script, QueryTypes.SELECT)
+    return await this._query(loja, script, QueryTypes.SELECT, log)
   }
   
-  async _query(loja, script, type){
+  async _query(loja, script, type, log){
+    log && console.log(script)
     const connection = connections[loja]
     const sequelize = new Sequelize(connection)
 

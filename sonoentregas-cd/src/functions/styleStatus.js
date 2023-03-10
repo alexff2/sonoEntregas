@@ -2,11 +2,11 @@ const StyleStatus = status => {
   var background
   if (status === 'Em lançamento') {
     background = '#2196f3'
-  } else if (status === 'Entregando' || status === 'Em deslocamento') {
+  } else if (status === 'Entregando' || status === 'Em deslocamento' || status === 'Em previsão') {
     background = '#ff9800'
   } else if (status === 'Finalizada') {
     background = '#388e3c'
-  } else if (status === 'Previsão') {
+  } else if (status === 'Vencida') {
     background = '#E83F5B'
   }
   return { 
