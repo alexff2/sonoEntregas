@@ -29,6 +29,7 @@ const OrcParc = require('../models/OrcParc')
 const ViewOrcParcLoja = require('../models/ViewOrcParcLoja')
 
 const ObjDate = require('../functions/getDate')
+const { QueryTypes } = require('sequelize/types')
 
 module.exports = {
   /**
@@ -135,12 +136,14 @@ module.exports = {
         }
       }
 
+      const saleCreate = await Sales._query(0, 'SELECT MAX(ID) ID FROM SALES', QueryTypes.SELECT)
+
       for (let i = 0; i < products.length; i++) {
         const { NUMVENDA, CODPRODUTO, ALTERNATI, DESCRICAO, QUANTIDADE, UNITARIO1,NPDESC, NVTOTAL, GIFT  } = products[i]
 
         const _GIFT = GIFT ? 1 : 0
 
-        let valueProd = `${NUMVENDA}, ${loja}, ${CODPRODUTO}, '${ALTERNATI}', '${DESCRICAO}', ${QUANTIDADE}, ${UNITARIO1}, ${NPDESC}, ${NVTOTAL}, 'Enviado', ${DOWN_EST}, ${_GIFT}`
+        let valueProd = `${NUMVENDA}, ${loja}, ${CODPRODUTO}, '${ALTERNATI}', '${DESCRICAO}', ${QUANTIDADE}, ${UNITARIO1}, ${NPDESC}, ${NVTOTAL}, 'Enviado', ${DOWN_EST}, ${_GIFT}, ${saleCreate[0].ID}`
 
         await SalesProd.creator(0, valueProd, true)
 
