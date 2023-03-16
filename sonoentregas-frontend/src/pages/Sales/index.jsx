@@ -5,7 +5,7 @@ import './style.css'
 import TabSendSale from './TabSendSale'
 import SalesOpenClose from './SalesOpenClose'
 import { TabSalesProcess } from './TabSaleProcess'
-import { TabSalesPrev } from './TabSalesPrev'
+import { TabForecast } from './TabForecast'
 
 export default function Sales(){
   const [ tabs, setTabs ] = useState({
@@ -70,7 +70,7 @@ export default function Sales(){
         {tabs.tab1 && <TabSendSale />}
         {tabs.tab2 && <SalesOpenClose type={'open'}/>}
         {tabs.tab3 && <TabSalesProcess />}
-        {tabs.tab4 && <TabSalesPrev />}
+        {tabs.tab4 && <TabForecast />}
         {tabs.tab5 && <SalesOpenClose type={'close'}/>}
       </div>
     </div>

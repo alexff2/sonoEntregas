@@ -1,0 +1,144 @@
+.forecast {
+  padding: 8px 16px;
+  border-radius: 5px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+  
+  background-color: #FFF;
+  margin-bottom: 16px;
+}
+
+.forecast .headerPrev {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: -8px -16px;
+  padding: 8px 16px;
+  background-color: var(--gray-headers);
+  color: #FFF;
+
+  margin-bottom: 12px;
+}
+
+.forecast .salePrev {
+  margin-top: 5px;
+  border-top: 1px solid #CCC;
+  position: relative;
+}
+
+.forecast .salePrev span:nth-child(1) {
+  display: inline-block;
+  width: 10%;
+}
+.forecast .salePrev span:nth-child(2) {
+  display: inline-block;
+  width: 50%;
+}
+.forecast .salePrev span:nth-child(3) {
+  display: inline-block;
+  width: 15%;
+}
+.forecast .salePrev span:nth-child(4) {
+  display: inline-block;
+  width: 25%;
+}
+
+.forecast .salePrev .btnValidRemove {
+  position: absolute;
+  right: 0;
+  top: 2px;
+}
+
+.forecast .salePrev .btnValidRemove button {
+  display: block;
+  color: #FFF;
+  padding: 3px;
+  width: 65px;
+  margin-bottom: 2px;
+  font-size: 0.8rem;
+  border-radius: 3px;
+  border: none;
+  cursor: pointer;
+}
+
+.forecast .productPrev span {
+  font-size: 0.8rem;
+}
+.forecast .productPrev span:nth-child(1) {
+  display: inline-block;
+  width: 15%;
+  padding-left: 10%;
+}
+.forecast .productPrev span:nth-child(2) {
+  display: inline-block;
+  width: 10%;
+}
+.forecast .productPrev span:nth-child(3) {
+  display: inline-block;
+  width: 55%;
+}
+.forecast .productPrev span:nth-child(4) {
+  display: inline-block;
+  width: 20%;
+}
+
+.sales-field.validateField label {
+  margin-bottom: 2px;
+}
+.sales-field.validateField input {
+  border: none;
+  margin-bottom: 8px;
+}
+.sales-field.validateField textarea {
+  border: none;
+  padding: 4px;
+}
+
+.sales-field.field-validate {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 0 24px;
+}
+
+.validate-radio {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 110px;
+}
+
+.validate-radio label {
+  background-color: #CCC;
+  padding: 4px;
+  border-radius: 2px;
+  width: 85px;
+  cursor: pointer;
+}
+
+.validate-radio input {
+  cursor: pointer;
+}
+.validate-radio.confirm input:checked + label {
+  background-color: var(--green);
+  color: #FFF;
+}
+.validate-radio.decline input:checked + label {
+  background-color: var(--red);
+  color: #FFF;
+}
+
+.btnSaved {
+  width: 100%;
+  border: none;
+  background-color: var(--green);
+  padding: 8px;
+  color: #FFF;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btnSaved:hover {
+  opacity: 0.7;
+}
+/* Dialog */

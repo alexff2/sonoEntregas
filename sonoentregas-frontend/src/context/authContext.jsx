@@ -10,31 +10,58 @@ const TOKEN_KEY = "@Sono-token"
 const SONO_USER = "@sono-user"
 const SONO_SHOP = "@sono-shop"
 
+const setToken = token => localStorage.setItem(TOKEN_KEY, token)
+const setUser = user => localStorage.setItem(SONO_USER, JSON.stringify(user))
+const setShop = shop => localStorage.setItem(SONO_SHOP, JSON.stringify(shop))
+
+const getToken = () => localStorage.getItem(TOKEN_KEY)
+const getUser = () => JSON.parse(localStorage.getItem(SONO_USER))
+const getShop = () => JSON.parse(localStorage.getItem(SONO_SHOP))
+
+const token = getToken()
+
 export default function AuthProvider({ children }){
   const [userAuth, setUserAuth] = useState({})
   const [shopAuth, setShopAuth] = useState({})
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(true)
   const { setAlert } = useModalAlert()
 
   useEffect(() => {
-    const token = getToken()
-    if (token) {
-      setIsAuthenticated(true)
-      const userLocalHistory = getUser()
-      const shopLocalHistory = getShop()
-  
-      setUserAuth(userLocalHistory)
-      setShopAuth(shopLocalHistory)
+    const validations = async () => {
+      try {
+        if (!token) {
+          return
+        }
+
+        await api.get('token/validation', {
+          params: {
+            token
+          }
+        })
+
+        setUserAuth(getUser())
+        setShopAuth(getShop)
+        setIsAuthenticated(true)
+      } catch (e) {
+        if (!e.response){
+          console.log(e)
+          setAlert('Rede')
+        } else if (e.response.status === 401){
+          console.log(e.response.data)
+          setAlert('Sua senha venceu, entre novamente na aplicação!')
+          setIsAuthenticated(false)
+          localStorage.clear()
+        } else if (e.response.status === 400){
+          console.log(e.response.data)
+          setAlert('Servidor')
+        } else {
+          console.log(e.response.data)
+        }
+      }
     }
-  }, [])
 
-  const setToken = token => localStorage.setItem(TOKEN_KEY, JSON.stringify(token))
-  const setUser = user => localStorage.setItem(SONO_USER, JSON.stringify(user))
-  const setShop = shop => localStorage.setItem(SONO_SHOP, JSON.stringify(shop))
-
-  const getToken = () => localStorage.getItem(TOKEN_KEY)
-  const getUser = () => JSON.parse(localStorage.getItem(SONO_USER))
-  const getShop = () => JSON.parse(localStorage.getItem(SONO_SHOP))
+    validations()
+  }, [setAlert])
 
   const login = async ({ userName, password, selectShop }) => {
     try {

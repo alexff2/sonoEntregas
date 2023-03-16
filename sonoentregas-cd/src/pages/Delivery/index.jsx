@@ -24,6 +24,7 @@ import { useForecasts } from '../../context/forecastsContext'
 import { useSale } from '../../context/saleContext'
 import { useAlert } from '../../context/alertContext'
 
+import { getObjDate } from '../../functions/getDates'
 import api from '../../services/api'
 
 const useStyle = makeStyles(theme => ({
@@ -97,6 +98,15 @@ export default function Delivery() {
   const { setAlert } = useAlert()
 
   const classes = useStyle()
+
+  const checkDataForecast = (date) => {
+    const timezoneForecast = getObjDate(date).setHours(0,0,0,0)
+    const timezoneNow = new Date().setHours(0,0,0,0)
+
+    return timezoneForecast < timezoneNow
+  }
+
+  const forecastsAvailable = forecasts.filter( forecast => forecast.status && !checkDataForecast(forecast.date) )
 
   //Functions
   const deleteDelivery = async cod => {
@@ -274,7 +284,7 @@ export default function Delivery() {
               >Previsão</Typography>
             </Box>
           </Paper>
-          {forecasts.length > 0 &&
+          {forecastsAvailable.length > 0 &&
             <Paper className={classes.card}  onClick={() => openModals('delivery', 'create')}>
               <Box>
                 <Typography

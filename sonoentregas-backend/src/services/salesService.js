@@ -147,7 +147,7 @@ module.exports = {
   },
   async findToCreateRoutes({ idSale }){
     /**@type {IForecast[]} */
-    const forecasts = await Forecast.findAny(0, { STATUS: 'INICIADA  ' })
+    const forecasts = await Forecast.findAny(0, { STATUS: 1 })
 
     if (forecasts.length === 0) {
       return {

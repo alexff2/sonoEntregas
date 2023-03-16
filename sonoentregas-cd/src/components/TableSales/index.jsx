@@ -146,7 +146,7 @@ function Row({ sale, type, setSales}) {
                     <TableCell>Código</TableCell>
                     <TableCell>Descrição</TableCell>
                     <TableCell>Qtd. Tot.</TableCell>
-                    <TableCell>Qtd. Entr.</TableCell>
+                    <TableCell>Qtd. Proc.</TableCell>
                     {type === 'forecast' &&
                       <>
                         <TableCell>Qtd</TableCell>
@@ -166,7 +166,7 @@ function Row({ sale, type, setSales}) {
                       <TableCell>
                         {product.COD_ORIGINAL}
                       </TableCell>
-                      <TableCell>{product.DESCRICAO}</TableCell>
+                      <TableCell>{product.NOME}</TableCell>
                       <TableCell>{product.QUANTIDADE}</TableCell>
                       <TableCell>{product.QTD_MOUNTING}</TableCell>
 

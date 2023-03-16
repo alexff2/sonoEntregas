@@ -18,10 +18,14 @@ import {
   },
   tableHead: {
     background: theme.palette.primary.main
+  },
+  tableHeadCellNull: {
+    padding: 0,
+    margin: 0
   }
  }))
 
-const TableHeadSale = () => {
+const TableHeadSale = ({type}) => {
   const classes = useStyles()
   return(
     <TableHead>
@@ -31,6 +35,7 @@ const TableHeadSale = () => {
         <TableCell className={classes.tableHeadCell}>Valor Total</TableCell>
         <TableCell className={classes.tableHeadCell}>Emissão</TableCell>
         <TableCell className={classes.tableHeadCell}>Loja</TableCell>
+        <TableCell className={classes.tableHeadCell}></TableCell>
       </TableRow>
     </TableHead>
   )

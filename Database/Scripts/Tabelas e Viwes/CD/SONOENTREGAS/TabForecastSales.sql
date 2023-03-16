@@ -8,7 +8,7 @@ CREATE TABLE FORECAST_SALES (
 	validationStatus bit,
 	dateValidation datetime,
 	obs varchar(255) NULL,
-	canInvalidate bit  NOT NULL DEFAULT 0,
+	requestInvalidate bit  NOT NULL DEFAULT 0,
 	invalidationObs varchar(255),
 	canRemove bit NOT NULL DEFAULT 1,
 	createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

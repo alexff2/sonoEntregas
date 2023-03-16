@@ -1,7 +1,6 @@
 import React from 'react'
 import { Outlet } from 'react-router-dom'
 
-import SetContext from '../context/SetContexts'
 import { useModalAlert } from '../context/modalAlertContext'
 
 import Header from '../components/Header'
@@ -13,7 +12,6 @@ export default function App() {
   const { open } = useModalAlert()
   return(
     <>
-      <SetContext />
       <div className="header">
         <Header />
         <Navbar />

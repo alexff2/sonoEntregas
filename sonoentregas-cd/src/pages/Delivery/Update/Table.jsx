@@ -26,6 +26,7 @@ import Modal from '../../../components/Modal'
 import ModalAddSale from './ModalAddSale'
 
 import { useForecasts } from '../../../context/forecastsContext'
+import { useDelivery } from '../../../context/deliveryContext'
 import { useSale } from '../../../context/saleContext'
 
 import { getComparator, stableSort } from '../../../functions/orderTable'
@@ -126,6 +127,7 @@ export default function TableSalesUpdate({ sales }) {
   const classes = useStyles()
   const { type, id: idData } = useParams()
   const { setForecasts, forecasts: forecastsContext } = useForecasts()
+  const { setDelivery, delivery } = useDelivery()
   const { setSales } = useSale()
 
   const handleRequestSort = (event, property) => {
@@ -164,8 +166,43 @@ export default function TableSalesUpdate({ sales }) {
     return selected.indexOf(id) !== -1
   }
 
-  const removeDeliverySales = () => {
-    console.log(selected)
+  const removeDeliverySales = async () => {
+    try {
+      const deliveries = delivery
+
+      for (let indexDelivery = 0; indexDelivery < deliveries.length; indexDelivery++){
+        if (deliveries[indexDelivery].ID === parseInt(idData)) {
+          for(let index = 0; index < selected.length; index++) {
+            const saleFind = deliveries[indexDelivery].sales.find( sale => sale.ID === selected[index])
+
+            await api.post(`delivery/sale/rmv`, { salesProd: saleFind.products })
+
+            const saleFilter = deliveries[indexDelivery].sales.filter( sale => sale.ID !== selected[index])
+
+
+            deliveries[indexDelivery].sales = saleFilter
+          }
+        }
+      }
+
+      setDelivery([...deliveries])
+
+      const { data: dataSales } = await api.get('sales/', {
+        params: {
+          status: 'open'
+        }
+      })
+
+      setSales(dataSales)
+
+      setSelected([])
+    } catch (e) {
+      console.log(e)
+      const { data } = await api.get('deliverys/open')
+      
+      setDelivery(data)
+      setSelected([])
+    }
   }
 
   const removeForecastSale = async () => {

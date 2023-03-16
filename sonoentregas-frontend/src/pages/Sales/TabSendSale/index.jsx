@@ -23,20 +23,22 @@ export default function TabSendSale(){
   useEffect(() => {
     setLoading(true)
 
-    api
-      .get(`salesshop/${emissao}/${cod}`)
-      .then( resp => {
-        setSales(resp.data)
-
-        setLoading(false)
+    if (cod) {
+      api
+        .get(`salesshop/${emissao}/${cod}`)
+        .then( resp => {
+          setSales(resp.data)
+  
+          setLoading(false)
+        })
+        .catch( erro => {
+          console.log(erro)
+  
+          setAlert(`Não foi possível conectar com servidor, entre em contato com Administrador`)
+  
+          setLoading(false)
       })
-      .catch( erro => {
-        console.log(erro)
-
-        setAlert(`Não foi possível conectar com servidor, entre em contato com Administrador`)
-
-        setLoading(false)
-    })
+    }
   }, [cod, emissao, setAlert])
 
   return(

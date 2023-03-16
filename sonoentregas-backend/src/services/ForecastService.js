@@ -4,6 +4,8 @@
  * @typedef {Object} IProduct
  * @property {number} ID_SALE_ID
  * @property {string} COD_ORIGINAL
+ * @property {number} QUANTIDADE
+ * @property {number} QTD_MOUNTING
  * @property {number} qtdDelivery
  * 
  * @typedef {Object} ISale
@@ -35,6 +37,7 @@
  * @property {ISale[]} sales
  * @property {string} userId
  * @property {string} idForecast
+ * @property {boolean} add
  * 
  * @typedef {Object} PropsValidation
  * @property {number} id
@@ -53,16 +56,16 @@ const ForecastSales = require('../models/tables/Forecast/ForecastSales')
 const ForecastProduct = require('../models/tables/Forecast/ForecastProduct')
 const Sale = require('../models/Sales')
 const SalesProd = require('../models/SalesProd')
-const Users = require('../models/Users')
 
 const ObjDate = require('../functions/getDate')
 
-module.exports = {
+class ForecastService {
   /**
-   * @param {Object} where 
+   * @param {Object | string} where
+   * @param {string | boolean} codLoja
    * @returns 
    */
-  async findForecast(where){
+  async findForecast(where, codLoja){//CALCULAR STATUS VENCIDO
     /** @type {IForecast[]} */
     const forecasts = where === 'created' 
       ? await Forecast._query(0, 'select * from Forecast where [status] IS NULL OR [status] = 1', QueryTypes.SELECT)
@@ -73,11 +76,13 @@ module.exports = {
     }
 
     const scriptSales = 
-    `SELECT A.*, C.DESC_ABREV SHOP, B.NOMECLI, B.BAIRRO, B.ID_SALES, B.D_ENTREGA2
+    `SELECT A.*, C.DESC_ABREV SHOP, B.NOMECLI, B.BAIRRO, B.ID_SALES, B.D_ENTREGA2, B.FONE, B.VENDEDOR, B.TOTAL
     FROM FORECAST_SALES A
     INNER JOIN SALES B ON A.idSale = B.ID
     INNER JOIN LOJAS C ON B.CODLOJA = C.CODLOJA
-    WHERE A.idForecast IN (${forecasts.map(forecast => forecast.id)})`
+    WHERE A.idForecast IN (${forecasts.map(forecast => forecast.id)})
+    ${codLoja ? `AND B.CODLOJA = ${codLoja} `: ''}
+    `
 
     /** @type {IForecastSales[]} */
     const forecastSales = await Forecast._query(0, scriptSales, QueryTypes.SELECT)
@@ -103,7 +108,8 @@ module.exports = {
     })
 
     return forecasts
-  },
+  }
+
   /** @param {PropsCreateForecast} props */
   async createForecast({ dateForecast, userId }) {
     const formatSqlForecastDate = ObjDate.setDaysInDate(dateForecast, 0)
@@ -116,9 +122,10 @@ module.exports = {
     const idForecast = await Forecast.findAny(0, { date: formatSqlForecastDate }, 'id')
 
     return idForecast[0].id
-  },
+  }
+
   /** @param {PropsSalesForecast} props */
-  async createSalesForecast({ sales, userId, idForecast }){
+  async createSalesForecast({ sales, userId, idForecast, add }){
     /**@type {IForecastSales[]} */
     const forecastSalesSaved = await ForecastSales.findAny(0, { idForecast, in: { idSale: sales.map( sale => sale.ID) }})
 
@@ -138,6 +145,16 @@ module.exports = {
 
     if (salesFiltered.length > 0) {
       await ForecastSales.creatorAny(0, salesFiltered, true)
+
+      if (add) {
+        const forecastStatus = await Forecast.findAny(0, {id: idForecast, status: 1}, 'status')
+
+        if (forecastStatus[0]) {
+          const idCreate = await ForecastSales._query(0, 'SELECT MAX(id) id FROM FORECAST_SALES', QueryTypes.SELECT)
+  
+          await ForecastSales.updateAny(0, { canRemove: 0 }, { id: idCreate[0].id })
+        }
+      }
     }
 
     /**@type {IForecastSales[]} */
@@ -153,10 +170,12 @@ module.exports = {
         for(let j = 0; j < sales[i].products.length; j++) {
           const { COD_ORIGINAL } = sales[i].products[j]
   
-          await SalesProd.updateAny(0, { STATUS: 'Em Previsão' }, {
-            ID_SALE_ID: sales[i].ID,
-            COD_ORIGINAL: COD_ORIGINAL
-          })
+          if ((sales[i].products[j].qtdDelivery + sales[i].products[j].QTD_MOUNTING) === sales[i].products[j].QUANTIDADE) {
+            await SalesProd.updateAny(0, { STATUS: 'Em Previsão' }, {
+              ID_SALE_ID: sales[i].ID,
+              COD_ORIGINAL: COD_ORIGINAL
+            })
+          }
   
           const prod = await SalesProd.findAny(0, {ID_SALE_ID: sales[i].ID, STATUS: 'Enviado'})
   
@@ -172,33 +191,27 @@ module.exports = {
     }
 
     await ForecastProduct.creatorAny(0, forecastProduct, true)
-  },
+  }
+
   async startedForecast({ id }){
     await Forecast.updateAny(0, { status: 1}, { id })
 
     await ForecastSales.updateAny(0, { canRemove: 0 }, { idForecast: id })
-  },
+  }
+
   async authorizeRemove({ id }){
     await ForecastSales.updateAny(0, { canRemove: 1 }, { id })
-  },
+  }
+
   /** @param { PropsDeleteSale } props */
   async deleteSaleForecast({ forecastSale }){
-    /** @type { IForecastProduct[] } */
-    const forecastProduct = await ForecastProduct.findAny(0, { idForecastSale: forecastSale.id })
-
-    await SalesProd.updateAny(0, { STATUS: 'Enviado' }, {
-      ID_SALE_ID: forecastSale.idSale,
-      in: {
-        COD_ORIGINAL: forecastProduct.map(prod => prod.COD_ORIGINAL)
-      }
-    })
-
-    await Sale.updateAny(0, { STATUS: 'Aberta' }, { ID: forecastSale.idSale })
+    await this.setSendStatusInSalesProd({ forecastSale })
 
     await ForecastProduct.deleteNotReturn(0, forecastSale.id, 'idForecastSale')
 
     await ForecastSales.deleteNotReturn(0, forecastSale.id)
-  },
+  }
+
   /** @param {PropsValidation} props */
   async validateSale(props){
     await ForecastSales.updateAny(0, {
@@ -211,19 +224,20 @@ module.exports = {
     {
       id: props.id
     })
-  },
-  async authorizeInvalidation({ id }){
-    await ForecastSales.updateAny(0, { canInvalidate: 1 }, { id })
-  },
-  async invalidateSale({ id, obs, userId }){
-    const userCancel = await Users.findAny(0, { id: userId })
-
+  }
+  
+  async invalidateSale({ id }){
+    await ForecastSales.updateAny(0, { validationStatus: 0 }, { id })
+  }
+  
+  async requestInvalidation({ id, obs, contact }){
     await ForecastSales.updateAny(0, {
-      invalidationObs: `Cancelamento por ${userCancel[0].DESCRIPTION} / Obs: ${obs}`,
-      validationStatus: 0
+      invalidationObs: `Solicitado por por ${contact} / Obs: ${obs}`,
+      requestInvalidate: 1
     },
     { id })
-  },
+  }
+  
   async finishForecastService({ id }){
     /**@type {IForecastSales[]} */
     const forecastSales = await ForecastSales.findAny(0, { idForecast: id, validationStatus: 0 })
@@ -243,6 +257,22 @@ module.exports = {
 
     await Sale.updateAny(0, { STATUS: 'Aberta' }, { in: { ID: forecastSales.map( sale => sale.idSale)} })
 
-    await Forecast.updateAny(0, { STATUS: 'FINALIZADA' }, { id })
+    await Forecast.updateAny(0, { status: 0 }, { id })
+  }
+
+  async setSendStatusInSalesProd({ forecastSale }) {
+    /** @type { IForecastProduct[] } */
+    const forecastProduct = await ForecastProduct.findAny(0, { idForecastSale: forecastSale.id })
+
+    await SalesProd.updateAny(0, { STATUS: 'Enviado' }, {
+      ID_SALE_ID: forecastSale.idSale,
+      in: {
+        COD_ORIGINAL: forecastProduct.map(prod => prod.COD_ORIGINAL)
+      }
+    })
+
+    await Sale.updateAny(0, { STATUS: 'Aberta' }, { ID: forecastSale.idSale })
   }
 }
+
+module.exports = new ForecastService()

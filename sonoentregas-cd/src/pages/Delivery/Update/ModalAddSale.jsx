@@ -174,15 +174,21 @@ export default function ModalAddSale({ setOpen }){
     try {
       setDisabledBtnSave(true)
 
-      const saleFiltered = saleSelected.filter( sale => {
-        sale.products = sale.products.filter( prod => prod.check)
+      let saleFiltered
 
-        if (sale.products.length > 0) {
-          return true
-        }
-
-        return false
-      })
+      if (type === 'forecast') {
+        saleFiltered = saleSelected.filter( sale => {
+          sale.products = sale.products.filter( prod => prod.check)
+  
+          if (sale.products.length > 0) {
+            return true
+          }
+  
+          return false
+        })
+      } else {
+        saleFiltered = saleSelected
+      }
 
       if(saleFiltered.length === 0) {
         setErrorMsg('Selecione ao menos um produto das vendas inseridas!')
@@ -197,7 +203,17 @@ export default function ModalAddSale({ setOpen }){
 
         setForecasts(data)
       } else {
-        setDelivery()
+        let salesProd = []
+
+        saleFiltered.forEach(sale => {
+          salesProd = [...salesProd, ...sale.products]
+        })
+
+        await api.post(`/delivery/${id}/sales/add`, { salesProd })
+
+        const { data } = await api.get('deliverys/open')
+
+        setDelivery(data)
       }
 
       const { data: dataSales } = await api.get('sales/', {

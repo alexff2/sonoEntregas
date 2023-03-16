@@ -150,14 +150,10 @@ export default function ModalDelivery({ setOpen, type }){
 
       setDisabledBtnSave(true)
 
-      const salesProd = []
+      let salesProd = []
 
       deliverySales.forEach( sale => {
-        sale.products = sale.products.filter( prod => prod.check)
-
-        if (sale.products.length > 0) {
-          salesProd.push(sale.products)
-        }
+        salesProd = [ ...salesProd,...sale.products]
       })
 
       await api.post('deliverys', {

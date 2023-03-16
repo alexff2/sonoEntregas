@@ -62,7 +62,7 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-export default function ForecastView({ forecast }){
+export default function ForecastView({ forecast, handleInvalidationSale }){
   const [value, setValue] = useState(0)
   const classes = useStyles()
 
@@ -86,7 +86,7 @@ export default function ForecastView({ forecast }){
       >
         <TableContainer component={Paper}>
           <Table aria-label="collapsible table">
-            <TableHeadSale />
+            <TableHeadSale/>
             <TableBody>
               {forecast.sales.filter(sale => sale.validationStatus === null).map((sale, index) => (
                 <RowSale
@@ -105,13 +105,14 @@ export default function ForecastView({ forecast }){
       >
         <TableContainer component={Paper}>
           <Table aria-label="collapsible table">
-            <TableHeadSale />
+            <TableHeadSale type='forecastView'/>
             <TableBody>
               {forecast.sales.filter(sale => sale.validationStatus).map((sale, index) => (
                 <RowSale
                   key={index}
                   sale={sale}
-                  type={'close'}
+                  type={'forecastView'}
+                  handleInvalidationSale={handleInvalidationSale}
                 />
               ))}
             </TableBody>

@@ -1,10 +1,5 @@
 //@ts-check
-const {
-  validateSale,
-  invalidateSale,
-  authorizeInvalidation,
-  authorizeRemove
-} = require('../services/ForecastService')
+const ForecastService = require('../services/ForecastService')
 const ForecastRules = require('../rules/forecastRules')
 
 module.exports = {
@@ -23,15 +18,17 @@ module.exports = {
         return res.status(400).json('Type of validation status is not boolean')
       }
 
-      if (!contact || obs === undefined) {
-        return res.status(400).json('Informe todos os dados necessários para validação')
+      if (!contact || contact === '' || obs === undefined) {
+        return res.status(400).json({
+          dataInvalid: 'Informe todos os dados necessários para validação'
+        })
       }
 
       await ForecastRules.checkExistValidForecast({ id: idForecast })
 
       await ForecastRules.checkForecastSaleIsValidated({ id })
 
-      await validateSale({
+      await ForecastService.validateSale({
         id,
         validationStatus,
         contact,
@@ -53,24 +50,38 @@ module.exports = {
    * @param {any} req
    * @param {any} res
    */
-  async authInvalidation(req, res){ // VERIFICAR SE ESTAR EM ROTA
+  async requestInvalidation(req, res){
     try {
       const { idForecast, id } = req.params
+      const { contact, obs } =  req.body
 
       const { id: userId } = req.user
+
+      if (!contact || contact === '' || obs === undefined) {
+        return res.status(400).json({
+          dataInvalid: 'Informe todos os dados necessários para validação'
+        })
+      }
 
       await ForecastRules.checkExistForecast({ id: idForecast })
 
       const forecastSale = await ForecastRules.checkForecastSaleNotValidated({ id })
 
-      if (forecastSale.canInvalidate) {
+      if (forecastSale.requestInvalidate) {
         throw {
           status: 409,
           error: 'Already authorized invalidation of this sale!'
         }
       }
 
-      await authorizeInvalidation({ id })
+      if (await ForecastRules.saleOnRoute({forecastSale})) {
+        throw {
+          status: 409,
+          error: 'onRoute'
+        }
+      }
+
+      await ForecastService.requestInvalidation({ id, contact, obs })
 
       return res.status(200).json(`cancellation request by ${userId}`)
     } catch (e) {
@@ -86,22 +97,17 @@ module.exports = {
    * @param {any} req
    * @param {any} res
    */
-  async invalidate(req, res){ // Mudar status do produto para enviado e talvez criar revalidação
+  async invalidate(req, res){
     try {
       const { idForecast, id } = req.params
-      const { obs } = req.body
 
       const { id: userId } = req.user
-
-      if (!obs) {
-        return res.status(400).json('Informe todos os dados necessários para validação')
-      }
 
       await ForecastRules.checkExistForecast({ id: idForecast })
 
       const forecastSales = await ForecastRules.checkForecastSaleNotValidated({ id })
 
-      if (!forecastSales.canInvalidate) {
+      if (!forecastSales.requestInvalidate) {
         throw {
           status: 409,
           error: "don't permission to sale invalidate!"
@@ -115,13 +121,9 @@ module.exports = {
         }
       }
 
-      await invalidateSale({
-        id,
-        obs,
-        userId
-      })
+      await ForecastService.invalidateSale({ id })
 
-      return res.status(200).json()
+      return res.status(200).json(userId)
     } catch (e) {
       console.log(e)
 
@@ -152,7 +154,7 @@ module.exports = {
         }
       }
 
-      await authorizeRemove({ id })
+      await ForecastService.authorizeRemove({ id })
 
       return res.status(200).json(`Removal allowed by user ${userId}`)
     } catch (e) {

@@ -7,8 +7,11 @@ import {
   TableRow,
   TableCell,
   Typography,
-  makeStyles
+  makeStyles,
+  Tooltip,
+  IconButton
  } from '@material-ui/core'
+import { RemoveShoppingCart } from "@material-ui/icons"
 
 import RowProd from './RowProd'
 
@@ -23,7 +26,7 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-const RowSale = ({ sale, type, status }) => {
+const RowSale = ({ sale, type, status, handleInvalidationSale }) => {
   const classes = useStyles()
   return(
     <React.Fragment>
@@ -39,6 +42,16 @@ const RowSale = ({ sale, type, status }) => {
         }</TableCell>
         <TableCell align="right">{getDateBr(sale.EMISSAO)}</TableCell>
         <TableCell align="right">{sale.SHOP}</TableCell>
+        {(type === 'forecastView' && sale.requestInvalidate)
+          ? <TableCell align='right' style={{padding: 0}}>
+            <Tooltip title='Negar venda!'>
+              <IconButton onClick={() => handleInvalidationSale(sale.id)}>
+                <RemoveShoppingCart style={{color: '#FFF'}}/>
+              </IconButton>
+            </Tooltip>
+          </TableCell>
+          : <TableCell></TableCell>
+        }
       </TableRow>
 
       <TableRow>

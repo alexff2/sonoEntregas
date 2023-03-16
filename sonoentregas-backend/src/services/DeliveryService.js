@@ -1,9 +1,13 @@
+//@ts-check
 const { QueryTypes } = require('sequelize')
 const Delivery = require('../models/Deliverys')
+const DeliveryProd = require('../models/DeliveryProd')
+const SalesProd = require('../models/SalesProd')
 const ViewDeliverySales = require('../models/ViewDeliverySales')
 const ViewDeliveryProd2 = require('../models/ViewDeliveryProd2')
 const MainService = require('../services/MainService')
 const Empresas = require('../models/Empresas')
+const ObjDate = require('../functions/getDate')
 
 module.exports = {
   async findSalesOfDelivery(deliveries){
@@ -114,6 +118,38 @@ module.exports = {
           await Delivery._query(0, `UPDATE SALES SET STATUS = 'Aberta' WHERE ID_SALES = ${idSales} AND CODLOJA = ${codLoja}`)
         }
       }
+    }
+  },
+  async addSale({ salesProd, idDelivery }){
+    const dataTime = ObjDate.getDate()
+
+    for(let i = 0; i < salesProd.length; i++) {
+      var { ID_SALES, CODLOJA, COD_ORIGINAL, quantityForecast } = salesProd[i]
+
+      var valueProd = `${idDelivery}, ${ID_SALES}, ${CODLOJA}, ${quantityForecast}, '${COD_ORIGINAL}', '${dataTime}', NULL, NULL, 0`
+
+      await DeliveryProd.creatorNotReturn(0, valueProd, true)
+
+      await SalesProd.updateAny(0, { STATUS: 'Em lançamento' }, {
+        CODLOJA,
+        ID_SALES,
+        COD_ORIGINAL
+      })
+    }
+  },
+  async rmvSale({ salesProd }){
+    const script = `DELETE DELIVERYS_PROD WHERE ID_DELIVERY = ${salesProd[0].ID_DELIVERY} AND ID_SALE = ${salesProd[0].ID_SALES} AND CODLOJA = ${salesProd[0].CODLOJA}`
+
+    await DeliveryProd._query(0, script, QueryTypes.SELECT)
+
+    for(let i = 0; i < salesProd.length; i++) {
+      var { ID_SALES, CODLOJA, COD_ORIGINAL } = salesProd[i]
+
+      await SalesProd.updateAny(0, { STATUS: 'Em Previsão' }, {
+        CODLOJA,
+        ID_SALES,
+        COD_ORIGINAL
+      })
     }
   }
 }

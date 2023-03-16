@@ -191,6 +191,25 @@ class ForecastRules {
     return forecastSale[0]
   }
 
+  async saleOnRoute({forecastSale}) {
+    /**@type {import('../services/ForecastService').IForecastProduct[]} */
+    const forecastProducts = await ForecastProduct.findAny(0, { idForecastSale: forecastSale.id })
+
+    const COD_ORIGINAL = forecastProducts.map(forecastProduct => forecastProduct.COD_ORIGINAL)
+
+    const saleProd = await SalesProd.findAny(0, { 
+      ID_SALE_ID: forecastSale.idSale,
+      STATUS: 'Em Previsão',
+      in: { COD_ORIGINAL }
+    })
+
+    if (saleProd.length > 0) {
+      return false
+    }
+
+    return true
+  }
+
   async checkForecastSaleIsValidatedToFinish({ id }) {
     /**@type {import('../services/ForecastService').IForecastSales[]} */
     const forecastSales = await ForecastSales.findAny(0, { idForecast: id })
@@ -199,7 +218,7 @@ class ForecastRules {
       if (sale.validationStatus === null) {
         throw {
           status: 409,
-          error: 'Not allowed!'
+          error: 'There are unconfirmed sales in this forecast!'
         }
       }
     })
@@ -215,14 +234,13 @@ class ForecastRules {
           .filter(product => product.idForecastSale === forecastSales[i].id)
           .map(product => product.COD_ORIGINAL)
   
-        const salesProd = await SalesProd.findAny(0, { ID_SALE_ID, STATUS: 'Em Previsão', in: { COD_ORIGINAL } })
+        const saleProd = await SalesProd.findAny(0, { ID_SALE_ID, STATUS: 'Em Previsão', in: { COD_ORIGINAL } })
   
-        if (salesProd.length > 0) {
+        if (saleProd.length > 0) {
           throw {
             status: 409,
             error: {
-              message: "Sales products aren't on routes!",
-              sales: salesProd
+              message: "There are confirmed sales in this forecast!"
             }
           }
         }

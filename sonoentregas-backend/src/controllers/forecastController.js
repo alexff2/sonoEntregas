@@ -10,7 +10,13 @@ module.exports = {
    */
   async findCreatedForecast(req, res){
     try {
-      const forecast = await ForecastService.findForecast('created')
+      const { codLoja, status } = req.query
+
+      const where = {
+        status
+      }
+
+      const forecast = await ForecastService.findForecast(status ? where : 'created', codLoja ? codLoja : false)
 
       return res.status(200).json(forecast)
     } catch (e) {
@@ -30,7 +36,12 @@ module.exports = {
     try {
       const { typeSearch, search } = req.query
 
-      const forecast = await ForecastService.findForecast({ typeSearch, search })
+      const where = {}
+
+      where[typeSearch] = search
+      where['status'] = 0
+
+      const forecast = await ForecastService.findForecast( where, false)
 
       return res.status(200).json(forecast)
     } catch (e) {
@@ -76,7 +87,8 @@ module.exports = {
       await ForecastService.createSalesForecast({
         sales,
         idForecast,
-        userId
+        userId,
+        add: false
       })
 
       return res.status(201).json(idForecast)
@@ -149,7 +161,8 @@ module.exports = {
       await ForecastService.createSalesForecast({
         sales,
         userId,
-        idForecast: id
+        idForecast: id,
+        add: true
       })
 
       return res.status(200).json('')
@@ -203,11 +216,11 @@ module.exports = {
 
       const forecast = await ForecastsRules.checkExistForecast({ id })
 
-      if (forecast.status) {
+      if (forecast.status === null) {
         throw {
           status: 409,
           error:{
-            message: 'Previously started forecast, check current status!'
+            message: 'Forecast with created status, not allowed to finalize!'
           }
         }
       }

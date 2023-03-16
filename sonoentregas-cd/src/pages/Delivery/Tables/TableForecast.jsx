@@ -12,7 +12,7 @@ import {
   IconButton,
   Tooltip
 } from '@material-ui/core'
-import { EditSharp, Send } from '@material-ui/icons'
+import { EditSharp, Send, CheckCircle } from '@material-ui/icons'
 
 import Modal from '../../../components/Modal'
 import Confirm from '../../../components/Confirm'
@@ -66,7 +66,7 @@ export default function TabForecast() {
   const [ openConfirm, setOpenConfirm ] = useState(false)
   const [ progress, setProgress ] = useState(false)
   const [ openModalForecasView, setOpenModalForecastView ] = useState(false)
-  const [ idForecastToSend, setIdForecastToSend ] = useState('')
+  const [ forecastToSendFinished, setForecastToSendFinished ] = useState({})
   const [ forecastSelect, setForecastSelect ] = useState({})
 
   const { forecasts, setForecasts } = useForecasts([])
@@ -74,11 +74,16 @@ export default function TabForecast() {
   const classes = useStyle()
   const navigate = useNavigate()
 
+  const handleClickSendFinishedForecast = forecast => {
+    setForecastToSendFinished(forecast)
+    setOpenConfirm(true)
+  }
+
   const handleStartedForecast = async () => {
     try {
       setProgress(true)
 
-      await api.put(`/forecast/${idForecastToSend}/started`)
+      await api.put(`/forecast/${forecastToSendFinished.id}/started`)
 
       const newForecasts = forecasts.map(forecast => {
         forecast.status = true
@@ -96,9 +101,51 @@ export default function TabForecast() {
 
       setForecasts(newForecasts)
 
+      setForecastToSendFinished({})
+
       setOpenConfirm(false)
 
       setProgress(false)
+    } catch (e) {
+      setOpenConfirm(false)
+
+      setProgress(false)
+
+      if (!e.response){
+        console.log(e)
+
+        setAlert('Rede')
+      } else if (e.response.status === 400){
+        console.log(e.response.data)
+
+        setAlert('Servidor')
+      } else {
+        console.log(e.response.data)
+      }
+    }
+  }
+
+  const handleInvalidationSale = async idSale => {
+    try {
+      await api.put(`/forecast/${forecastSelect.id}/sale/${idSale}/invalidation`)
+
+      const newForecasts = forecasts.map(forecast => {
+        if (forecast.id === forecastSelect.id) {
+          const newSales = forecast.sales.map(sale => {
+            if (sale.id === idSale) {
+              sale.validationStatus = false
+            }
+
+            return sale
+          })
+
+          forecast.sales = newSales
+        }
+
+        return forecast
+      })
+ 
+      setForecasts(newForecasts)
     } catch (e) {
       if (!e.response){
         console.log(e)
@@ -114,9 +161,46 @@ export default function TabForecast() {
     }
   }
 
-  const handleClickSendForecast = id => {
-    setIdForecastToSend(id)
-    setOpenConfirm(true)
+  const handleFinishedForecast = async () => {
+    try {
+      setProgress(true)
+
+      await api.put(`/forecast/${forecastToSendFinished.id}/finish`)
+
+      setForecasts(forecasts.filter( forecast => forecast.id !== forecastToSendFinished.id))
+
+      setForecastToSendFinished({})
+
+      setOpenConfirm(false)
+
+      setProgress(false)
+    } catch (e) {
+      setOpenConfirm(false)
+
+      setProgress(false)
+
+      if (!e.response){
+        console.log(e)
+
+        setAlert('Rede')
+      } else if (e.response.status === 400){
+        console.log(e.response.data)
+
+        setAlert('Servidor')
+      } else if (e.response.data.message === `There are confirmed sales in this forecast!`) {
+        console.log(e.response.data.sales)
+
+        setAlert('Existe vendas confirmadas nesta previsão que não foram para rota!')
+      } else if (e.response.data.message === `There are unconfirmed sales in this forecast!`) {
+        console.log(e.response.data.sales)
+
+        setAlert('Existe vendas pendentes de confirmação nesta previsão!')
+      } else {
+        console.log(e.response.data)
+
+        setAlert('Servidor')
+      }
+    }
   }
 
   return (
@@ -151,11 +235,15 @@ export default function TabForecast() {
                     <EditSharp/>
                   </IconButton>
                 </Tooltip>
-                <Tooltip title='Enviar previsão para as lojas'>
-                  <IconButton onClick={() => handleClickSendForecast(forecast.id)}>
-                    <Send/>
-                  </IconButton>
-                </Tooltip>
+                {(forecast.status === null || forecast.status) &&
+                  <Tooltip title={forecast.status ? 'Finalizar Previsão' : 'Enviar previsão para as lojas'}>
+                    <IconButton onClick={() => handleClickSendFinishedForecast(forecast)}>
+                      { forecast.status
+                        ? <CheckCircle />
+                        : <Send/>
+                      }
+                    </IconButton>
+                  </Tooltip>}
               </TableCell>
             </TableRow>
           ))}
@@ -165,7 +253,7 @@ export default function TabForecast() {
       <Confirm
         open={openConfirm}
         setOpen={setOpenConfirm}
-        handleClick={handleStartedForecast}
+        handleClick={forecastToSendFinished.status === null ? handleStartedForecast : handleFinishedForecast}
         progress={progress}
       />
 
@@ -176,6 +264,7 @@ export default function TabForecast() {
       >
         <ForecastView 
           forecast={forecastSelect}
+          handleInvalidationSale={handleInvalidationSale}
         />
       </Modal>
     </TableContainer>
