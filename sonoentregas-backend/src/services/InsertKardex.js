@@ -20,7 +20,7 @@ module.exports = {
   async createKardex(prod, kardex){
     try {
       const KardexId = await Produto._query(1, 'SELECT MAX(CODIGO) CODIGO FROM KARDEX_PRODUTOS_HISTORICO')
-      const KardexSeq = await Produto._query(1, 'SELECT MAX(SEQUENCIA) CODIGO FROM KARDEX_PRODUTOS_HISTORICO')
+      const KardexSeq = await Produto._query(1, 'SELECT MAX(SEQUENCIA) SEQUENCIA FROM KARDEX_PRODUTOS_HISTORICO')
 
       const ID = KardexId[0][0].CODIGO + 1
       const SEQ = KardexSeq[0][0].SEQUENCIA + 1

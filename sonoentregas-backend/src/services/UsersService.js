@@ -20,7 +20,7 @@ module.exports = {
   /** @param {number} codloja*/
   async findUser(codloja){
     /** @type {User[]} */
-    const users = await Users._query(0, `SELECT ID, DESCRIPTION, OFFICE, ACTIVE, CODLOJA FROM USERS WHERE CODLOJA = ${codloja} OR (OFFICE = 'Dev' OR OFFICE = 'Master')`, QueryTypes.SELECT)
+    const users = await Users._query(0, `SELECT ID, DESCRIPTION, OFFICE, ACTIVE, CODLOJA FROM USERS WHERE ACTIVE = 1 AND CODLOJA = ${codloja} OR (OFFICE = 'Dev' OR OFFICE = 'Master')`, QueryTypes.SELECT)
 
     return users
   },

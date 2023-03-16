@@ -238,6 +238,7 @@ export default function TableMain() {
           className={classes.btnSearch}
           onClick={searchMain}
         >Pesquisar</Button>
+        <Box> - QTD:{maintenance.length}</Box>
       </Box>
 
       <TableContainer className={classes.paperTable} component={Paper}>

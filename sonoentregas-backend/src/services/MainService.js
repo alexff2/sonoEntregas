@@ -3,7 +3,7 @@ const MaintenanceDeliv = require('../models/tables/MaintenanceDeliv')
 const Maintenance = require('../models/tables/Maintenance')
 const ViewMaintenance = require('../models/views/ViewMaintenance')
 
-const Prodlojas = require('../services/ProdLojaService')
+const ProdLojaService = require('../services/ProdLojaService')
 const ObjDate = require('../functions/getDate')
 
 /**
@@ -50,7 +50,7 @@ module.exports = {
 
       await MaintenanceDeliv.updateAny(0, { D_DELIVING: maint.date }, { ID: id })
 
-      if(maint.CHANGE_PROD) await Prodlojas.updateEstProdloja(maint, kardex)
+      if(maint.CHANGE_PROD) await ProdLojaService.updateEstProdloja(maint, kardex)
   
       await Maintenance.updateAny(0, { STATUS: 'Em deslocamento' }, { ID: maint.ID })
     } catch (error) {
@@ -78,7 +78,7 @@ module.exports = {
         D_DELIVERED: maint.date,
       }, { ID })
 
-      if(maint.CHANGE_PROD) await Prodlojas.updateEstProdloja(maint, kardex)
+      if(maint.CHANGE_PROD) await ProdLojaService.updateEstProdloja(maint, kardex)
 
       await Maintenance.updateAny(0, { 
         D_FINISH: maint.date,
@@ -110,7 +110,7 @@ module.exports = {
         REASON_RETURN: maint.reasonReturn
       }, { ID })
 
-      if(maint.CHANGE_PROD) await Prodlojas.updateEstProdloja(maint, kardex)
+      if(maint.CHANGE_PROD) await ProdLojaService.updateEstProdloja(maint, kardex)
 
       await Maintenance.updateAny(0, { STATUS: 'No CD' }, {ID: maint.ID})
     } catch (error) {

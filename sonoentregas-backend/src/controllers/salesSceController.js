@@ -40,7 +40,7 @@ module.exports = {
     try {
       const { loja, emissao } = req.params
 
-      const vendas = await ViewVendas.findSome(loja, `EMISSAO = '${emissao}'`)
+      const vendas = await ViewVendas.findSome(loja, `EMISSAO = '${emissao}' ORDER BY CODIGOVENDA`)
   
       return res.send(vendas)
     } catch (error) {
