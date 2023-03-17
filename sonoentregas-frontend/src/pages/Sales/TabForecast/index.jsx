@@ -11,6 +11,7 @@ import Modal from '../../../components/Modal'
 import ConfirmDialog from '../../../components/ConfirmDialog'
 
 import api from '../../../services/api'
+import { dateSqlToReact } from '../../../functions/getDate'
 
 import './style.css'
 
@@ -124,8 +125,8 @@ export function TabForecast(){
         {forecasts.map(forecast => (
           <div key={forecast.id} className='forecast'>
             <div className='headerPrev'>
-              <span>Previsão de {forecast.date}</span>
-              <span>Criado por: {forecast.idUserCreated}</span>
+              <span>Previsão de {dateSqlToReact(forecast.date)}</span>
+              <span>Criado por: {forecast.userCreated}</span>
             </div>
             {forecast.sales.map( sale => (
               <React.Fragment key={sale.id}>

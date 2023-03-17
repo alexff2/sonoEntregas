@@ -67,7 +67,7 @@ export default function TabForecast() {
   const [ progress, setProgress ] = useState(false)
   const [ openModalForecasView, setOpenModalForecastView ] = useState(false)
   const [ forecastToSendFinished, setForecastToSendFinished ] = useState({})
-  const [ forecastSelect, setForecastSelect ] = useState({})
+  const [ forecastSelect, setForecastSelect ] = useState({ sales: []})
 
   const { forecasts, setForecasts } = useForecasts([])
   const { setAlert } = useAlert()
@@ -260,7 +260,7 @@ export default function TabForecast() {
       <Modal
         open={openModalForecasView}
         setOpen={setOpenModalForecastView}
-        title={"Visualização"}
+        title={`Visualização - ${forecastSelect.sales.length } vendas lançadas`}
       >
         <ForecastView 
           forecast={forecastSelect}

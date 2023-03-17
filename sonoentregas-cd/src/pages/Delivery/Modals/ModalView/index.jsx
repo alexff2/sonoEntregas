@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   makeStyles,
   Table,
@@ -80,17 +80,20 @@ export default function ModalView({ setOpen, selectDelivery, type }){
 
   const classes = useStyles()
 
-  type === 'open' && selectDelivery.sales.forEach(sale =>{
-    sale.products.forEach(produto => {
-      produto.DELIVERED = true
-      produto.STATUS = 'Enviado'
+  useEffect(() => {
+    type === 'open' && selectDelivery.sales.forEach(sale =>{
+      sale.products.forEach(produto => {
+        produto.DELIVERED = true
+        produto.STATUS = 'Enviado'
+      })
     })
-  })
+  }, [type, selectDelivery])
 
   //Functions
 
   const finish = async () => {
     try {
+      console.log(selectDelivery)
       if(dateDelivery){
         setDisabledBtnSave(true)
     

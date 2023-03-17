@@ -26,6 +26,7 @@
  * 
  * @typedef {Object} IForecast
  * @property {number} id
+ * @property {number} idUserCreated
  * @property {string} date
  * @property {string} status
  * 
@@ -56,6 +57,7 @@ const ForecastSales = require('../models/tables/Forecast/ForecastSales')
 const ForecastProduct = require('../models/tables/Forecast/ForecastProduct')
 const Sale = require('../models/Sales')
 const SalesProd = require('../models/SalesProd')
+const Users = require('../models/Users')
 
 const ObjDate = require('../functions/getDate')
 
@@ -103,8 +105,14 @@ class ForecastService {
       sale['products'] = forecastProduct.filter(prod => prod.idForecastSale === sale.id)
     })
 
+    const users = await Users.findAny(0, { in: {ID: forecasts.map(forecast => forecast.idUserCreated)} })
+
     forecasts.forEach(forecast => {
       forecast['sales'] = forecastSales.filter(sale => sale.idForecast === forecast.id)
+
+      const userCreate = users.find( user => user.ID === forecast.idUserCreated)
+
+      forecast['userCreated'] = userCreate.DESCRIPTION
     })
 
     return forecasts

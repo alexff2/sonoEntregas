@@ -182,7 +182,7 @@ function Row({ sale, modalDetalProduct, setOpenModalBoxInfo }) {
                       <TableCell component="th" scope="row">
                         {produto.COD_ORIGINAL}
                       </TableCell>
-                      <TableCell>{produto.DESCRICAO}</TableCell>
+                      <TableCell>{produto.NOME}</TableCell>
                       <TableCell>{produto.QUANTIDADE}</TableCell>
                       <TableCell align="right">{
                         Intl

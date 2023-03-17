@@ -29,7 +29,7 @@ const OrcParc = require('../models/OrcParc')
 const ViewOrcParcLoja = require('../models/ViewOrcParcLoja')
 
 const ObjDate = require('../functions/getDate')
-const { QueryTypes } = require('sequelize/types')
+const { QueryTypes } = require('sequelize')
 
 module.exports = {
   /**
@@ -116,7 +116,8 @@ module.exports = {
       const { CODIGOVENDA, CODCLIENTE, NOMECLI, VALORPROD, DESCONTO, TOTALVENDA, EMISSAO, ENDERECO, NUMERO, BAIRRO, CIDADE, ESTADO, PONTOREF, OBS, products, USER_ID, VENDEDOR, FONE, CGC_CPF, INS_RG, FAX, orcParc, O_V , OBS2, HAVE_OBS2 } = req.body
 
       const D_ENVIO = ObjDate.getDate()
-      const D_ENTREGA1 = ObjDate.setDaysInDate(EMISSAO, 10) //Objetivo do sistema
+
+      const D_ENTREGA1 = ObjDate.setDaysInDate(EMISSAO.split('T')[0], 10) //Objetivo do sistema
       const DOWN_EST = O_V == 0 ? 1 : 'NULL'
 
       const saleFind = await Sales.findSome(0, `ID_SALES = ${CODIGOVENDA} AND CODLOJA = ${loja}`)

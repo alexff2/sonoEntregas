@@ -75,7 +75,7 @@ function Row({ sale, cancelSubmitSales, reverseStock, saleDetail }) {
                 {sale.products.map((product) => (
                   <tr key={product.CODPRODUTO} onClick={e => clickProd(e, product)}>
                     <td>{product.COD_ORIGINAL}</td>
-                    <td>{product.DESCRICAO}</td>
+                    <td>{product.DESCRIPTION_SHOP}</td>
                     <td>{product.QUANTIDADE}</td>
                     <td>{
                       <FormatValue>{product.NVTOTAL}</FormatValue>
@@ -120,6 +120,7 @@ export default function TabSaleWaiting({ type }) {
       .then(resp => {
         if(resp.data){
           setSales(resp.data)
+          console.log(resp.data)
         }
         setLoading(false)
       })

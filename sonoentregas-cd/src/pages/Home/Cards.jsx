@@ -7,9 +7,9 @@ import {
   makeStyles
 } from '@material-ui/core'
 import { LocalShipping, ShoppingCart } from '@material-ui/icons'
-//import api from '../../services/api'
+import api from '../../services/api'
 
-//import { useSale } from '../../context/saleContext'
+import { useSale } from '../../context/saleContext'
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -41,11 +41,16 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Item = ({classes, title, icon: Icon, value, searchHome}) => {
-  //const { setSales }  = useSale()
+  const { setSales }  = useSale()
   
   const searchSales = async () => {
-    /* const { data } = await api.get('sales/false/false/Aberta/null')
-    setSales(data) */
+    const { data } = await api.get('sales/', {
+      params: {
+        status: 'open'
+      }
+    })
+
+    setSales(data)
     searchHome()
   }
   
@@ -74,7 +79,6 @@ const Item = ({classes, title, icon: Icon, value, searchHome}) => {
 
 export default function Home(){
   const [ itens, setItens ] = useState([])
-  //const { sales } = useSale()
   const classes = useStyles()
 
   useEffect(()=>{
@@ -82,30 +86,33 @@ export default function Home(){
   },[])
 
   const searchHome = () => {
-    
+    api
+      .get('/home')
+      .then(resp => {
         setItens([
           {
             icon: ShoppingCart,
-            value: 1,
+            value: resp.data.salesPending,
             title: 'Vendas Pendentes',
           },
           {
             icon: ShoppingCart,
-            value: 1,
+            value: (resp.data.salesOnRelease + resp.data.salesOnDelivring),
             title: 'Vendas em processo',
           },
           {
             icon: LocalShipping,
-            value: 1,
+            value: resp.data.devOnRelease,
             title: 'Rotas em lançamento',
           },
           {
             icon: LocalShipping,
-            value: 1,
+            value: resp.data.delivering,
             title: 'Rotas em deslocamento',
           }
         ])
-      
+      })
+      .catch(e => console.log(e))
   }
 
   return(
