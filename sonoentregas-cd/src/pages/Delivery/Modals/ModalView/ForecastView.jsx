@@ -66,6 +66,10 @@ export default function ForecastView({ forecast, handleInvalidationSale }){
   const [value, setValue] = useState(0)
   const classes = useStyles()
 
+  const forecastNotValidated = forecast.sales.filter(sale => sale.validationStatus === null)
+  const forecastAccepted = forecast.sales.filter(sale => sale.validationStatus)
+  const forecastRefused = forecast.sales.filter(sale => sale.validationStatus === false)
+
   return (
     <>
       <AppBar position="static">
@@ -75,9 +79,9 @@ export default function ForecastView({ forecast, handleInvalidationSale }){
           aria-label="simple tabs example"
           variant="fullWidth"
         >
-          <Tab label="Não validadas" {...a11yProps(0)}/>
-          <Tab label="Confirmadas" {...a11yProps(1)}/>
-          <Tab label="Negadas" {...a11yProps(2)}/>
+          <Tab label={`${forecastNotValidated.length} Não validada(s)`} {...a11yProps(0)}/>
+          <Tab label={`${forecastAccepted.length} Confirmada(s)`} {...a11yProps(1)}/>
+          <Tab label={`${forecastRefused.length} Negada(s)`} {...a11yProps(2)}/>
         </Tabs>
       </AppBar>
 
@@ -88,7 +92,7 @@ export default function ForecastView({ forecast, handleInvalidationSale }){
           <Table aria-label="collapsible table">
             <TableHeadSale/>
             <TableBody>
-              {forecast.sales.filter(sale => sale.validationStatus === null).map((sale, index) => (
+              {forecastNotValidated.map((sale, index) => (
                 <RowSale
                   key={index}
                   sale={sale}
@@ -107,7 +111,7 @@ export default function ForecastView({ forecast, handleInvalidationSale }){
           <Table aria-label="collapsible table">
             <TableHeadSale type='forecastView'/>
             <TableBody>
-              {forecast.sales.filter(sale => sale.validationStatus).map((sale, index) => (
+              {forecastAccepted.map((sale, index) => (
                 <RowSale
                   key={index}
                   sale={sale}
@@ -127,7 +131,7 @@ export default function ForecastView({ forecast, handleInvalidationSale }){
           <Table aria-label="collapsible table">
             <TableHeadSale />
             <TableBody>
-              {forecast.sales.filter(sale => sale.validationStatus === false).map((sale, index) => (
+              {forecastRefused.map((sale, index) => (
                 <RowSale
                   key={index}
                   sale={sale}

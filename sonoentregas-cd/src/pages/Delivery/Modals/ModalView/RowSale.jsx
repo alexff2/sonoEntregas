@@ -59,9 +59,10 @@ const RowSale = ({ sale, type, status, handleInvalidationSale }) => {
           <Box margin={1}>
             <Typography variant="h6" gutterBottom component="div">
               Produtos 
-              <span style={{fontSize: 12, color: '#FF4070'}}>{
-                sale.OBS && ` - OBS: ${sale.OBS}`
-              }</span>
+              <span style={{fontSize: 12, color: '#FF4070'}}>
+                {sale.OBS && ` - OBS: ${sale.OBS}`}
+                {sale.obs && ` - Validado em: ${sale.dateValidationFormat} | Obs: ${sale.obs}`}
+              </span>
             </Typography>
             <Table size="small" aria-label="purchases">
               <TableHead>
