@@ -78,6 +78,7 @@ export function TabForecast(){
         }
       })
 
+      setSaleSelect({})
       setForecasts(data)
       setDisableBtn(false)
       setOpenModalStatus(false)
@@ -101,14 +102,36 @@ export function TabForecast(){
 
   }
 
-  function handleDelete() {
+  function handleDelete(sale) {
+    setSaleSelect(sale)
     setShowDialog(true);
   }
 
   async function handleConfirm() {
-    setTimeout(() => {
+    try {
+      await api.put(`/forecast/${saleSelect.idForecast}/sale/${saleSelect.id}/rmv/auth`)
+
+      const { data } = await api.get(`/forecast`, {
+        params: {
+          codLoja,
+          status: 1
+        }
+      })
+
+      setSaleSelect({})
+      setForecasts(data)
       setShowDialog(false)
-    }, 2000)
+    } catch (e) {
+      console.log(e.response)
+      setDisableBtn(false)
+      setOpenModalStatus(false)
+
+      if (e.response.data.dataInvalid) {
+        setAlert(e.response.data.dataInvalid)
+      } else if (e.response.data.message) {
+        setAlert(e.response.data.message)
+      }
+    }
   }
 
   function handleCancel() {
@@ -143,7 +166,7 @@ export function TabForecast(){
                   <span>{sale.FONE}</span>
                   <span><strong>Vendedor: </strong>{sale.VENDEDOR}</span>
                   <div className="btnValidRemove">
-                  {(sale.validationStatus === null || (sale.validationStatus && !sale.requestInvalidate)) && 
+                  {(!sale.canRemove && (sale.validationStatus === null || (sale.validationStatus && !sale.requestInvalidate))) && 
                     <button
                       className="btnValidation"
                       style={{background: 'var(--blue)'}}
@@ -152,11 +175,11 @@ export function TabForecast(){
                       { sale.validationStatus === null && 'Validar' }
                       { sale.validationStatus && 'Invalidar' }
                     </button>}
-                    {(sale.validationStatus === null) && 
+                    {(sale.validationStatus === null && !sale.canRemove) && 
                     <button
                       className="btnRemove"
                       style={{background: 'var(--green)'}}
-                      onClick={() => handleDelete()}
+                      onClick={() => handleDelete(sale)}
                     >
                       Remove
                     </button>}

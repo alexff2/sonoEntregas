@@ -188,9 +188,9 @@ export default function TabForecast() {
 
         setAlert('Servidor')
       } else if (e.response.data.message === `There are confirmed sales in this forecast!`) {
-        console.log(e.response.data.sales)
+        console.log(e.response.data)
 
-        setAlert('Existe vendas confirmadas nesta previsão que não foram para rota!')
+        setAlert('Existe vendas confirmadas nesta previsão que não foram para rota! Vendas: '+e.response.data.salesId)
       } else if (e.response.data.message === `There are unconfirmed sales in this forecast!`) {
         console.log(e.response.data.sales)
 

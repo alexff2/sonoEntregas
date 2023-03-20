@@ -237,10 +237,20 @@ class ForecastRules {
         const saleProd = await SalesProd.findAny(0, { ID_SALE_ID, STATUS: 'Em Previsão', in: { COD_ORIGINAL } })
   
         if (saleProd.length > 0) {
+          let salesId = []
+
+          saleProd.forEach( prod => {
+            const saleId = salesId.find( saleId => saleId === prod.ID_SALES)
+            if (!saleId) {
+              salesId = [...salesId, prod.ID_SALES]
+            }
+          })
+
           throw {
             status: 409,
             error: {
-              message: "There are confirmed sales in this forecast!"
+              message: "There are confirmed sales in this forecast!",
+              salesId
             }
           }
         }
