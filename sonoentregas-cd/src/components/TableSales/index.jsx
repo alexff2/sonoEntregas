@@ -105,30 +105,27 @@ function Row({ sale, type, setSales}) {
     })
   }
 
-  const clickRowTable = e => {
-    if (e.target.localName !== 'path' && e.target.id !== 'svgRmvSale') {
-      setInformation()
-    } else {
-      setSales(sales => sales.filter( saleCurrent => saleCurrent.ID !== sale.ID) )
-    }
-  }
-
   return(
     <React.Fragment>
-      <TableRow className={ type === 'home' ? classes.row : classes.row1 } onClick={clickRowTable}>
+      <TableRow className={ type === 'home' ? classes.row : classes.row1 }>
         <TableCell>
           {type === 'home' && <IconButton aria-label="expand row" style={{padding: 0}} onClick={() => setOpen(!open)}>
             {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
           </IconButton>}
         </TableCell>
-        <TableCell>{sale.ID_SALES}</TableCell>
-        <TableCell>{sale.NOMECLI}</TableCell>
-        <TableCell>{sale.BAIRRO}</TableCell>
-        <TableCell style={styleDateDelivery()}>{getDateBr(sale.D_ENTREGA1)}</TableCell>
-        <TableCell>{sale.SHOP}</TableCell>
+        <TableCell onClick={setInformation}>{sale.ID_SALES}</TableCell>
+        <TableCell onClick={setInformation}>{sale.NOMECLI}</TableCell>
+        <TableCell onClick={setInformation}>{sale.BAIRRO}</TableCell>
+        <TableCell onClick={setInformation} style={styleDateDelivery()}>{getDateBr(sale.D_ENTREGA1)}</TableCell>
+        <TableCell onClick={setInformation}>{sale.SHOP}</TableCell>
         { type === 'delivery' && 
-          <TableCell style={{ cursor: 'pointer' }}>
-            <Cancel color='secondary' id="svgRmvSale"/>
+          <TableCell
+            style={{ cursor: 'pointer' }} 
+            onClick={() => {
+              setSales(sales => sales.filter( saleCurrent => saleCurrent.ID !== sale.ID))
+            }}
+          >
+            <Cancel color='secondary'/>
           </TableCell>
         }
       </TableRow>
