@@ -59,13 +59,13 @@ module.exports = {
    */
   async create(req, res) {
     try {
-      var { ID_DELIVERY, CODLOJA, ID_SALES, COD_ORIGINAL, WARRANTY, DEFECT, OUTHER_DEF, OBS, QUANTIDADE, ID_USER } = req.body
+      var { ID_DELIVERY, CODLOJA, ID_SALES, COD_ORIGINAL, WARRANTY, DEFECT, OUTHER_DEF, OBS, QTD_DELIV, ID_USER } = req.body
   
       const D_ENVIO = ObjDate.getDate()
       const D_PREV = ObjDate.setDaysInDate(D_ENVIO, 17) //Objetivo do sistema
       WARRANTY = WARRANTY ? 1 : 0
 
-      const values = { ID_DELIVERY, CODLOJA, ID_SALE: ID_SALES, COD_ORIGINAL, QUANTIDADE, STATUS: 'Aguardando', WARRANTY, ID_CAT_DEF: DEFECT, OBS, D_ENVIO, D_PREV, ID_USER, OUTHER_DEF }
+      const values = { ID_DELIVERY, CODLOJA, ID_SALE: ID_SALES, COD_ORIGINAL, QUANTIDADE: QTD_DELIV, STATUS: 'Aguardando', WARRANTY, ID_CAT_DEF: DEFECT, OBS, D_ENVIO, D_PREV, ID_USER, OUTHER_DEF }
 
       OUTHER_DEF === 'NULL' && delete values.OUTHER_DEF
   

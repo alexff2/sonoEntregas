@@ -15,17 +15,18 @@ const setUser = user => localStorage.setItem(SONO_USER, JSON.stringify(user))
 const getToken = () => localStorage.getItem(TOKEN_KEY)
 const getUser = () => JSON.parse(localStorage.getItem(SONO_USER))
 
-const token = getToken()
-
 export default function AuthProvider({ children }){
   const [userAuth, setUserAuth] = useState({})
-  const [isAuthenticated, setIsAuthenticated] = useState(token ? true : false)
+  const [isAuthenticated, setIsAuthenticated] = useState(true)
   const { setAlert } = useAlert()
 
   useEffect(() => {
     const validations = async () => {
+      const token = getToken()
+
       try {
         if (!token) {
+          setIsAuthenticated(false)
           return
         }
 

@@ -18,8 +18,6 @@ const getToken = () => localStorage.getItem(TOKEN_KEY)
 const getUser = () => JSON.parse(localStorage.getItem(SONO_USER))
 const getShop = () => JSON.parse(localStorage.getItem(SONO_SHOP))
 
-const token = getToken()
-
 export default function AuthProvider({ children }){
   const [userAuth, setUserAuth] = useState({})
   const [shopAuth, setShopAuth] = useState({})
@@ -28,8 +26,11 @@ export default function AuthProvider({ children }){
 
   useEffect(() => {
     const validations = async () => {
+      const token = getToken()
+
       try {
         if (!token) {
+          setIsAuthenticated(false)
           return
         }
 

@@ -120,7 +120,6 @@ export default function TabSaleWaiting({ type }) {
       .then(resp => {
         if(resp.data){
           setSales(resp.data)
-          console.log(resp.data)
         }
         setLoading(false)
       })

@@ -20,6 +20,7 @@ export default function TabSendMain(){
   const [ defect, setDefect ] = useState(1)
   const [ outherDef, setOutherDef ] = useState('NULL')
   const [ warranty, setWarranty ] = useState(true)
+  const [ qtd, setQtd ] = useState('')
   const [ obs, setObs ] = useState('')
   const [ mainProd, setMainProd ] = useState({})
   const { setMaintenance } = useMaintenance()
@@ -89,8 +90,11 @@ export default function TabSendMain(){
         mainProd.DEFECT = defect
         mainProd.OUTHER_DEF = outherDef
         mainProd.OBS = obs
+        mainProd.QTD_DELIV = qtd === '' ? mainProd.QTD_DELIV : qtd
         mainProd.ID_USER = idUser
+
         const { data } = await api.post('maintenance', mainProd)
+
         setMaintenance(data)
         setBlockSearchSale(false)
         setBlockSale(true)
@@ -240,7 +244,17 @@ export default function TabSendMain(){
               <tr key={prod.COD_ORIGINAL}>
                 <td>{prod.COD_ORIGINAL}</td>
                 <td>{prod.DESCRICAO}</td>
-                <td>{prod.QTD_DELIV}</td>
+                <td>
+                  { mainProd.COD_ORIGINAL === prod.COD_ORIGINAL
+                    ? <input 
+                        type="number"
+                        defaultValue={prod.QTD_DELIV}
+                        max={prod.QTD_DELIV}
+                        min='1'
+                        onChange={e => setQtd(e.target.value)}/> 
+                    : prod.QTD_DELIV
+                  }
+                </td>
                 <td>{Intl
                   .NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'})
                   .format(prod.NVTOTAL)}</td>
