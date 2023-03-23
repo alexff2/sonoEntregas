@@ -145,7 +145,7 @@ export default function Product() {
             <TableRow key={product.COD_ORIGINAL}>
               <TableCell>{product.COD_ORIGINAL}</TableCell>
               <TableCell>{product.NOME}</TableCell>
-              <TableCell align="right">{product.EST_ATUAL}</TableCell>
+              <TableCell align="right">{product.EST_LOJA}</TableCell>
               <TableCell align="right">{product.EST_RESERVA}</TableCell>
               <TableCell align="right">{product.EST_DISPONIVEL}</TableCell>
             </TableRow>

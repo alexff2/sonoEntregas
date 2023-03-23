@@ -67,7 +67,7 @@ export default function Product(){
               <tr key={item.COD_ORIGINAL}>
                 <td>{item.COD_ORIGINAL}</td>
                 <td>{item.NOME}</td>
-                <td>{item.EST_ATUAL}</td>
+                <td>{item.EST_LOJA}</td>
                 <td>{item.EST_RESERVA}</td>
                 <td>{item.EST_DISPONIVEL}</td>
               </tr>

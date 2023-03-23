@@ -27,3 +27,11 @@ Ajustar conexão mssql de data
 ================================================================================
 
 - Melhorar infra de consulta de entregas (contextDelivery para deixar sistema mais leve)
+
+Caracteres especiais:
+
+ã - Ò
+Ã - ├
+Á - ┴
+Ç - Ã
+ç - þ
