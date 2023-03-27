@@ -71,3 +71,18 @@
    align-items: center;
    justify-content: space-between;
  }
+
+ .btnReport {
+  position: absolute;
+  right: 1.5rem;
+  top: 1rem;
+  background-color: orange;
+  color: #FFF;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0.7;
+ }
+ .btnReport:hover {
+  opacity: 1;
+ }

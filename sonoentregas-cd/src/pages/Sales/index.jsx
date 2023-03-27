@@ -231,6 +231,7 @@ export default function Sales() {
             search
           }
         })
+
         if (response.data === ''){
           console.log(response)
           setChildrenAlert('Venda(s) não encontrada(s)!') 

@@ -31,26 +31,28 @@ export default function ModalDelivering({ setOpen, selectDelivery }){
         setError(true)
   
         setChildrenError('Selecione uma data válida!')
-      } else {
-        setDisabledBtnSave(true)
-  
-        selectDelivery.STATUS = 'Entregando'
-        selectDelivery['DATE'] = date
-    
-        selectDelivery.sales.forEach(sale =>{
-          sale.products.forEach(produto => {
-            produto.STATUS = 'Entregando'
-            if (produto.QUANTIDADE !== (produto.QTD_DELIVERING + produto.QTD_DELIV)) produto['UPST'] = false
-          }
-        )})
-  
-        await api.put(`deliverys/status/${selectDelivery.ID}`, selectDelivery)
-  
-        const {data} = await api.get('deliverys/open')
-        setDelivery(data)
-  
-        setOpen(false)
+
+        return
       }
+
+      setDisabledBtnSave(true)
+
+      selectDelivery.STATUS = 'Entregando'
+      selectDelivery['DATE'] = date
+  
+      selectDelivery.sales.forEach(sale =>{
+        sale.products.forEach(produto => {
+          produto.STATUS = 'Entregando'
+          if (produto.QUANTIDADE !== (produto.QTD_DELIVERING + produto.QTD_DELIV)) produto['UPST'] = false
+        }
+      )})
+
+      await api.put(`deliverys/status/${selectDelivery.ID}`, selectDelivery)
+
+      const {data} = await api.get('deliverys/open')
+      setDelivery(data)
+
+      setOpen(false)
     } catch (e) {
       if (!e.response){
         console.log(e)

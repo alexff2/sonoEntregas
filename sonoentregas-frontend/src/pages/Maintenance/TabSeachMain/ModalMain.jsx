@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
+
 import api from '../../../services/api'
+
 import '../style.css'
 
 import { useModalAlert } from '../../../context/modalAlertContext'
@@ -46,7 +48,7 @@ const CheckFinishStatus = ({ maintDeliv, datePrevMain }) => {
   )
 }
 
-export default function ModalMain({ maint }) {
+export default function ModalMain({ maint, clickReport }) {
   const [maintDelivs, setMaintDelivs] = useState([])
   const { setChildrenError, setOpen, setType } = useModalAlert()
 
@@ -67,8 +69,9 @@ export default function ModalMain({ maint }) {
       <div className="headerModal">
         <h2>DAV <span>#{maint.ID_SALE}</span></h2>
         <h1>Detalhes da Assistência <span> - {maint.ID}</span></h1>
+        <button className='btnReport' onClick={clickReport}>Relatório</button>
       </div>
-      
+
       <div className="content">
         <div className="infoDav">
           <div className="infoMain">
@@ -221,6 +224,7 @@ export default function ModalMain({ maint }) {
           </div>))}
         </div>
       </div>
+
     </div>
   );
 }

@@ -35,7 +35,7 @@ class objDate {
   getDate(date = false) {
     if (date) {
       var data = this.getObjDate(date)
-      data.setDate(data.getDate()+1)
+      data.setDate(data.getDate())
       var dia  = data.getDate().toString(),
         diaF = (dia.length === 1) ? '0'+dia : dia,
         mes  = (data.getMonth()+1).toString(), //+1 pois no getMonth Janeiro começa com zero.

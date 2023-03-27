@@ -9,13 +9,9 @@
 const Deliverys = require('../models/Deliverys')
 const ViewDeliverys = require('../models/ViewDeliverys')
 const DeliveryProd = require('../models/DeliveryProd')
-const Sales = require('../models/Sales')
 const SalesProd = require('../models/SalesProd')
 
 const DeliveryService = require('../services/DeliveryService')
-const MainService = require('../services/MainService')
-
-const ObjDate = require('../functions/getDate')
 
 module.exports = {
   /**
@@ -77,30 +73,6 @@ module.exports = {
    * @param {*} req 
    * @param {*} res 
    */
-  async updateHeader( req, res ) {
-    try {
-      const { id } = req.params
-      const { id: user_id } = req.user
-      const { description, ID_CAR, ID_DRIVER, ID_ASSISTANT } = req.body
-
-      await Deliverys.updateAny(0, {
-        description,
-        ID_CAR,
-        ID_DRIVER,
-        ID_ASSISTANT
-      }, id)
-
-      return res.json({ message: `Update by${user_id}` })
-    } catch (e) {
-      console.log(e)
-
-      return res.status(400).json(e)
-    }
-  },
-  /**
-   * @param {*} req 
-   * @param {*} res 
-   */
   async addSale( req, res ) {
     try {
       const { id } = req.params
@@ -155,37 +127,6 @@ module.exports = {
       res.json({delete: true})
     } catch (error) {
       res.status(400).json(error)
-    }
-  },
-  /**
-   * @param {*} req 
-   * @param {*} res 
-   */
-  async updateStatus( req, res ){
-    const { id } = req.params
-    const delivery = req.body
-    const { id: user_id } = req.user
-
-    try {
-      const maintenances = await MainService.findMain({
-        codloja: 0,
-        typeSeach: 'ID_DELIV_MAINT',
-        search: id
-      })
-
-      await DeliveryService.updateDeliveryProd(delivery, id)
-
-      await DeliveryService.finishDelivery({
-        delivery,
-        id,
-        user_id,
-        maintenances
-      })
-
-      return res.json(delivery)
-    } catch (e) {
-      console.log(e)
-      res.status(400).json(e)
     }
   }
 }

@@ -24,10 +24,14 @@ export function getObjDate(date){
 
 export function convertDate(date=false, days = 0){
   let data, dia, diaF, mes, mesF, anoF
+
   if (date) {
-    
+    if(!date.includes('T')){
+      date = date.concat('T00:00:00')
+    }
+
     data = new Date(date)
-    data.setDate(data.getDate()+1+days)
+    //data.setDate(data.getDate()+days)
     dia  = data.getDate().toString()
     diaF = (dia.length === 1) ? '0'+dia : dia
     mes  = (data.getMonth()+1).toString() //+1 pois no getMonth Janeiro começa com zero.
@@ -58,8 +62,12 @@ export function getDateSql(date = false, days = 0) {
 export function setDate(days, date = false) {
   var data, dia, diaF, mes, mesF, anoF
   if (date) {
+    if(!date.includes('T')){
+      date = date.concat('T00:00:00')
+    }
+
     data = new Date(date)
-    data.setDate(data.getDate()+days+1)
+    data.setDate(data.getDate()+days)
     dia  = data.getDate().toString()
     diaF = (dia.length === 1) ? '0'+dia : dia
     mes  = (data.getMonth()+1).toString() //+1 pois no getMonth Janeiro começa com zero.

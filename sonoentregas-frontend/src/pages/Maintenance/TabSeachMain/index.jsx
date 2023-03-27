@@ -10,9 +10,11 @@ import { dateSqlToReact } from '../../../functions/getDate'
 import Status from "../../../components/Status"
 import ModalMain from "./ModalMain"
 import Modal from "../../../components/Modal"
+import ReportMaint from '../Visit/ReportMaint'
 
 export default function TabSeachMain() {
   const [ openModalMain, setOpenModalMain ] = useState(false)
+  const [openReport, setOpenReport] = useState(false)
   const [ mainModal, setMainModal ] = useState('')
   const [ search, setSearch ] = useState('')
   const [ typeSeach, setTypeSeach ] = useState('STATUS')
@@ -93,6 +95,11 @@ export default function TabSeachMain() {
     e.target.id === 'btnCancel'
       ? cancelSubmitMain(main.ID)
       : modalMain(main)
+  }
+
+  const clickReport = () => {
+    setOpenReport(true)
+    setOpenModalMain(false)
   }
 
   return(
@@ -194,8 +201,14 @@ export default function TabSeachMain() {
         openModal={openModalMain}
         setOpenModal={setOpenModalMain}
       >
-        <ModalMain maint={mainModal}/>
+        <ModalMain maint={mainModal} clickReport={clickReport}/>
       </Modal>
+
+      <ReportMaint
+        maint={mainModal}
+        openModal={openReport}
+        setOpenModal={setOpenReport}
+        />
     </>
   )
 }

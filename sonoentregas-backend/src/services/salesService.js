@@ -157,7 +157,8 @@ module.exports = {
       }
     }
 
-    let sales = await Sales.findAny(0, { ID_SALES: idSale })
+    /**@type {ISales[] | []} */
+    const sales = await Sales.findAny(0, { ID_SALES: idSale })
 
     if (sales.length === 0) {
       return ''
@@ -207,10 +208,19 @@ module.exports = {
                 FROM FORECAST_PRODUCT A
                 INNER JOIN FORECAST_SALES B ON A.idForecastSale = B.id) A
     ON A.idSale = B.ID_SALE_ID AND A.COD_ORIGINAL = B.COD_ORIGINAL
-    WHERE A.idForecastSale in (${forecastSales.map(sale => sale.idForecastSale)})`
+    WHERE B.STATUS = 'Em Previsão'
+    AND A.idForecastSale in (${forecastSales.map(sale => sale.idForecastSale)})`
 
     /**@type {IProduct[]} */
     const forecastProduct = await Forecast._query(0, scriptProduct, QueryTypes.SELECT)
+
+    if (forecastProduct.length === 0) {
+      return {
+        notFound: {
+           message: 'Produtos já em rota, ou já entregues!'
+        }
+      }
+    }
 
     return addProductInSale({sales: forecastSales, products: forecastProduct })
   }
