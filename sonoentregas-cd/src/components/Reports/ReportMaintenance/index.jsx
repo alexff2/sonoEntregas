@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 
 import api from '../../../services/api'
-import { dateSqlToReact, dateWarranty } from '../../../functions/getDate'
-import Report from '../../../components/Report'
-import CheckBox from '../../../components/CheckBox'
+import { getDateBr, dateWarranty } from '../../../functions/getDates'
+import Report from '../index'
+import CheckBox from '../../CheckBox'
+import './style.css'
 
-export default function ReportMaint({maint, openModal, setOpenModal}){
+export default function ReportMaintenance({maintenance, openModal, setOpenModal}){
   const [catDef, setCatDef] = useState([])
 
   useEffect(()=>{
@@ -15,7 +16,7 @@ export default function ReportMaint({maint, openModal, setOpenModal}){
 
   return(
     <Report
-      save={`Relatório da assistência Nº ${maint.ID}.pdf`}
+      save={`Relatório da assistência Nº ${maintenance.ID}.pdf`}
       openModal={openModal}
       setOpenModal={setOpenModal}
     >
@@ -28,7 +29,7 @@ export default function ReportMaint({maint, openModal, setOpenModal}){
         </div>
         <div className="protocol">
           <label>Nº PROTOCOLO</label>
-          <span>{maint.ID}</span>
+          <span>{maintenance.ID}</span>
         </div>
       </div>
 
@@ -37,21 +38,21 @@ export default function ReportMaint({maint, openModal, setOpenModal}){
         <div className='divSetor'>
           <div>
             <label className="labelField">Cliente: </label>
-            <span>{maint.NOMECLI}</span>
+            <span>{maintenance.NOMECLI}</span>
             <label className="labelField">CPF/CNPJ: </label>
-            <span>{maint.CGC_CPF}</span>
+            <span>{maintenance.CGC_CPF}</span>
           </div>
           <div>
             <label className="labelField">Endereço: </label>
-            <span>{maint.ENDERECO+', '+maint.BAIRRO}</span>
+            <span>{maintenance.ENDERECO+', '+maintenance.BAIRRO}</span>
           </div>
           <div>
             <label className="labelField">Telefone: </label>
-            <span>{maint.FONE}</span>
+            <span>{maintenance.FONE}</span>
             <label className="labelField">Cidade: </label>
-            <span>{maint.CIDADE}</span>
+            <span>{maintenance.CIDADE}</span>
             <label className="labelField">UF: </label>
-            <span>{maint.ESTADO}</span>
+            <span>{maintenance.ESTADO}</span>
           </div>
         </div>
         <p>2. INDENTIFICAÇÃO DO CLIENTE - LOJA</p>
@@ -79,35 +80,35 @@ export default function ReportMaint({maint, openModal, setOpenModal}){
         <div className='divSetor'>
           <div>
             <label className="labelField">Código: </label>
-            <span style={{fontStyle: 'italic'}}>{maint.CODLOJA}</span>
-            <span style={{fontStyle: 'italic'}}>{`${maint.SHOP_NAME}`.toUpperCase()}</span>
+            <span style={{fontStyle: 'italic'}}>{maintenance.CODLOJA}</span>
+            <span style={{fontStyle: 'italic'}}>{`${maintenance.SHOP_NAME}`.toUpperCase()}</span>
           </div>
         </div>
         {/* Garantia*/}
-        <div className='divSetor'>
+        <div className='divSetor' style={{marginTop: -10}}>
           <div>
-            <label className="labelField">Produto</label>
-            <span>{maint.PRODUTO}</span>
-            <label className="labelField">Código</label>
-            <span>{maint.COD_ORIGINAL}</span>
+            <label className="labelField">Produto:</label>
+            <span>{maintenance.PRODUTO}</span>
+            <label className="labelField">Código:</label>
+            <span>{maintenance.COD_ORIGINAL}</span>
           </div>
-          <div className="divWarranty">
+          <div className="divWarranty" style={{padding: 0}}>
             <label className="labelField">Garantia:</label>
             <div>
-              <div className='flexCenter'>
-                <CheckBox check={!maint.WARRANTY} />
+              <div className='flexCenter' style={{padding: 0}}>
+                <CheckBox check={!maintenance.WARRANTY} />
                 <span className='notSublim'> Não - </span>
                 <label className="labelField">Garantia válida até: </label>
-                <span>{dateWarranty(dateSqlToReact(maint.EMISSAO))}</span>
+                <span>{dateWarranty(getDateBr(maintenance.EMISSAO))}</span>
                 <label className="labelField">Fabricação: </label>
               </div>
-              <div className='flexCenter'>
-                <CheckBox check={maint.WARRANTY} />
+              <div className='flexCenter' style={{padding: 0}}>
+                <CheckBox check={maintenance.WARRANTY} />
                 <span className='notSublim'> Sim - </span>
                 <label className="labelField">Tempo de garantia: </label>
                 <span>1 ANO</span>
                 <label className="labelField">Data da venda: </label>
-                <span className='notSublim'>{dateSqlToReact(maint.EMISSAO)}</span>
+                <span className='notSublim'>{getDateBr(maintenance.EMISSAO)}</span>
               </div>
             </div>
           </div>
@@ -122,12 +123,12 @@ export default function ReportMaint({maint, openModal, setOpenModal}){
               {catDef.map(cat => (
                 <tr 
                   key={cat.ID} 
-                  className={maint.ID_CAT_DEF === cat.ID ? 'colorRed' : ''}
+                  className={maintenance.ID_CAT_DEF === cat.ID ? 'colorRed' : ''}
                 >
                   <td className='idDef'>{cat.ID}</td>
                   <td className='nameDef'>{cat.DESCRIPTION}</td>
                   <td className='checkDef' style={{textAlign: 'center'}}>
-                    { maint.ID_CAT_DEF === cat.ID && 'X' }
+                    { maintenance.ID_CAT_DEF === cat.ID && 'X' }
                   </td>
                 </tr>
               ))}
@@ -139,10 +140,10 @@ export default function ReportMaint({maint, openModal, setOpenModal}){
               src={`${process.env.REACT_APP_BASE_URL}/imgs/Camas.png`}
               alt="camas" />
           </div>
-          {maint.OTHER_DEF &&
+          {maintenance.OTHER_DEF &&
             <div className='flexCenter'>
               <label>Outros: </label>
-              <span style={{color: 'red'}}>{maint.OTHER_DEF}</span>
+              <span style={{color: 'red'}}>{maintenance.OTHER_DEF}</span>
             </div>
           }
         </div>
@@ -153,7 +154,7 @@ export default function ReportMaint({maint, openModal, setOpenModal}){
             <label>Trocar o produto</label> &nbsp;&nbsp;&nbsp;
             <CheckBox check={false} />
             <label>Outra</label>
-            <div className='outhers'></div>
+            <div className='others'></div>
           </div>
         </div>
         <div className='divSetor signatures'>

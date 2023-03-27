@@ -26,6 +26,7 @@ import api from '../../../services/api'
 import { getDateBr } from '../../../functions/getDates'
 import styleStatus from '../../../functions/styleStatus'
 
+import ReportMaintenance from '../../../components/Reports/ReportMaintenance'
 import ModalProcessMain from './ModalProcessMain'
 import ModalStartMain from './ModalStartMain'
 import ModalMain from './ModalMain'
@@ -116,6 +117,7 @@ export default function TableMain() {
   const [typeSeach, setTypeSeach] = useState('STATUS')
   const [typesStatus, setTypesStatus] = useState('open')
   const [openModalMain, setOpenModalMain] = useState(false)
+  const [openReport, setOpenReport] = useState(false)
   const [openModalProcess, setOpenModalProcess] = useState(false)
   const [openModalStart, setOpenModalStart] = useState(false)
   const [selectMain, setSelectMain] = useState({})
@@ -134,6 +136,11 @@ export default function TableMain() {
     if(e.target.id === 'btnStartMain') setOpenModalStart(true)
     else if (e.target.id === 'btnProcessMain') setOpenModalProcess(true)
     else setOpenModalMain(true)
+  }
+
+  const clickReport = () => {
+    setOpenReport(true)
+    setOpenModalMain(false)
   }
 
   const searchMain = async () => {
@@ -300,10 +307,16 @@ export default function TableMain() {
         title=""
       >
         <ModalMain
-          setOpen={setOpenModalMain}
+          clickReport={clickReport}
           maint={selectMain}
         />
       </Modal>
+
+      <ReportMaintenance
+        maintenance={selectMain}
+        openModal={openReport}
+        setOpenModal={setOpenReport}
+      />
 
       <Modal
         open={openModalProcess}

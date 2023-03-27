@@ -1,0 +1,154 @@
+/* -----------------Report maint */
+.headerReportMaint {
+  display: flex;
+  color: black;
+}
+
+.headerReportMaint div,
+.headerReportMaint img, 
+.headerReportMaint h1 {
+  border-top: 1px solid black;
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+  border-left: none;
+}
+
+.headerReportMaint img {
+  width: 20%;
+  padding: 0.3rem;
+  border-left: 1px solid black;
+}
+.headerReportMaint h1 {
+  width: 46%;
+  text-align: center;
+  font-size: 16px;
+  padding-top: 15px;
+  margin: 0;
+}
+.headerReportMaint div {
+  width: 15%;
+  display: flex;
+  flex-direction: column;
+}
+.headerReportMaint .protocol {
+  width: 19%;
+}
+
+.headerReportMaint div label {
+  padding-top: 5px;
+  height: 30px;
+  font-weight: bold;
+  border-bottom: 1px solid black;
+  text-align: center;
+}
+.headerReportMaint div span {
+  margin: auto;
+}
+
+.bodyReportMaint {
+  border-top: none;
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+  border-left: 1px solid black;
+  color: black;
+  padding: 1rem 1rem 0 1rem;
+}
+.bodyReportMaint p {
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+}
+
+.bodyReportMaint .divSetor {
+  margin-bottom: 0.6rem;
+}
+
+.bodyReportMaint .divSetor div {
+  padding: 0.3rem 0;
+}
+
+.bodyReportMaint .divSetor div label,
+.bodyReportMaint div span {
+  padding: 0.2rem;
+}
+
+.bodyReportMaint .divSetor div span {
+  border-bottom: 1px solid black;
+  margin-right: 1rem;
+  font-size: 14px;
+}
+
+.bodyReportMaint .divSetor div svg {
+  margin-left: 10px;
+}
+
+.bodyReportMaint .divSetor div .notSublim {
+  border: none;
+}
+.bodyReportMaint .divSetor div .toFill {
+  width: 120px;
+  border-bottom: 1px solid black;
+  margin-top: 10px;
+}
+
+.divWarranty {
+  display: flex;
+  align-items: center;
+
+  font-size: 13px;
+}
+
+.divWarranty label {
+  margin-right: 1rem;
+}
+
+.flexCenter {
+  display: flex;
+  align-items: center;
+}
+
+.bodyReportMaint .divSetor .def {
+  display: flex;
+}
+
+.bodyReportMaint .divSetor .def table {
+  font-size: 12px;
+  font-weight: bold;
+  width: 48%;
+  margin-right: 2%;
+}
+.bodyReportMaint .divSetor .def table tr {
+  background-color: transparent;
+}
+.bodyReportMaint .divSetor .def table td {
+  padding: 0 0.2rem;
+  color: black;
+  border: 1px solid black;
+}
+.bodyReportMaint .divSetor .def table .textCenter {
+  text-align: center;
+}
+.bodyReportMaint .divSetor .def table .colorRed td {
+  color: red
+}
+.bodyReportMaint .divSetor .def img {
+  width: 48%;
+}
+
+.bodyReportMaint .divSetor div .outhers {
+  width: 400px;
+  border-bottom: 1px solid black;
+  margin-top: 10px;
+}
+.bodyReportMaint .divSetor.signatures {
+  display: flex;
+}
+.bodyReportMaint .divSetor.signatures div{
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.bodyReportMaint .divSetor.signatures div span {
+  width: 95%;
+  margin-top: -10px;
+}

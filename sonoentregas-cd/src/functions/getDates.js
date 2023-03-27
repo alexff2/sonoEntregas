@@ -87,3 +87,32 @@ export function setDate(days, date = false) {
     return date
   }
 }
+
+export function dateWarranty(issueDate) {
+  if (!issueDate) {
+    return
+  }
+
+  issueDate = issueDate.split('/',3)
+  var ano = issueDate[2]
+  ano = parseInt(ano) + 1
+  return `${issueDate[0]}/${issueDate[1]}/${ano}`
+}
+
+export function checkDateWarranty(issueDate) {
+  if (!issueDate) {
+    return
+  }
+
+  issueDate = issueDate.split('/',3)
+  var ano = issueDate[2]
+  ano = parseInt(ano) + 1
+
+  var warranty = new Date(`${ano}-${issueDate[1]}-${issueDate[0]}`)
+  warranty.setDate(warranty.getDate()+1)
+  warranty = warranty.setHours(0,0,0,0)
+
+  const dateNow = new Date().setHours(0,0,0,0)  
+
+  return warranty >= dateNow
+}

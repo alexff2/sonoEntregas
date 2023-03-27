@@ -46,7 +46,7 @@ const CheckFinishStatus = ({ maintDeliv, datePrevMaint }) => {
   )
 }
 
-export default function ModalMain({ maint }) {
+export default function ModalMain({ maint, clickReport }) {
   const [maintDelivs, setMaintDelivs] = useState([])
   const { setOpen, setChildrenModal } = useAlert()
 
@@ -65,6 +65,7 @@ export default function ModalMain({ maint }) {
       <div className="headerModal">
         <h2>DAV <span>#{maint.ID_SALE}</span></h2>
         <h1>Detalhes da Assistência <span> - {maint.ID}</span></h1>
+        <button className='btnReport' onClick={clickReport}>Relatório</button>
       </div>
       
       <div className="content maint">
