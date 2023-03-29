@@ -6,7 +6,7 @@
 .headerReport {
   position: fixed;
   background-color: var(--gray-line);
-  width: 800px;
+  width: 784px;
   margin: -20px;
   padding: 0.2rem 0.5rem;
 }

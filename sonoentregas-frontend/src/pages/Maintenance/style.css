@@ -103,7 +103,6 @@
 }
 
 .bodyReportMaint .divSetor div span {
-  border-bottom: 1px solid black;
   margin-right: 1rem;
   font-size: 14px;
 }
@@ -165,7 +164,7 @@
   width: 48%;
 }
 
-.bodyReportMaint .divSetor div .outhers {
+.bodyReportMaint .divSetor div .others {
   width: 400px;
   border-bottom: 1px solid black;
   margin-top: 10px;

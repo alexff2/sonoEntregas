@@ -41,6 +41,9 @@
   border-radius: 4px;
   cursor: pointer;
   opacity: 0.7;
+  font-size: 0.9rem;
+  font-weight: bold;
+  padding: 0.5rem;
  }
  .btnReport:hover {
   opacity: 1;

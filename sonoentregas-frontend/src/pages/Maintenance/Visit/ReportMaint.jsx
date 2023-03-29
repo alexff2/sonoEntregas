@@ -33,7 +33,7 @@ export default function ReportMaint({maint, openModal, setOpenModal}){
       </div>
 
       <div className="bodyReportMaint">
-        <p>1. INDENTIFICAÇÃO DO CONSUMIDOR</p>
+        <p>1. IDENTIFICAÇÃO DO CONSUMIDOR</p>
         <div className='divSetor'>
           <div>
             <label className="labelField">Cliente: </label>
@@ -54,7 +54,7 @@ export default function ReportMaint({maint, openModal, setOpenModal}){
             <span>{maint.ESTADO}</span>
           </div>
         </div>
-        <p>2. INDENTIFICAÇÃO DO CLIENTE - LOJA</p>
+        <p>2. IDENTIFICAÇÃO DO CLIENTE - LOJA</p>
         <div className='divSetor'>
           <div>
             <label className="labelField">Código: </label>
@@ -75,39 +75,43 @@ export default function ReportMaint({maint, openModal, setOpenModal}){
             <div className='toFill'></div>
           </div>
         </div>
-        <p>3. INDENTIFICAÇÃO DO REPRESENTANTE</p>
+        <p>3. IDENTIFICAÇÃO DO REPRESENTANTE</p>
         <div className='divSetor'>
           <div>
             <label className="labelField">Código: </label>
-            <span style={{fontStyle: 'italic'}}>{maint.CODLOJA}</span>
-            <span style={{fontStyle: 'italic'}}>{`${maint.SHOP_NAME}`.toUpperCase()}</span>
+            <span style={{fontStyle: 'italic'}}>
+              {maint.CODLOJA} - {`${maint.SHOP_NAME}`.toUpperCase()}
+            </span>
           </div>
         </div>
         {/* Garantia*/}
         <div className='divSetor'>
           <div>
-            <label className="labelField">Produto</label>
+            <label className="labelField">Produto:</label>
             <span>{maint.PRODUTO}</span>
-            <label className="labelField">Código</label>
+            <label className="labelField">Código:</label>
             <span>{maint.COD_ORIGINAL}</span>
           </div>
           <div className="divWarranty">
             <label className="labelField">Garantia:</label>
             <div>
               <div className='flexCenter'>
-                <CheckBox check={!maint.WARRANTY} />
+                <CheckBox check={!maint.WARRANTY} />&nbsp;
                 <span className='notSublim'> Não - </span>
-                <label className="labelField">Garantia válida até: </label>
-                <span>{dateWarranty(dateSqlToReact(maint.EMISSAO))}</span>
-                <label className="labelField">Fabricação: </label>
+                <label className="labelField">
+                  Garantia válida até: &nbsp;
+                  {dateWarranty(dateSqlToReact(maint.EMISSAO))}
+                </label>
+                <label className="labelField">Fabricação: {dateSqlToReact(maint.MANUFACTURING_DATE)}</label>
               </div>
               <div className='flexCenter'>
-                <CheckBox check={maint.WARRANTY} />
+                <CheckBox check={maint.WARRANTY} />&nbsp;
                 <span className='notSublim'> Sim - </span>
-                <label className="labelField">Tempo de garantia: </label>
-                <span>1 ANO</span>
-                <label className="labelField">Data da venda: </label>
-                <span className='notSublim'>{dateSqlToReact(maint.EMISSAO)}</span>
+                <label className="labelField">Tempo de garantia: 1 ANO</label>
+                <label className="labelField">
+                  Data da venda: &nbsp;
+                  {dateSqlToReact(maint.EMISSAO)}
+                </label>
               </div>
             </div>
           </div>
@@ -153,16 +157,16 @@ export default function ReportMaint({maint, openModal, setOpenModal}){
             <label>Trocar o produto</label> &nbsp;&nbsp;&nbsp;
             <CheckBox check={false} />
             <label>Outra</label>
-            <div className='outhers'></div>
+            <div className='others'></div>
           </div>
         </div>
         <div className='divSetor signatures'>
           <div>
-            <span></span>
+            <span className='toFill'></span>
             <label>Responsável</label>
           </div>
           <div>
-            <span></span>
+            <span className='toFill'></span>
             <label>Visto</label>
           </div>
         </div>

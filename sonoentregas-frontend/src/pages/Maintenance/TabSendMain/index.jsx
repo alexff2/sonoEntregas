@@ -18,8 +18,9 @@ export default function TabSendMain(){
   const [ catDefect, setCatDefect ] = useState([{ID:1, DESCRIPTION: '------'}])
   const [ sale, setSale ] = useState({})
   const [ defect, setDefect ] = useState(1)
-  const [ outherDef, setOutherDef ] = useState('NULL')
+  const [ otherDef, setOtherDef ] = useState('NULL')
   const [ warranty, setWarranty ] = useState(true)
+  const [ manufacturingDate, setManufacturingDate ] = useState('')
   const [ qtd, setQtd ] = useState('')
   const [ obs, setObs ] = useState('')
   const [ mainProd, setMainProd ] = useState({})
@@ -45,6 +46,7 @@ export default function TabSendMain(){
     setSale([])
     setIdSale('')
     setMainProd({})
+    setManufacturingDate('')
   }
 
   const searchSale = async e => {
@@ -86,11 +88,19 @@ export default function TabSendMain(){
     e.preventDefault()
     try {
       if (Object.keys(mainProd).length !== 0) {
+        if (manufacturingDate === '') {
+          setOpenModalAlert(true)
+          setType('alert')
+          setChildrenError('Selecione a data de fabricação!')
+          return
+        }
+
         mainProd.WARRANTY = warranty
         mainProd.DEFECT = defect
-        mainProd.OUTHER_DEF = outherDef
+        mainProd.OTHER_DEF = otherDef
         mainProd.OBS = obs
         mainProd.QTD_DELIV = qtd === '' ? mainProd.QTD_DELIV : qtd
+        mainProd.MANUFACTURING_DATE = manufacturingDate
         mainProd.ID_USER = idUser
 
         const { data } = await api.post('maintenance', mainProd)
@@ -101,7 +111,7 @@ export default function TabSendMain(){
         setOpenModalAlert(true)
         setType('sucess')
         setChildrenError('Assistência enviada com sucesso!')
-        setOutherDef('NULL')
+        setOtherDef('NULL')
         setDefect(1)
         cleanVar()
         document.getElementById('searchIdSale').focus()
@@ -113,7 +123,7 @@ export default function TabSendMain(){
     } catch (error) {
       setOpenModalAlert(true)
       setType('alert')
-      setChildrenError('Erro ao lançar assistência, entre em contato com ADM!')
+      setChildrenError('Erro ao lançar assistência, entre em contato com Alexandre!')
       cleanVar()
       console.log(error)
     }
@@ -137,7 +147,7 @@ export default function TabSendMain(){
             type="text" 
             placeholder='Pesquise pelo código da venda' 
             onChange={e => {
-              parseInt(e.target.value) === 0 && setOutherDef('NULL')
+              parseInt(e.target.value) === 0 && setOtherDef('NULL')
               setIdSale(e.target.value)
             }}
             required
@@ -203,6 +213,16 @@ export default function TabSendMain(){
           </div>
         </div>
         <div>
+          <div>
+            Fabricação: 
+            <input
+              type="date"
+              value={manufacturingDate}
+              onChange={e => setManufacturingDate(e.target.value)}
+              style={{ border: 'none', marginBottom: 10, background: 'transparent'}}
+              disabled={blockSale}
+              />
+          </div>
           <div id='textArea'>
             Obs:
             <textarea 
@@ -211,7 +231,8 @@ export default function TabSendMain(){
               value={obs}
               disabled={blockSale}
               onChange={e => setObs(e.target.value)}
-            ></textarea></div>
+            ></textarea>
+          </div>
         </div>
       </div>
 
@@ -221,7 +242,7 @@ export default function TabSendMain(){
           <textarea 
             rows={1}
             style={{width: '100%', marginBottom: 10}}
-            onChange={e => setOutherDef(e.target.value)}
+            onChange={e => setOtherDef(e.target.value)}
             ></textarea>
         </div>
       }

@@ -59,15 +59,19 @@ module.exports = {
    */
   async create(req, res) {
     try {
-      var { ID_DELIVERY, CODLOJA, ID_SALES, COD_ORIGINAL, WARRANTY, DEFECT, OUTHER_DEF, OBS, QTD_DELIV, ID_USER } = req.body
+      var { ID_DELIVERY, CODLOJA, ID_SALES, COD_ORIGINAL, WARRANTY, DEFECT, OTHER_DEF, OBS, MANUFACTURING_DATE, QTD_DELIV, ID_USER } = req.body
+
+      if (!MANUFACTURING_DATE || MANUFACTURING_DATE === '') {
+        throw new Error('manufacturing date unknown!')
+      }
   
       const D_ENVIO = ObjDate.getDate()
       const D_PREV = ObjDate.setDaysInDate(D_ENVIO, 17) //Objetivo do sistema
       WARRANTY = WARRANTY ? 1 : 0
 
-      const values = { ID_DELIVERY, CODLOJA, ID_SALE: ID_SALES, COD_ORIGINAL, QUANTIDADE: QTD_DELIV, STATUS: 'Aguardando', WARRANTY, ID_CAT_DEF: DEFECT, OBS, D_ENVIO, D_PREV, ID_USER, OUTHER_DEF }
+      const values = { ID_DELIVERY, CODLOJA, ID_SALE: ID_SALES, COD_ORIGINAL, QUANTIDADE: QTD_DELIV, STATUS: 'Aguardando', WARRANTY, ID_CAT_DEF: DEFECT, OBS, D_ENVIO, D_PREV, ID_USER, OTHER_DEF, MANUFACTURING_DATE }
 
-      OUTHER_DEF === 'NULL' && delete values.OUTHER_DEF
+      OTHER_DEF === 'NULL' && delete values.OTHER_DEF
   
       await Maintenance.creatorAny(0, [values])
   
@@ -75,7 +79,7 @@ module.exports = {
       return res.json(maint)
     } catch (error) {
       console.log(error)
-      return res.json(error)
+      return res.status(400).json(error)
     }
   },
   /**

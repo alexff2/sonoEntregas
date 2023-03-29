@@ -25,7 +25,7 @@ export default function ReportMaintenance({maintenance, openModal, setOpenModal}
         <h1>RELATÓRIO DE ATENDIMENTO DAS RECLAMAÇÕES  - EXTERNO</h1>
         <div>
           <label>DATA</label>
-          <span>02/04/2022</span>
+          <span>{getDateBr()}</span>
         </div>
         <div className="protocol">
           <label>Nº PROTOCOLO</label>
@@ -34,7 +34,7 @@ export default function ReportMaintenance({maintenance, openModal, setOpenModal}
       </div>
 
       <div className="bodyReportMaint">
-        <p>1. INDENTIFICAÇÃO DO CONSUMIDOR</p>
+        <p>1. IDENTIFICAÇÃO DO CONSUMIDOR</p>
         <div className='divSetor'>
           <div>
             <label className="labelField">Cliente: </label>
@@ -55,7 +55,7 @@ export default function ReportMaintenance({maintenance, openModal, setOpenModal}
             <span>{maintenance.ESTADO}</span>
           </div>
         </div>
-        <p>2. INDENTIFICAÇÃO DO CLIENTE - LOJA</p>
+        <p>2. IDENTIFICAÇÃO DO CLIENTE - LOJA</p>
         <div className='divSetor'>
           <div>
             <label className="labelField">Código: </label>
@@ -76,12 +76,13 @@ export default function ReportMaintenance({maintenance, openModal, setOpenModal}
             <div className='toFill'></div>
           </div>
         </div>
-        <p>3. INDENTIFICAÇÃO DO REPRESENTANTE</p>
+        <p>3. IDENTIFICAÇÃO DO REPRESENTANTE</p>
         <div className='divSetor'>
           <div>
             <label className="labelField">Código: </label>
-            <span style={{fontStyle: 'italic'}}>{maintenance.CODLOJA}</span>
-            <span style={{fontStyle: 'italic'}}>{`${maintenance.SHOP_NAME}`.toUpperCase()}</span>
+            <span style={{fontStyle: 'italic'}}>
+              {maintenance.CODLOJA} - {`${maintenance.SHOP_NAME}`.toUpperCase()}
+            </span>
           </div>
         </div>
         {/* Garantia*/}
@@ -96,19 +97,22 @@ export default function ReportMaintenance({maintenance, openModal, setOpenModal}
             <label className="labelField">Garantia:</label>
             <div>
               <div className='flexCenter' style={{padding: 0}}>
-                <CheckBox check={!maintenance.WARRANTY} />
+                <CheckBox check={!maintenance.WARRANTY} />&nbsp;
                 <span className='notSublim'> Não - </span>
-                <label className="labelField">Garantia válida até: </label>
-                <span>{dateWarranty(getDateBr(maintenance.EMISSAO))}</span>
-                <label className="labelField">Fabricação: </label>
+                <label className="labelField">
+                  Garantia válida até: &nbsp;
+                  {dateWarranty(getDateBr(maintenance.EMISSAO))}
+                </label>
+                <label className="labelField">Fabricação: {getDateBr(maintenance.MANUFACTURING_DATE)}</label>
               </div>
               <div className='flexCenter' style={{padding: 0}}>
-                <CheckBox check={maintenance.WARRANTY} />
+                <CheckBox check={maintenance.WARRANTY} />&nbsp;
                 <span className='notSublim'> Sim - </span>
-                <label className="labelField">Tempo de garantia: </label>
-                <span>1 ANO</span>
-                <label className="labelField">Data da venda: </label>
-                <span className='notSublim'>{getDateBr(maintenance.EMISSAO)}</span>
+                <label className="labelField">Tempo de garantia: 1 ANO</label>
+                <label className="labelField">
+                  Data da venda: &nbsp;
+                  {getDateBr(maintenance.EMISSAO)}
+                </label>
               </div>
             </div>
           </div>
@@ -159,11 +163,11 @@ export default function ReportMaintenance({maintenance, openModal, setOpenModal}
         </div>
         <div className='divSetor signatures'>
           <div>
-            <span></span>
+            <span className='toFill'></span>
             <label>Responsável</label>
           </div>
           <div>
-            <span></span>
+            <span className='toFill'></span>
             <label>Visto</label>
           </div>
         </div>

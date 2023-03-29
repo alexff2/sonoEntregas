@@ -65,7 +65,7 @@ export default function ModalMain({ maint, clickReport }) {
       <div className="headerModal">
         <h2>DAV <span>#{maint.ID_SALE}</span></h2>
         <h1>Detalhes da Assistência <span> - {maint.ID}</span></h1>
-        <button className='btnReport' onClick={clickReport}>Relatório</button>
+        <button className='btnReport' onClick={clickReport}>Laudo</button>
       </div>
       
       <div className="content maint">
