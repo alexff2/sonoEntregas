@@ -1,5 +1,5 @@
-export function getDateToSql(date = false) {
-  var data, dia, diaF, mes, mesF, anoF
+export function convertDate(date=false, days = 0){
+  let data, dia, diaF, mes, mesF, anoF
 
   if (date) {
     if(!date.includes('T')){
@@ -7,47 +7,32 @@ export function getDateToSql(date = false) {
     }
 
     data = new Date(date)
+    //data.setDate(data.getDate()+days)
     dia  = data.getDate().toString()
     diaF = (dia.length === 1) ? '0'+dia : dia
     mes  = (data.getMonth()+1).toString() //+1 pois no getMonth Janeiro começa com zero.
     mesF = (mes.length === 1) ? '0'+mes : mes
     anoF = data.getFullYear()
-    date = `${anoF}-${mesF}-${diaF}`
-
-    return date
   } else { 
     data = new Date()
+    data.setDate(data.getDate()+days)
     dia  = data.getDate().toString()
     diaF = (dia.length === 1) ? '0'+dia : dia
     mes  = (data.getMonth()+1).toString() //+1 pois no getMonth Janeiro começa com zero.
     mesF = (mes.length === 1) ? '0'+mes : mes
     anoF = data.getFullYear()
-    date = `${anoF}-${mesF}-${diaF}`
-
-    return date
   }
+  return { diaF, mesF, anoF }
 }
 
-export function dateSqlToReact(dateSql){
-  if (!dateSql) {
-    return
-  }
+export function dateSqlToReact(date = false, days = 0) {
+  const { diaF, mesF, anoF } = convertDate(date, days)
+  return `${diaF}/${mesF}/${anoF} `
+}
 
-  function adicionaZero(numero){
-    if (numero <= 9) 
-        return "0" + numero
-    else
-        return numero
-  }
-
-  if(!dateSql.includes('T')){
-    dateSql = dateSql.concat('T00:00:00')
-  }
-
-  let dataAtual = new Date(dateSql)
-  let dataAtualFormatada = (adicionaZero(dataAtual.getDate().toString()) + "/" + (adicionaZero(dataAtual.getMonth()+1).toString()) + "/" + dataAtual.getFullYear())
-
-  return dataAtualFormatada
+export function getDateToSql(date = false, days = 0) {
+  const { diaF, mesF, anoF } = convertDate(date, days)
+  return `${anoF}-${mesF}-${diaF}`
 }
 
 export function dateWarranty(emissao) {
