@@ -31,10 +31,11 @@ SELECT CODIGO+25037, 1, '2015-01-01 00:00:00.000', '16:57:57', 'ACERTO EST SAI L
 FROM VIEW_KARDEX_DIF_EST WHERE DIF > 0
 
 -- ENTRADA (Troca)
-declare @codvenda char(15), @date datetime, @horas varchar(8)
-set @codvenda = '128498'
-set @date = '2022-12-10'
-set @horas = '10:53:00'
+declare @codvenda char(15), @date datetime, @horas varchar(8), @OBS VARCHAR(80)
+set @codvenda = '688'
+set @date = '2023-03-29'
+set @horas = '11:53:00'
+SET @OBS = 'Troca da DAV da LOJA S. SHOPPING'
 INSERT KARDEX_PRODUTOS_HISTORICO
 ([CODIGO]
            ,[CODLOJA]
@@ -63,7 +64,7 @@ INSERT KARDEX_PRODUTOS_HISTORICO
            ,[SALDO]
            ,[PROCESSAR])
 SELECT ROW_NUMBER() OVER(ORDER BY CODIGO ASC) + (SELECT MAX(CODIGO) FROM KARDEX_PRODUTOS_HISTORICO), 
-1,  @date, @horas, 'DEVOLUCAO', @codvenda, CODIGO, DIF*-1, 0, 'E', 'Devoluçao Ref a Troca', 0, 'ALEXANDRE',
+1,  @date, @horas, 'DEVOLUCAO', @codvenda, CODIGO, DIF*-1, 0, 'E', @OBS, 0, 'ALEXANDRE',
 0, 'S', 0, 1, 'F', 'ALEXANDRE', 1, -1, 1, 'UN',
  ROW_NUMBER() OVER(ORDER BY CODIGO ASC) + (SELECT MAX(SEQUENCIA) FROM KARDEX_PRODUTOS_HISTORICO), 0, 'S'
 FROM VIEW_KARDEX_DIF_EST WHERE DIF < 0

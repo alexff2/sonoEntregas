@@ -90,6 +90,10 @@ class ForecastService {
     /** @type {IForecastSales[]} */
     const forecastSales = await Forecast._query(0, scriptSales, QueryTypes.SELECT)
 
+    if (forecastSales.length === 0) {
+      return []
+    }
+
     const scriptProduct = 
     `SELECT B.*, A.quantityForecast, A.idForecastSale 
     FROM VIEW_SALES_PROD B
@@ -251,20 +255,22 @@ class ForecastService {
     /**@type {IForecastSales[]} */
     const forecastSales = await ForecastSales.findAny(0, { idForecast: id, validationStatus: 0 })
 
-    /**@type {IForecastProduct[]} */
-    const forecastProduct = await ForecastProduct.findAny(0, { in: { idForecastSale: forecastSales.map( sale => sale.id) }})
+    if (forecastSales.length > 0) {
+      /**@type {IForecastProduct[]} */
+      const forecastProduct = await ForecastProduct.findAny(0, { in: { idForecastSale: forecastSales.map( sale => sale.id) }})
 
-    for (let i = 0; i < forecastSales.length; i++) {
-      const ID_SALE_ID = forecastSales[i].idSale
+      for (let i = 0; i < forecastSales.length; i++) {
+        const ID_SALE_ID = forecastSales[i].idSale
 
-      const COD_ORIGINAL = forecastProduct
-        .filter(product => product.idForecastSale === forecastSales[i].id)
-        .map(product => product.COD_ORIGINAL)
+        const COD_ORIGINAL = forecastProduct
+          .filter(product => product.idForecastSale === forecastSales[i].id)
+          .map(product => product.COD_ORIGINAL)
 
-      await SalesProd.updateAny(0, { STATUS: 'Enviado' }, { ID_SALE_ID, in: { COD_ORIGINAL } }, true)
+        await SalesProd.updateAny(0, { STATUS: 'Enviado' }, { ID_SALE_ID, in: { COD_ORIGINAL } }, true)
+      }
+
+      await Sale.updateAny(0, { STATUS: 'Aberta' }, { in: { ID: forecastSales.map( sale => sale.idSale)} })      
     }
-
-    await Sale.updateAny(0, { STATUS: 'Aberta' }, { in: { ID: forecastSales.map( sale => sale.idSale)} })
 
     await Forecast.updateAny(0, { status: 0 }, { id })
   }

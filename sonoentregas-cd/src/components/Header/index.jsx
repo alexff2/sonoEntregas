@@ -1,9 +1,38 @@
 import React, { useState } from 'react'
-import { AppBar, Toolbar, makeStyles, Box, Paper } from '@material-ui/core'
-import { AccountCircle, ExitToApp } from '@material-ui/icons'
+import { 
+  AppBar,
+  Toolbar,
+  makeStyles,
+  withStyles,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  Typography
+} from '@material-ui/core'
+import { AccountCircle, ExitToApp, Assessment } from '@material-ui/icons'
 
 import { useAuthenticate } from '../../context/authContext'
 import BtnUpdate from './BtnUpdate'
+
+const StyledMenu = withStyles({
+  paper: {
+    border: '1px solid #d3d4d5',
+  },
+})((props) => (
+  <Menu
+    elevation={0}
+    getContentAnchorEl={null}
+    anchorOrigin={{
+      vertical: 'bottom',
+      horizontal: 'right',
+    }}
+    transformOrigin={{
+      vertical: 'top',
+      horizontal: 'right',
+    }}
+    {...props}
+  />
+))
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -28,55 +57,55 @@ const useStyles = makeStyles(theme => ({
     '& > svg:hover': {
       boxShadow: '1px 1px 5px #FFF'
     }
-  },
-  subMenu: {
-    position: 'absolute',
-    bottom: -35,
-    right: 24,
-    padding: 10,
-    display: 'flex',
-    alignItems: 'center',
-    gap: 5,
-    cursor: 'pointer',
-
-    '&:hover': {
-      color: theme.palette.primary.main
-    }
   }
 }))
 
-function Header() {
-  const [ subMenu, setSubMenu ] = useState(false)
+export default function Header() {
+  const [anchorEl, setAnchorEl] = useState(null)
   const { userAuth, logout } = useAuthenticate()
   const classes = useStyles()
 
-  const openSm = () => {
-    setSubMenu(!subMenu)
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null)
   }
 
   return(
     <AppBar position="fixed" className={classes.root}>
       <Toolbar className={classes.toolbar}>
         <BtnUpdate />
+
         <p className={classes.toolbar}>
           Seja bem vindo(a), 
           <strong>{userAuth.DESCRIPTION}</strong>
-          <AccountCircle onClick={openSm}/>
-        </p>
 
-        { subMenu &&
-          <Box
-            component={Paper}
-            className={classes.subMenu}
-            onClick={logout}
+          <AccountCircle onClick={handleClick}/>
+
+          <StyledMenu
+            id="simple-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleCloseMenu}
           >
-            Sair
-            <ExitToApp/>
-          </Box>
-        }
+            <MenuItem onClick={handleCloseMenu}>
+              <ListItemIcon>
+                <Assessment />
+              </ListItemIcon>
+              <Typography variant="inherit" >Relatórios</Typography>
+            </MenuItem>
+            <MenuItem onClick={logout}>
+              <ListItemIcon>
+                <ExitToApp />
+              </ListItemIcon>
+              <Typography variant="inherit" >Sair</Typography>
+            </MenuItem>
+          </StyledMenu>
+        </p>
       </Toolbar>
     </AppBar>
   )
 }
-
-export default Header
