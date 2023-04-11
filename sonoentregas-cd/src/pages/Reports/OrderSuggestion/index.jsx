@@ -70,6 +70,7 @@ for(let i = 2020; i <= currentYears; i++) {
 export default function OrderSuggestion() {
   const [ selectedYears, setSelectedYears ] = useState(currentYears)
   const [ selectedMonth, setSelectedMonth ] = useState(currentMonth - 1)
+  const [ resultFilter, setResultFilter ] = useState('positives')
   const [ search, setSearch ] = useState('')
   const [ products, setProducts ] = useState([])
   const [ isOpenFilter, setIsOpenFilter ] = useState(true)
@@ -89,7 +90,7 @@ export default function OrderSuggestion() {
     month1 = monthAbbreviated[10]
     month2 = monthAbbreviated[11]
   } else if (selectedMonth === 1) {
-    month1 = monthAbbreviated[10]
+    month1 = monthAbbreviated[11]
     month2 = monthAbbreviated[selectedMonth-1]
   } else {
     month1 = monthAbbreviated[selectedMonth-2]
@@ -122,10 +123,6 @@ export default function OrderSuggestion() {
 
   const handleCloseFilter = () => setIsOpenFilter(false)
 
-  const productsFilter = search.length > 0
-    ? products.filter( prod => prod.NOME.includes(search))
-    : products
-  
   var valueMonth1 = 0
   var valueMonth2 = 0
   var valueMonth3 = 0
@@ -134,15 +131,39 @@ export default function OrderSuggestion() {
   var valueEstDep = 0
   var valuePed = 0
 
-  for(var i = 0; i < productsFilter.length; i++) {
-    valueMonth1 += productsFilter[i].QTD_MES1
-    valueMonth2 += productsFilter[i].QTD_MES2
-    valueMonth3 += productsFilter[i].QTD_MES3
-    valuePend += productsFilter[i].PENDENTE
-    valueEstLoja += productsFilter[i].EST_LOJA
-    valueEstDep += productsFilter[i].EST_DEPOSITO
-    valuePed += productsFilter[i].PEDIDO
+  for(var i = 0; i < products.length; i++) {
+    valueMonth1 += products[i].QTD_MES1
+    valueMonth2 += products[i].QTD_MES2
+    valueMonth3 += products[i].QTD_MES3
+    valuePend += products[i].PENDENTE
+    valueEstLoja += products[i].EST_LOJA
+    valueEstDep += products[i].EST_DEPOSITO
+    valuePed += products[i].PEDIDO
+    products[i]['Tot'] = products[i].QTD_MES1 + products[i].QTD_MES2 + products[i].QTD_MES3
+    products[i]['MedMen'] = Math.floor((products[i].QTD_MES1 + products[i].QTD_MES2 + products[i].QTD_MES3) / 3)
+    products[i]['MedSem'] = Math.floor((products[i].QTD_MES1 + products[i].QTD_MES2 + products[i].QTD_MES3) / 9)
+    products[i]['Result'] = (Math.floor((products[i].QTD_MES1 + products[i].QTD_MES2 + products[i].QTD_MES3)/9) + products[i].PENDENTE)-products[i].EST_LOJA-products[i].PEDIDO
   }
+
+  const productsFilter = (search.length  > 0 || resultFilter !== 'all')
+    ? products.filter( prod => {
+        if (resultFilter === 'positives') {
+          if (prod.Result <= 0) {
+            return false
+          }
+        } else if (resultFilter === 'negatives') {
+          if (prod.Result >= 0) {
+            return false
+          }
+        }
+
+        if(prod.NOME.includes(search)){
+          return true
+        }
+
+        return false
+      })
+    : products
 
   return (
     <Box  component={Paper} p={2}>
@@ -165,6 +186,17 @@ export default function OrderSuggestion() {
 
       <Box  marginTop={2} marginBottom={2}>
         <Input placeholder='Pesquisa de produto!' onChange={e => setSearch(e.target.value)}/>
+
+        <Select
+          value={resultFilter}
+          onChange={e => {
+            setResultFilter(e.target.value)
+          }}
+        >
+          <MenuItem value={'all'}>Todos</MenuItem>
+          <MenuItem value={'positives'}>Positivos</MenuItem>
+          <MenuItem value={'negatives'}>Negativos</MenuItem>
+        </Select>
       </Box>
 
       <TableContainer>
@@ -197,14 +229,14 @@ export default function OrderSuggestion() {
                 <TableCell>{product.QTD_MES1}</TableCell>
                 <TableCell>{product.QTD_MES2}</TableCell>
                 <TableCell>{product.QTD_MES3}</TableCell>
-                <TableCell>{product.QTD_MES1 + product.QTD_MES2 + product.QTD_MES3}</TableCell>
-                <TableCell>{Math.floor((product.QTD_MES1 + product.QTD_MES2 + product.QTD_MES3)/3)}</TableCell>
-                <TableCell>{Math.floor((product.QTD_MES1 + product.QTD_MES2 + product.QTD_MES3)/9)}</TableCell>
+                <TableCell>{product.Tot}</TableCell>
+                <TableCell>{product.MedMen}</TableCell>
+                <TableCell>{product.MedSem}</TableCell>
                 <TableCell>{product.PENDENTE}</TableCell>
                 <TableCell>{product.EST_LOJA} / {product.EST_DEPOSITO}</TableCell>
                 <TableCell>{product.PEDIDO}</TableCell>
-                <TableCell>
-                  {(Math.floor((product.QTD_MES1 + product.QTD_MES2 + product.QTD_MES3)/12) + product.PENDENTE)-product.EST_LOJA-product.PEDIDO}
+                <TableCell style={ product.Result < 0 ? {color: 'green'} : {color: 'red'}}>
+                  {product.Result}
                 </TableCell>
               </TableRow>
             ))}
@@ -222,7 +254,7 @@ export default function OrderSuggestion() {
               <TableCell>{valueEstLoja} / {valueEstDep}</TableCell>
               <TableCell>{valuePed}</TableCell>
               <TableCell>
-                {(Math.floor((valueMonth1 + valueMonth2 + valueMonth3)/12) + valuePend)-valueEstLoja-valuePed}
+                {(Math.floor((valueMonth1 + valueMonth2 + valueMonth3)/9) + valuePend)-valueEstLoja-valuePed}
               </TableCell>
             </TableRow>
           </TableFooter>
@@ -268,22 +300,39 @@ export default function OrderSuggestion() {
             {productsFilter.map( product => (
               <TableRow key={product.COD_ORIGINAL} className={classe.rowBody}>
                 <TableCell>{product.COD_ORIGINAL}</TableCell>
-                <TableCell>{product.NOME}</TableCell>
+                <TableCell style={{fontSize: 10}}>{product.NOME}</TableCell>
                 <TableCell>{product.QTD_MES1}</TableCell>
                 <TableCell>{product.QTD_MES2}</TableCell>
                 <TableCell>{product.QTD_MES3}</TableCell>
-                <TableCell>{product.QTD_MES1 + product.QTD_MES2 + product.QTD_MES3}</TableCell>
-                <TableCell>{Math.floor((product.QTD_MES1 + product.QTD_MES2 + product.QTD_MES3)/3)}</TableCell>
-                <TableCell>{Math.floor((product.QTD_MES1 + product.QTD_MES2 + product.QTD_MES3)/12)}</TableCell>
+                <TableCell>{product.Tot}</TableCell>
+                <TableCell>{product.MedMen}</TableCell>
+                <TableCell>{product.MedSem}</TableCell>
                 <TableCell>{product.PENDENTE}</TableCell>
                 <TableCell>{product.EST_LOJA} / {product.EST_DEPOSITO}</TableCell>
                 <TableCell>{product.PEDIDO}</TableCell>
                 <TableCell>
-                  {(Math.floor((product.QTD_MES1 + product.QTD_MES2 + product.QTD_MES3)/12) + product.PENDENTE)-product.EST_LOJA-product.PEDIDO}
+                  {product.Result}
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
+          <TableFooter>
+            <TableRow className={classe.rowBody}>
+              <TableCell colSpan={2}>TOTAIS</TableCell>
+              <TableCell>{valueMonth1}</TableCell>
+              <TableCell>{valueMonth2}</TableCell>
+              <TableCell>{valueMonth3}</TableCell>
+              <TableCell>{valueMonth1 + valueMonth2 + valueMonth3}</TableCell>
+              <TableCell>{Math.floor((valueMonth1 + valueMonth2 + valueMonth3)/3)}</TableCell>
+              <TableCell>{Math.floor((valueMonth1 + valueMonth2 + valueMonth3)/9)}</TableCell>
+              <TableCell>{valuePend}</TableCell>
+              <TableCell>{valueEstLoja} / {valueEstDep}</TableCell>
+              <TableCell>{valuePed}</TableCell>
+              <TableCell>
+                {(Math.floor((valueMonth1 + valueMonth2 + valueMonth3)/9) + valuePend)-valueEstLoja-valuePed}
+              </TableCell>
+            </TableRow>
+          </TableFooter>
           </Table>
         </TableContainer>
       </ReportContainer>
