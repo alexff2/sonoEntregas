@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { 
   AppBar,
   Toolbar,
@@ -64,13 +65,15 @@ export default function Header() {
   const [anchorEl, setAnchorEl] = useState(null)
   const { userAuth, logout } = useAuthenticate()
   const classes = useStyles()
+  const navigate = useNavigate()
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget)
   }
 
-  const handleCloseMenu = () => {
+  const handleClickReport = () => {
     setAnchorEl(null)
+    navigate('/app/reports')
   }
 
   return(
@@ -89,9 +92,9 @@ export default function Header() {
             anchorEl={anchorEl}
             keepMounted
             open={Boolean(anchorEl)}
-            onClose={handleCloseMenu}
+            onClose={() => setAnchorEl(null)}
           >
-            <MenuItem onClick={handleCloseMenu}>
+            <MenuItem onClick={handleClickReport}>
               <ListItemIcon>
                 <Assessment />
               </ListItemIcon>

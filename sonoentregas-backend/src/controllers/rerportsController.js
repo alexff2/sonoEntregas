@@ -48,16 +48,13 @@ module.exports = {
        CASE WHEN B.QTD IS NULL THEN 0 ELSE B.QTD END PENDENTE,
        CASE WHEN C.PEDIDO IS NULL THEN 0 ELSE C.PEDIDO END PEDIDO, D.EST_LOJA, D.EST_DEPOSITO, D.EST_ATUAL
        FROM PRODUTOS A
-       INNER JOIN PRODLOJAS D
-       ON D.CODIGO = A.CODIGO
-       LEFT JOIN SONOENTREGAS..VIEW_QTD_PROD_PENDENTE B
-       ON A.ALTERNATI = B.COD_ORIGINAL
+       INNER JOIN PRODLOJAS D ON D.CODIGO = A.CODIGO
+       LEFT JOIN SONOENTREGAS..VIEW_QTD_PROD_PENDENTE B ON A.ALTERNATI = B.COD_ORIGINAL
        LEFT JOIN (
            SELECT CODPRODUTO, SUM(QTE_PEDIDO) - SUM(QTE_CHEGADA) PEDIDO
            FROM VIEW_SALDO_PEDIDO_PRODUTO
            GROUP BY CODPRODUTO
-       ) C
-       ON A.CODIGO = C.CODPRODUTO
+       ) C ON A.CODIGO = C.CODPRODUTO
        WHERE A.ATIVO = 'S'
        AND D.CODLOJA = 1
        ORDER BY B.QTD DESC
@@ -66,35 +63,32 @@ module.exports = {
       if (month1 === -1) {
         month1 = 11
         script_month1 = `
-          SELECT A.COD_ORIGINAL,
-          B.NOME,
-          SUM(A.QTD_DELIV) QTD_MES1
-          FROM DELIVERYS_PROD A
+          SELECT A.COD_ORIGINAL, B.NOME, SUM(A.QTD_DELIV) QTD_MES1
+          FROM SALES_PROD A
           INNER JOIN SONO..PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
-          WHERE SUBSTRING(CONVERT(CHAR(8),A.D_DELIVERED,112),1,6)='${yearBase-1}${month1}'
+          INNER JOIN SALES C ON A.CODLOJA = C.CODLOJA AND A.ID_SALES = C.ID_SALES
+          WHERE SUBSTRING(CONVERT(CHAR(8),C.EMISSAO,112),1,6)='${yearBase-1}${month1}'
           AND B.ATIVO = 'S'
           GROUP BY A.COD_ORIGINAL, B.NOME
         `
       } else if (month1 === 0) {
         month1 = 12
         script_month1 = `
-          SELECT A.COD_ORIGINAL,
-          B.NOME,
-          SUM(A.QTD_DELIV) QTD_MES1
-          FROM DELIVERYS_PROD A
+          SELECT A.COD_ORIGINAL, B.NOME, SUM(A.QUANTIDADE) QTD_MES1
+          FROM SALES_PROD A
           INNER JOIN SONO..PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
-          WHERE SUBSTRING(CONVERT(CHAR(8),A.D_DELIVERED,112),1,6)='${yearBase-1}${month1}'
+          INNER JOIN SALES C ON A.CODLOJA = C.CODLOJA AND A.ID_SALES = C.ID_SALES
+          WHERE SUBSTRING(CONVERT(CHAR(8),C.EMISSAO,112),1,6)='${yearBase-1}${month1}'
           AND B.ATIVO = 'S'
           GROUP BY A.COD_ORIGINAL, B.NOME
         `
       } else {
         script_month1 = `
-          SELECT A.COD_ORIGINAL,
-          B.NOME,
-          SUM(A.QTD_DELIV) QTD_MES1
-          FROM DELIVERYS_PROD A
+          SELECT A.COD_ORIGINAL, B.NOME, SUM(A.QUANTIDADE) QTD_MES1
+          FROM SALES_PROD A
           INNER JOIN SONO..PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
-          WHERE SUBSTRING(CONVERT(CHAR(8),A.D_DELIVERED,112),1,6)='${yearBase}${monthBase.length === 1 ? '0'+month1 : month1}'
+          INNER JOIN SALES C ON A.CODLOJA = C.CODLOJA AND A.ID_SALES = C.ID_SALES
+          WHERE SUBSTRING(CONVERT(CHAR(8),C.EMISSAO,112),1,6)='${yearBase}${monthBase.length === 1 ? '0'+month1 : month1}'
           AND B.ATIVO = 'S'
           GROUP BY A.COD_ORIGINAL, B.NOME
         `
@@ -106,23 +100,21 @@ module.exports = {
       if (month2 === 0) {
         month2 = 12
         script_month2 = `
-          SELECT A.COD_ORIGINAL,
-          B.NOME,
-          SUM(A.QTD_DELIV) QTD_MES2
-          FROM DELIVERYS_PROD A
+          SELECT A.COD_ORIGINAL, B.NOME, SUM(A.QUANTIDADE) QTD_MES2
+          FROM SALES_PROD A
           INNER JOIN SONO..PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
-          WHERE SUBSTRING(CONVERT(CHAR(8),A.D_DELIVERED,112),1,6)='${yearBase-1}${month2}'
+          INNER JOIN SALES C ON A.CODLOJA = C.CODLOJA AND A.ID_SALES = C.ID_SALES
+          WHERE SUBSTRING(CONVERT(CHAR(8),C.EMISSAO,112),1,6)='${yearBase-1}${month2}'
           AND B.ATIVO = 'S'
           GROUP BY A.COD_ORIGINAL, B.NOME
         `
       } else {
         script_month2 = `
-          SELECT A.COD_ORIGINAL,
-          B.NOME,
-          SUM(A.QTD_DELIV) QTD_MES2
-          FROM DELIVERYS_PROD A
+          SELECT A.COD_ORIGINAL, B.NOME, SUM(A.QUANTIDADE) QTD_MES2
+          FROM SALES_PROD A
           INNER JOIN SONO..PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
-          WHERE SUBSTRING(CONVERT(CHAR(8),A.D_DELIVERED,112),1,6)='${yearBase}${monthBase.length === 1 ? '0'+ month2 : month2}'
+          INNER JOIN SALES C ON A.CODLOJA = C.CODLOJA AND A.ID_SALES = C.ID_SALES
+          WHERE SUBSTRING(CONVERT(CHAR(8),C.EMISSAO,112),1,6)='${yearBase}${monthBase.length === 1 ? '0'+ month2 : month2}'
           AND B.ATIVO = 'S'
           GROUP BY A.COD_ORIGINAL, B.NOME
         `
@@ -132,12 +124,11 @@ module.exports = {
       const products_month2 = await Products._query(0, script_month2, QueryTypes.SELECT)
 
       script_month3 = `
-          SELECT A.COD_ORIGINAL,
-          B.NOME,
-          SUM(A.QTD_DELIV) QTD_MES3
-          FROM DELIVERYS_PROD A
-          INNER JOIN SONO..PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
-          WHERE SUBSTRING(CONVERT(CHAR(8),A.D_DELIVERED,112),1,6)='${yearBase}${monthBase.length === 1 ? '0'+month3 : month3}'
+        SELECT A.COD_ORIGINAL, B.NOME, SUM(A.QUANTIDADE) QTD_MES3
+        FROM SALES_PROD A
+        INNER JOIN SONO..PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
+        INNER JOIN SALES C ON A.CODLOJA = C.CODLOJA AND A.ID_SALES = C.ID_SALES
+        WHERE SUBSTRING(CONVERT(CHAR(8),C.EMISSAO,112),1,6)='${yearBase}${monthBase.length === 1 ? '0'+month3 : month3}'
           AND B.ATIVO = 'S'
           GROUP BY A.COD_ORIGINAL, B.NOME
         `

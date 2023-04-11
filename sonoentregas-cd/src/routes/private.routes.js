@@ -12,6 +12,8 @@ import Cars from '../pages/Cars'
 import Users from '../pages/Users'
 import Products from '../pages/Product'
 import Sales from '../pages/Sales'
+import Reports from '../pages/Reports'
+import OrderSuggestion from '../pages/Reports/OrderSuggestion'
 import Maintenance from '../pages/Maintenance'
 //import Error from './pages/Error'
 
@@ -28,6 +30,8 @@ export default function PrivateRoutes(){
         <Route path="/app/products" element={<Products />} />
         <Route path="/app/maintenance" element={<Maintenance />} />
         <Route path="/app/users" element={<Users />} />
+        <Route path="/app/reports" element={<Reports />} />
+        <Route path="/app/reports/orderSuggestion" element={<OrderSuggestion />} />
         <Route path="*" element={<Navigate to="/"/>} />
       </Route>
     </Routes>

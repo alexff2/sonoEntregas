@@ -6,7 +6,7 @@ import Modal from '../Modal'
 
 import './report.css'
 
-export default function ReportMaintenance({children, save, openModal, setOpenModal}){
+export default function Reports({children, save, openModal, setOpenModal}){
   const generatePDF = ()=>{
     const report = document.querySelector('#report')
     const doc = new jsPDF('p', 'px', 'a4')
