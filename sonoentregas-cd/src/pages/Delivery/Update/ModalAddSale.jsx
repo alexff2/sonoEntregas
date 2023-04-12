@@ -84,6 +84,7 @@ export default function ModalAddSale({ setOpen }){
   const [ idSale, setIdSale ] = useState('')
   const [ saleSelected, setSaleSelected ] = useState([])
   const [ salesWithSameNumber, setSalesWithSameNumber ] = useState([])
+  const [ availableStocks, setAvailableStocks ] = useState([])
 
   const { setAlert } = useAlert()
   const { setForecasts } = useForecasts()
@@ -141,6 +142,22 @@ export default function ModalAddSale({ setOpen }){
           setIdSale('')
           return
         }
+
+        setAvailableStocks([ ...availableStocks, ...data[0].products.filter( product => {
+          const availableStock = availableStocks.find(availableStock => availableStock.COD_ORIGINAL === product.COD_ORIGINAL)
+
+          if (!!availableStock) {
+            return false
+          }
+
+          return true
+        }).map(product => ({
+          COD_ORIGINAL: product.COD_ORIGINAL,
+          NOME: product.NOME,
+          QUANTIDADE: product.QUANTIDADE,
+          qtdFullForecast: product.qtdFullForecast,
+          availableStock: product.availableStock
+        }))])
 
         setSaleSelected([...saleSelected, ...data])
         setSlideInputs(false)
@@ -327,6 +344,7 @@ export default function ModalAddSale({ setOpen }){
               sales={saleSelected} 
               setSales={setSaleSelected}
               type={type}
+              availableStocks={availableStocks}
             />
 
             <Box className={classes.boxAddress}>
