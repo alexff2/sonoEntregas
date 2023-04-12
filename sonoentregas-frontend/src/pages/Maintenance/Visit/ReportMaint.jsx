@@ -24,7 +24,7 @@ export default function ReportMaint({maint, openModal, setOpenModal}){
         <h1>RELATÓRIO DE ATENDIMENTO DAS RECLAMAÇÕES  - EXTERNO</h1>
         <div>
           <label>DATA</label>
-          <span>{dateSqlToReact()}</span>
+          <span>{dateSqlToReact(maint.D_ENVIO)}</span>
         </div>
         <div className="protocol">
           <label>Nº PROTOCOLO</label>

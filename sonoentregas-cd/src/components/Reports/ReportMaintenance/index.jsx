@@ -25,7 +25,7 @@ export default function ReportMaintenance({maintenance, openModal, setOpenModal}
         <h1>RELATÓRIO DE ATENDIMENTO DAS RECLAMAÇÕES  - EXTERNO</h1>
         <div>
           <label>DATA</label>
-          <span>{getDateBr()}</span>
+          <span>{getDateBr(maintenance.D_ENVIO)}</span>
         </div>
         <div className="protocol">
           <label>Nº PROTOCOLO</label>
