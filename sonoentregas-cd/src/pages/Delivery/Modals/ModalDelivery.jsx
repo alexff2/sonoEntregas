@@ -126,6 +126,7 @@ export default function ModalDelivery({ setOpen, type }){
   const [ codAssistant, setCodAssistant ] = useState(false)
   const [ idSale, setIdSale ] = useState('')
   const [ deliverySales, setDeliverySales ] = useState([])
+  const [ availableStocks, setAvailableStocks ] = useState([])
   const [ errorMsg, setErrorMsg ] = useState('')
   const [ disabledBtnSave, setDisabledBtnSave ] = useState(false)
 
@@ -239,6 +240,11 @@ export default function ModalDelivery({ setOpen, type }){
       if (!e.response){
         console.log(e)
         setAlert('Rede')
+      } else if (e.response.status === 409){
+        if (e.response.data.message === 'Product was out of stock!') {
+          setDisabledBtnSave(false)
+          setErrorMsg('Atenção! Existe produtos que ficaram com estoque negativo, por favor verifique as vendas que estão com Qtd Disp negativo e de cor vermelha!')
+        }
       } else if (e.response.status === 400){
         console.log(e.response.data)
         setAlert('Servidor')
@@ -306,6 +312,22 @@ export default function ModalDelivery({ setOpen, type }){
           setIdSale('')
           return
         }
+
+        setAvailableStocks([ ...availableStocks, ...filteredSales[0].products.filter( product => {
+          const availableStock = availableStocks.find(availableStock => availableStock.COD_ORIGINAL === product.COD_ORIGINAL)
+
+          if (!!availableStock) {
+            return false
+          }
+
+          return true
+        }).map(product => ({
+          COD_ORIGINAL: product.COD_ORIGINAL,
+          NOME: product.NOME,
+          QUANTIDADE: product.QUANTIDADE,
+          qtdFullForecast: product.qtdFullForecast,
+          availableStock: product.availableStock
+        }))])
 
         setDeliverySales([...deliverySales, ...filteredSales])
       }
@@ -458,6 +480,7 @@ export default function ModalDelivery({ setOpen, type }){
           sales={deliverySales} 
           setSales={setDeliverySales}
           type={type}
+          availableStocks={availableStocks}
         />
 
         <Box className={classes.boxAddress}>

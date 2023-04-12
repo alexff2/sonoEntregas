@@ -150,6 +150,55 @@ class ForecastRules {
       })
     })
   }
+  /** @param {Sale[]} sales */
+  async checkAvailableStock(sales){
+    var qtdProducts = []
+    var codOriginal = ''
+
+    sales.forEach(sale => {
+      sale.products.forEach(product => {
+        const qtdProduct = qtdProducts.length > 0 ? qtdProducts.find( qtdProduct => qtdProduct.COD_ORIGINAL === product.COD_ORIGINAL) : undefined
+
+        if (!qtdProduct) {
+          qtdProducts = [...qtdProducts, product]
+
+          if (codOriginal === '') {
+            codOriginal = `'${product.COD_ORIGINAL}'`
+          } else {
+            codOriginal = `, '${product.COD_ORIGINAL}'`
+          }
+        } else {
+          qtdProducts.forEach( qtdProductReleased => qtdProductReleased.qtdDelivery += qtdProduct.qtdDelivery)
+        }
+      })
+    })
+
+    const estProducts = await SalesProd._query(1, `
+      SELECT A.ALTERNATI, B.EST_LOJA - C.qtdFullForecast qtdAvailableStock
+      FROM PRODUTOS A
+      INNER JOIN PRODLOJAS B ON A.CODIGO = B.CODIGO
+      LEFT JOIN ( SELECT COD_ORIGINAL, SUM(QUANTIDADE) qtdFullForecast
+          FROM SONOENTREGAS..SALES_PROD 
+          WHERE [STATUS] = 'Em Previsão'
+          GROUP BY COD_ORIGINAL) C ON A.ALTERNATI = C.COD_ORIGINAL
+      WHERE B.CODLOJA = 1 AND A.ALTERNATI IN (${codOriginal})
+    `, QueryTypes.SELECT)
+
+    estProducts.forEach( estProduct => {
+      qtdProducts.forEach( qtdProduct => {
+        if (estProduct.ALTERNATI === qtdProduct.COD_ORIGINAL) {
+          if (estProduct.qtdAvailableStock < qtdProduct.qtdDelivery) {
+            throw {
+              status: 409,
+              error: {
+                message: 'Product was out of stock!'
+              }
+            }
+          }
+        }
+      })
+    })
+  }
 
   async checkForecastSaleIsValidated({ id }) {
     const forecastSale = await ForecastSales.findAny(0, { id })

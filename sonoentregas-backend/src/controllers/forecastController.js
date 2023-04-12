@@ -59,7 +59,7 @@ module.exports = {
    */
   async create(req, res){
     try {
-      const { dateForecast, sales } = req.body
+      const { dateForecast, sales, availableStocks } = req.body
       const { id: userId } = req.user
 
       if (!dateForecast || !sales) {
@@ -78,20 +78,11 @@ module.exports = {
 
       await ForecastsRules.checkStatusProduct(sales)
 
+      await ForecastsRules.checkAvailableStock(sales)
+
       // Process
-      const idForecast = await ForecastService.createForecast({
-        userId,
-        dateForecast
-      })
 
-      await ForecastService.createSalesForecast({
-        sales,
-        idForecast,
-        userId,
-        add: false
-      })
-
-      return res.status(201).json(idForecast)
+      return res.status(201).json()
     } catch (e) {
       console.log(e)
 

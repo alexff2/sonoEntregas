@@ -27,9 +27,36 @@ import EnhancedTableHead from '../EnhancedTableHead'
 import { getDateBr } from '../../functions/getDates'
 import { getComparator, stableSort } from '../../functions/orderTable'
 
-const CheckProd = ({ product, classes }) => {
+const CheckProd = ({ product, classes, availableStocks }) => {
   const [ qtdDelivery, setQtdDelivery ] = useState(product.openQuantity)
   const [ inputNumber, setInputNumber ] = useState(false)
+
+  const handleCheck = e => {
+    product['qtdDelivery'] = qtdDelivery
+    product['check'] = e.target.checked
+    setInputNumber(!inputNumber)
+    if (e.target.checked) {
+      availableStocks.forEach(availableStock => {
+        if (availableStock.COD_ORIGINAL === product.COD_ORIGINAL) {
+          availableStock.availableStock -= qtdDelivery
+        }
+      })
+    } else {
+      availableStocks.forEach(availableStock => {
+        if (availableStock.COD_ORIGINAL === product.COD_ORIGINAL) {
+          availableStock.availableStock += qtdDelivery
+        }
+      })
+    }
+  }
+
+  var availableStockQtd
+
+  availableStocks.forEach(availableStock => {
+    if (availableStock.COD_ORIGINAL === product.COD_ORIGINAL) {
+      availableStockQtd = availableStock.availableStock
+    }
+  })
 
   if ( product.STATUS !== 'Enviado' ) {
     return (
@@ -38,9 +65,15 @@ const CheckProd = ({ product, classes }) => {
         <TableCell></TableCell>
       </>
     )
-  } else {
+  } else if(product.availableStock <= 0){
+    return <TableCell colSpan={2}>{availableStockQtd}</TableCell>
+  } else{
     return (
       <>
+        <TableCell
+          style={availableStockQtd < 0 ? {background: 'red', color: 'white'}: {}}
+        >{availableStockQtd}</TableCell>
+
         <TableCell>
           <input 
             type="number" 
@@ -55,11 +88,7 @@ const CheckProd = ({ product, classes }) => {
 
         <TableCell align="right" className={classes.tdCheckBox}>
           <Checkbox
-            onChange={ e => {
-              product['qtdDelivery'] = qtdDelivery
-              product['check'] = e.target.checked
-              setInputNumber(!inputNumber)
-            }}
+            onChange={handleCheck}
           />
         </TableCell>
       </>
@@ -67,7 +96,7 @@ const CheckProd = ({ product, classes }) => {
   }
 }
 
-function Row({ sale, type, setSales}) {
+function Row({ sale, type, setSales, availableStocks }) {
   const [ open, setOpen ] = useState(false)
   const classes = useStyles()
   const { setAddress } = useAddress()
@@ -146,6 +175,7 @@ function Row({ sale, type, setSales}) {
                     <TableCell>Qtd. Proc.</TableCell>
                     {type === 'forecast' &&
                       <>
+                        <TableCell>Qtd Disp</TableCell>
                         <TableCell>Qtd</TableCell>
                         <TableCell></TableCell>
                       </>
@@ -171,6 +201,7 @@ function Row({ sale, type, setSales}) {
                         <CheckProd 
                           product={product}
                           classes={classes}
+                          availableStocks={availableStocks}
                         />
                       }
                       {type === 'delivery' &&
@@ -193,7 +224,8 @@ function Row({ sale, type, setSales}) {
 export default function TableSales({ 
   sales,
   setSales,
-  type
+  type,
+  availableStocks
 }){
   const [ order, setOrder ] = useState('asc')
   const [ orderBy, setOrderBy ] = useState('idSales')
@@ -242,6 +274,7 @@ export default function TableSales({
                 setSales={setSales}
                 classes={classes}
                 type={type}
+                availableStocks={availableStocks}
               />
           ))}
         </TableBody>
