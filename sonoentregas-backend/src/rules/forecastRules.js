@@ -165,7 +165,7 @@ class ForecastRules {
           if (codOriginal === '') {
             codOriginal = `'${product.COD_ORIGINAL}'`
           } else {
-            codOriginal = `, '${product.COD_ORIGINAL}'`
+            codOriginal += `, '${product.COD_ORIGINAL}'`
           }
         } else {
           qtdProducts.forEach( qtdProductReleased => qtdProductReleased.qtdDelivery += qtdProduct.qtdDelivery)
@@ -174,7 +174,7 @@ class ForecastRules {
     })
 
     const estProducts = await SalesProd._query(1, `
-      SELECT A.ALTERNATI, B.EST_LOJA - C.qtdFullForecast qtdAvailableStock
+      SELECT A.ALTERNATI, B.EST_LOJA - ISNULL(C.qtdFullForecast, 0) qtdAvailableStock
       FROM PRODUTOS A
       INNER JOIN PRODLOJAS B ON A.CODIGO = B.CODIGO
       LEFT JOIN ( SELECT COD_ORIGINAL, SUM(QUANTIDADE) qtdFullForecast
