@@ -81,8 +81,19 @@ module.exports = {
       await ForecastsRules.checkAvailableStock(sales)
 
       // Process
+      const idForecast = await ForecastService.createForecast({
+        userId,
+        dateForecast
+      })
 
-      return res.status(201).json()
+      await ForecastService.createSalesForecast({
+        sales,
+        idForecast,
+        userId,
+        add: false
+      })
+
+      return res.status(201).json(idForecast)
     } catch (e) {
       console.log(e)
 
