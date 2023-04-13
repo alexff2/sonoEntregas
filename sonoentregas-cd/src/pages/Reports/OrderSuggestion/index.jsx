@@ -202,7 +202,7 @@ export default function OrderSuggestion() {
       <TableContainer>
         <Table>
           <TableHead>
-            <TableRow className={classe.rowHead}>
+            <TableRow className={classe.tableHead}>
               {[
                 'CÓDIGO',
                 'DESCRIÇÃO',
@@ -277,7 +277,7 @@ export default function OrderSuggestion() {
         <TableContainer>
           <Table>
             <TableHead>
-              <TableRow className={classe.rowHead}>
+              <TableRow className={classe.tableHead}>
                 {[
                   'CÓDIGO',
                   'DESCRIÇÃO',

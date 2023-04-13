@@ -23,9 +23,12 @@ export default function Reports(){
         </Typography>
       </AppBar>
 
-      <Box p={4} display={'flex'}>
+      <Box p={4} display={'flex'} style={{gap: 12}}>
         <Link className={classe.link} onClick={() => navigate('/app/reports/orderSuggestion')}>
           <Assessment /> <Typography>Sugestão de pedidos</Typography>
+        </Link>
+        <Link className={classe.link} onClick={() => navigate('/app/reports/salesOpen')}>
+          <Assessment /> <Typography>DAVs abertas</Typography>
         </Link>
       </Box>
 

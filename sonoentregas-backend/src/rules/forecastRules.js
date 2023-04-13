@@ -7,6 +7,7 @@
  * 
  * @typedef {Object} Products
  * @property {string} COD_ORIGINAL
+ * @property {number} qtdDelivery
  * 
  * @typedef {Object} Sale
  * @property {number} ID
@@ -160,7 +161,10 @@ class ForecastRules {
         const qtdProduct = qtdProducts.length > 0 ? qtdProducts.find( qtdProduct => qtdProduct.COD_ORIGINAL === product.COD_ORIGINAL) : undefined
 
         if (!qtdProduct) {
-          qtdProducts = [...qtdProducts, product]
+          qtdProducts = [...qtdProducts, { 
+            COD_ORIGINAL: product.COD_ORIGINAL,
+            qtdDelivery: product.qtdDelivery
+          }]
 
           if (codOriginal === '') {
             codOriginal = `'${product.COD_ORIGINAL}'`
@@ -168,7 +172,11 @@ class ForecastRules {
             codOriginal += `, '${product.COD_ORIGINAL}'`
           }
         } else {
-          qtdProducts.forEach( qtdProductReleased => qtdProductReleased.qtdDelivery += qtdProduct.qtdDelivery)
+          qtdProducts.forEach( qtdProductReleased => {
+            if (qtdProductReleased.COD_ORIGINAL === product.COD_ORIGINAL) {
+              qtdProductReleased.qtdDelivery += product.qtdDelivery
+            }
+          })
         }
       })
     })
