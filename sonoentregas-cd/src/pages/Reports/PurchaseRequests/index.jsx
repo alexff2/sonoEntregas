@@ -21,9 +21,12 @@ import {
 import { useNavigate } from 'react-router-dom'
 
 import SearchIcon from '@material-ui/icons/Search'
+
+import Modal from '../../../components/Modal'
 import ReportContainer from '../../../components/Reports'
 import EnhancedTableHead from '../../../components/EnhancedTableHead'
 import BrMonetaryValue from '../../../components/BrMonetaryValue'
+import PurchaseProducts from './PurchaseProducts'
 
 import { getComparator, stableSort } from '../../../functions/orderTable'
 import { getDateBr } from '../../../functions/getDates'
@@ -41,15 +44,17 @@ const BoxFlex = (props) => (
   />
 )
 
-export default function SalesOpen(){
+export default function PurchaseRequests(){
   const [ order, setOrder ] = useState('desc')
   const [ orderBy, setOrderBy ] = useState('DIAS_EMIS')
+  const [ openModal, setOpenModal ] = useState(false)
   const [ openReport, setOpenReport ] = useState(false)
   const [ typeSearch, setTypeSearch ] = useState('COD_PED')
   const [ search, setSearch ] = useState('')
   const [ onlyGreaterThan10, setOnlyGreaterThan10 ] = useState(false)
   const [ partial, setPartial ] = useState(false)
   const [ purchaseRequests, setPurchaseRequests ] = useState([])
+  const [ purchaseSelect, setPurchaseSelect ] = useState({})
   const navigate = useNavigate()
   const classe = useStyle()
 
@@ -66,6 +71,11 @@ export default function SalesOpen(){
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
+  }
+
+  const handleDialogProductPurchase = purchase => {
+    setOpenModal(true)
+    setPurchaseSelect(purchase)
   }
 
   const headCells = [
@@ -117,6 +127,7 @@ return(
 
     <BoxFlex mt={2} mb={2}>
       <Button variant='contained' color='primary' onClick={() => navigate('/app/reports')}>Voltar</Button>
+      <Button variant='contained' color='primary' onClick={() => getPurchase()}>Atualizar</Button>
       <Button variant='contained' color='primary' onClick={() => setOpenReport(true)}>PDF</Button>
     </BoxFlex>
 
@@ -184,10 +195,14 @@ return(
           headCells={headCells}
           classe={classe}
         />
+
         <TableBody>
           {stableSort(purchaseRequestsFiltered, getComparator(order, orderBy)).map((item, i) => (
             <TableRow key={i} className={classe.rowBody}>
-              <TableCell>{item.CODIGOPEDIDO}</TableCell>
+              <TableCell
+                onClick={() =>handleDialogProductPurchase(item)}
+                style={{ cursor: 'pointer'}}
+              >{item.CODIGOPEDIDO}</TableCell>
               <TableCell>{getDateBr(item.EMISSAO)}</TableCell>
               <TableCell>{item.DIAS_EMIS}</TableCell>
               <TableCell>
@@ -232,7 +247,7 @@ return(
                   <BrMonetaryValue value={item.VALORBRUTO}/>
                 </TableCell>
                 <TableCell>
-                  <BrMonetaryValue value={item.VALORCHEGADA}/>
+                  <BrMonetaryValue value={item.VALOR_CHEGADA}/>
                 </TableCell>
                 <TableCell>{item.CODALTERNATIVO}</TableCell>
                 <TableCell>{item.OBS}</TableCell>
@@ -242,5 +257,14 @@ return(
         </Table>
       </TableContainer>
     </ReportContainer>
+
+    <Modal
+      open={openModal}
+      setOpen={setOpenModal}
+      title={'Pedido de compra'}
+    >
+      <PurchaseProducts supplier={purchaseSelect} />
+    </Modal>
+
   </Box>)
 }

@@ -29,5 +29,8 @@
   padding: 15px;
   margin-top: 20px;
   width: 744px; /* 248 is 10% the a4 (3*10%) */
-  height: 1052.4px; /* 350,8 is 10% the a4 (3*10%) */
+  /* height: 1052.4px; 350,8 is 10% the a4 (3*10%) */
+}
+.paginavel {
+  page-break-after: always;
 }

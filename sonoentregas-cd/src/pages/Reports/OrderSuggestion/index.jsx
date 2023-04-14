@@ -299,7 +299,7 @@ export default function OrderSuggestion() {
             <TableBody>
             {productsFilter.map( product => (
               <TableRow key={product.COD_ORIGINAL} className={classe.rowBody}>
-                <TableCell>{product.COD_ORIGINAL}</TableCell>
+                <TableCell style={{fontSize: 10}}>{product.COD_ORIGINAL}</TableCell>
                 <TableCell style={{fontSize: 10}}>{product.NOME}</TableCell>
                 <TableCell>{product.QTD_MES1}</TableCell>
                 <TableCell>{product.QTD_MES2}</TableCell>

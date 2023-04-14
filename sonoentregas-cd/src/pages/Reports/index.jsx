@@ -25,13 +25,13 @@ export default function Reports(){
 
       <Box p={4} style={{display: 'grid', gap: 32}}>
         <Link className={classe.link} onClick={() => navigate('/app/reports/orderSuggestion')}>
-          <Assessment /> <Typography>Sugestão de pedidos</Typography>
+          <Assessment /> &nbsp; &nbsp; <Typography>Sugestão de pedidos</Typography>
         </Link>
         <Link className={classe.link} onClick={() => navigate('/app/reports/salesOpen')}>
-          <Assessment /> <Typography>DAVs abertas</Typography>
+          <Assessment /> &nbsp; &nbsp; <Typography>DAVs abertas</Typography>
         </Link>
         <Link className={classe.link} onClick={() => navigate('/app/reports/purchaseRequests')}>
-          <Assessment /> <Typography>Pedidos de compra abertos</Typography>
+          <Assessment /> &nbsp; &nbsp; <Typography>Pedidos de compra abertos</Typography>
         </Link>
       </Box>
 
