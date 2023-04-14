@@ -126,6 +126,7 @@ routes.put('/sizes', sizesController.inactivate)
 routes.get('/catdef', catDefController.index)
 //Reports
 routes.get('/reports', reportsController.listProducts)
+routes.get('/reports/sales/open', reportsController.salesOpen)
 //Developer 
 routes.get('/dev/:table', devController.getTable)
 

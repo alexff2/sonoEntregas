@@ -32,6 +32,7 @@ class objDate {
 
     return dateObj
   }
+
   getDate(date = false) {
     if (date) {
       var data = this.getObjDate(date)
@@ -54,6 +55,7 @@ class objDate {
       return date
     }
   }
+
   setDaysInDate(date, days) {
     var data, dia, diaF, mes, mesF, anoF
   
@@ -68,6 +70,7 @@ class objDate {
   
     return date
   }
+
   getHours(){
     const date = new Date()
     var hours, minutes, seconds
@@ -79,6 +82,30 @@ class objDate {
     seconds = seconds.length === 1 ? `0${seconds}` : seconds
 
     return `${hours}:${minutes}:${seconds}`
+  }
+
+  convertMillisecondsToDays(milliseconds){
+    return milliseconds / 86400000
+  }
+
+  subtractDate(majorDate, minusDate) {
+    console.log(majorDate)
+    const dif = majorDate - minusDate
+
+    return this.convertMillisecondsToDays(dif)
+  }
+
+  difDate(date1, date2){
+    let difDays
+    
+    if (date1 < date2) {
+      //console.log( )
+      difDays = (date2-date1)/86400000
+    } else {
+      difDays = (date1-date2)/86400000
+    }
+
+    return difDays
   }
 }
 

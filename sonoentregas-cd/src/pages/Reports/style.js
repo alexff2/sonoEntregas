@@ -19,8 +19,9 @@ export const useStyle = makeStyles(theme => ({
   barHeader: {
     padding: theme.spacing(2),
     background: theme.palette.primary.main,
-    display: 'flex'
-    //flexGrow: 1
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between'
   },
   search: {
     position: 'relative',
@@ -56,7 +57,7 @@ export const useStyle = makeStyles(theme => ({
   label: {
     color: fade(theme.palette.common.white, 0.55)
   },
-  fieldSeach: {
+  fieldSearch: {
     color: fade(theme.palette.common.white, 0.55),
     height: '2.3rem',
     width: theme.spacing(15),
@@ -64,6 +65,7 @@ export const useStyle = makeStyles(theme => ({
   },
   btnSearch: {
     background: theme.palette.primary.dark,
-    color: theme.palette.common.white
+    color: theme.palette.common.white,
+    marginRight: 12
   }
 }))

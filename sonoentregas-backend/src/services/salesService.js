@@ -15,6 +15,8 @@
  * @property {number} ID_SALES
  * @property {number} CODLOJA
  * @property {string} STATUS
+ * @property {string} EMISSAO
+ * @property {string} D_ENVIO
  * @property {IProduct[] | []} products
  * 
  * @typedef {Object} IForecast
@@ -27,6 +29,7 @@ const Sales = require('../models/Sales')
 const ViewSalesProd = require('../models/ViewSalesProd')
 const Empresas = require('../models/Empresas')
 const Forecast = require('../models/tables/Forecast')
+const { difDate } = require('../functions/getDate')
 
 /**
  * @typedef {Object} PropAddProductSale
@@ -223,5 +226,28 @@ module.exports = {
     }
 
     return addProductInSale({sales: forecastSales, products: forecastProduct })
+  },
+  async findSalesToReport(){
+    /**@type {ISales[] | []} */
+    const sales = await Sales.findAny(0, {
+      status: 'Aberta'
+    }, 'ID_SALES, NOMECLI, EMISSAO, D_ENVIO')
+
+    sales.forEach(sale => {
+      const millisecondsIssuance = new Date(sale.EMISSAO).setHours(0,0,0,0)
+      const millisecondsSend = new Date(sale.D_ENVIO).setHours(0,0,0,0)
+      const millisecondsNow = new Date().setHours(0,0,0,0)
+
+      const daysIssuance = difDate(millisecondsIssuance, millisecondsNow)
+      const daysSend = difDate(millisecondsSend, millisecondsNow)
+
+      const difDays = daysIssuance - daysSend
+
+      sale['DIAS_EMIS'] = daysIssuance
+      sale['DIAS_ENVIO'] = daysSend
+      sale['DIF_DIAS'] = difDays
+    })
+
+    return sales
   }
 }

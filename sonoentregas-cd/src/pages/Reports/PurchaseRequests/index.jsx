@@ -29,7 +29,17 @@ import { getDateBr } from '../../../functions/getDates'
 
 import { useStyle } from '../style'
 
-import api from '../../../services/api'
+const dataTeste = [
+  {CODIGOPEDIDO: 123, EMISSAO: '2023-04-10', DIAS_EMIS: 2, VALORBRUTO: 123.01, VALORCHEGADA: 123.01, CODALTERNATIVO: 1, OBS: '' },
+  {CODIGOPEDIDO: 123, EMISSAO: '2023-04-05', DIAS_EMIS: 7, VALORBRUTO: 123.01, VALORCHEGADA: 123.01, CODALTERNATIVO: 1, OBS: '' },
+  {CODIGOPEDIDO: 223, EMISSAO: '2023-04-01', DIAS_EMIS: 11, VALORBRUTO: 123.01, VALORCHEGADA: 123.01, CODALTERNATIVO: 0, OBS: '' },
+  {CODIGOPEDIDO: 146, EMISSAO: '2023-04-01', DIAS_EMIS: 9, VALORBRUTO: 123.01, VALORCHEGADA: 123.01, CODALTERNATIVO: 0, OBS: '' },
+  {CODIGOPEDIDO: 423, EMISSAO: '2023-04-01', DIAS_EMIS: 11, VALORBRUTO: 123.01, VALORCHEGADA: 123.01, CODALTERNATIVO: 3, OBS: '' },
+  {CODIGOPEDIDO: 223, EMISSAO: '2023-04-07', DIAS_EMIS: 5, VALORBRUTO: 123.01, VALORCHEGADA: 123.01, CODALTERNATIVO: 2, OBS: '' },
+  {CODIGOPEDIDO: 323, EMISSAO: '2023-04-07', DIAS_EMIS: 5, VALORBRUTO: 123.01, VALORCHEGADA: 123.01, CODALTERNATIVO: 2, OBS: '' },
+]
+
+//import api from '../../../services/api'
 
 const BoxFlex = (props) => (
   <Box
@@ -44,22 +54,12 @@ export default function SalesOpen(){
   const [ order, setOrder ] = useState('desc')
   const [ orderBy, setOrderBy ] = useState('DIAS_EMIS')
   const [ openReport, setOpenReport ] = useState(false)
-  const [ typeSearch, setTypeSearch ] = useState('DESC')
+  const [ typeSearch, setTypeSearch ] = useState('COD_PED')
   const [ search, setSearch ] = useState('')
   const [ onlyGreaterThan10, setOnlyGreaterThan10 ] = useState(false)
-  const [ onlyDifGreaterThan1, setOnlyDifGreaterThan1 ] = useState(false)
-  const [ sales, setSales ] = useState([])
+  const [ purchaseRequests, setPurchaseRequests ] = useState(dataTeste)
   const navigate = useNavigate()
   const classe = useStyle()
-
-  useEffect(() => {
-    getSales()
-  },[])
-
-  const getSales = async () => {
-    const { data } = await api.get('reports/sales/open')
-    setSales(data)
-  }
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -68,32 +68,42 @@ export default function SalesOpen(){
   }
 
   const headCells = [
-    {id: 'ID_SALES', label: 'DAV'},
-    {id: 'NOMECLI', label: 'DESCRIÇÃO'},
+    {id: 'CODIGOPEDIDO', label: 'PEDIDO'},
     {id: 'EMISSAO', label: 'EMISSÃO'},
     {id: 'DIAS_EMIS', label: 'DIAS'},
-    {id: 'D_ENVIO', label: 'DATA ENVIO'},
-    {id: 'DIAS_ENVIO', label: 'DIAS'},
-    {id: 'DIF_DIAS', label: '# DIAS'},
+    {id: 'VALORBRUTO', label: 'VALOR'},
+    {id: 'VALORCHEGADA', label: 'VL CHEGOU'},
+    {id: 'CODALTERNATIVO', label: 'PED FORNECEDOR'},
+    {id: 'OBS', label: 'OBSERVAÇÃO'},
   ]
 
-  var salesFiltered = sales
+  const headCellsReport = [
+    {id: 'CODIGOPEDIDO', label: 'PEDIDO'},
+    {id: 'EMISSAO', label: 'EMISSÃO'},
+    {id: 'DIAS_EMIS', label: 'DIAS'},
+    {id: 'VALORBRUTO', label: 'VALOR'},
+    {id: 'VALORCHEGADA', label: 'VL CHEGOU'},
+    {id: 'CODALTERNATIVO', label: 'PED FOR'},
+    {id: 'OBS', label: 'OBSERVAÇÃO'},
+  ]
 
-  if (typeSearch === 'DESC') {
-    salesFiltered = salesFiltered.filter(sale => sale.NOMECLI.includes(search))
+  var purchaseRequestsFiltered = purchaseRequests
+
+  if (typeSearch === 'COD_PED') {
+    purchaseRequestsFiltered = purchaseRequestsFiltered.filter(item => item.CODIGOPEDIDO.toString().includes(search))
   }
 
-  if (typeSearch === 'COD') {
-    salesFiltered = salesFiltered.filter(sale => sale.ID_SALES.toString().includes(search))
+  if (typeSearch === 'COD_FOR') {
+    purchaseRequestsFiltered = purchaseRequestsFiltered.filter(item => item.CODALTERNATIVO.toString().includes(search))
   }
 
   if (onlyGreaterThan10) {
-    salesFiltered = salesFiltered.filter(sale => sale.DIAS_EMIS > 10)
+    purchaseRequestsFiltered = purchaseRequestsFiltered.filter(item => item.DIAS_EMIS > 10)
   }
 
-  if (onlyDifGreaterThan1) {
-    salesFiltered = salesFiltered.filter(sale => sale.DIF_DIAS > 1)
-  }
+  useEffect(() => {
+    setPurchaseRequests(dataTeste)
+  },[])
 
 return(
   <Box  component={Paper} p={2}>
@@ -101,7 +111,7 @@ return(
       component='h1'
       align='center'
     >
-      Relatório de DAVs abertas
+      Relatório de Pedidos de compra abertas
     </Typography>
 
     <BoxFlex mt={2} mb={2}>
@@ -120,8 +130,8 @@ return(
             onChange={e => setTypeSearch(e.target.value)}
             defaultValue={typeSearch}
           >
-            <MenuItem value={'COD'}>Código</MenuItem>
-            <MenuItem value={'DESC'}>Descrição</MenuItem>
+            <MenuItem value={'COD_PED'}>Código</MenuItem>
+            <MenuItem value={'COD_FOR'}>Cod Fornecedor</MenuItem>
           </Select>
         </FormControl>
         <div className={classe.search}>
@@ -151,17 +161,6 @@ return(
         className={classe.inputRoot}
         label="Maior que 10 dias"
       />
-
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={onlyDifGreaterThan1}
-            onChange={e => setOnlyDifGreaterThan1(e.target.checked)}
-          />
-        }
-        className={classe.inputRoot}
-        label="Diferença maior que 2"
-      />
     </Box>
 
     <TableContainer>
@@ -174,15 +173,15 @@ return(
           classe={classe}
         />
         <TableBody>
-          {stableSort(salesFiltered, getComparator(order, orderBy)).map((sale, i) => (
+          {stableSort(purchaseRequestsFiltered, getComparator(order, orderBy)).map((item, i) => (
             <TableRow key={i} className={classe.rowBody}>
-              <TableCell>{sale.ID_SALES}</TableCell>
-              <TableCell>{sale.NOMECLI}</TableCell>
-              <TableCell>{getDateBr(sale.EMISSAO)}</TableCell>
-              <TableCell>{sale.DIAS_EMIS}</TableCell>
-              <TableCell>{getDateBr(sale.D_ENVIO)}</TableCell>
-              <TableCell>{sale.DIAS_ENVIO}</TableCell>
-              <TableCell style={sale.DIF_DIAS > 1 ? {color: 'red'} : {color: 'black'}}>{sale.DIF_DIAS}</TableCell>
+              <TableCell>{item.CODIGOPEDIDO}</TableCell>
+              <TableCell>{getDateBr(item.EMISSAO)}</TableCell>
+              <TableCell>{item.DIAS_EMIS}</TableCell>
+              <TableCell>{item.VALORBRUTO}</TableCell>
+              <TableCell>{item.VALORCHEGADA}</TableCell>
+              <TableCell>{item.CODALTERNATIVO}</TableCell>
+              <TableCell>{item.OBS}</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -200,27 +199,27 @@ return(
 
       <TableContainer>
         <Table>
-        <EnhancedTableHead
-          order={order}
-          orderBy={orderBy}
-          onRequestSort={handleRequestSort}
-          headCells={headCells}
-          classe={classe}
-        />
-        <TableBody>
-          {stableSort(salesFiltered, getComparator(order, orderBy)).map((sale, i) => (
-            <TableRow key={i} className={classe.rowBody}>
-              <TableCell>{sale.ID_SALES}</TableCell>
-              <TableCell>{sale.NOMECLI}</TableCell>
-              <TableCell>{getDateBr(sale.EMISSAO)}</TableCell>
-              <TableCell>{sale.DIAS_EMIS}</TableCell>
-              <TableCell>{getDateBr(sale.D_ENVIO)}</TableCell>
-              <TableCell>{sale.DIAS_ENVIO}</TableCell>
-              <TableCell style={sale.DIF_DIAS > 1 ? {color: 'red'} : {color: 'black'}}>{sale.DIF_DIAS}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          <EnhancedTableHead
+            order={order}
+            orderBy={orderBy}
+            onRequestSort={handleRequestSort}
+            headCells={headCellsReport}
+            classe={classe}
+          />
+          <TableBody>
+            {stableSort(purchaseRequestsFiltered, getComparator(order, orderBy)).map((item, i) => (
+              <TableRow key={i} className={classe.rowBody}>
+                <TableCell>{item.CODIGOPEDIDO}</TableCell>
+                <TableCell>{getDateBr(item.EMISSAO)}</TableCell>
+                <TableCell>{item.DIAS_EMIS}</TableCell>
+                <TableCell>{item.VALORBRUTO}</TableCell>
+                <TableCell>{item.VALORCHEGADA}</TableCell>
+                <TableCell>{item.CODALTERNATIVO}</TableCell>
+                <TableCell>{item.OBS}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </TableContainer>
     </ReportContainer>
   </Box>)
