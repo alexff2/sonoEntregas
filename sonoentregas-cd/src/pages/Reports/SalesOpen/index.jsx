@@ -45,6 +45,7 @@ export default function SalesOpen(){
   const [ orderBy, setOrderBy ] = useState('DIAS_EMIS')
   const [ openReport, setOpenReport ] = useState(false)
   const [ typeSearch, setTypeSearch ] = useState('DESC')
+  const [ typeShop, setTypeShop ] = useState('all')
   const [ search, setSearch ] = useState('')
   const [ onlyGreaterThan10, setOnlyGreaterThan10 ] = useState(false)
   const [ onlyDifGreaterThan1, setOnlyDifGreaterThan1 ] = useState(false)
@@ -75,9 +76,10 @@ export default function SalesOpen(){
     {id: 'D_ENVIO', label: 'DATA ENVIO'},
     {id: 'DIAS_ENVIO', label: 'DIAS'},
     {id: 'DIF_DIAS', label: '# DIAS'},
+    {id: 'SHOP', label: 'LOJA'},
   ]
 
-  var salesFiltered = sales
+  let salesFiltered = sales
 
   if (typeSearch === 'DESC') {
     salesFiltered = salesFiltered.filter(sale => sale.NOMECLI.includes(search))
@@ -87,6 +89,10 @@ export default function SalesOpen(){
     salesFiltered = salesFiltered.filter(sale => sale.ID_SALES.toString().includes(search))
   }
 
+  if (typeShop !== 'all') {
+    salesFiltered = salesFiltered.filter(sale => sale.SHOP.includes(typeShop))
+  }
+
   if (onlyGreaterThan10) {
     salesFiltered = salesFiltered.filter(sale => sale.DIAS_EMIS > 10)
   }
@@ -94,6 +100,15 @@ export default function SalesOpen(){
   if (onlyDifGreaterThan1) {
     salesFiltered = salesFiltered.filter(sale => sale.DIF_DIAS > 1)
   }
+
+  let shops = []
+  sales.forEach(sale => {
+    const shop = shops.find(shop => shop === sale.SHOP)
+
+    if (!shop) {
+      shops = [...shops, sale.SHOP]
+    }
+  })
 
 return(
   <Box  component={Paper} p={2}>
@@ -162,6 +177,22 @@ return(
         className={classe.inputRoot}
         label="Diferença maior que 2"
       />
+
+      <FormControl variant="outlined">
+        <InputLabel id="fieldShop" className={classe.label}>Loja</InputLabel>
+        <Select
+          label="Loja"
+          labelId="fieldShop"
+          className={classe.fieldSearch}
+          onChange={e => setTypeShop(e.target.value)}
+          defaultValue={typeShop}
+        >
+          <MenuItem value={'all'}>Todas</MenuItem>
+          {shops.map( shop => (
+            <MenuItem value={shop} key={shop}>{shop}</MenuItem>
+          ))}
+        </Select>
+      </FormControl>
     </Box>
 
     <TableContainer>
@@ -183,6 +214,7 @@ return(
               <TableCell>{getDateBr(sale.D_ENVIO)}</TableCell>
               <TableCell>{sale.DIAS_ENVIO}</TableCell>
               <TableCell style={sale.DIF_DIAS > 1 ? {color: 'red'} : {color: 'black'}}>{sale.DIF_DIAS}</TableCell>
+              <TableCell>{sale.SHOP}</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -217,6 +249,7 @@ return(
               <TableCell>{getDateBr(sale.D_ENVIO)}</TableCell>
               <TableCell>{sale.DIAS_ENVIO}</TableCell>
               <TableCell style={sale.DIF_DIAS > 1 ? {color: 'red'} : {color: 'black'}}>{sale.DIF_DIAS}</TableCell>
+              <TableCell>{sale.SHOP}</TableCell>
             </TableRow>
           ))}
         </TableBody>

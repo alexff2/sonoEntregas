@@ -231,7 +231,9 @@ module.exports = {
     /**@type {ISales[] | []} */
     const sales = await Sales.findAny(0, {
       status: 'Aberta'
-    }, 'ID_SALES, NOMECLI, EMISSAO, D_ENVIO')
+    }, 'CODLOJA, ID_SALES, NOMECLI, EMISSAO, D_ENVIO')
+
+    const shops = await Empresas._query(0, 'SELECT * FROM LOJAS', QueryTypes.SELECT)
 
     sales.forEach(sale => {
       const millisecondsIssuance = new Date(sale.EMISSAO).setHours(0,0,0,0)
@@ -246,6 +248,12 @@ module.exports = {
       sale['DIAS_EMIS'] = daysIssuance
       sale['DIAS_ENVIO'] = daysSend
       sale['DIF_DIAS'] = difDays
+
+      shops.forEach( shops => {
+        if (shops.CODLOJA === sale.CODLOJA) {
+          sale['SHOP'] = shops.DESC_ABREV
+        }
+      })
     })
 
     return sales
