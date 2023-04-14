@@ -127,6 +127,7 @@ routes.get('/catdef', catDefController.index)
 //Reports
 routes.get('/reports', reportsController.listProducts)
 routes.get('/reports/sales/open', reportsController.salesOpen)
+routes.get('/reports/purchase/requests', reportsController.purchaseRequest)
 //Developer 
 routes.get('/dev/:table', devController.getTable)
 

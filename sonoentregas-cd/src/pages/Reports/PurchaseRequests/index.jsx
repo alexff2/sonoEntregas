@@ -23,23 +23,14 @@ import { useNavigate } from 'react-router-dom'
 import SearchIcon from '@material-ui/icons/Search'
 import ReportContainer from '../../../components/Reports'
 import EnhancedTableHead from '../../../components/EnhancedTableHead'
+import BrMonetaryValue from '../../../components/BrMonetaryValue'
 
 import { getComparator, stableSort } from '../../../functions/orderTable'
 import { getDateBr } from '../../../functions/getDates'
 
 import { useStyle } from '../style'
 
-const dataTeste = [
-  {CODIGOPEDIDO: 123, EMISSAO: '2023-04-10', DIAS_EMIS: 2, VALORBRUTO: 123.01, VALORCHEGADA: 123.01, CODALTERNATIVO: 1, OBS: '' },
-  {CODIGOPEDIDO: 123, EMISSAO: '2023-04-05', DIAS_EMIS: 7, VALORBRUTO: 123.01, VALORCHEGADA: 123.01, CODALTERNATIVO: 1, OBS: '' },
-  {CODIGOPEDIDO: 223, EMISSAO: '2023-04-01', DIAS_EMIS: 11, VALORBRUTO: 123.01, VALORCHEGADA: 123.01, CODALTERNATIVO: 0, OBS: '' },
-  {CODIGOPEDIDO: 146, EMISSAO: '2023-04-01', DIAS_EMIS: 9, VALORBRUTO: 123.01, VALORCHEGADA: 123.01, CODALTERNATIVO: 0, OBS: '' },
-  {CODIGOPEDIDO: 423, EMISSAO: '2023-04-01', DIAS_EMIS: 11, VALORBRUTO: 123.01, VALORCHEGADA: 123.01, CODALTERNATIVO: 3, OBS: '' },
-  {CODIGOPEDIDO: 223, EMISSAO: '2023-04-07', DIAS_EMIS: 5, VALORBRUTO: 123.01, VALORCHEGADA: 123.01, CODALTERNATIVO: 2, OBS: '' },
-  {CODIGOPEDIDO: 323, EMISSAO: '2023-04-07', DIAS_EMIS: 5, VALORBRUTO: 123.01, VALORCHEGADA: 123.01, CODALTERNATIVO: 2, OBS: '' },
-]
-
-//import api from '../../../services/api'
+import api from '../../../services/api'
 
 const BoxFlex = (props) => (
   <Box
@@ -57,9 +48,19 @@ export default function SalesOpen(){
   const [ typeSearch, setTypeSearch ] = useState('COD_PED')
   const [ search, setSearch ] = useState('')
   const [ onlyGreaterThan10, setOnlyGreaterThan10 ] = useState(false)
-  const [ purchaseRequests, setPurchaseRequests ] = useState(dataTeste)
+  const [ partial, setPartial ] = useState(false)
+  const [ purchaseRequests, setPurchaseRequests ] = useState([])
   const navigate = useNavigate()
   const classe = useStyle()
+
+  useEffect(() => {
+    getPurchase()
+  },[])
+
+  const getPurchase = async () => {
+    const { data } = await api.get('reports/purchase/requests')
+    setPurchaseRequests(data)
+  }
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -101,9 +102,9 @@ export default function SalesOpen(){
     purchaseRequestsFiltered = purchaseRequestsFiltered.filter(item => item.DIAS_EMIS > 10)
   }
 
-  useEffect(() => {
-    setPurchaseRequests(dataTeste)
-  },[])
+  if (partial) {
+    purchaseRequestsFiltered = purchaseRequestsFiltered.filter(item => item.difValue !== item.VALORBRUTO)
+  }
 
 return(
   <Box  component={Paper} p={2}>
@@ -161,6 +162,17 @@ return(
         className={classe.inputRoot}
         label="Maior que 10 dias"
       />
+
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={partial}
+            onChange={e => setPartial(e.target.checked)}
+          />
+        }
+        className={classe.inputRoot}
+        label="Parciais"
+      />
     </Box>
 
     <TableContainer>
@@ -178,8 +190,12 @@ return(
               <TableCell>{item.CODIGOPEDIDO}</TableCell>
               <TableCell>{getDateBr(item.EMISSAO)}</TableCell>
               <TableCell>{item.DIAS_EMIS}</TableCell>
-              <TableCell>{item.VALORBRUTO}</TableCell>
-              <TableCell>{item.VALORCHEGADA}</TableCell>
+              <TableCell>
+                <BrMonetaryValue value={item.VALORBRUTO}/>
+              </TableCell>
+              <TableCell>
+                <BrMonetaryValue value={item.VALOR_CHEGADA}/>
+              </TableCell>
               <TableCell>{item.CODALTERNATIVO}</TableCell>
               <TableCell>{item.OBS}</TableCell>
             </TableRow>
@@ -212,8 +228,12 @@ return(
                 <TableCell>{item.CODIGOPEDIDO}</TableCell>
                 <TableCell>{getDateBr(item.EMISSAO)}</TableCell>
                 <TableCell>{item.DIAS_EMIS}</TableCell>
-                <TableCell>{item.VALORBRUTO}</TableCell>
-                <TableCell>{item.VALORCHEGADA}</TableCell>
+                <TableCell>
+                  <BrMonetaryValue value={item.VALORBRUTO}/>
+                </TableCell>
+                <TableCell>
+                  <BrMonetaryValue value={item.VALORCHEGADA}/>
+                </TableCell>
                 <TableCell>{item.CODALTERNATIVO}</TableCell>
                 <TableCell>{item.OBS}</TableCell>
               </TableRow>
