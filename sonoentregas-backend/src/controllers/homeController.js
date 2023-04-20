@@ -4,14 +4,14 @@ module.exports = {
   async index( req, res){
     const { salesPending,
       salesOnRelease,
-      salesOnDelivring,
+      salesOnDelivering,
       devOnRelease,
       delivering } = await salesDevInf()
 
     return res.json({ 
       salesPending,
       salesOnRelease,
-      salesOnDelivring,
+      salesOnDelivering,
       devOnRelease,
       delivering
     })

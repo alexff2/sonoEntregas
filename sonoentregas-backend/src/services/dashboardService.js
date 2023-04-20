@@ -6,61 +6,65 @@ const ObjDate = require('../functions/getDate')
 const { decimalAdjust } = require('../functions/roundNumber')
 
 module.exports = {
-  async issueDate(datesearch, days = 15){
+  async issueDate(dateSearch, days = 15){
     const issue = []
 
-    issue.push(new Date(datesearch))
+    issue.push(new Date(dateSearch))
 
     for (let index = 0; index < days-1; index++) {
       const date1 = new Date(issue[index])
+
       date1.setDate(date1.getDate()-1)
+
       issue.push(date1)
     }
     
     issue.sort( (a,b) => a - b )
     
     for (let i = 0; i < issue.length; i++) {
-      issue[i] = ObjDate.getDate(issue[i]) 
+      issue[i] = ObjDate.getDate(issue[i], true)
     }
+
     return issue
   },
 
-  async salesByDeliv(issue){
+  async salesByDelivery(issue){
     const issueStart = issue[0]
     const issueEnd = issue[issue.length - 1]
 
     const salesArray = []
-    const delivArray = []
+    const deliveriesArray = []
 
     const sales = await Sales.count(0, `WHERE EMISSAO BETWEEN '${issueStart}' AND '${issueEnd}'`, 'EMISSAO')
-    const deliv = await Sales._query(0, `SELECT * FROM VIEW_DELIVERED_BY_DAYS WHERE D_DELIVERED BETWEEN '${issueStart}' AND '${issueEnd}'`)
+    const deliveries = await Sales._query(0, `SELECT * FROM VIEW_DELIVERED_BY_DAYS WHERE D_DELIVERED BETWEEN '${issueStart}' AND '${issueEnd}'`)
     
     issue.forEach(elEmis => {
-      const foundSale = sales.find(elSales => ObjDate.getDate(elSales.EMISSAO) === elEmis )
+      const foundSale = sales.find(elSales => ObjDate.getDate(elSales.EMISSAO, true) === elEmis )
       foundSale ? salesArray.push(foundSale.SALES) : salesArray.push(0)
       
-      const foundDeliv = deliv[0].find(elDeliv => ObjDate.getDate(elDeliv.D_DELIVERED) === elEmis )
-      foundDeliv ? delivArray.push(foundDeliv.QTD_SALES) : delivArray.push(0)
+      const foundDelivery = deliveries[0].find(elDelivery => ObjDate.getDate(elDelivery.D_DELIVERED, true) === elEmis )
+
+      foundDelivery ? deliveriesArray.push(foundDelivery.QTD_SALES) : deliveriesArray.push(0)
     })
 
-    return { salesArray, delivArray}
+    return { salesArray, deliveriesArray}
   },
 
   async onTime(issue){
     const issueStart = issue[0]
     const issueEnd = issue[issue.length - 1]
 
-    const delivOnTime = await Sales._query(0, `SELECT COUNT(ID_SALE) delivOnTime FROM VIEW_DELIV_FINISH_SALES where D_DELIVERED BETWEEN '${issueStart}' and '${issueEnd}' AND D_DELIVERED <= D_ENTREGA1`, QueryTypes.SELECT)
+    const deliveryOnTime = await Sales._query(0, `SELECT COUNT(ID_SALE) deliveryOnTime FROM VIEW_DELIV_FINISH_SALES where D_DELIVERED BETWEEN '${issueStart}' and '${issueEnd}' AND D_DELIVERED <= D_ENTREGA1`, QueryTypes.SELECT)
     
-    const delivTot = await Sales._query(0, `SELECT COUNT(ID_SALE) delivTot FROM VIEW_DELIV_FINISH_SALES where D_DELIVERED BETWEEN '${issueStart}' and '${issueEnd}'`, QueryTypes.SELECT)
+    const deliveryTot = await Sales._query(0, `SELECT COUNT(ID_SALE) deliveryTot FROM VIEW_DELIV_FINISH_SALES where D_DELIVERED BETWEEN '${issueStart}' and '${issueEnd}'`, QueryTypes.SELECT)
   
-    const delivLate = delivTot[0].delivTot - delivOnTime[0].delivOnTime
+    const deliveryLate = deliveryTot[0].deliveryTot - deliveryOnTime[0].deliveryOnTime
 
-    const valueCalcPerc = (delivOnTime[0].delivOnTime / delivTot[0].delivTot) * 100
+    const valueCalcPercentage = (deliveryOnTime[0].deliveryOnTime / deliveryTot[0].deliveryTot) * 100
 
-    const percDelivOnTime = decimalAdjust( 'round',valueCalcPerc, -1)
+    const percentageDeliveryOnTime = decimalAdjust( 'round',valueCalcPercentage, -1)
 
-    return { delivTot: delivTot[0].delivTot, delivOnTime: delivOnTime[0].delivOnTime, delivLate, percDelivOnTime }
+    return { deliveryTot: deliveryTot[0].deliveryTot, deliveryOnTime: deliveryOnTime[0].deliveryOnTime, deliveryLate, percentageDeliveryOnTime }
   },
 
   async salesOpen(){
@@ -69,7 +73,7 @@ module.exports = {
     const totSalesOpen = sales.length
     var salesLate = 0, salesAwait = 0, scheduledSales = 0
     sales.forEach(sale => {
-      if (ObjDate.getDate(sale.D_ENTREGA1) < ObjDate.getDate()){
+      if (ObjDate.getDate(sale.D_ENTREGA1, true) < ObjDate.getDate()){
         salesLate++
       } else if (sale.SCHEDULED) {
         scheduledSales++
@@ -95,6 +99,7 @@ module.exports = {
       datas.push(item.QTD_SALES)
       labels.push(item.DESC_ABREV)
     })
+
     return { labels, datas }
   },
 

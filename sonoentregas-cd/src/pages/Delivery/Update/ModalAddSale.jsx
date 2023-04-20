@@ -178,7 +178,8 @@ export default function ModalAddSale({ setOpen }){
   }
 
   const addSaleFound = sale => {
-    if (sale.validationStatus) {
+    console.log(sale)
+    if (!sale.validationStatus) {
       setSaleSelected([...saleSelected, sale])
       setSlideInputs(false)
       setSlideTable(true)
@@ -306,7 +307,7 @@ export default function ModalAddSale({ setOpen }){
               {salesWithSameNumber.map((sale, i) => (
                 <Paper
                   key={i}
-                  className={sale.validationStatus ? classes.card : classes.cardDisable}
+                  className={!sale.validationStatus ? classes.card : classes.cardDisable}
                   onClick={() => addSaleFound(sale)}>
                   <Box>
                     <Typography className={classes.text}>

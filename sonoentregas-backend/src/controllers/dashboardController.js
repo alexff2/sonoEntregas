@@ -1,6 +1,8 @@
+//@ts-check
+
 const {
   issueDate,
-  salesByDeliv,
+  salesByDelivery,
   onTime,
   salesOpen,
   salesByShop,
@@ -10,35 +12,35 @@ const { salesDevInf } = require('../services/homeService')
 
 module.exports = {
   async index( req, res ){
-    const { datesearch } = req.params
+    const { dateSearch } = req.params
 
-    const issue = await issueDate(datesearch)
+    const issue = await issueDate(dateSearch)
 
-    const { delivArray, salesArray } = await salesByDeliv(issue)
+    const { deliveriesArray, salesArray } = await salesByDelivery(issue)
 
-    const { delivTot, delivOnTime, delivLate, percDelivOnTime } = await onTime(issue)
+    const { deliveryTot, deliveryOnTime, deliveryLate, percentageDeliveryOnTime } = await onTime(issue)
 
     const salesOpenDatas = await salesOpen()
 
     const dataSalesByShop = await salesByShop(issue)
 
-    const { salesOnRelease, salesOnDelivring, devOnRelease, delivering } = await salesDevInf()
+    const { salesOnRelease, salesOnDelivering, devOnRelease, delivering } = await salesDevInf()
 
     const { devFinish, salesFinish } = await salesEndDevFinish(issue)
 
       return res.json({ 
       issue,
-      delivArray,
+      deliveriesArray,
       salesArray,
-      delivTot,
-      delivOnTime,
-      delivLate,
-      percDelivOnTime,
+      deliveryTot,
+      deliveryOnTime,
+      deliveryLate,
+      percentageDeliveryOnTime,
       salesOpenDatas,
       salesByShop: dataSalesByShop,
       salesDevInfos: {
         salesOnRelease,
-        salesOnDelivring,
+        salesOnDelivering,
         devOnRelease,
         delivering,
         devFinish,

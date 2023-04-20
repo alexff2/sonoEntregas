@@ -8,7 +8,7 @@ module.exports = {
     
     const salesOnRelease = await Sales._query(0, `SELECT COUNT(A.SALESONRELEASE) SALESONRELEASE FROM (SELECT COUNT(ID_SALES) AS SALESONRELEASE FROM SALES_PROD WHERE STATUS = 'Em lançamento' GROUP BY ID_SALES) A`, QueryTypes.SELECT)
     
-    const salesOnDelivring = await Sales._query(0, `SELECT COUNT(A.SALESONDELIV) SALESONDELIV FROM (SELECT COUNT(ID_SALES) AS SALESONDELIV FROM SALES_PROD WHERE STATUS = 'Entregando' GROUP BY ID_SALES) A`, QueryTypes.SELECT)
+    const salesOnDelivering = await Sales._query(0, `SELECT A.SALESONDELIV FROM (SELECT COUNT(ID_SALES) AS SALESONDELIV FROM SALES_PROD WHERE STATUS = 'Entregando' GROUP BY ID_SALES) A`, QueryTypes.SELECT)
 
     const devOnRelease = await Deliverys._query(0, `SELECT COUNT(ID) AS ONRELEASEDEV FROM DELIVERYS WHERE STATUS = 'Em lançamento'`, QueryTypes.SELECT)
     
@@ -17,7 +17,7 @@ module.exports = {
     return { 
       salesPending: salesPending[0].SALESPENDING,
       salesOnRelease: salesOnRelease[0].SALESONRELEASE,
-      salesOnDelivring: salesOnDelivring[0].SALESONDELIV,
+      salesOnDelivering: salesOnDelivering[0].SALESONDELIV,
       devOnRelease: devOnRelease[0].ONRELEASEDEV,
       delivering: delivering[0].DELIVERYN,
     }
