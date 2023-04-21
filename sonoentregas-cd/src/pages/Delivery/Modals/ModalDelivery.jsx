@@ -51,7 +51,7 @@ const useStyles = makeStyles(theme => ({
   divSearchSale: {
     display: 'flex',
     '& button': {
-      margin: '16px 0 8px 16px',
+      margin: '16px 0 8px 8px',
       width: 100,
       background: theme.palette.primary.main,
       border: 'none',
@@ -64,6 +64,10 @@ const useStyles = makeStyles(theme => ({
         opacity: '0.7'
       } 
     }
+  },
+  formControlTypeSearch: {
+    margin: '16px 8px 8px 0',
+    minWidth: '160px',
   },
   error: {
     margin: '4px 0',
@@ -124,7 +128,8 @@ export default function ModalDelivery({ setOpen, type }){
   const [ codCar, setCodCar ] = useState(false)
   const [ codDriver, setCodDriver ] = useState(false)
   const [ codAssistant, setCodAssistant ] = useState(false)
-  const [ idSale, setIdSale ] = useState('')
+  const [ search, setSearch ] = useState('')
+  const [ typeSearch, setTypeSearch ] = useState('idSale')
   const [ deliverySales, setDeliverySales ] = useState([])
   const [ availableStocks, setAvailableStocks ] = useState([])
   const [ errorMsg, setErrorMsg ] = useState('')
@@ -254,84 +259,110 @@ export default function ModalDelivery({ setOpen, type }){
     }
   }
 
-  const handleSearchSales = async e => {
-    try {
-      e.preventDefault()
+  const setStateSales = sales => {
+    let products = []
+      
+    sales.forEach( sale => {
+      products = [...products, ...sale.products]
+    })
 
-      if (idSale === ''){
-        setErrorMsg('Preencha o campo Código da Venda')
-        return
+    setAvailableStocks([ ...availableStocks, ...products.filter( product => {
+      const availableStock = availableStocks.find(availableStock => availableStock.COD_ORIGINAL === product.COD_ORIGINAL)
+
+      if (!!availableStock) {
+        return false
       }
 
-      let { data }  = await api.get(`sales/${idSale}/${ type === 'forecast' ? 'forecast':'routes' }/create`)
+      return true
+    }).map(product => ({
+      COD_ORIGINAL: product.COD_ORIGINAL,
+      NOME: product.NOME,
+      QUANTIDADE: product.QUANTIDADE,
+      qtdFullForecast: product.qtdFullForecast,
+      availableStock: product.availableStock
+    }))])
+
+    setDeliverySales([...deliverySales, ...sales])
+  }
+
+  const validationsSearchById = async (sales) => {
+    if (sales.length > 1) {
+      setSalesFound(sales)
+      setOpenModalSelectSales(true)
+      return
+    }
+
+    if (sales[0].validationStatus === null) {
+      setErrorMsg('Venda não validada, solicite que a loja entre em contato com cliente!')
+      setSearch('')
+      return
+    }
+
+    if (sales[0].validationStatus === false) {
+      setErrorMsg('A entrega desta venda foi recusada pelo cliente, acesse a previsão para ver o motivo!')
+      setSearch('')
+      return
+    }
+
+    setStateSales(sales)
+  }
+
+  const handleSearchSales = async e => {
+    e.preventDefault()
+
+    if (search === ''){
+      setErrorMsg(`Preencha o campo Código ${ typeSearch === 'codProduct' ? 'do Produto' : 'da DAV'}`)
+      return
+    }
+
+    try {
+      const { data }  = typeSearch === 'idSale'
+        ? await api.get(`sales/${search}/${ type === 'forecast' ? 'forecast':'routes' }/create`)
+        : await api.get(`/sales/forecast/create/product/${search}`)
 
       if (data === '') {
-        setErrorMsg('Venda não enviada a base do CD!')
-
+        setErrorMsg( typeSearch === 'idSale' ? 'Venda não enviada a base do CD!' : 'Produto sem vendas pendentes!')
+  
         return
-      } else if (data.notFound) {
+      }
+  
+      if (data.notFound) {
         setErrorMsg(data.notFound.message)
         
         return
-      } else if (data.length === 0) {
-        setErrorMsg('Venda FECHADA já lançada em rota, consultar no menu VENDAS para saber STATUS da rota')
-        
-        return
-      } else {
-        const filteredSales = deliverySales.length > 0
-          ? data.filter( sale => {
-              const deliverySale = deliverySales.find( deliverySale => deliverySale.ID === sale.ID)
-
-              if (!!deliverySale) {
-                return false
-              }
-
-              return true
-            })
-          : data
-
-        if(filteredSales.length === 0) {
-          setErrorMsg('Venda já lançada')
-          return
-        }
-
-        if (filteredSales.length > 1) {
-          setSalesFound(filteredSales)
-          setOpenModalSelectSales(true)
-          return
-        }
-
-        if (filteredSales[0].validationStatus === null) {
-          setErrorMsg('Venda não validada, solicite que a loja entre em contato com cliente!')
-          setIdSale('')
-          return
-        }
-
-        if (filteredSales[0].validationStatus === false) {
-          setErrorMsg('A entrega desta venda foi recusada pelo cliente, acesse a previsão para ver o motivo!')
-          setIdSale('')
-          return
-        }
-
-        setAvailableStocks([ ...availableStocks, ...filteredSales[0].products.filter( product => {
-          const availableStock = availableStocks.find(availableStock => availableStock.COD_ORIGINAL === product.COD_ORIGINAL)
-
-          if (!!availableStock) {
-            return false
-          }
-
-          return true
-        }).map(product => ({
-          COD_ORIGINAL: product.COD_ORIGINAL,
-          NOME: product.NOME,
-          QUANTIDADE: product.QUANTIDADE,
-          qtdFullForecast: product.qtdFullForecast,
-          availableStock: product.availableStock
-        }))])
-
-        setDeliverySales([...deliverySales, ...filteredSales])
       }
-    } catch (e) {
+  
+      if (data.length === 0) {
+        setErrorMsg( typeSearch === 'idSale'
+          ? 'Venda FECHADA já lançada em rota, consultar no menu VENDAS para saber STATUS da rota'
+          : 'Atenção erro em venda(s) desse produto!'
+        )
+
+        return
+      }
+  
+      const filteredSales = deliverySales.length > 0
+        ? data.filter( sale => {
+            const deliverySale = deliverySales.find( deliverySale => deliverySale.ID === sale.ID)
+  
+            if (!!deliverySale) {
+              return false
+            }
+  
+            return true
+          })
+        : data
+  
+      if(filteredSales.length === 0) {
+        setErrorMsg('Venda(s) já lançada')
+        return
+      }
+
+      typeSearch === 'idSale'
+        ? validationsSearchById(filteredSales)
+        : setStateSales(filteredSales)
+
+      } catch (e) {
       if (!e.response){
         console.log(e)
         setAlert('Rede')
@@ -342,24 +373,42 @@ export default function ModalDelivery({ setOpen, type }){
         console.log(e.response.data)
       }
     }
-    setIdSale('')
+
+    setSearch('')
   }
 
-  const onChangeInputIdSale = e => {
+  const onChangeInputSearch = e => {
     if (errorMsg !== '') {
       setErrorMsg('')
     }
 
-    if (e.target.value === '') setIdSale(e.target.value)
-    else if (!isNaN(parseInt(e.target.value))) setIdSale(parseInt(e.target.value))
+    if (e.target.value === '') setSearch(e.target.value)
+    else if (typeSearch === 'codProduct') setSearch(e.target.value)
+    else if (!isNaN(parseInt(e.target.value))) setSearch(parseInt(e.target.value))
     else setErrorMsg('Digite apenas números')
   }
 
   const addSalesInDeliverySales = sale => {
-    if (sale.validationStatus) {
+    if (!sale.validationStatus) {
+      setAvailableStocks([ ...availableStocks, ...sale.products.filter( product => {
+        const availableStock = availableStocks.find(availableStock => availableStock.COD_ORIGINAL === product.COD_ORIGINAL)
+
+        if (!!availableStock) {
+          return false
+        }
+
+        return true
+      }).map(product => ({
+        COD_ORIGINAL: product.COD_ORIGINAL,
+        NOME: product.NOME,
+        QUANTIDADE: product.QUANTIDADE,
+        qtdFullForecast: product.qtdFullForecast,
+        availableStock: product.availableStock
+      }))])
+
       setDeliverySales([...deliverySales, sale])
       setOpenModalSelectSales(false)
-      setIdSale('')
+      setSearch('')
     }
   }
 
@@ -457,19 +506,37 @@ export default function ModalDelivery({ setOpen, type }){
       <hr style={{ marginTop: '16px' }}/>
 
       <div className={classes.divSearchSale}>
+        <FormControl variant="outlined" className={classes.formControlTypeSearch}>
+          <InputLabel id="typeSearch">Tipo</InputLabel>
+          <Select
+            labelId="typeSearch"
+            value={typeSearch}
+            onChange={e => {
+              setErrorMsg('')
+              setSearch('')
+              setTypeSearch(e.target.value)
+            }}
+            label="Tipo da pesquisa"
+          >
+            <MenuItem value={'idSale'}>DAV</MenuItem>
+            <MenuItem value={'codProduct'}>Produto</MenuItem>
+          </Select>
+        </FormControl>
+
         <TextField
           id="idSale"
-          label="Inserir venda"
-          placeholder="Digite código da venda"
+          label={typeSearch === 'idSale' ? "Código DAV" : "Código Produto"}
+          placeholder={typeSearch === 'idSale' ? "Digite código da DAV!" : "Digite código do produto!"}
           fullWidth
           margin="normal"
           InputLabelProps={{
             shrink: true,
           }}
-          value={idSale}
+          value={search}
           variant="outlined"
-          onChange={onChangeInputIdSale}
+          onChange={onChangeInputSearch}
         />
+
         <button onClick={e => handleSearchSales(e)}>Inserir</button>
       </div>
 
@@ -514,7 +581,7 @@ export default function ModalDelivery({ setOpen, type }){
           {salesFound.map((sale, i) => (
             <Paper
               key={i}
-              className={sale.validationStatus ? classes.card : classes.cardDisable}
+              className={!sale.validationStatus ? classes.card : classes.cardDisable}
               onClick={() => addSalesInDeliverySales(sale)}>
               <Box>
                 <Typography className={classes.text}>

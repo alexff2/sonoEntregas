@@ -52,6 +52,7 @@ routes.put('/users/:userId', usersController.update)
 //Sales Sono Delivery
 routes.get('/sales', salesController.findSales)
 routes.get('/sales/:idSale/forecast/create', salesController.findSalesToCreatedForecast)
+routes.get('/sales/forecast/create/product/:idProduct', salesController.findSalesToCreatedForecastByProduct)
 routes.get('/sales/:idSale/routes/create', salesController.findSalesToCreatedDelivery)
 routes.get('/sales/:idSale/loja/:idLoja/product/:idProduct', salesController.findProductDetails)
 routes.post('/sales/updateDate/:idSale', salesController.updateDateDelivery)
@@ -85,7 +86,7 @@ routes.put('/deliverys/status/:id', ensureAuthenticated, deliveryUpdateControlle
 routes.delete('/deliverys/:id', ensureAuthenticated, deliverysController.delete)
 //Homes
 routes.get('/home', homeController.index)
-routes.get('/dashboard/:datesearch', dashboardController.index)
+routes.get('/dashboard/:dateSearch', dashboardController.index)
 //Maintenance
 routes.get('/maintenance/:codloja', maintController.index)
 routes.get('/maintenance/:idSale/:codloja', maintController.searchSaleToMaint)

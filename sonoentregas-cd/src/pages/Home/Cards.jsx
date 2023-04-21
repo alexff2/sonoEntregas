@@ -97,7 +97,7 @@ export default function Home(){
           },
           {
             icon: ShoppingCart,
-            value: (resp.data.salesOnRelease + resp.data.salesOnDelivring),
+            value: (resp.data.salesOnRelease + resp.data.salesOnDelivering),
             title: 'Vendas em processo',
           },
           {

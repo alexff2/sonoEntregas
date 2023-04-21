@@ -147,7 +147,7 @@ function Row({ sale, type, setSales, availableStocks }) {
         <TableCell onClick={setInformation}>{sale.BAIRRO}</TableCell>
         <TableCell onClick={setInformation} style={styleDateDelivery()}>{getDateBr(sale.D_ENTREGA1)}</TableCell>
         <TableCell onClick={setInformation}>{sale.SHOP}</TableCell>
-        { type === 'delivery' && 
+        { (type === 'delivery' || type === 'forecast') && 
           <TableCell
             style={{ cursor: 'pointer' }} 
             onClick={() => {

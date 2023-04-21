@@ -178,8 +178,23 @@ export default function ModalAddSale({ setOpen }){
   }
 
   const addSaleFound = sale => {
-    console.log(sale)
     if (!sale.validationStatus) {
+      setAvailableStocks([ ...availableStocks, ...sale.products.filter( product => {
+        const availableStock = availableStocks.find(availableStock => availableStock.COD_ORIGINAL === product.COD_ORIGINAL)
+
+        if (!!availableStock) {
+          return false
+        }
+
+        return true
+      }).map(product => ({
+        COD_ORIGINAL: product.COD_ORIGINAL,
+        NOME: product.NOME,
+        QUANTIDADE: product.QUANTIDADE,
+        qtdFullForecast: product.qtdFullForecast,
+        availableStock: product.availableStock
+      }))])
+
       setSaleSelected([...saleSelected, sale])
       setSlideInputs(false)
       setSlideTable(true)

@@ -1,7 +1,7 @@
 //@ts-check
 const Sales = require('../models/Sales')
 const ViewDeliveryProd = require('../models/ViewDeliveryProd2')
-const ViewDeliverys = require('../models/ViewDeliverys')
+const ViewDeliveries = require('../models/ViewDeliverys')
 
 const SalesService = require('../services/salesService')
 
@@ -49,10 +49,30 @@ module.exports = {
    * @param {*} req 
    * @param {*} res 
    */
+  async findSalesToCreatedForecastByProduct(req, res){
+    try {
+      const { idProduct } = req.params
+
+      const sales = await SalesService.findToCreateForecastByProduct(idProduct)
+
+      return res.json(sales)
+    } catch (e) {
+      console.log(e)
+
+      let status = e.status ? e.status : 400
+      let error = e.error ? e.error : e
+
+      return res.status(status).json(error)
+    }
+  },
+  /**
+   * @param {*} req 
+   * @param {*} res 
+   */
   async findSalesToCreatedForecast(req, res){
     try {
       const { idSale } = req.params
-      
+
       if(isNaN(parseInt(idSale))) {
         console.log(idSale)
         throw new Error('Param idSale is not number!')
@@ -108,7 +128,7 @@ module.exports = {
       var resp
   
       if (products.length > 0 ) {
-        const delivery = await ViewDeliverys.findSome(0, `ID = ${products[products.length - 1].ID_DELIVERY}`)
+        const delivery = await ViewDeliveries.findSome(0, `ID = ${products[products.length - 1].ID_DELIVERY}`)
   
         resp = {products, delivery}
         return res.status(200).json(resp)
