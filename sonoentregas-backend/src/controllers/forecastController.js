@@ -59,10 +59,11 @@ module.exports = {
    */
   async create(req, res){
     try {
-      const { dateForecast, sales } = req.body
+      const { date, sales } = req.body
       const { id: userId } = req.user
+      console.log(date)
 
-      if (!dateForecast || !sales) {
+      if (!date || !sales) {
         throw {
           status: 400,
           error: {
@@ -72,7 +73,7 @@ module.exports = {
       }
 
       //Business Rules
-      await ForecastsRules.checkDateInsertForecast({ dateForecast })
+      await ForecastsRules.checkDateInsertForecast({ date })
 
       await ForecastsRules.checkForecastSalesIsClosed(sales)
 
@@ -83,7 +84,7 @@ module.exports = {
       // Process
       const idForecast = await ForecastService.createForecast({
         userId,
-        dateForecast
+        date
       })
 
       await ForecastService.createSalesForecast({

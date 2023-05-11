@@ -31,7 +31,7 @@
  * @property {string} status
  * 
  * @typedef {Object} PropsCreateForecast
- * @property {string} dateForecast
+ * @property {string} date
  * @property {string} userId
  * 
  * @typedef {Object} PropsSalesForecast
@@ -124,8 +124,8 @@ class ForecastService {
   }
 
   /** @param {PropsCreateForecast} props */
-  async createForecast({ dateForecast, userId }) {
-    const formatSqlForecastDate = ObjDate.setDaysInDate(dateForecast, 0)
+  async createForecast({ date, userId }) {
+    const formatSqlForecastDate = ObjDate.setDaysInDate(date, 0)
 
     await Forecast.creatorAny(0, [{
       date: formatSqlForecastDate,

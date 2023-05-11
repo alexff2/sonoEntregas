@@ -114,20 +114,39 @@ module.exports = {
   async salesEndDevFinish(issue){
     const issueEnd = issue[issue.length - 1]
 
-    var salesFinish = await Sales._query(0,`SELECT QTD_SALES FROM VIEW_DELIVERED_BY_DAYS WHERE D_DELIVERED = '${issueEnd}'`, QueryTypes.SELECT)
+    var salesFinish = await Sales._query(0,`
+    SELECT COUNT(*) qtdSales
+      FROM (SELECT ID_DELIVERY, ID_SALE, CODLOJA
+      FROM DELIVERYS_PROD A
+      INNER JOIN DELIVERYS B ON A.ID_DELIVERY = B.ID
+      WHERE D_DELIVERED = '${issueEnd}'
+      GROUP BY ID_DELIVERY, ID_SALE, CODLOJA) A`, QueryTypes.SELECT)
+
     salesFinish.length > 0 ? salesFinish = salesFinish[0].QTD_SALES : salesFinish = 0
 
-    const salesReturnDeliveries = await Sales._query(0,`SELECT DELIVERED, COUNT(DELIVERED) qtdSales
-    FROM (SELECT ID_DELIVERY, ID_SALE, CODLOJA, DELIVERED
-    FROM DELIVERYS_PROD
-    WHERE D_DELIVERED = '2023-05-08'
-    GROUP BY ID_DELIVERY, ID_SALE, CODLOJA, DELIVERED) A
+    const salesReturnDeliveries = await Sales._query(0,`
+    SELECT DELIVERED, COUNT(DELIVERED) qtdSales
+      FROM (SELECT ID_DELIVERY, ID_SALE, CODLOJA, DELIVERED
+      FROM DELIVERYS_PROD A
+      INNER JOIN DELIVERYS B ON A.ID_DELIVERY = B.ID
+      WHERE D_DELIVERED = '${issueEnd}'
+      GROUP BY ID_DELIVERY, ID_SALE, CODLOJA, DELIVERED) A
     GROUP BY DELIVERED`, QueryTypes.SELECT)
 
-    var devFinish = await Sales._query(0,`SELECT COUNT(ID_DELIVERY) QTD_DELIV FROM VIEW_D_DELV_ROUTES WHERE D_DELIVERED = '${issueEnd}'`, QueryTypes.SELECT)
+    let salesReturnByDay, salesDeliveredByday
+
+    salesReturnDeliveries.forEach( item => {
+      if (!item.DELIVERED) {
+        salesDeliveredByday = item.qtdSales
+      } else {
+        salesReturnByDay = item.qtdSales
+      }
+    })
+
+    var devFinish = await Sales._query(0,`SELECT COUNT(ID) QTD_DELIV FROM VIEW_D_DELV_ROUTES WHERE D_DELIVERED = '${issueEnd}'`, QueryTypes.SELECT)
 
     devFinish.length > 0 ? devFinish = devFinish[0].QTD_DELIV : devFinish = 0
 
-    return { salesFinish, devFinish }
+    return { salesFinish, devFinish, salesReturnByDay, salesDeliveredByday }
   }
 }

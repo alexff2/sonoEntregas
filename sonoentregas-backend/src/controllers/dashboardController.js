@@ -26,7 +26,7 @@ module.exports = {
 
     const { salesOnRelease, salesOnDelivering, devOnRelease, delivering } = await salesDevInf()
 
-    const { devFinish, salesFinish } = await salesEndDevFinish(issue)
+    const { devFinish, salesFinish, salesDeliveredByday, salesReturnByDay } = await salesEndDevFinish(issue)
 
       return res.json({ 
       issue,
@@ -44,7 +44,9 @@ module.exports = {
         devOnRelease,
         delivering,
         devFinish,
-        salesFinish
+        salesFinish,
+        salesReturnByDay,
+        salesDeliveredByday
       }
     })
   }

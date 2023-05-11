@@ -23,8 +23,8 @@ const ForecastSales = require('../models/tables/Forecast/ForecastSales')
 const ForecastProduct = require('../models/tables/Forecast/ForecastProduct')
 
 class ForecastRules {
-  async checkDateInsertForecast({ dateForecast }){
-    const dateForecastTimezone = ObjDate.getObjDate(dateForecast).setHours(0,0,0,0)
+  async checkDateInsertForecast({ date }){
+    const dateForecastTimezone = ObjDate.getObjDate(date).setHours(0,0,0,0)
 
     const currentDateTimezone = new Date().setHours(0,0,0,0)
 
@@ -38,8 +38,8 @@ class ForecastRules {
     }
   }
 
-  async checkDateForecast({ dateForecast }){
-    const dateForecastTimezone = ObjDate.getObjDate(dateForecast).setHours(0,0,0,0)
+  async checkDateForecast({ date }){
+    const dateForecastTimezone = ObjDate.getObjDate(date).setHours(0,0,0,0)
 
     const currentDateTimezone = new Date().setHours(0,0,0,0)
 
@@ -98,7 +98,7 @@ class ForecastRules {
       }
     }
 
-    await this.checkDateForecast({ dateForecast: forecast[0].date })
+    await this.checkDateForecast({ date: forecast[0].date })
 
     return forecast[0]
   }
