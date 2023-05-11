@@ -7,6 +7,7 @@ import { useAuthenticate } from '../../context/authContext'
 import { useModalAlert } from '../../context/modalAlertContext'
 
 export default function SignIn() {
+  const [ loading, setLoading ] = useState(false)
   const [ userName, setUserName ] = useState()
   const [ password, setPassword ] = useState()
   const [ shops, setShops ] = useState([])
@@ -38,7 +39,9 @@ export default function SignIn() {
   const handleLogin = async e => {
     e.preventDefault()
 
-    await login({ password, userName, selectShop })
+    setLoading(true)
+
+    await login({ password, userName, selectShop, setLoading })
   }
 
   return (
@@ -56,7 +59,8 @@ export default function SignIn() {
         <FiUser />
         <input
           type="text"
-          placeholder="Usuário" 
+          placeholder="Usuário"
+          disabled={loading}
           onChange={e => setUserName(e.target.value)}/>
       </div>
 
@@ -65,14 +69,22 @@ export default function SignIn() {
         <input
           type="password"
           placeholder="Senha"
+          disabled={loading}
           onChange={e => setPassword(e.target.value)}/>
       </div>
 
-      <input
+      <button
         type="submit"
         value="Entrar"
+        disabled={loading}
         className="btn solid"
-      />
+      >
+        Entrar 
+        { loading && 
+          <div className="spinner-container">
+            <div className="spinner"></div>
+          </div>}
+      </button>
     </form>
   )
 }

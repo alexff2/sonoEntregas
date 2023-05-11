@@ -4,7 +4,8 @@ import {
   Table,
   TableBody,
   TableContainer,
-  Paper
+  Paper,
+  TextField
 } from "@material-ui/core"
 
 import { ButtonCancel, ButtonSuccess } from '../../../../components/Buttons'
@@ -71,7 +72,7 @@ export default function ModalView({ setOpen, selectDelivery, type }){
   //States
   const [ openModalAlert, setOpenModalAlert ] = useState(false)
   const [ childrenModalAlert, setChildrenOpenModalAlert ] = useState('')
-  const [ dateDelivery, setDateDelivery ] = useState(false)
+  const [ date, setDate ] = useState(false)
   const [ disabledBtnSave, setDisabledBtnSave ] = useState(false)
 
   const { setDelivery } = useDelivery()
@@ -93,12 +94,11 @@ export default function ModalView({ setOpen, selectDelivery, type }){
 
   const finish = async () => {
     try {
-      console.log(selectDelivery)
-      if(dateDelivery){
+      if(date){
         setDisabledBtnSave(true)
     
         selectDelivery.STATUS = 'Finalizada'
-        selectDelivery['dateDelivery'] = dateDelivery
+        selectDelivery['date'] = date
   
         selectDelivery.sales.forEach(sale =>{
           sale.products.forEach(produto => {
@@ -148,13 +148,13 @@ export default function ModalView({ setOpen, selectDelivery, type }){
         <div>
           <p><span>Veículo: </span> {selectDelivery.CAR}</p>
           {type !== 'close' &&
-            <div>
-              <span>Data da Entrega: </span>
-              <input 
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4}}>
+              <span>Data da Entrega: </span>&nbsp;&nbsp;
+              <TextField 
                 type="date"
                 required
-                onChange={e => setDateDelivery(e.target.value)}
-              />&nbsp;
+                onChange={e => setDate(e.target.value)}
+              />
             </div>
           }
         </div>

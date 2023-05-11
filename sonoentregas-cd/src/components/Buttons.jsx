@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, makeStyles } from "@material-ui/core"
+import { Button, makeStyles, CircularProgress } from "@material-ui/core"
 
 const widthBtn = 100
 const useStyle = makeStyles( theme => ({
@@ -22,10 +22,13 @@ const useStyle = makeStyles( theme => ({
   }
 }))
 
-export function ButtonSuccess({children, className, ...other}) {
+export function ButtonSuccess({children, loading=false, ...other}) {
   const classes = useStyle()
   return(
-    <Button className={classes.btnSuccess} children={children} {...other}/>
+    <Button className={classes.btnSuccess} {...other}>
+      <span style={loading ? {marginRight: 8} : {}}>{ children }</span> 
+      {loading &&  <CircularProgress size={25}/> }
+    </Button>
   )
 }
 

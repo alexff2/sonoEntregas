@@ -1,0 +1,43 @@
+-------------------- Entregas e retornos por loja
+SELECT A.CODLOJA, C.DESCRICAO, B.CONT_DELIVERY, A.CONT_RETURN FROM
+    (SELECT A.CODLOJA, COUNT(A.ID_SALE) CONT_RETURN FROM
+        (SELECT A.CODLOJA, A.ID_SALE
+        FROM DELIVERYS_PROD A
+        WHERE A.D_DELIVERED >= '2023-04-01' AND A.DELIVERED = 1
+        GROUP BY A.CODLOJA, A.ID_SALE) A
+    GROUP BY A.CODLOJA) A
+INNER JOIN
+    (SELECT A.CODLOJA, COUNT(A.ID_SALE) CONT_DELIVERY FROM
+        (SELECT A.CODLOJA, A.ID_SALE
+        FROM DELIVERYS_PROD A
+        WHERE A.D_DELIVERED >= '2023-04-01' AND A.DELIVERED = 0
+        GROUP BY A.CODLOJA, A.ID_SALE) A
+    GROUP BY A.CODLOJA) B
+ON A.CODLOJA = B.CODLOJA
+INNER JOIN LOJAS C
+ON A.CODLOJA = C.CODLOJA
+
+------------- Previsões negadas
+select b.CODLOJA, C.DESCRICAO, count (b.CODLOJA) QUANTIDADE_NEGADA 
+from FORECAST_SALES a
+inner join SALES b on a.idSale = b.ID
+inner join LOJAS C on b.CODLOJA = C.CODLOJA
+where a.validationStatus = 0
+group by b.CODLOJA, C.DESCRICAO
+order by b.CODLOJA
+
+------------ Comparação de status da tabela Sales_prod com status da tabela deliveries
+SELECT * FROM 
+	(select ID_SALES, CODLOJA
+	from SALES_PROD 
+	where STATUS = 'Entregando'
+	group by ID_SALES, CODLOJA) A
+RIGHT JOIN (
+	SELECT ID_SALE, CODLOJA 
+	FROM DELIVERYS_PROD 
+	WHERE ID_DELIVERY IN (
+		SELECT ID FROM DELIVERYS A
+		WHERE A.STATUS = 'Entregando')
+	GROUP BY ID_SALE, CODLOJA) B ON A.CODLOJA = B.CODLOJA AND A.ID_SALES = B.ID_SALE
+
+---------------------------------

@@ -64,7 +64,7 @@ export default function AuthProvider({ children }){
     validations()
   }, [setAlert])
 
-  const login = async ({ userName, password, selectShop }) => {
+  const login = async ({ userName, password, selectShop, setLoading }) => {
     try {
       if (validateFields([password, userName])) {
         const { data } = await api.post('/authenticated', {
@@ -78,6 +78,7 @@ export default function AuthProvider({ children }){
         setToken(token)
         setUser(user)
         setShop(selectShop)
+        setLoading(false)
 
         setUserAuth(user)
         setShopAuth(selectShop)
@@ -85,9 +86,13 @@ export default function AuthProvider({ children }){
 
       } else {
         setAlert('Preencha todos os campos corretamente.')
+        setLoading(false)
       }
     } catch (e) {
+      setLoading(false)
+
       console.log(e.response)
+
       if(e.response.status === 404){
         setAlert('Rede')
       }

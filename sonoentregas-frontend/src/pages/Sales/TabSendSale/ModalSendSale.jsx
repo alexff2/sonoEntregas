@@ -64,7 +64,7 @@ function SetEstoque({ product }) {
 }
 
 export default function ModalSendSale({ 
-  item,
+  sale,
   setModal,
   date,
   setEmissao
@@ -79,11 +79,10 @@ export default function ModalSendSale({
 
   const { cod } = shopAuth
   const { ID: USER_ID } = userAuth
-  
 
   useEffect(()=>{
     setLoading(true)
-    api.get(`salesshop/products/${item.CODIGOVENDA}/${cod}`)
+    api.get(`salesshop/products/${sale.CODIGOVENDA}/${cod}`)
     .then( resp => {
         setProductSales(resp.data.productsSceShop)
         setOrcParc(resp.data.orcparc)
@@ -97,13 +96,13 @@ export default function ModalSendSale({
         console.log(err)
         setLoading(false)
       })
-  },[ cod, item, setChildrenError, setOpenAlert, setType ])
+  },[ cod, sale, setChildrenError, setOpenAlert, setType ])
 
   const submitSales = async sale => {
     const sendProduct = []
 
     productSales.forEach(product => {
-      product.SEND &&sendProduct.push(product)
+      product.SEND && sendProduct.push(product)
     })
 
     try {
@@ -148,7 +147,7 @@ export default function ModalSendSale({
   return (
     <div 
       className="modal-overlaw" 
-      key={item.CODIGOVENDA}
+      key={sale.CODIGOVENDA}
       onClick={closeModal}
     >
       <div className="modal">
@@ -157,12 +156,12 @@ export default function ModalSendSale({
 
           <div className="sales-head">
             <div className="sales-field">
-              <div><span>N Venda: </span>{item.CODIGOVENDA}</div>
-              <div><span>Cliente: </span>{item.NOMECLI}</div>
+              <div><span>N Venda: </span>{sale.CODIGOVENDA}</div>
+              <div><span>Cliente: </span>{sale.NOMECLI}</div>
               <div><span>Valor: </span>{
                 Intl
                   .NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'})
-                  .format(item.TOTALVENDA)
+                  .format(sale.TOTALVENDA)
               }</div>
               
               <div>
@@ -180,7 +179,7 @@ export default function ModalSendSale({
 
             <div className="sales-buttons">
               <button className="cancel-modal">Cancelar</button>
-              <button onClick={() => submitSales(item)}>Enviar</button>
+              <button onClick={() => submitSales(sale)}>Enviar</button>
             </div> 
           </div>
 

@@ -37,12 +37,12 @@ module.exports = {
 
     const sales = await Sales.count(0, `WHERE EMISSAO BETWEEN '${issueStart}' AND '${issueEnd}'`, 'EMISSAO')
     const deliveries = await Sales._query(0, `SELECT * FROM VIEW_DELIVERED_BY_DAYS WHERE D_DELIVERED BETWEEN '${issueStart}' AND '${issueEnd}'`)
-    
+
     issue.forEach(elEmis => {
       const foundSale = sales.find(elSales => ObjDate.getDate(elSales.EMISSAO, true) === elEmis )
       foundSale ? salesArray.push(foundSale.SALES) : salesArray.push(0)
       
-      const foundDelivery = deliveries[0].find(elDelivery => ObjDate.getDate(elDelivery.D_DELIVERED, true) === elEmis )
+      const foundDelivery = deliveries[0].find(elDelivery => ObjDate.getDate(elDelivery.D_DELIVERED) === elEmis )
 
       foundDelivery ? deliveriesArray.push(foundDelivery.QTD_SALES) : deliveriesArray.push(0)
     })
@@ -93,7 +93,15 @@ module.exports = {
     const labels = []
     const datas = []
 
-    const data = await Sales._query(0,`SELECT COUNT(ID_SALE) QTD_SALES, B.DESC_ABREV FROM VIEW_DELIV_FINISH_SALES A INNER JOIN LOJAS B ON A.CODLOJA = B.CODLOJA WHERE D_DELIVERED BETWEEN '${issueStart}' AND '${issueEnd}' GROUP BY A.CODLOJA, B.DESC_ABREV ORDER BY A.CODLOJA `,QueryTypes.SELECT)
+    const script = 
+      `SELECT COUNT(ID_SALE) QTD_SALES, B.DESC_ABREV
+      FROM VIEW_DELIV_FINISH_SALES A
+      INNER JOIN LOJAS B ON A.CODLOJA = B.CODLOJA
+      WHERE D_DELIVERED BETWEEN '${issueStart}' AND '${issueEnd}'
+      GROUP BY A.CODLOJA, B.DESC_ABREV
+      ORDER BY A.CODLOJA`
+
+    const data = await Sales._query(0,script,QueryTypes.SELECT)
 
     data.forEach( item => {
       datas.push(item.QTD_SALES)
@@ -109,8 +117,15 @@ module.exports = {
     var salesFinish = await Sales._query(0,`SELECT QTD_SALES FROM VIEW_DELIVERED_BY_DAYS WHERE D_DELIVERED = '${issueEnd}'`, QueryTypes.SELECT)
     salesFinish.length > 0 ? salesFinish = salesFinish[0].QTD_SALES : salesFinish = 0
 
+    const salesReturnDeliveries = await Sales._query(0,`SELECT DELIVERED, COUNT(DELIVERED) qtdSales
+    FROM (SELECT ID_DELIVERY, ID_SALE, CODLOJA, DELIVERED
+    FROM DELIVERYS_PROD
+    WHERE D_DELIVERED = '2023-05-08'
+    GROUP BY ID_DELIVERY, ID_SALE, CODLOJA, DELIVERED) A
+    GROUP BY DELIVERED`, QueryTypes.SELECT)
+
     var devFinish = await Sales._query(0,`SELECT COUNT(ID_DELIVERY) QTD_DELIV FROM VIEW_D_DELV_ROUTES WHERE D_DELIVERED = '${issueEnd}'`, QueryTypes.SELECT)
-    
+
     devFinish.length > 0 ? devFinish = devFinish[0].QTD_DELIV : devFinish = 0
 
     return { salesFinish, devFinish }

@@ -1,33 +1,21 @@
 USE [SONOENTREGAS]
 GO
 
-/****** Object:  Table [dbo].[DELIVERYS]    Script Date: 06/06/2021 15:38:38 ******/
-SET ANSI_NULLS ON
-GO
-
-SET QUOTED_IDENTIFIER ON
-GO
-
-SET ANSI_PADDING ON
-GO
-
 CREATE TABLE [dbo].[DELIVERYS](
-	[ID] [float] NOT NULL,
+	[ID] [int] NOT NULL PRIMARY KEY,
 	[DESCRIPTION] [varchar](30) NOT NULL,
-	[ID_CAR] [float] NOT NULL,
-	[ID_ASSISTANT] [float] NOT NULL,
-	[ID_DRIVER] [float] NOT NULL,
+	[ID_CAR] [int] NOT NULL,
+	[ID_ASSISTANT] [int] NOT NULL,
+	[ID_DRIVER] [int] NOT NULL,
 	[STATUS] [varchar](15) NOT NULL,
-	[OBS] [varchar](80) NULL,
- CONSTRAINT [PK_DELIVERYS] PRIMARY KEY CLUSTERED 
-(
-	[ID] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
-
-GO
-
-SET ANSI_PADDING OFF
-GO
-
-
+	[OBS] [varchar](255),
+	[ID_USER_MOUNT] [int] NOT NULL,
+	[dateCreated] [dateTime] NOT NULL,
+	[D_MOUNTING] [date] NOT NULL,
+	[ID_USER_DELIVERING] [int],
+	[dateUpdateDelivering] [datetime],
+	[D_DELIVERING] [date],
+	[ID_USER_DELIVERED] [int],
+	[dateUpdateDelivered] [datetime],
+	[D_DELIVERED] [date]
+)

@@ -28,6 +28,8 @@ const SalesProd = require('../models/SalesProd')
 const OrcParc = require('../models/OrcParc')
 const ViewOrcParcLoja = require('../models/ViewOrcParcLoja')
 
+const SalesService = require('../services/salesService')
+
 const ObjDate = require('../functions/getDate')
 const { QueryTypes } = require('sequelize')
 
@@ -208,5 +210,19 @@ module.exports = {
     } catch (error) {
       return res.status(400).json(error)
     }
+  },
+  /**
+   * @param {*} req
+   * @param {*} res
+   * @returns
+   */
+  async updateAddressClient(req, res) {
+    const { idSale } = req.params
+
+    await SalesService.updateAddress(idSale)
+
+    const sale = await SalesService.findSales(`ID = ${idSale}`)
+
+    return res.json(sale[0])
   }
 }

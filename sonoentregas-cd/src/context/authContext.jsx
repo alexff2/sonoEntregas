@@ -58,7 +58,7 @@ export default function AuthProvider({ children }){
     validations()
   },[setAlert])
 
-  const login = async ({ userName, password }) => {
+  const login = async ({ userName, password, setLoading }) => {
     try {
       if (validateFields([password, userName])) {
         const { data } = await api.post('/authenticated', {
@@ -76,9 +76,12 @@ export default function AuthProvider({ children }){
         setIsAuthenticated(true)
 
       } else {
+        setLoading(false)
         return setAlert('Preencha todos os campos corretamente.')
       }
     } catch (e) {
+      setLoading(false)
+
       console.log(e.response)
 
       if (!e.response)

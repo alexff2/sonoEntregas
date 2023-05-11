@@ -101,6 +101,10 @@ form.sign-in-form {
   font-weight: 500;
 }
 
+.input-field input:disabled {
+  cursor: not-allowed;
+}
+
 .btn {
   width: 150px;
   background-color: #063a79;
@@ -114,10 +118,21 @@ form.sign-in-form {
   margin: 10px 0;
   cursor: pointer;
   transition: 0.5s;
+  position: relative;
+}
+.btn:disabled {
+  background-color: #012c5f;
+  cursor: progress;
 }
 
 .btn:hover {
   background-color: #012c5f;
+}
+
+.btn span {
+  position: absolute;
+  left: 42%;
+  top: 25%;
 }
 .panels-container {
   position: absolute;

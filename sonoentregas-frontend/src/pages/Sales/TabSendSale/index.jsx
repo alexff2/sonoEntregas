@@ -83,7 +83,7 @@ export default function TabSendSale(){
       modal.map( item =>(
         <ModalSendSale 
           key={item.CODIGOVENDA}
-          item={item}
+          sale={item}
           setModal={setModal}
           date={date}
           setEmissao={setEmissao}

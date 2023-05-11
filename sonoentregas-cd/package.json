@@ -2,7 +2,7 @@
   "name": "sono-entregas-cd",
   "version": "0.1.0",
   "description": "Delivery module developed in Electro with React",
-  "author": "alexandre",
+  "author": "Alexandre",
   "build": {
     "appId": "react.electron",
     "win": {

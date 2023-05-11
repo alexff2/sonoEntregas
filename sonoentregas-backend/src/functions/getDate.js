@@ -73,6 +73,20 @@ class objDate {
     return date
   }
 
+  dateTime(objDate){
+    const dateString = objDate.toLocaleString("pt-BR", {timeZone: "America/Sao_Paulo"})
+
+    const arrayDate = dateString.split(' ')
+
+    const objDateTime =  {
+      date: arrayDate[0],
+      time: arrayDate[1],
+      dateTime: dateString
+    }
+
+    return objDateTime
+  }
+
   getHours(){
     const date = new Date()
     var hours, minutes, seconds

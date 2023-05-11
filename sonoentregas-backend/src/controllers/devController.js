@@ -1,7 +1,7 @@
 const { QueryTypes } = require('sequelize')
 
 const Model = require('../databases/MSSQL/Model')
-const { getHours } = require('../functions/getDate')
+const { dateTime } = require('../functions/getDate')
 
 class DevModel extends Model {
   constructor(){
@@ -12,11 +12,13 @@ class DevModel extends Model {
 
 module.exports = {
   async getTable(req, res) {
-    const { table } = req.params
+    //const { table } = req.params
     const DevMod = new DevModel()
 
-    const hotas = getHours()
+    //const times = getHours()
+    const forecast = await DevMod._query(0, 'SELECT * FROM FORECAST WHERE ID = 1', QueryTypes.SELECT)
+    const objDateTime = dateTime(forecast[0].createdAt)
 
-    return res.json({hotas})
+    return res.json( objDateTime )
   }
 }

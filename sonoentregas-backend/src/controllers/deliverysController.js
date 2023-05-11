@@ -5,12 +5,12 @@
  * @property {number} ID_SALES
  * @property {number} CODLOJA
  */
-
 const Deliverys = require('../models/Deliverys')
 const ViewDeliverys = require('../models/ViewDeliverys')
 const DeliveryProd = require('../models/DeliveryProd')
 const SalesProd = require('../models/SalesProd')
 
+const Date = require('../class/Date')
 const DeliveryService = require('../services/DeliveryService')
 
 module.exports = {
@@ -46,7 +46,7 @@ module.exports = {
   async create( req, res ){
     try {
       const { id: user_id } = req.user
-      const { description, ID_CAR, ID_DRIVER, ID_ASSISTANT, salesProd } = req.body
+      const { description, ID_CAR, ID_DRIVER, ID_ASSISTANT, D_MOUNTING, salesProd } = req.body
 
       const deliveryCreateId = await Deliverys.creatorAny(0, [{
         description,
@@ -55,6 +55,8 @@ module.exports = {
         ID_ASSISTANT,
         STATUS: 'Em lançamento',
         ID_USER_MOUNT: user_id,
+        dateCreated: new Date().getISODateTimeBr().dateTime,
+        D_MOUNTING,
       }])
 
       const dataDelivery = await ViewDeliverys.findSome(0, `ID = ${deliveryCreateId}`)

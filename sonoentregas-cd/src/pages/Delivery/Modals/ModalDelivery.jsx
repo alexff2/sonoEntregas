@@ -36,8 +36,6 @@ const useStyles = makeStyles(theme => ({
     maxWidth: 1050
   },
   fieldDate: {
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
     width: 200,
   },
   divFormControl: {
@@ -123,7 +121,7 @@ export default function ModalDelivery({ setOpen, type }){
   //States
   const [ openModalSelectSales, setOpenModalSelectSales ] = useState(false)
   const [ salesFound, setSalesFound ] = useState([])
-  const [ dateForecast, setDateForecast ] = useState('')
+  const [ date, setDate ] = useState('')
   const [ description, setDescription ] = useState('')
   const [ codCar, setCodCar ] = useState(false)
   const [ codDriver, setCodDriver ] = useState(false)
@@ -154,6 +152,12 @@ export default function ModalDelivery({ setOpen, type }){
         return
       }
 
+      if(date === '') {
+        setErrorMsg('Selecione a data de carregamento!')
+        setDisabledBtnSave(false)
+        return
+      }
+
       setDisabledBtnSave(true)
 
       let salesProd = []
@@ -167,6 +171,7 @@ export default function ModalDelivery({ setOpen, type }){
         ID_CAR: codCar,
         ID_DRIVER: codDriver,
         ID_ASSISTANT: codAssistant,
+        D_MOUNTING: date,
         salesProd
       })
 
@@ -183,6 +188,7 @@ export default function ModalDelivery({ setOpen, type }){
 
       setOpen(false)
     } catch (e) {
+      setDisabledBtnSave(false)
       if (!e.response){
         console.log(e)
         setAlert('Rede')
@@ -199,7 +205,7 @@ export default function ModalDelivery({ setOpen, type }){
     try {
       setDisabledBtnSave(true)
 
-      if(dateForecast === '') {
+      if(date === '') {
         setErrorMsg('Selecione a data de previsão!')
         setDisabledBtnSave(false)
         return
@@ -222,7 +228,7 @@ export default function ModalDelivery({ setOpen, type }){
       }
 
       const forecast = {
-        dateForecast,
+        date,
         sales
       }
 
@@ -242,12 +248,12 @@ export default function ModalDelivery({ setOpen, type }){
 
       setOpen(false)
     } catch (e) {
+      setDisabledBtnSave(false)
       if (!e.response){
         console.log(e)
         setAlert('Rede')
       } else if (e.response.status === 409){
         if (e.response.data.message === 'Product was out of stock!') {
-          setDisabledBtnSave(false)
           setErrorMsg('Atenção! Existe produtos que ficaram com estoque negativo, por favor verifique as vendas que estão com Qtd Disp negativo e de cor vermelha!')
         }
       } else if (e.response.status === 400){
@@ -415,7 +421,6 @@ export default function ModalDelivery({ setOpen, type }){
   //Component
   return(
     <form className={classes.form}>
-
       {type !== 'forecast'
         ?<div className={classes.divFormControl}>
           <TextField
@@ -430,6 +435,18 @@ export default function ModalDelivery({ setOpen, type }){
             defaultValue={''}
             onChange={(e) => setDescription(e.target.value)}
             required
+          />
+
+          <TextField
+            label="Data"
+            type="date"
+            variant="outlined"
+            className={classes.formControl}
+            style={{ width: 171}}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            onChange={e => setDate(e.target.value)}
           />
 
           <FormControl variant="outlined" className={classes.formControl}>
@@ -493,9 +510,10 @@ export default function ModalDelivery({ setOpen, type }){
         :<TextField
           id="date"
           label="Previsão"
-          defaultValue={dateForecast}
+          defaultValue={date}
           type="date"
-          onChange={e => setDateForecast(e.target.value)}
+          variant="outlined"
+          onChange={e => setDate(e.target.value)}
           className={classes.fieldDate}
           InputLabelProps={{
             shrink: true,

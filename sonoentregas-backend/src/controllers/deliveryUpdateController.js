@@ -57,7 +57,7 @@ module.exports = {
 
       await DeliveryService.updateDeliveryProd(delivery, id)
 
-      await DeliveryService.finishDelivery({
+      await DeliveryService.updateDelivery({
         delivery,
         id,
         user_id,

@@ -1,6 +1,11 @@
 import React, { useState } from "react"
 import { ButtonSuccess } from "../../../components/Buttons"
-import { makeStyles } from '@material-ui/core'
+import {
+  makeStyles,
+  TextField,
+  Divider,
+  Box
+} from '@material-ui/core'
 
 import { useDelivery } from "../../../context/deliveryContext"
 import { useAlert } from '../../../context/alertContext'
@@ -12,7 +17,17 @@ const useStyle = makeStyles(theme => ({
     fontSize: 15,
     color: theme.palette.common.white,
     background: theme.palette.error.light,
-    padding: 5
+    padding: 8
+  },
+  boxContainer: {
+    width: 500,
+    marginTop: 20,
+    display: 'flex',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    '& > span' : {
+      fontWeight: 'bold'
+    }
   }
 }))
 
@@ -21,8 +36,9 @@ export default function ModalDelivering({ setOpen, selectDelivery }){
   const [ error, setError ] = useState(false)
   const [ childrenError, setChildrenError ] = useState('')
   const [ disabledBtnSave, setDisabledBtnSave ] = useState(false)
+
+  const classes = useStyle()
   const { setDelivery } = useDelivery()
-  const { errorDiv } = useStyle()
   const { setAlert } = useAlert()
 
   const delivering = async () => {
@@ -38,7 +54,7 @@ export default function ModalDelivering({ setOpen, selectDelivery }){
       setDisabledBtnSave(true)
 
       selectDelivery.STATUS = 'Entregando'
-      selectDelivery['DATE'] = date
+      selectDelivery['date'] = date
   
       selectDelivery.sales.forEach(sale =>{
         sale.products.forEach(produto => {
@@ -54,6 +70,8 @@ export default function ModalDelivering({ setOpen, selectDelivery }){
 
       setOpen(false)
     } catch (e) {
+      setDisabledBtnSave(false)
+
       if (!e.response){
         console.log(e)
         setAlert('Rede')
@@ -68,11 +86,25 @@ export default function ModalDelivering({ setOpen, selectDelivery }){
 
   return(
     <div>
-      <hr />
-      Selecione a data de saída: &nbsp;
-      <input type="date" onChange={e => setDate(e.target.value)}/>&nbsp;
-      <ButtonSuccess children={'SALVAR'} onClick={delivering} disabled={disabledBtnSave}/><br/><br/>
-      {error && <div className={errorDiv}><span>{childrenError}</span></div>}
+      <Divider />
+      <Box className={classes.boxContainer}>
+        <span>Selecione a data de saída:</span>
+        <TextField
+          type="date"
+          onChange={e => setDate(e.target.value)}
+          InputLabelProps={{
+            shrink: true
+          }}
+        />
+
+        <ButtonSuccess
+          children={'SALVAR'}
+          onClick={delivering}
+          disabled={disabledBtnSave}
+          loading={disabledBtnSave}
+        />
+      </Box>
+      {error && <div className={classes.errorDiv}><span>{childrenError}</span></div>}
     </div>
   )
 }

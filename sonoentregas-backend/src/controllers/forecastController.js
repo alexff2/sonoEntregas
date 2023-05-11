@@ -59,7 +59,7 @@ module.exports = {
    */
   async create(req, res){
     try {
-      const { dateForecast, sales, availableStocks } = req.body
+      const { dateForecast, sales } = req.body
       const { id: userId } = req.user
 
       if (!dateForecast || !sales) {

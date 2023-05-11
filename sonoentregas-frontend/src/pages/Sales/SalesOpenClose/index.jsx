@@ -10,6 +10,7 @@ import { useModalAlert } from '../../../context/modalAlertContext'
 import LoadingCircle from '../../../components/LoadingCircle'
 import Status from '../../../components/Status'
 import { FormatValue } from "../../../components/FormatValue"
+import ConfirmDialog from "../../../components/ConfirmDialog"
 
 import ModalSaleDetail from '../ModalSaleDetail'
 
@@ -34,23 +35,23 @@ function TdStatus({product}){
   }
 }
 
-function Row({ sale, cancelSubmitSales, reverseStock, saleDetail }) {
-  const [open, setOpen] = React.useState(false)
+function Row({ sale, cancelSubmitSales, reverseStock, saleDetail, updateAddress }) {
+  const [open, setOpen] = useState(false)
 
   const clickProd = (e, prod) => {
     if(e.target.id === 'btnCancel') cancelSubmitSales(prod)
     else if(e.target.id === 'btnEstornar') reverseStock(prod)
     else saleDetail(sale, prod)
   }
-  
+
   return (
-    <React.Fragment>
+    <>
       <tr>
         <td style={{width: 10}} onClick={() => setOpen(!open)}>
           { open ? <AiOutlineArrowUp /> : <AiOutlineArrowDown /> }
         </td>
         <td>{sale.ID_SALES}</td>
-        <td>{sale.NOMECLI}</td>
+        <td style={{cursor: 'pointer'}} onClick={() => updateAddress(sale)}>{sale.NOMECLI}</td>
         <td>{dateSqlToReact(sale.EMISSAO)}</td>
         <td>{dateSqlToReact(sale.D_ENTREGA1)}</td>
       </tr>
@@ -88,12 +89,12 @@ function Row({ sale, cancelSubmitSales, reverseStock, saleDetail }) {
           </div>
         </td>
       </tr>
-
-    </React.Fragment>
+    </>
   );
 }
 
 export default function TabSaleWaiting({ type }) {
+  const [ showDialog, setShowDialog ] = useState(false)
   const [ openModalSaleDetail, setOpenModalSaleDetail ] = useState(false)
   const [ selectedSale, setSelectedSale ] = useState({})
   const [ selectedProduct, setSelectedProduct ] = useState({})
@@ -105,7 +106,7 @@ export default function TabSaleWaiting({ type }) {
   const { shopAuth } = useAuthenticate()
   const { cod: codLoja } = shopAuth
 
-  useEffect(()=>{
+  useEffect(()=> {
     setLoading(true)
 
     api
@@ -201,6 +202,35 @@ export default function TabSaleWaiting({ type }) {
     setOpenModalSaleDetail(true)
   }
 
+  const updateAddress = sale => {
+    setSelectedSale(sale)
+    setShowDialog(true)
+  }
+
+  const updateAddressClient = async () => {
+    try {
+      const { data: sale } = await api.put(`/sales/${selectedSale.ID}/updateAddress`)
+
+      setSales(sales.map(saleState => {
+        if(saleState.ID === sale.ID){
+          return sale
+        }
+
+        return saleState
+      }))
+
+    } catch (e) {
+      console.log(e)
+      
+      setAlert('Erro ao conectar com Servidor!')
+    }
+
+    setTimeout(() => {
+      setShowDialog(false)
+      setSelectedSale({})
+    }, 200)
+  }
+
   return(
     <>
       {/*Campo de busca de vendas*/}
@@ -271,6 +301,7 @@ export default function TabSaleWaiting({ type }) {
                 cancelSubmitSales={cancelSubmitSales}
                 reverseStock={reverseStock}
                 saleDetail={saleDetail}
+                updateAddress={updateAddress}
               />
             ))}
           </tbody>
@@ -278,11 +309,25 @@ export default function TabSaleWaiting({ type }) {
       }
 
       {openModalSaleDetail &&
-      <ModalSaleDetail 
-        sale={selectedSale}
-        product={selectedProduct}
-        openModal={openModalSaleDetail}
-        setOpenModal={setOpenModalSaleDetail}/>}
+        <ModalSaleDetail 
+          sale={selectedSale}
+          product={selectedProduct}
+          openModal={openModalSaleDetail}
+          setOpenModal={setOpenModalSaleDetail}
+        />
+      }
+
+      {showDialog && 
+        <ConfirmDialog
+          title={'Atualizar cadastro de cliente'}
+          body={'Deseja realmente atualizar o cadastro desse cliente?'}
+          onConfirm={updateAddressClient}
+          onCancel={() => {
+            setShowDialog(false)
+            setSelectedSale({})
+          }}
+        />
+      }
     </>
   )
 }

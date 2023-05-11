@@ -301,7 +301,7 @@ export default function Delivery() {
       <Modal 
         open={openModalCreateForecastDelivery}
         setOpen={setOpenModalCreateForecastDelivery}
-        title={`Lançar ${typeForecasDelivery === 'forecast' ? 'Previsão' : 'Entrega'}`}
+        title={typeForecasDelivery === 'forecast' ? 'Lançar Previsão' : 'Carregar caminhão'}
       >
         <ModalDelivery
           setOpen={setOpenModalCreateForecastDelivery}

@@ -17,6 +17,7 @@
  * @property {string} STATUS
  * @property {string} EMISSAO
  * @property {string} D_ENVIO
+ * @property {string} ENDERECO
  * @property {IProduct[] | []} products
  * 
  * @typedef {Object} IForecast
@@ -26,6 +27,7 @@
  */
 const { QueryTypes } = require('sequelize')
 const Sales = require('../models/Sales')
+const ViewVendas = require('../models/ViewVendas')
 const ViewSalesProd = require('../models/ViewSalesProd')
 const Empresas = require('../models/Empresas')
 const Forecast = require('../models/tables/Forecast')
@@ -105,7 +107,8 @@ module.exports = {
     const salesDeliveriesProd = await Sales._query(0, `SELECT A.ID_SALE
     FROM DELIVERYS_PROD A
     INNER JOIN SALES B ON A.CODLOJA = B.CODLOJA AND A.ID_SALE = B.ID_SALES
-    WHERE A.D_DELIVERED IS NOT NULL AND A.DELIVERED = 0 AND B.[STATUS] = 'Fechada' ${where}`, QueryTypes.SELECT)
+    INNER JOIN DELIVERYS C ON A.ID_DELIVERY = C.ID
+    WHERE C.STATUS = 'Finalizada' AND A.DELIVERED = 0 AND B.[STATUS] = 'Fechada' ${where}`, QueryTypes.SELECT)
 
     if (salesDeliveriesProd.length === 0) {
       return []
@@ -162,7 +165,7 @@ module.exports = {
     if (idSales.length === 0) {
       return {
         notFound: {
-          message: 'Produto não encontrado!'
+          message: 'Produto não encontrado, não pendente e/ou sem estoque!'
         }
       }
     }
@@ -291,5 +294,27 @@ module.exports = {
     })
 
     return sales
+  },
+  /**
+   * @param {number} idSale
+   * @returns 
+   */
+  async updateAddress(idSale){
+    /**@type {ISales[]} */
+    const sale = await Sales.findAny(0, { ID: idSale }, 'ID_SALES, CODLOJA')
+
+    const saleSce = await ViewVendas.findAny(sale[0].CODLOJA, {
+      CODIGOVENDA: sale[0].ID_SALES
+    })
+
+    await Sales.updateAny(0, {
+      ENDERECO: saleSce[0].ENDERECO,
+      NUMERO: saleSce[0].NUMERO,
+      BAIRRO: saleSce[0].BAIRRO,
+      CIDADE: saleSce[0].CIDADE,
+      ESTADO: saleSce[0].ESTADO,
+      PONTOREF: saleSce[0].PONTOREF,
+      OBS: saleSce[0].OBS
+    }, { ID: idSale })
   }
 }

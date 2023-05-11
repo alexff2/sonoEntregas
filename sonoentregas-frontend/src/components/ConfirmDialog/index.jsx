@@ -19,13 +19,11 @@ function DialogBox({ title, body, onCancel, onConfirm }) {
     }, 200)
   }
 
-  const handleConfirm = () => {
-    setShow(false)
+  const handleConfirm = async () => {
     setIsDisable(true)
     setIsLoading(true)
     onConfirm().then(() => {
-      setIsDisable(false)
-      setIsLoading(false)
+      setShow(false)
     })
   }
 
