@@ -49,6 +49,7 @@ export default function SalesOpen(){
   const [ search, setSearch ] = useState('')
   const [ onlyGreaterThan10, setOnlyGreaterThan10 ] = useState(false)
   const [ onlyDifGreaterThan1, setOnlyDifGreaterThan1 ] = useState(false)
+  const [ onlyLateSales, setOnlyLateSales ] = useState(false)
   const [ sales, setSales ] = useState([])
   const navigate = useNavigate()
   const classe = useStyle()
@@ -101,6 +102,10 @@ export default function SalesOpen(){
     salesFiltered = salesFiltered.filter(sale => sale.DIF_DIAS > 1)
   }
 
+  if (onlyLateSales) {
+    salesFiltered = salesFiltered.filter(sale => sale.lateDays > 0)
+  }
+
   let shops = []
   sales.forEach(sale => {
     const shop = shops.find(shop => shop === sale.SHOP)
@@ -109,6 +114,7 @@ export default function SalesOpen(){
       shops = [...shops, sale.SHOP]
     }
   })
+  console.log(salesFiltered)
 
 return(
   <Box  component={Paper} p={2}>
@@ -165,6 +171,17 @@ return(
         }
         className={classe.inputRoot}
         label="Maior que 10 dias"
+      />
+
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={onlyLateSales}
+            onChange={e => setOnlyLateSales(e.target.checked)}
+          />
+        }
+        className={classe.inputRoot}
+        label="Somente atrasadas"
       />
 
       <FormControlLabel
