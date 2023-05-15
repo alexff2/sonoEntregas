@@ -12,9 +12,9 @@ module.exports = {
 	 */
 	async index(req, res){
 		try {
-			const FdSk = await FeedStockService.findFeed(FeedStock)
+			const fdSk = await FeedStockService.findFeed()
 			
-			return res.json(FdSk)
+			return res.json(fdSk)
 		} catch (error) {
 			console.log(error)
 		}
@@ -28,15 +28,15 @@ module.exports = {
 		try {
 			const { id } = req.params
 	
-			const FdSk = await FeedStock.findSome(0, `ID = ${id}`)
+			const fdSk = await FeedStock.findSome(0, `ID = ${id}`)
 
-			if (FdSk.length > 0) {
-				FdSk.forEach(el => {
+			if (fdSk.length > 0) {
+				fdSk.forEach(el => {
 					el['nameClass'] = ''
 				})
 			}
 	
-			return res.json(FdSk)
+			return res.json(fdSk)
 		} catch (error) {
 			console.log(error)
 		}
@@ -61,7 +61,7 @@ module.exports = {
 				value: valueProd
 			}])
 
-			const feed = await FeedStockService.findFeed(FeedStock)
+			const feed = await FeedStockService.findFeed()
 
 			return res.status(201).json(feed)
 		} catch (error) {

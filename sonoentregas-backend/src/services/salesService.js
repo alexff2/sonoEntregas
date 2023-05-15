@@ -17,6 +17,7 @@
  * @property {string} STATUS
  * @property {string} EMISSAO
  * @property {string} D_ENVIO
+ * @property {string} D_ENTREGA1
  * @property {string} ENDERECO
  * @property {IProduct[] | []} products
  * 
@@ -268,23 +269,26 @@ module.exports = {
     /**@type {ISales[] | []} */
     const sales = await Sales.findAny(0, {
       status: 'Aberta'
-    }, 'CODLOJA, ID_SALES, NOMECLI, EMISSAO, D_ENVIO')
+    }, 'CODLOJA, ID_SALES, NOMECLI, EMISSAO, D_ENVIO, D_ENTREGA1')
 
     const shops = await Empresas._query(0, 'SELECT * FROM LOJAS', QueryTypes.SELECT)
 
     sales.forEach(sale => {
       const millisecondsIssuance = new Date(sale.EMISSAO).setHours(0,0,0,0)
       const millisecondsSend = new Date(sale.D_ENVIO).setHours(0,0,0,0)
+      const millisecondsDelivery = new Date(sale.D_ENTREGA1).setHours(0,0,0,0)
       const millisecondsNow = new Date().setHours(0,0,0,0)
 
       const daysIssuance = difDate(millisecondsIssuance, millisecondsNow)
       const daysSend = difDate(millisecondsSend, millisecondsNow)
+      const lateDays = (millisecondsNow - millisecondsDelivery) / 86400000
 
       const difDays = daysIssuance - daysSend
 
       sale['DIAS_EMIS'] = daysIssuance
       sale['DIAS_ENVIO'] = daysSend
       sale['DIF_DIAS'] = difDays
+      sale['lateDays'] = lateDays
 
       shops.forEach( shops => {
         if (shops.CODLOJA === sale.CODLOJA) {

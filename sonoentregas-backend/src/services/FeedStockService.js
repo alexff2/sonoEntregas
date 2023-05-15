@@ -1,6 +1,8 @@
-module.exports = {
-  async findFeed(FeedsModel){
-    const FdSk = await FeedsModel.findAll(0)
+const FeedStock = require('../models/tables/FeedStock')
+
+class FeedStockService {
+  async findFeed(){
+    const FdSk = await FeedStock.findAll(0)
 
     if (FdSk.length > 0) {
       FdSk.forEach(el => {
@@ -11,3 +13,5 @@ module.exports = {
     return FdSk
   }
 }
+
+module.exports = new FeedStockService()
