@@ -2,7 +2,7 @@ const Model = require('../../databases/MSSQL/Model')
 
 class Sizes extends Model {
   constructor(){
-    super('SIZES', 'ID, DESCRIPTION , WIDTH, HEIGHT, LENGTH, ACTIVE')
+    super('SIZES', 'ID , WIDTH, LENGTH')
   }
 }
 

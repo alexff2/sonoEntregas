@@ -106,24 +106,23 @@ routes.put('/maintvisit/start/:id', mainVisitController.startVisit)
 routes.put('/maintvisit/finish/:id', mainVisitController.finishVisit)
 // FeedStock
 routes.get('/feedstock', feedStockController.index)
+routes.get('/feedstock/unit', feedStockController.findUnd)
 routes.get('/feedstock/:id', feedStockController.find)
 routes.get('/feedstock/:typeSearch/:search', feedStockController.searchFeed)
 routes.post('/feedstock', feedStockController.create)
-routes.get('/fdund', feedStockController.findUnd)
 // Beds
 routes.get('/beds', bedsController.index)
 routes.get('/beds/:id', bedsController.find)
 routes.get('/beds/:typeSearch/:search', bedsController.searchProd)
 routes.post('/beds', bedsController.create)
 //Config Beds
-routes.get('/configbeds', configBedsController.index)
-routes.post('/configbeds', configBedsController.create)
-routes.put('/configbeds', configBedsController.inactivate)
+routes.get('/config/beds', configBedsController.index)
+routes.post('/config/beds', configBedsController.create)
+routes.put('/config/beds', configBedsController.inactivate)
 //Config Size Beds
 routes.get('/sizes', sizesController.index)
 routes.get('/sizes/:find', sizesController.find)
 routes.post('/sizes', sizesController.create)
-routes.put('/sizes', sizesController.inactivate)
 // Category Def
 routes.get('/catdef', catDefController.index)
 //Reports

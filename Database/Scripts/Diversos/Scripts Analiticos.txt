@@ -41,3 +41,9 @@ RIGHT JOIN (
 	GROUP BY ID_SALE, CODLOJA) B ON A.CODLOJA = B.CODLOJA AND A.ID_SALES = B.ID_SALE
 
 ---------------------------------
+--Total em vendas por ANO_MES
+SELECT A.ANO_MES, ROUND(A.TOTAL, 2) TOT FROM
+(select sum(b.NVTOTAL) TOTAL, SUBSTRING(CONVERT(CHAR(8),A.EMISSAO,112),1,6) ANO_MES
+from sales a inner join sales_prod b on a.id_sales = b.id_sales and a.codloja = b.codloja
+and a.EMISSAO BETWEEN '2023-05-01' and '2023-05-19 03:00:00.000'
+GROUP by SUBSTRING(CONVERT(CHAR(8),A.EMISSAO,112),1,6)) A

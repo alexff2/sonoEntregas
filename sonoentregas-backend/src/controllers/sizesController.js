@@ -3,7 +3,7 @@ const Sizes = require('../models/tables/Sizes')
 module.exports = {
   async index(req, res) {
     try {    
-      const sizes = await Sizes.findAny(0, { ACTIVE: 1 })
+      const sizes = await Sizes.findAll(0)
 
       return res.json(sizes)
     } catch (error) {
@@ -14,7 +14,7 @@ module.exports = {
   async find(req, res) {
     try {
       const { find } = req.params
-      const sizes = await Sizes.findSome(0, `ACTIVE = 1 AND DESCRIPTION LIKE '%${find}%'`)
+      const sizes = await Sizes.findAll(0, `ACTIVE = 1 AND DESCRIPTION LIKE '%${find}%'`)
 
       return res.json(sizes)
     } catch (error) {
@@ -24,27 +24,13 @@ module.exports = {
   },
   async create(req, res) {
     try {
-      const { DESCRIPTION, width, length, height } = req.body
+      const { width, length } = req.body
 
       await Sizes.creatorAny(0, [{
-        DESCRIPTION, width, length, height
+        width, length
       }])
 
-      const sizes = await Sizes.findAny(0, { ACTIVE: 1 })
-
-      return res.json(sizes)
-    } catch (error) {
-      console.log(error)
-      return res.status(401).json('Bad request!')
-    }
-  },
-  async inactivate(req, res) {
-    try {
-      const { ID } = req.body
-      
-      await Sizes.updateAny(0, { ACTIVE: 0 }, { ID })
-
-      const sizes = await Sizes.findAny(0, { ACTIVE: 1 })
+      const sizes = await Sizes.findAll(0)
 
       return res.json(sizes)
     } catch (error) {

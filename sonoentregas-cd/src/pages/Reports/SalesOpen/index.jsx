@@ -114,7 +114,6 @@ export default function SalesOpen(){
       shops = [...shops, sale.SHOP]
     }
   })
-  console.log(salesFiltered)
 
 return(
   <Box  component={Paper} p={2}>

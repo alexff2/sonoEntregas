@@ -6,7 +6,7 @@ const ConfigBeds = require('../models/tables/ConfigBeds')
  * @typedef {Object} Configs
  * @property {number} ID
  * @property {string} NAME
- * @property {ConfigsBedBase[]} descs
+ * @property {ConfigsBedBase[]} descriptions
  * 
  * @typedef {Object} ConfigsBedBase
  * @property {number} ID
@@ -23,11 +23,11 @@ module.exports = {
 			
 			//console.log(configBeds)
 			configs.forEach((/** @type {Configs} */ config) => {
-				config.descs = []
+				config.descriptions = []
 				configBeds.forEach((/**@type {ConfigsBedBase} */ configBed) => {
 					if (config.ID === configBed.ID) {
             configBed.NAME = config.NAME
-            config.descs.push(configBed)
+            config.descriptions.push(configBed)
           }
 				})
 			})
