@@ -55,15 +55,15 @@ module.exports = {
    * @param {*} res 
    * @returns 
    */
-  async salesSceProd(req, res){
+  async salesSceProd(req, res) {
     try {
-      const { loja, numSale } = req.params
+      const { idShop, codDAV } = req.params
 
       /** @type { [ProductSceShop] } */
       const productsSceShop = await ProductsSceShop.find({
-        loja,
+        loja: idShop,
         where: {
-          NUMVENDA: numSale
+          NUMVENDA: codDAV
         }
       })
 
@@ -95,9 +95,9 @@ module.exports = {
       })
 
       const orcparc = await ViewOrcParcLoja.find({
-        loja,
+        loja: idShop,
         where: {
-          TITULO: numSale
+          TITULO: codDAV
         }
       })
 
@@ -115,7 +115,7 @@ module.exports = {
     try {
       const { loja } = req.params
       
-      const { CODIGOVENDA, CODCLIENTE, NOMECLI, VALORPROD, DESCONTO, TOTALVENDA, EMISSAO, ENDERECO, NUMERO, BAIRRO, CIDADE, ESTADO, PONTOREF, OBS, products, USER_ID, VENDEDOR, FONE, CGC_CPF, INS_RG, FAX, orcParc, O_V , OBS2, HAVE_OBS2 } = req.body
+      const { CODIGOVENDA, CODCLIENTE, NOMECLI, VALORPROD, DESCONTO, TOTALVENDA, EMISSAO, ENDERECO, NUMERO, BAIRRO, CIDADE, ESTADO, PONTOREF, OBS, products, USER_ID, VENDEDOR, FONE, CGC_CPF, INS_RG, FAX, orcParc, O_V , OBS2, HAVE_OBS2, isWithdrawal } = req.body
 
       const D_ENVIO = ObjDate.getDate()
 
@@ -126,7 +126,7 @@ module.exports = {
 
       if (saleFind.length === 0) {
 
-        const valuesSales = `${CODIGOVENDA}, ${loja}, ${CODCLIENTE}, '${NOMECLI}', ${VALORPROD}, ${DESCONTO}, ${TOTALVENDA}, '${EMISSAO}', 'Aberta', '${ENDERECO}', '${NUMERO}', '${BAIRRO}', '${CIDADE}', '${ESTADO}', '${PONTOREF}', '${OBS}', NULL, ${USER_ID}, '${D_ENTREGA1}', '${D_ENVIO}', '${VENDEDOR}', '${FONE}', '${CGC_CPF}', '${INS_RG}', '${FAX}', '${O_V}', '${OBS2}', '${HAVE_OBS2}', 0, NULL`
+        const valuesSales = `${CODIGOVENDA}, ${loja}, ${CODCLIENTE}, '${NOMECLI}', ${VALORPROD}, ${DESCONTO}, ${TOTALVENDA}, '${EMISSAO}', 'Aberta', '${ENDERECO}', '${NUMERO}', '${BAIRRO}', '${CIDADE}', '${ESTADO}', '${PONTOREF}', '${OBS}', ${USER_ID}, '${D_ENTREGA1}', '${D_ENVIO}', '${VENDEDOR}', '${FONE}', '${CGC_CPF}', '${INS_RG}', '${FAX}', '${O_V}', '${OBS2}', '${HAVE_OBS2 ? 1 : 0}', 0, NULL, ${isWithdrawal ? 1 : 0}, NULL`
 
         await Sales.creator(0, valuesSales)
 
@@ -139,14 +139,14 @@ module.exports = {
         }
       }
 
-      const saleCreate = await Sales._query(0, 'SELECT MAX(ID) ID FROM SALES', QueryTypes.SELECT)
+      const currentSale = saleFind.length === 0 ? await Sales._query(0, 'SELECT MAX(ID) ID FROM SALES', QueryTypes.SELECT) : saleFind
 
       for (let i = 0; i < products.length; i++) {
         const { NUMVENDA, CODPRODUTO, ALTERNATI, DESCRICAO, QUANTIDADE, UNITARIO1,NPDESC, NVTOTAL, GIFT  } = products[i]
 
         const _GIFT = GIFT ? 1 : 0
 
-        let valueProd = `${NUMVENDA}, ${loja}, ${CODPRODUTO}, '${ALTERNATI}', '${DESCRICAO}', ${QUANTIDADE}, ${UNITARIO1}, ${NPDESC}, ${NVTOTAL}, 'Enviado', ${DOWN_EST}, ${_GIFT}, ${saleCreate[0].ID}`
+        let valueProd = `${NUMVENDA}, ${loja}, ${CODPRODUTO}, '${ALTERNATI}', '${DESCRICAO}', ${QUANTIDADE}, ${UNITARIO1}, ${NPDESC}, ${NVTOTAL}, 'Enviado', ${DOWN_EST}, ${_GIFT}, ${currentSale[0].ID}`
 
         await SalesProd.creator(0, valueProd, true)
 

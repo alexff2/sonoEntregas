@@ -161,6 +161,8 @@ module.exports = {
 
       await ForecastsRules.checkStatusProduct(sales)
 
+      await ForecastsRules.checkAvailableStock(sales)
+
       await ForecastService.createSalesForecast({
         sales,
         userId,

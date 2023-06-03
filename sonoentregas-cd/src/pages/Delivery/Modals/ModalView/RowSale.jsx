@@ -76,7 +76,7 @@ const RowSale = ({ sale, type, status, handleInvalidationSale }) => {
               </TableHead>
               <TableBody>
                 {sale.products.map((product) => (
-                  <RowProd key={product.CODPRODUTO}
+                  <RowProd key={product.COD_ORIGINAL}
                     product={product}
                     status={status}
                     type={type}

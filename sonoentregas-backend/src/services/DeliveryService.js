@@ -1,12 +1,33 @@
 //@ts-check
+
+/**
+* @typedef {Object} IProduct
+* @property {number} ID_SALE_ID
+* @property {string} COD_ORIGINAL
+* @property {number} QUANTIDADE
+* @property {number} QTD_MOUNTING
+* @property {number} qtdDelivery
+* 
+* @typedef {Object} ISale
+* @property {number} ID
+* @property {number} ID_SALES
+* @property {number} CODLOJA
+* @property {string} whoReceived
+* @property {boolean} isWithdrawal
+* @property {IProduct[]} products
+*/
+
 const { QueryTypes } = require('sequelize')
+
 const Delivery = require('../models/Deliverys')
 const DeliveryProd = require('../models/DeliveryProd')
 const SalesProd = require('../models/SalesProd')
 const ViewDeliverySales = require('../models/ViewDeliverySales')
 const ViewDeliveryProd2 = require('../models/ViewDeliveryProd2')
-const MainService = require('../services/MainService')
 const Empresas = require('../models/Empresas')
+const Sales = require('../models/Sales')
+
+const MainService = require('../services/MainService')
 const Date = require('../class/Date')
 
 module.exports = {
@@ -32,14 +53,17 @@ module.exports = {
 
         const shops = await Empresas._query(0, 'SELECT * FROM LOJAS', QueryTypes.SELECT)
 
-        deliveries.forEach((/** @type {{ [x: string]: never[]; ID: any; sales: any[]; }} */ delivery) => {
+        deliveries.forEach( delivery => {
           delivery['sales'] = []
+          delivery.D_MOUNTING = new Date(delivery.D_MOUNTING+'T00:00:00').getBRDateTime().date
+          delivery.D_DELIVERING = new Date(delivery.D_DELIVERING+'T00:00:00').getBRDateTime().date
+          delivery.D_DELIVERED = new Date(delivery.D_DELIVERED+'T00:00:00').getBRDateTime().date
 
-          sales.forEach((/** @type {{ [x: string]: any; ID_SALES: any; CODLOJA: any; ID_DELIVERY: any; products: any[]; }} */ sale) => {
+          sales.forEach(sale => {
 
             sale["products"] = []
 
-            vDeliveryProd2.forEach((/** @type {{ ID_SALES: any; CODLOJA: any; ID_DELIVERY: any; }} */ saleProd) => {
+            vDeliveryProd2.forEach(saleProd => {
               if (sale.ID_SALES === saleProd.ID_SALES && sale.CODLOJA === saleProd.CODLOJA && saleProd.ID_DELIVERY === sale.ID_DELIVERY) {
                 sale.products.push(saleProd)
               }
@@ -49,7 +73,7 @@ module.exports = {
               delivery.sales.push(sale)
             }
 
-            shops.forEach( (/** @type {{ CODLOJA: any; DESC_ABREV: any; }} */ shops) => {
+            shops.forEach( shops => {
               if (shops.CODLOJA === sale.CODLOJA) {
                 sale['SHOP'] = shops.DESC_ABREV
               }
@@ -130,7 +154,7 @@ module.exports = {
   /**
    * @param {number} idDelivery
    */
-  async updateStockByIdDelivery(idDelivery){
+  async updateStockByIdDelivery(idDelivery){ // No used
     const script = `UPDATE SONO..PRODLOJAS SET EST_ATUAL = EST_ATUAL - C.QTD, EST_LOJA = EST_LOJA - C.QTD
     FROM SONO..PRODLOJAS A INNER JOIN SONO..PRODUTOS B ON A.CODIGO = B.CODIGO 
     INNER JOIN (
@@ -172,5 +196,59 @@ module.exports = {
         COD_ORIGINAL
       })
     }
+  },
+  /**
+   * @param {ISale} sale
+   * @param {string} date
+   * @param {number} user_id
+   * @param {string} whoWithdrew
+   */
+  async saleAndProductsWithdrawal( sale, date, user_id, whoWithdrew ){
+    const deliveryId = await Delivery.findAny(0, { D_MOUNTING: date, ID_DRIVER: 48 }, 'ID')
+
+    if (deliveryId.length === 0) {
+      var deliveryCreateId = await Delivery.creatorAny(0, [{
+        description: 'Retiradas',
+        ID_CAR: 0,
+        ID_DRIVER: 48,
+        ID_ASSISTANT: 49,
+        STATUS: 'Finalizada',
+        ID_USER_MOUNT: user_id,
+        dateCreated: new Date().getISODateTimeBr().dateTime,
+        D_MOUNTING: date,
+        ID_USER_DELIVERING: user_id,
+        dateUpdateDelivering: new Date().getISODateTimeBr().dateTime,
+        D_DELIVERING: date,
+        ID_USER_DELIVERED: user_id,
+        dateUpdateDelivered: new Date().getISODateTimeBr().dateTime,
+        D_DELIVERED: date,
+      }])
+    }
+
+    const idDelivery = deliveryId.length > 0 ? deliveryId[0].ID : deliveryCreateId
+
+    await Sales.updateAny(0, { STATUS: 'Fechada', whoWithdrew }, { ID: sale.ID})
+
+    await SalesProd.updateAny(0, { STATUS: 'Finalizada' }, { ID_SALE_ID: sale.ID })
+
+    let arraySaleProducts = []
+    let scriptUpdateSaleProd = ''
+
+    sale.products.filter( product => {
+      arraySaleProducts = [...arraySaleProducts, {
+        ID_DELIVERY: idDelivery,
+        ID_SALE: sale.ID_SALES,
+        CODLOJA: sale.CODLOJA,
+        QTD_DELIV: product.qtdDelivery,
+        COD_ORIGINAL: product.COD_ORIGINAL,
+        DELIVERED: 0
+      }]
+
+      scriptUpdateSaleProd += `UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL - ${product.qtdDelivery}, EST_LOJA = EST_LOJA - ${product.qtdDelivery} FROM PRODLOJAS A INNER JOIN PRODUTOS B ON A.CODIGO = B.CODIGO WHERE A.CODLOJA = 1 AND B.ALTERNATI = '${product.COD_ORIGINAL}' \n`
+    })
+
+    await DeliveryProd.creatorAny(0, arraySaleProducts, true)
+
+    await DeliveryProd._query(1, scriptUpdateSaleProd)
   }
 }

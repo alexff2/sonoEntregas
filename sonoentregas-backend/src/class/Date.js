@@ -14,7 +14,7 @@ class DateTime {
     const arrayDate = dateString.split(' ')
 
     const objDateTime =  {
-      date: arrayDate[0],
+      date: arrayDate[0].substring(0,10),
       time: arrayDate[1],
       dateTime: dateString
     }

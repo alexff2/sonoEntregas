@@ -6,13 +6,13 @@
  * @property {number} CODLOJA
  */
 
-const Deliverys = require('../models/Deliverys')
-const ViewDeliverys = require('../models/ViewDeliverys')
-const DeliveryProd = require('../models/DeliveryProd')
-const SalesProd = require('../models/SalesProd')
+const Deliveries = require('../models/Deliverys')
 
 const DeliveryService = require('../services/DeliveryService')
 const MainService = require('../services/MainService')
+const ForecastsRules = require('../rules/forecastRules')
+const DeliveriesRules = require('../rules/DeliveriesRules')
+const Date = require('../class/Date')
 
 module.exports = {
   /**
@@ -25,7 +25,7 @@ module.exports = {
       const { id: user_id } = req.user
       const { description, ID_CAR, ID_DRIVER, ID_ASSISTANT } = req.body
 
-      await Deliverys.updateAny(0, {
+      await Deliveries.updateAny(0, {
         description,
         ID_CAR,
         ID_DRIVER,
@@ -70,14 +70,59 @@ module.exports = {
       res.status(400).json(e)
     }
   },
-    /**
+  /**
    * @param {*} req 
    * @param {*} res 
    */
   async delivering(req, res){},
-    /**
+  /**
    * @param {*} req 
    * @param {*} res 
    */
-  async finish(req, res){}
+  async finish(req, res){},
+  /**
+   * @param {*} req 
+   * @param {*} res 
+   */
+  async withdrawalSale(req, res) {
+    try {
+      const { id: user_id } = req.user
+      const { idSale, date, whoWithdrew } = req.body
+      console.log(req.body)
+
+      if (!date || !whoWithdrew) {
+        throw {
+          status: 401,
+          error: 'date not exist!'
+        }
+      }
+
+      const SaleRules = new DeliveriesRules(idSale)
+      await SaleRules.find()
+
+      if (SaleRules.sale === undefined) {
+        throw {
+          status: 400,
+          error: {
+            message: 'Sale does not read!'
+          }
+        }
+      }
+
+      await ForecastsRules.checkStatusProduct([SaleRules.sale])
+
+      await ForecastsRules.checkAvailableStock([SaleRules.sale])
+
+      await DeliveryService.saleAndProductsWithdrawal( SaleRules.sale, date, whoWithdrew, user_id)
+
+      return res.json({ message: `Update by${user_id}` })
+    } catch (e) {
+      console.log(e)
+
+      let status = e.status ? e.status : 400
+      let error = e.error ? e.error : e
+
+      return res.status(status).json(error)
+    }
+  }
 }

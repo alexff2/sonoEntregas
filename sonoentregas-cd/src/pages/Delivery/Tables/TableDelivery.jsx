@@ -63,7 +63,7 @@ export default function TableDelivery({ type, deleteDelivery, openModals }){
         {delivery.filter(item => item.DRIVER).map( item => (
           <TableRow key={item.ID} className={classes.body}>
             <TableCell width={'5%'}>{item.ID}</TableCell>
-            <TableCell width={'25%'}>{item.DESCRIPTION}</TableCell>
+            <TableCell width={'25%'}>{item.DESCRIPTION+' - '+item.D_MOUNTING}</TableCell>
             <TableCell width={'13%'}>{item.DRIVER}</TableCell>
             <TableCell width={'13%'}>{item.ASSISTANT}</TableCell>
             <TableCell width={'10%'}>{item.CAR}</TableCell>

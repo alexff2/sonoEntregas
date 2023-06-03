@@ -75,13 +75,15 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-export default function ModalAddSale({ setOpen }){
+export default function ModalAddSale({ setOpen, typeModal }){
   const [ openModalSelectSalesWithSameNumber, setOpenModalSelectSalesWithSameNumber ] = useState(false)
   const [ slideInputs, setSlideInputs ] = useState(true)
   const [ slideTable, setSlideTable ] = useState(false)
   const [ errorMsg, setErrorMsg ] = useState('')
   const [ disabledBtnSave, setDisabledBtnSave ] = useState(false)
   const [ idSale, setIdSale ] = useState('')
+  const [ whoWithdrew, setWhoWithdrew ] = useState('')
+  const [ date, setDate ] = useState('')
   const [ saleSelected, setSaleSelected ] = useState([])
   const [ salesWithSameNumber, setSalesWithSameNumber ] = useState([])
   const [ availableStocks, setAvailableStocks ] = useState([])
@@ -110,7 +112,23 @@ export default function ModalAddSale({ setOpen }){
         return
       }
 
-      let { data }  = await api.get(`sales/${idSale}/${ type === 'forecast' ? 'forecast':'routes' }/create`)
+      let router
+
+      if (typeModal === 'withdrawal') {
+        router = 'forecast'
+      } else {
+        router = type === 'forecast' ? 'forecast':'routes'
+      }
+
+      let { data }  = await api.get(`sales/${idSale}/${router}/create`)
+
+      if (typeModal === 'withdrawal') {
+        if (!data[0].isWithdrawal) {
+          setErrorMsg('Venda sem solicitação de retirada!')
+
+          return
+        }
+      }
 
       if (data === '') {
         setErrorMsg('Venda não enviada a base do CD!')
@@ -274,9 +292,72 @@ export default function ModalAddSale({ setOpen }){
     }
   }
 
+  const handleWithdrawal = async () => {
+    try {
+      if (date === '' || whoWithdrew === '') {
+        setAlert('Selecione a data da retirada e quem retirou a mercadoria!')
+        return
+      }
+
+      setDisabledBtnSave(true)
+
+      let validation = true
+
+      saleSelected[0].products.forEach( prod => {
+        if(!prod.check){
+          validation = false
+        }
+      })
+
+      if (!validation) {
+        setAlert('Selecione todos os produtos!')
+        return
+      }
+
+      await api.post('delivery/withdrawal', {
+        date,
+        idSale: saleSelected[0].ID,
+        whoWithdrew
+      })
+
+      const { data: dataDelivery } = await api.get('deliverys/status') 
+      setDelivery(dataDelivery)
+
+      const { data: dataSales } = await api.get('sales/', {
+        params: {
+          status: 'open'
+        }
+      })
+
+      setSales(dataSales)
+
+      setOpen(false)
+    } catch (e) {
+      if (!e.response){
+        console.log(e)
+        setAlert('Rede')
+      } else if (e.response.status === 400){
+        console.log(e.response.data)
+        setAlert('Servidor')
+      } else {
+        console.log(e.response.data)
+        if (e.response.data.message === 'outdated forecast!') {
+          setAlert('Previsão fora do prazo!')
+        } else setAlert(e.response.data)
+      }
+    }
+  }
+
   return(
-    <Box width={'1100px'} height="600px" p={4}>
-      <Typography variant='h4'style={{ marginBottom: 12 }} component='h2'>Adicionar venda</Typography>
+    <Box component={Paper} width={'1100px'} height="600px" p={4}>
+      <Typography
+        variant='h4'
+        style={{ marginBottom: 12 }}
+        component='h2'
+      >
+        {typeModal === 'withdrawal' ? 'Registrar retirada de venda' : 'Adicionar venda'}
+      </Typography>
+
       <Slide direction="right" in={slideInputs} mountOnEnter unmountOnExit>
         <Paper>
           <Box p={4} display='flex'>
@@ -343,8 +424,35 @@ export default function ModalAddSale({ setOpen }){
           </Modal>
         </Paper>
       </Slide>
+
       <Slide direction="left" in={slideTable} mountOnEnter unmountOnExit>
-        <Paper>
+        <Paper style={{padding: 8}}>
+          {typeModal === 'withdrawal' &&
+            <Box display={'flex'}>
+              <TextField
+                label="Quem retirou"
+                type="text"
+                variant="outlined"
+                className={classes.formControl}
+                style={{ width: 300, marginLeft: 8}}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                onChange={e => setWhoWithdrew(e.target.value)}
+              />
+              <TextField
+                label="Data"
+                type="date"
+                variant="outlined"
+                className={classes.formControl}
+                style={{ width: 171, marginLeft: 8}}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                onChange={e => setDate(e.target.value)}
+              />
+            </Box>
+          }
           {errorMsg !== '' && 
             <Box 
               bgcolor='#e57373'
@@ -355,11 +463,11 @@ export default function ModalAddSale({ setOpen }){
               {errorMsg}
             </Box>
           }
-          <Box display="flex">
+          <Box display="flex" mt={2}>
             <TableSales 
               sales={saleSelected} 
               setSales={setSaleSelected}
-              type={type}
+              type={typeModal === 'withdrawal' ? 'forecast' : type}
               availableStocks={availableStocks}
             />
 
@@ -371,8 +479,9 @@ export default function ModalAddSale({ setOpen }){
           <div className={classes.btnActions}>
             <ButtonSuccess 
               children={"Lançar"}
-              onClick={addSalesInData}
+              onClick={typeModal === 'withdrawal' ? handleWithdrawal : addSalesInData}
               disabled={disabledBtnSave}
+              loading={disabledBtnSave}
             />
             <ButtonCancel 
               children="Cancelar"

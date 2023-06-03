@@ -73,8 +73,10 @@ export default function ModalSendSale({
   const [ orcParc, setOrcParc ] = useState([])
   const [ productSales, setProductSales ] = useState([])
   const [ openObs, setOpenObs ] = useState(false)
+  const [ isWithdrawal, setIsWithdrawal ] = useState(false)
+  const [ disableButton, setDisableButton] = useState(false)
   const [ obs, setObs ] = useState('')
-  const { setOpen: setOpenAlert, setChildrenError, setType } = useModalAlert()
+  const { setAlert } = useModalAlert()
   const { shopAuth, userAuth } = useAuthenticate()
 
   const { cod } = shopAuth
@@ -82,7 +84,8 @@ export default function ModalSendSale({
 
   useEffect(()=>{
     setLoading(true)
-    api.get(`salesshop/products/${sale.CODIGOVENDA}/${cod}`)
+
+    api.get(`sales/${sale.CODIGOVENDA}/shop/${cod}/products`)
     .then( resp => {
         setProductSales(resp.data.productsSceShop)
         setOrcParc(resp.data.orcparc)
@@ -90,13 +93,11 @@ export default function ModalSendSale({
       })
 
       .catch( err => {
-        setChildrenError("Falha ao buscar produtos da venda!")
-        setOpenAlert()
-        setType()
+        setAlert("Falha ao buscar produtos da venda!")
         console.log(err)
         setLoading(false)
       })
-  },[ cod, sale, setChildrenError, setOpenAlert, setType ])
+  },[ cod, sale, setAlert ])
 
   const submitSales = async sale => {
     const sendProduct = []
@@ -106,12 +107,15 @@ export default function ModalSendSale({
     })
 
     try {
+      setDisableButton(true)
+
       if(sendProduct.length > 0 && validateObs(obs, openObs)) {
         sale["products"] = sendProduct
-        sale.USER_ID = USER_ID
-        sale.orcParc = orcParc
-        sale.OBS2 = obs
-        sale.HAVE_OBS2 = openObs ? 1 : 0
+        sale["USER_ID"] = USER_ID
+        sale["orcParc"] = orcParc
+        sale["OBS2"] = obs
+        sale["HAVE_OBS2"] = openObs
+        sale["isWithdrawal"] = isWithdrawal
 
         const { data } = await api.post(`salesshop/${cod}`, sale)
         
@@ -119,20 +123,19 @@ export default function ModalSendSale({
         
         setModal([])
       } else {
+        setDisableButton(false)
+
         if (sendProduct.length === 0) {
-          setChildrenError('Selecione um produto')
+          setAlert('Selecione um produto')
         } else if (!validateObs(obs, openObs)){
-          setChildrenError('Coloque uma observação ou desabilite o checkbox de observação')
+          setAlert('Coloque uma observação ou desabilite o checkbox de observação')
         }
-        setOpenAlert()
-        setType()
       }
+      
     } catch (error) {
       console.log(error)
 
-      setChildrenError('Erro ao enviar venda, entre em contato com Administrador')
-      setOpenAlert()
-      setType()
+      setAlert('Erro ao enviar venda, entre em contato com Administrador')
     }
   }
 
@@ -165,6 +168,8 @@ export default function ModalSendSale({
               }</div>
               
               <div>
+                <span>Retirada?</span>
+                <input type="checkbox" onChange={() => setIsWithdrawal(!isWithdrawal)}/>
                 <div className="divObsCkeck">
                   <span>Observação?</span>
                   <input type="checkbox" onChange={() => setOpenObs(!openObs)}/>
@@ -179,7 +184,11 @@ export default function ModalSendSale({
 
             <div className="sales-buttons">
               <button className="cancel-modal">Cancelar</button>
-              <button onClick={() => submitSales(sale)}>Enviar</button>
+
+              <button
+                disabled={disableButton}
+                onClick={() => submitSales(sale)}
+              >Enviar</button>
             </div> 
           </div>
 

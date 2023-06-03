@@ -210,6 +210,10 @@ div.sales-buttons button {
   transition: 0.3s;
 }
 
+div.sales-buttons button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
 div.sales-buttons button:hover{
   opacity: 0.6;
 }

@@ -17,6 +17,7 @@ import ModalView from './Modals/ModalView'
 import ModalDelivering from './Modals/ModalDelivering'
 import TableDelivery from './Tables/TableDelivery'
 import TableForecast from './Tables/TableForecast'
+import ModalAddSale from './Update/ModalAddSale'
 //Context
 import { useDelivery } from '../../context/deliveryContext'
 import { useDeliveryFinish } from '../../context/deliveryFinishContext'
@@ -81,8 +82,9 @@ const useStyle = makeStyles(theme => ({
 
 export default function Delivery() {
   //Modals Open States
-  const [ openModalSelectForecastDelivery, setOpenModalSelectForecastDelivery ] = useState(false)
+  const [ openModalSelect, setOpenModalSelect ] = useState(false)
   const [ openModalCreateForecastDelivery, setOpenModalCreateForecastDelivery ] = useState(false)
+  const [ openModalWithdrawal, setOpenModalWithdrawal ] = useState(false)
   const [ openModalDelivering, setOpenModalDelivering ] = useState(false)
   const [ openFinish, setOpenFinish ] = useState(false)
   const [ openView, setOpenView ] = useState(false)
@@ -140,9 +142,13 @@ export default function Delivery() {
   const openModals = (item, modal) => {
     switch (modal) {
       case 'create':
-        setOpenModalSelectForecastDelivery(false)
+        setOpenModalSelect(false)
         setOpenModalCreateForecastDelivery(true)
         setTypeForecasDelivery(item)
+        break;
+      case 'withdrawal':
+        setOpenModalSelect(false)
+        setOpenModalWithdrawal(true)
         break;
       case 'view':
         setSelectDelivery(item)
@@ -262,7 +268,7 @@ export default function Delivery() {
         <Fab 
           color="primary"
           className={classes.btnAdd}
-          onClick={() => setOpenModalSelectForecastDelivery(true)}
+          onClick={() => setOpenModalSelect(true)}
         >
           <Add />
         </Fab>
@@ -270,11 +276,20 @@ export default function Delivery() {
       
       {/* Modais*/}
       <Modal
-        open={openModalSelectForecastDelivery}
-        setOpen={setOpenModalSelectForecastDelivery}
+        open={openModalSelect}
+        setOpen={setOpenModalSelect}
         title={"Selecione:"}
       >
         <Box display="flex" flexDirection="row">
+          <Paper className={classes.card}  onClick={() => openModals('', 'withdrawal')}>
+            <Box>
+              <Typography
+                variant="h6"
+                color="textSecondary"
+                className={classes.text}
+              >Retirada</Typography>
+            </Box>
+          </Paper>
           <Paper className={classes.card}  onClick={() => openModals('forecast', 'create')}>
             <Box>
               <Typography
@@ -307,6 +322,13 @@ export default function Delivery() {
           setOpen={setOpenModalCreateForecastDelivery}
           type={typeForecasDelivery}
         />
+      </Modal>
+
+      <Modal
+        open={openModalWithdrawal}
+        setOpen={setOpenModalWithdrawal}
+      >
+        <ModalAddSale setOpen={setOpenModalWithdrawal} typeModal='withdrawal'/>
       </Modal>
 
       <Modal

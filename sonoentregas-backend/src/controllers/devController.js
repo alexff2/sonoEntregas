@@ -12,13 +12,17 @@ class DevModel extends Model {
 
 module.exports = {
   async getTable(req, res) {
-    //const { table } = req.params
     const DevMod = new DevModel()
+    /* const DevMod = new DevModel()
 
-    //const times = getHours()
     const forecast = await DevMod._query(0, 'SELECT * FROM FORECAST WHERE ID = 1', QueryTypes.SELECT)
-    const objDateTime = dateTime(forecast[0].createdAt)
+    const objDateTime = dateTime(forecast[0].createdAt) */
 
-    return res.json( objDateTime )
+    const script = `UPDATE FORECAST SET DATE = '2023-05-28' WHERE ID = 1\n`+
+    `UPDATE FORECAST SET DATE = '2023-05-29' WHERE ID = 3`
+
+    const response = await DevMod._query(0, script, QueryTypes.RAW)
+
+    return res.json( response )
   }
 }

@@ -63,9 +63,7 @@ module.exports = {
 
       await DeliveryService.addSale({ salesProd, idDelivery: dataDelivery[0].ID })
 
-      const dataDeliverys = await DeliveryService.findSalesOfDelivery([dataDelivery[0]])
-
-      return res.json(dataDeliverys[0])
+      return res.json({ success: true})
     } catch (error) {
       console.log(error)
       res.status(400).json(error)
@@ -80,6 +78,7 @@ module.exports = {
       const { id } = req.params
       const { id: user_id } = req.user
       const { salesProd } = req.body
+      //Faltou validação
 
       await DeliveryService.addSale({ salesProd, idDelivery: id })
 

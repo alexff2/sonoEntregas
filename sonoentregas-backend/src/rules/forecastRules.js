@@ -6,11 +6,18 @@
  * @property {string} STATUS
  * 
  * @typedef {Object} Products
+ * @property {number} ID_SALE_ID
  * @property {string} COD_ORIGINAL
+ * @property {number} QUANTIDADE
+ * @property {number} QTD_MOUNTING
  * @property {number} qtdDelivery
  * 
  * @typedef {Object} Sale
  * @property {number} ID
+ * @property {number} ID_SALES
+ * @property {number} CODLOJA
+ * @property {string} whoReceived
+ * @property {boolean} isWithdrawal
  * @property {Products[]} products
  */
 
