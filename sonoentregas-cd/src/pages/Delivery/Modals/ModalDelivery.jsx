@@ -337,6 +337,12 @@ export default function ModalDelivery({ setOpen, type }){
         
         return
       }
+
+      if (data[0].isWithdrawal) {
+        setErrorMsg('Venda para retirada, sem permissão para adicionar na previsão!')
+
+        return
+      }
   
       if (data.length === 0) {
         setErrorMsg( typeSearch === 'idSale'

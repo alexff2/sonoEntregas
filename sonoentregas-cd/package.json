@@ -29,7 +29,7 @@
     "react-scripts": "^3.2.0"
   },
   "scripts": {
-    "start-react": "react-scripts start",
+    "start-react": "PORT=3334 react-scripts --openssl-legacy-provider start",
     "build-react": "react-scripts build",
     "test-react": "react-scripts test --env=jsdom",
     "eject-react": "react-scripts eject",

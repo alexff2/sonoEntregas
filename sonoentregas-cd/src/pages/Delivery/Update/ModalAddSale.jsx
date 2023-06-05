@@ -128,6 +128,13 @@ export default function ModalAddSale({ setOpen, typeModal }){
 
           return
         }
+      } else {
+        console.log(data)
+        if (data[0].isWithdrawal) {
+          setErrorMsg('Venda para retirada, sem permissão para adicionar na previsão!')
+
+          return
+        }
       }
 
       if (data === '') {

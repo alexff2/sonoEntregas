@@ -52,7 +52,7 @@ export default function ModalSaleDetail({ sale, product, setOpenModal, openModal
   const [ detailsDeliv, setDetailsDeliv ] = useState({})
 
   useEffect(()=>{
-    api.get(`sales/${sale.ID_SALES}/loja/${sale.CODLOJA}/product/${product.CODPRODUTO}`)
+    api.get(`sales/${sale.ID_SALES}/loja/${sale.CODLOJA}/product/${product.COD_ORIGINAL}`)
       .then(resp => {
         setDatePrevDeliv(dateSqlToReact(sale.D_ENTREGA1))
         if (!resp.data) {
