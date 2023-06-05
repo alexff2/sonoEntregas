@@ -113,7 +113,7 @@ module.exports = {
 
       await ForecastsRules.checkAvailableStock([SaleRules.sale])
 
-      await DeliveryService.saleAndProductsWithdrawal( SaleRules.sale, date, whoWithdrew, user_id)
+      await DeliveryService.saleAndProductsWithdrawal( SaleRules.sale, date, user_id, whoWithdrew)
 
       return res.json({ message: `Update by${user_id}` })
     } catch (e) {

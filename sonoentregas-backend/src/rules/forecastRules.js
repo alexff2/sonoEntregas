@@ -111,6 +111,21 @@ class ForecastRules {
   }
 
   /** @param {Sale[]} sales */
+  async checkSaleIsWithdrawal(sales){
+    const salesIsWithdrawal = await Sale.findAny(0, { isWithdrawal: 1, in: { ID: sales.map( sale => sale.ID) }})
+
+    if (salesIsWithdrawal.length > 0) {
+      throw {
+        status: 400,
+        error: {
+          message: 'Sales with STATUS isWithdrawal',
+          salesIsWithdrawal
+        },
+      }
+    }
+  }
+
+  /** @param {Sale[]} sales */
   async checkForecastSalesIsClosed(sales){
     const salesClosed = await Sale.findAny(0, { STATUS: 'Fechada', in: { ID: sales.map( sale => sale.ID) }})
 

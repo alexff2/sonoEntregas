@@ -61,7 +61,6 @@ module.exports = {
     try {
       const { date, sales } = req.body
       const { id: userId } = req.user
-      console.log(date)
 
       if (!date || !sales) {
         throw {
@@ -72,10 +71,11 @@ module.exports = {
         }
       }
 
-      //Business Rules
       await ForecastsRules.checkDateInsertForecast({ date })
 
       await ForecastsRules.checkForecastSalesIsClosed(sales)
+
+      await ForecastsRules.checkSaleIsWithdrawal(sales)
 
       await ForecastsRules.checkStatusProduct(sales)
 
@@ -94,7 +94,7 @@ module.exports = {
         add: false
       })
 
-      return res.status(201).json(idForecast)
+      return res.status(201).json()
     } catch (e) {
       console.log(e)
 
@@ -158,6 +158,8 @@ module.exports = {
       await ForecastsRules.checkExistValidForecast({ id })
 
       await ForecastsRules.checkForecastSalesIsClosed(sales)
+
+      await ForecastsRules.checkSaleIsWithdrawal(sales)
 
       await ForecastsRules.checkStatusProduct(sales)
 
