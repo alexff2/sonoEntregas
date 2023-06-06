@@ -54,6 +54,9 @@ export default function SalesOpen(){
   const navigate = useNavigate()
   const classe = useStyle()
 
+  const currentDate = new Date()
+  const dateTimeBr = currentDate.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })
+
   useEffect(() => {
     getSales()
   },[])
@@ -242,6 +245,9 @@ return(
       setOpenModal={setOpenReport}
       save={`Relatório de DAVs Abertas.pdf`}
     >
+      <Typography>
+        {dateTimeBr}
+      </Typography>
       <Typography align='center'>
         Relatório de DAVs abertas
       </Typography>

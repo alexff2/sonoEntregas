@@ -77,6 +77,8 @@ export default function OrderSuggestion() {
   const [ openReport, setOpenReport ] = useState(false)
   const [ disabledButton, setDisabledButton ] = useState(false)
 
+  const dateTimeBr = currentDate.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })
+
   const classe = useStyle()
 
   const navigate = useNavigate()
@@ -266,6 +268,10 @@ export default function OrderSuggestion() {
         setOpenModal={setOpenReport}
         save={`Relatório de Cálculo de Estoque Ideal - ${month[selectedMonth]} / ${selectedYears}.pdf`}
       >
+        <Typography>
+          {dateTimeBr}
+        </Typography>
+
         <Typography align='center'>
           Relatório de Cálculo de Estoque Ideal
         </Typography>
