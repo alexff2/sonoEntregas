@@ -105,7 +105,6 @@ function Row({ sale, type, setSales, availableStocks }) {
     // VERIFICAR
     var dateDelivery, dateNow, dateAlert
     dateDelivery = new Date(sale.D_ENTREGA1)
-    dateDelivery.setDate(dateDelivery.getDate()+1)
     dateDelivery.setHours(0,0,0,0)
 
     dateNow = new Date().setHours(0,0,0,0)

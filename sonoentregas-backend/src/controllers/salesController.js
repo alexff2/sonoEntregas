@@ -123,7 +123,7 @@ module.exports = {
     try {
       const { idSale, idLoja, idProduct } = req.params
   
-      const products = await ViewDeliveryProd.findSome(0, `ID_SALES = ${idSale} AND CODLOJA = ${idLoja} AND COD_ORIGINAL = ${idProduct} ORDER BY ID_DELIVERY`)
+      const products = await ViewDeliveryProd.findSome(0, `ID_SALES = ${idSale} AND CODLOJA = ${idLoja} AND COD_ORIGINAL = '${idProduct}' ORDER BY ID_DELIVERY`)
 
       var resp
   

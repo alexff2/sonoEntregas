@@ -214,10 +214,10 @@ export default function TableMain() {
         {typeSeach === 'STATUS' &&
         <>
           <FormControl variant="outlined">
-            <InputLabel id="fildStatus" className={classes.label}>Estatus</InputLabel>
+            <InputLabel id="fieldStatus" className={classes.label}>Estatus</InputLabel>
             <Select
               label="Status"
-              labelId="fildStatus"
+              labelId="fieldStatus"
               className={classes.fieldSeach}
               onChange={e => setTypesStatus(e.target.value)}
               value={typesStatus}

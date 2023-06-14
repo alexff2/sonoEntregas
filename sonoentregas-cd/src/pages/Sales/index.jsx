@@ -124,7 +124,7 @@ const useStyles = makeStyles(theme => ({
 
 function Row({ sale, modalDetalProduct, setOpenModalBoxInfo }) {
   const [open, setOpen] = useState(false)
-  const [openModalUpdaDate, setOpenModalUpdaDate] = useState(false)
+  const [openModalUpdateDate, setOpenModalUpdateDate] = useState(false)
   const classes = useStyles()
   const { setAddress } = useAddress()
 
@@ -154,7 +154,7 @@ function Row({ sale, modalDetalProduct, setOpenModalBoxInfo }) {
           >{sale.ID_SALES}</TableCell>
         <TableCell>{sale.NOMECLI}</TableCell>
         <TableCell align="right">{getDateBr(sale.EMISSAO)}</TableCell>
-        <TableCell align="right" onClick={()=>setOpenModalUpdaDate(true)} className={classes.updateDateDeliv}>
+        <TableCell align="right" onClick={()=>setOpenModalUpdateDate(true)} className={classes.updateDateDeliv}>
           {getDateBr(sale.D_ENTREGA1)}
         </TableCell>
         <TableCell align="right">{sale.SHOP}</TableCell>
@@ -199,8 +199,8 @@ function Row({ sale, modalDetalProduct, setOpenModalBoxInfo }) {
       </TableRow>
 
       <ModalUpdateDateDeliv 
-        open={openModalUpdaDate}
-        setOpen={setOpenModalUpdaDate}
+        open={openModalUpdateDate}
+        setOpen={setOpenModalUpdateDate}
         saleCurrent={sale}
       />
     </React.Fragment>

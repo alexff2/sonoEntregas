@@ -64,22 +64,6 @@ module.exports = {
    */
   async finishToMaintNotReturn(ID, maint){
     try {
-      //Valores para Kardex
-      const kardex = {
-        MODULO: 'ASSISTENCIA',
-        DOC: maint.ID_SALE,
-        OBS: `Retorno de assistência Nº ${maint.ID} com defeito`,
-        VALOR: maint.UNITARIO1,
-        USUARIO: 'DEFAULT',
-        tipo: 'E'
-      }
-
-      await MaintenanceDeliv.updateAny(0, { 
-        D_DELIVERED: maint.date,
-      }, { ID })
-
-      if(maint.CHANGE_PROD) await ProdLojaService.updateEstProdloja(maint, kardex)
-
       await Maintenance.updateAny(0, { 
         D_FINISH: maint.date,
         STATUS: 'Finalizada'
@@ -96,7 +80,7 @@ module.exports = {
     try {
       //Valores para Kardex
       const kardex = {
-        MODULO: 'ASSISTENCIA',
+        MODULO: 'ASSISTÊNCIA',
         DOC: maint.ID_SALE,
         OBS: `Retorno de assistência Nº ${maint.ID}`,
         VALOR: maint.UNITARIO1,

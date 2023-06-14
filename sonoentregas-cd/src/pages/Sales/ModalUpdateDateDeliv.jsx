@@ -41,9 +41,12 @@ export default function ModalUpdateDateDev({open, setOpen, saleCurrent}){
 
   const changeDateDeliv = e => {
     setError(false)
-    
-    if (new Date(e.target.value).setHours(0,0,0,0) >= new Date(saleCurrent.EMISSAO).setHours(0,0,0,0)) {
-      setDateDeliv(e.target.value)
+
+    const dateSelect = new Date(e.target.value+'T03:00:00.000Z').setHours(0,0,0,0)
+    const dateNow = new Date(saleCurrent.EMISSAO).setHours(0,0,0,0)
+
+    if (dateSelect >= dateNow) {
+      setDateDeliv(e.target.value+'T03:00:00.000Z')
     } else {
       e.target.value = ''
 

@@ -119,7 +119,7 @@ module.exports = {
 
       const D_ENVIO = ObjDate.getDate()
 
-      const D_ENTREGA1 = ObjDate.setDaysInDate(EMISSAO.split('T')[0], 10) //Objetivo do sistema
+      const D_ENTREGA1 = ObjDate.setDaysInDate(EMISSAO.split('T')[0], 6) //Objetivo do sistema
       const DOWN_EST = O_V == 0 ? 1 : 'NULL'
 
       const saleFind = await Sales.findSome(0, `ID_SALES = ${CODIGOVENDA} AND CODLOJA = ${loja}`)
