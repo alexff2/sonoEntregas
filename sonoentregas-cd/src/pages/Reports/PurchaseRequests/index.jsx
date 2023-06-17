@@ -17,9 +17,7 @@ import {
   Paper,
   FormControlLabel
 } from '@material-ui/core'
-
 import { useNavigate } from 'react-router-dom'
-
 import SearchIcon from '@material-ui/icons/Search'
 
 import Modal from '../../../components/Modal'

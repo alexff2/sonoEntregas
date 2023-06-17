@@ -208,6 +208,52 @@ module.exports = {
 
       return res.status(status).json(error)
     }
+  },
+  /**
+   * @param {any} req
+   * @param {any} res
+   */
+  async productsMovement(req, res){
+    try {
+      const { date, typeMovement } = req.query
+
+      if (!date || !typeMovement) {
+        throw {
+          status: 409,
+          error: {
+            message: 'outdated forecast!'
+          }
+        }
+      }
+
+      const types = {
+        all: '',
+        movement: '      WHERE A.QTD_ENT <> 0 OR A.QTD_SAI <> 0',
+        notMovement: '      WHERE A.QTD_ENT = 0 AND A.QTD_SAI = 0'
+      }
+
+      const script = `
+      SELECT * FROM (
+        SELECT A.CODIGO, A.ALTERNATI, A.NOME, A.ESTOQUE_KARDEX + (ISNULL(B.QTD_MOV, 0)*-1) EST_INI, ISNULL(B.QTD_ENT, 0) QTD_ENT,
+        ISNULL(B.QTD_SAI, 0) *-1 QTD_SAI, A.ESTOQUE_KARDEX EST_ATUAL
+        FROM VIEW_KARDEX_DIF_EST A
+        LEFT JOIN  (SELECT CODPRODUTO, SUM(QUANT_ENTRADA) QTD_ENT, SUM(QUANT_SAIDA) QTD_SAI, SUM(QUANT_ENTRADA) - SUM(QUANT_SAIDA) QTD_MOV
+          FROM VIEW_KARDEX_PRODUTOS
+          WHERE DATA >= '${date}'
+          AND LOJA = 1
+          GROUP BY CODPRODUTO) B ON A.CODIGO = B.CODPRODUTO) A\n`+types[typeMovement]
+
+      const getProductsMovement = await Products._query(1, script, QueryTypes.SELECT)
+
+      return res.json(getProductsMovement)
+    } catch (e) {
+      console.log(e)
+
+      let status = e.status ? e.status : 400
+      let error = e.error ? e.error : e
+
+      return res.status(status).json(error)
+    }
   }
 }
 

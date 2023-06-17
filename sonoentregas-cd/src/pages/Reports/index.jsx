@@ -37,6 +37,9 @@ export default function Reports(){
         <Link className={classe.link} onClick={() => navigate('/app/reports/purchaseRequests')}>
           <Assessment /> &nbsp; &nbsp; <Typography>Pedidos de compra abertos</Typography>
         </Link>
+        <Link className={classe.link} onClick={() => navigate('/app/reports/products/movement')}>
+          <Assessment /> &nbsp; &nbsp; <Typography>Movimentação de produtos</Typography>
+        </Link>
         {isAuth && 
           <Link className={classe.link} href='http://174.200.200.41:3335'>
             <Assessment /> &nbsp; &nbsp; <Typography>Dashboard CD</Typography>
