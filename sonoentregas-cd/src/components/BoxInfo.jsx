@@ -10,7 +10,10 @@ import { useAddress } from '../context/addressContext'
 const useStyles = makeStyles( theme => ({
   container: {
     borderRadius: '0 4px 0 0',
-    height: '100%'
+    height: '100%',
+    [theme.breakpoints.down('sm')]: {
+      fontSize: '10px'
+    }
   },
   headBox: {
     borderRadius: '0 4px 0 0',

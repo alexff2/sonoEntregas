@@ -5,7 +5,8 @@ import {
   Divider,
   Drawer,
   List,
-  makeStyles
+  makeStyles,
+  Hidden
 } from '@material-ui/core'
 import {
   EmojiTransportationTwoTone,
@@ -63,8 +64,10 @@ const itens = [
 
 const useStyle = makeStyles(theme => ({
   drawer: {
-    width: widthDrawer,
-    flexShrink: 0
+    [theme.breakpoints.up('sm')]: {
+      width: widthDrawer,
+      flexShrink: 0,
+    }
   },
   drawerPaper: {
     width: widthDrawer
@@ -74,46 +77,75 @@ const useStyle = makeStyles(theme => ({
   }
 }))
 
-function Nav() {
+function Nav({
+  handleDrawerToggle,
+  container,
+  mobileOpen
+}) {
   const classes = useStyle()
-  return (
-    <Drawer
-      anchor="left"
-      variant="permanent"
-      className={classes.drawer}
-      classes={{
-        paper: classes.drawerPaper
-      }}
+
+  const drawer = (
+    <Box
+      height="100%"
+      display="flex"
+      flexDirection="column"
     >
       <Box
-        height="100%"
+        alignItems="center"
         display="flex"
         flexDirection="column"
+        p={2}
       >
-        <Box
-          alignItems="center"
-          display="flex"
-          flexDirection="column"
-          p={2}
-        >
-          <img src={logo} alt="Logo" className={classes.logo} />
-        </Box>
-        <Divider />
-        <Box p={2}>
-          <List>
-            {itens.map(item => (
-              <NavItem
-                key={item.title}
-                title={item.title}
-                href={item.href}
-                icon={item.icon}
-              />
-            ))}
-          </List>
-        </Box>
-        <Box flexGrow={1} />
+        <img src={logo} alt="Logo" className={classes.logo} />
       </Box>
-    </Drawer>
+      <Divider />
+      <Box p={2}>
+        <List>
+          {itens.map(item => (
+            <NavItem
+              key={item.title}
+              title={item.title}
+              href={item.href}
+              icon={item.icon}
+            />
+          ))}
+        </List>
+      </Box>
+      <Box flexGrow={1} />
+    </Box>
+  )
+
+return (
+  <nav className={classes.drawer} aria-label="mailbox folders">
+    <Hidden smUp implementation="css">
+      <Drawer
+        container={container}
+        variant="temporary"
+        anchor={'left'}
+        open={mobileOpen}
+        onClose={handleDrawerToggle}
+        classes={{
+          paper: classes.drawerPaper,
+        }}
+        ModalProps={{
+          keepMounted: true,
+        }}
+      >
+        {drawer}
+      </Drawer>
+    </Hidden>
+    <Hidden xsDown implementation="css">
+      <Drawer
+        classes={{
+          paper: classes.drawerPaper,
+        }}
+        variant="permanent"
+        open
+      >
+        {drawer}
+      </Drawer>
+    </Hidden>
+  </nav>
   )
 }
 

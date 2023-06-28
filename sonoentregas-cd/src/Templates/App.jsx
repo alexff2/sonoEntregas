@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { makeStyles, Box } from '@material-ui/core'
 
@@ -11,19 +11,40 @@ import ModalALert from '../components/ModalAlert'
 
 const useStyles = makeStyles((theme) => ({
   content: {
-    flexGrow: 1,
-    padding: theme.spacing(3)
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(1.5),
+      width: '100%'
+    },
+    [theme.breakpoints.up('sm')]: {
+      padding: theme.spacing(3),
+      flexGrow: 1
+    },
   },
   toolbar: theme.mixins.toolbar,
 }))
 
-export default function App() {
+export default function App(props) {
   const classes = useStyles()
+  const [mobileOpen, setMobileOpen] = useState(false)
   const { childrenModal, open, setOpen, type } = useAlert()
+  const { window } = props
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen)
+  }
+
+  const container = window !== undefined ? () => window().document.body : undefined;
+
   return(
     <Box display="flex">
-      <Header />
-      <Nav />
+      <Header
+        handleDrawerToggle={handleDrawerToggle}
+      />
+      <Nav
+        handleDrawerToggle={handleDrawerToggle}
+        container={container}
+        mobileOpen={mobileOpen}
+      />
       <main className={classes.content}>
         <div className={classes.toolbar} />
         <Outlet />

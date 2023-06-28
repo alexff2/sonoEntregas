@@ -14,6 +14,7 @@ const useStyles = makeStyles((theme) => ({
   sales: {
     marginTop: theme.spacing(3),
     display: 'flex',
+    width: '100%'
   },
   boxAddress: {
     width: '40%'

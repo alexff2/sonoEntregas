@@ -8,9 +8,10 @@ import {
   Menu,
   MenuItem,
   ListItemIcon,
-  Typography
+  Typography,
+  IconButton
 } from '@material-ui/core'
-import { AccountCircle, ExitToApp, Assessment } from '@material-ui/icons'
+import { AccountCircle, ExitToApp, Assessment, Menu as MenuIcon } from '@material-ui/icons'
 
 import { useAuthenticate } from '../../context/authContext'
 import BtnUpdate from './BtnUpdate'
@@ -38,8 +39,16 @@ const StyledMenu = withStyles({
 const useStyles = makeStyles(theme => ({
   root: {
     background: theme.palette.primary.main,
-    width: `calc(100% - ${256}px)`,
-    marginLeft: 256,
+    [theme.breakpoints.up('sm')]: {
+      width: `calc(100% - ${256}px)`,
+      marginLeft: 256,
+    },
+  },
+  menuButton: {
+    marginRight: theme.spacing(2),
+    [theme.breakpoints.up('sm')]: {
+      display: 'none',
+    },
   },
   toolbar: {
     display: 'flex',
@@ -61,7 +70,7 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-export default function Header() {
+export default function Header({ handleDrawerToggle }) {
   const [anchorEl, setAnchorEl] = useState(null)
   const { userAuth, logout } = useAuthenticate()
   const classes = useStyles()
@@ -79,6 +88,15 @@ export default function Header() {
   return(
     <AppBar position="fixed" className={classes.root}>
       <Toolbar className={classes.toolbar}>
+        <IconButton
+          color="inherit"
+          aria-label="open drawer"
+          edge="start"
+          onClick={handleDrawerToggle}
+          className={classes.menuButton}
+        >
+          <MenuIcon />
+        </IconButton>
         <BtnUpdate />
 
         <p className={classes.toolbar}>
