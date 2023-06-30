@@ -25,7 +25,11 @@ const useStyles = makeStyles(theme => ({
   barHeader: {
     padding: theme.spacing(2),
     background: theme.palette.primary.main,
-    display: 'flex'
+    display: 'flex',
+    [theme.breakpoints.down('sm')]: {
+      flexDirection: 'column',
+      gap: 4
+    }
     //flexGrow: 1
   },
   search: {
@@ -35,7 +39,10 @@ const useStyles = makeStyles(theme => ({
     '&:hover': {
       backgroundColor: fade(theme.palette.common.white, 0.25),
     },
-    marginRight: theme.spacing(2)
+    marginRight: theme.spacing(2),
+    [theme.breakpoints.down('sm')]: {
+      marginRight: theme.spacing(0)
+    }
   },
   searchIcon: {
     padding: theme.spacing(0, 2),

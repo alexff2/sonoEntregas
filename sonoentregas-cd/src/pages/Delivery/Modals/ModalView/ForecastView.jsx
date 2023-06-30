@@ -54,11 +54,25 @@ const useStyles = makeStyles(theme => ({
     },
     background: theme.palette.primary.light
   },
+  headerTab: {
+    [theme.breakpoints.down('sm')]: {
+      '& *': {
+        fontSize: '10px'
+      }
+    }
+  },
   bodyTab: {
     background: '#FAFAFA',
     border: `1px solid #F7F7F7`,
     minWidth: 771,
-    minHeight: 300
+    minHeight: 300,
+    [theme.breakpoints.down('sm')]: {
+      minWidth: '100%',
+      '& *': {
+        fontSize: '10px',
+        padding: 4
+      }
+    }
   }
 }))
 
@@ -74,6 +88,7 @@ export default function ForecastView({ forecast, handleInvalidationSale }){
     <>
       <AppBar position="static">
         <Tabs
+          className={classes.headerTab}
           value={value}
           onChange={(event, newValue) => setValue(newValue)}
           aria-label="simple tabs example"
@@ -89,7 +104,7 @@ export default function ForecastView({ forecast, handleInvalidationSale }){
         className={classes.bodyTab} value={value} index={0}
       >
         <TableContainer component={Paper}>
-          <Table aria-label="collapsible table">
+          <Table className={classes.table}>
             <TableHeadSale/>
             <TableBody>
               {forecastNotValidated.map((sale, index) => (
@@ -108,7 +123,7 @@ export default function ForecastView({ forecast, handleInvalidationSale }){
         className={classes.bodyTab} value={value} index={1}
       >
         <TableContainer component={Paper}>
-          <Table aria-label="collapsible table">
+          <Table className={classes.table}>
             <TableHeadSale type='forecastView'/>
             <TableBody>
               {forecastAccepted.map((sale, index) => (
@@ -128,7 +143,7 @@ export default function ForecastView({ forecast, handleInvalidationSale }){
         className={classes.bodyTab} value={value} index={2}
       >
         <TableContainer component={Paper}>
-          <Table aria-label="collapsible table">
+          <Table className={classes.table}>
             <TableHeadSale />
             <TableBody>
               {forecastRefused.map((sale, index) => (

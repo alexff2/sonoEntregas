@@ -37,7 +37,14 @@ const useStyle = makeStyles(theme => ({
       padding: 0
     },
     '& td': {
-      padding: '4px 16px'
+      padding: '4px 16px',
+      [theme.breakpoints.down('sm')]: {
+        padding: '4px',
+        fontSize: '12px',
+        '& button': {
+          padding: '4px'
+        }
+      }
     }
   }
 }))

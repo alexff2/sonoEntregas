@@ -5,7 +5,13 @@ const useStyles = makeStyles( theme => ({
   modal: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    [theme.breakpoints.down('sm')]: {
+      '& *': {
+        fontSize: '10px',
+        padding: 4
+      }
+    }
   },
   paper1: {
     backgroundColor: theme.palette.background.paper,
@@ -13,7 +19,11 @@ const useStyles = makeStyles( theme => ({
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3),
     maxHeight: 'calc(100vh - 100px)',
-    overflow: 'auto'
+    overflow: 'auto',
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(1),
+      width: '100%'
+    }
   },
   paper2: {  
     border: 'none',
@@ -22,7 +32,10 @@ const useStyles = makeStyles( theme => ({
     letterSpacing: -0.5,
     minWidth: 'min(95vw, 800px)',
     maxHeight: 'calc(100vh - 50px)',
-    overflow: 'auto'
+    overflow: 'auto',
+    [theme.breakpoints.down('sm')]: {
+      width: '100%'
+    }
   }
 }))
 

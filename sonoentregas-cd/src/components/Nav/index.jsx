@@ -107,6 +107,8 @@ function Nav({
               title={item.title}
               href={item.href}
               icon={item.icon}
+              handleDrawerToggle={handleDrawerToggle}
+              mobileOpen={mobileOpen}
             />
           ))}
         </List>

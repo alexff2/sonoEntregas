@@ -30,6 +30,8 @@ const useStyle = makeStyles((theme)=>({
 function Navbar({
   title,
   icon: Icon,
+  handleDrawerToggle,
+  mobileOpen,
   href,
   ...rest
 }) {
@@ -42,6 +44,7 @@ function Navbar({
     >
       <Button
         className={classes.button}
+        onClick={() => mobileOpen &&  handleDrawerToggle()}
         component={NavLink}
         to={href}
       >
