@@ -24,50 +24,90 @@ import { useNavigate } from 'react-router-dom'
 
 import ReportContainer from '../../../components/Reports'
 
+import splitReportTable from '../../../functions/splitReportTable'
+import { dateAndTimeCurrent } from '../../../functions/getDates'
+
 import { useStyle } from '../style'
 
 import api from '../../../services/api'
 
-const currentDate = new Date()
-const currentMonth = currentDate.getMonth()
-const currentYears = currentDate.getFullYear()
+const PageReport = ({ products, lastPage, result, classe, pageNumber, months }) => {
+  const { dateTimeBr } = dateAndTimeCurrent()
 
-const month = [
-  'Janeiro',
-  'Fevereiro',
-  'Março',
-  'Abril',
-  'Maio',
-  'Junho',
-  'Julho',
-  'Agosto',
-  'Setembro',
-  'Outubro',
-  'Novembro',
-  'Dezembro'
-]
-const monthAbbreviated = [
-  'Jan',
-  'Fev',
-  'Mar',
-  'Abr',
-  'Mai',
-  'Jun',
-  'Jul',
-  'Ago',
-  'Set',
-  'Out',
-  'Nov',
-  'Dez'
-]
+  return(
+  <Box className="report">
+    <Box display='flex' justifyContent='space-between' mb={1}>
+      <Typography style={{ fontSize: 11 }}>{dateTimeBr}</Typography>
+      <Typography style={{ fontSize: 11 }}>Pagina {pageNumber}</Typography>
+    </Box>
 
-const years = []
-
-for(let i = 2020; i <= currentYears; i++) {
-  years.push(i)
-}
+    <TableContainer>
+      <Table>
+        <TableHead>
+          <TableRow className={classe.tableHead}>
+            {[
+              'CÓDIGO',
+              'DESCRIÇÃO',
+              months.month1,
+              months.month2,
+              months.month3,
+              'TOTAL',
+              'M.TRI',
+              'M.SEM',
+              'PEND.',
+              'EST/ASS',
+              'PED',
+              'COMP'
+            ].map((th, i) => (
+              <TableCell  color={'black'} key={i}>{th}</TableCell>
+            ))}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {products.map(( product, i) => (
+            <TableRow key={i} className={classe.rowBody}>
+              <TableCell>{product.COD_ORIGINAL}</TableCell>
+              <TableCell>{product.NOME}</TableCell>
+              <TableCell>{product.QTD_MES1}</TableCell>
+              <TableCell>{product.QTD_MES2}</TableCell>
+              <TableCell>{product.QTD_MES3}</TableCell>
+              <TableCell>{product.Tot}</TableCell>
+              <TableCell>{product.MedMen}</TableCell>
+              <TableCell>{product.MedSem}</TableCell>
+              <TableCell>{product.PENDENTE}</TableCell>
+              <TableCell>{product.EST_LOJA} / {product.EST_DEPOSITO}</TableCell>
+              <TableCell>{product.PEDIDO}</TableCell>
+              <TableCell>
+                {product.Result}
+              </TableCell>
+            </TableRow>))}
+        </TableBody>
+          {lastPage && (
+            <TableFooter>
+              <TableRow className={classe.rowBody}>
+                <TableCell colSpan={2}>TOTAIS</TableCell>
+                <TableCell>{result.valueMonth1}</TableCell>
+                <TableCell>{result.valueMonth2}</TableCell>
+                <TableCell>{result.valueMonth3}</TableCell>
+                <TableCell>{result.valueMonth1 + result.valueMonth2 + result.valueMonth3}</TableCell>
+                <TableCell>{Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/3)}</TableCell>
+                <TableCell>{Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/9)}</TableCell>
+                <TableCell>{result.valuePend}</TableCell>
+                <TableCell>{result.valueEstLoja} / {result.valueEstDep}</TableCell>
+                <TableCell>{result.valuePed}</TableCell>
+                <TableCell>
+                  {(Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/9) + result.valuePend)-result.valueEstLoja-result.valuePed}
+                </TableCell>
+              </TableRow>
+            </TableFooter>)}
+      </Table>
+    </TableContainer>
+  </Box>
+)}
 
 export default function OrderSuggestion() {
+  const { month, monthAbbreviated, years, currentMonth, currentYears, dateTimeBr } = dateAndTimeCurrent()
+
   const [ selectedYears, setSelectedYears ] = useState(currentYears)
   const [ selectedMonth, setSelectedMonth ] = useState(currentMonth - 1)
   const [ resultFilter, setResultFilter ] = useState('positives')
@@ -76,8 +116,6 @@ export default function OrderSuggestion() {
   const [ isOpenFilter, setIsOpenFilter ] = useState(true)
   const [ openReport, setOpenReport ] = useState(false)
   const [ disabledButton, setDisabledButton ] = useState(false)
-
-  const dateTimeBr = currentDate.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })
 
   const classe = useStyle()
 
@@ -125,28 +163,6 @@ export default function OrderSuggestion() {
 
   const handleCloseFilter = () => setIsOpenFilter(false)
 
-  var valueMonth1 = 0
-  var valueMonth2 = 0
-  var valueMonth3 = 0
-  var valuePend = 0
-  var valueEstLoja = 0
-  var valueEstDep = 0
-  var valuePed = 0
-
-  for(var i = 0; i < products.length; i++) {
-    valueMonth1 += products[i].QTD_MES1
-    valueMonth2 += products[i].QTD_MES2
-    valueMonth3 += products[i].QTD_MES3
-    valuePend += products[i].PENDENTE
-    valueEstLoja += products[i].EST_LOJA
-    valueEstDep += products[i].EST_DEPOSITO
-    valuePed += products[i].PEDIDO
-    products[i]['Tot'] = products[i].QTD_MES1 + products[i].QTD_MES2 + products[i].QTD_MES3
-    products[i]['MedMen'] = Math.floor((products[i].QTD_MES1 + products[i].QTD_MES2 + products[i].QTD_MES3) / 3)
-    products[i]['MedSem'] = Math.floor((products[i].QTD_MES1 + products[i].QTD_MES2 + products[i].QTD_MES3) / 9)
-    products[i]['Result'] = (Math.floor((products[i].QTD_MES1 + products[i].QTD_MES2 + products[i].QTD_MES3)/9) + products[i].PENDENTE)-products[i].EST_LOJA-products[i].PEDIDO
-  }
-
   const productsFilter = (search.length  > 0 || resultFilter !== 'all')
     ? products.filter( prod => {
         if (resultFilter === 'positives') {
@@ -167,8 +183,34 @@ export default function OrderSuggestion() {
       })
     : products
 
+  const result = {
+    valueMonth1: 0,
+    valueMonth2: 0,
+    valueMonth3: 0,
+    valuePend: 0,
+    valueEstLoja: 0,
+    valueEstDep: 0,
+    valuePed: 0
+  }
+
+  for(var i = 0; i < productsFilter.length; i++) {
+    result.valueMonth1 += productsFilter[i].QTD_MES1
+    result.valueMonth2 += productsFilter[i].QTD_MES2
+    result.valueMonth3 += productsFilter[i].QTD_MES3
+    result.valuePend += productsFilter[i].PENDENTE
+    result.valueEstLoja += productsFilter[i].EST_LOJA
+    result.valueEstDep += productsFilter[i].EST_DEPOSITO
+    result.valuePed += productsFilter[i].PEDIDO
+    productsFilter[i]['Tot'] = productsFilter[i].QTD_MES1 + productsFilter[i].QTD_MES2 + productsFilter[i].QTD_MES3
+    productsFilter[i]['MedMen'] = Math.floor((productsFilter[i].QTD_MES1 + productsFilter[i].QTD_MES2 + productsFilter[i].QTD_MES3) / 3)
+    productsFilter[i]['MedSem'] = Math.floor((productsFilter[i].QTD_MES1 + productsFilter[i].QTD_MES2 + productsFilter[i].QTD_MES3) / 9)
+    productsFilter[i]['Result'] = (Math.floor((productsFilter[i].QTD_MES1 + productsFilter[i].QTD_MES2 + productsFilter[i].QTD_MES3)/9) + productsFilter[i].PENDENTE)-productsFilter[i].EST_LOJA-productsFilter[i].PEDIDO
+  }
+
+  const productsReport = splitReportTable(productsFilter, 49, 47)
+
   return (
-    <Box  component={Paper} p={2}>
+    <Box component={Paper} p={2}>
       <Typography
         component='h1'
         align='center'
@@ -224,8 +266,8 @@ export default function OrderSuggestion() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {productsFilter.map( product => (
-              <TableRow key={product.COD_ORIGINAL} className={classe.rowBody}>
+            {productsFilter.map( (product, i) => (
+              <TableRow key={i} className={classe.rowBody}>
                 <TableCell>{product.COD_ORIGINAL}</TableCell>
                 <TableCell>{product.NOME}</TableCell>
                 <TableCell>{product.QTD_MES1}</TableCell>
@@ -246,17 +288,17 @@ export default function OrderSuggestion() {
           <TableFooter>
             <TableRow className={classe.rowBody}>
               <TableCell colSpan={2}>TOTAIS</TableCell>
-              <TableCell>{valueMonth1}</TableCell>
-              <TableCell>{valueMonth2}</TableCell>
-              <TableCell>{valueMonth3}</TableCell>
-              <TableCell>{valueMonth1 + valueMonth2 + valueMonth3}</TableCell>
-              <TableCell>{Math.floor((valueMonth1 + valueMonth2 + valueMonth3)/3)}</TableCell>
-              <TableCell>{Math.floor((valueMonth1 + valueMonth2 + valueMonth3)/9)}</TableCell>
-              <TableCell>{valuePend}</TableCell>
-              <TableCell>{valueEstLoja} / {valueEstDep}</TableCell>
-              <TableCell>{valuePed}</TableCell>
+              <TableCell>{result.valueMonth1}</TableCell>
+              <TableCell>{result.valueMonth2}</TableCell>
+              <TableCell>{result.valueMonth3}</TableCell>
+              <TableCell>{result.valueMonth1 + result.valueMonth2 + result.valueMonth3}</TableCell>
+              <TableCell>{Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/3)}</TableCell>
+              <TableCell>{Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/9)}</TableCell>
+              <TableCell>{result.valuePend}</TableCell>
+              <TableCell>{result.valueEstLoja} / {result.valueEstDep}</TableCell>
+              <TableCell>{result.valuePed}</TableCell>
               <TableCell>
-                {(Math.floor((valueMonth1 + valueMonth2 + valueMonth3)/9) + valuePend)-valueEstLoja-valuePed}
+                {(Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/9) + result.valuePend)-result.valueEstLoja-result.valuePed}
               </TableCell>
             </TableRow>
           </TableFooter>
@@ -266,81 +308,102 @@ export default function OrderSuggestion() {
       <ReportContainer
         openModal={openReport}
         setOpenModal={setOpenReport}
-        save={`Relatório de Cálculo de Estoque Ideal - ${month[selectedMonth]} / ${selectedYears}.pdf`}
+        save={`Relatório de Cálculo de Estoque Ideal - ${month[selectedMonth]} / ${selectedYears}`}
       >
-        <Typography>
-          {dateTimeBr}
-        </Typography>
+        <Box className="report">
+          <Box display='flex' justifyContent='space-between'>
+            <Typography style={{ fontSize: 11 }}>{dateTimeBr}</Typography>
+            <Typography style={{ fontSize: 11 }}>Pagina 1</Typography>
+          </Box>
 
-        <Typography align='center'>
-          Relatório de Cálculo de Estoque Ideal
-        </Typography>
+          <Typography align='center' style={{ fontSize: 12, color: '#000', fontWeight: 'bold' }}>
+            Relatório de Cálculo de Estoque Ideal
+          </Typography>
 
-        <Typography align='center'>
-          Mês/Ano base: { month[selectedMonth]} / {selectedYears}
-        </Typography>
+          <Typography align='center' style={{ fontSize: 12, color: '#000', fontWeight: 'bold' }}>
+            Mês/Ano base: { month[selectedMonth]} / {selectedYears}
+          </Typography>
 
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow className={classe.tableHead}>
-                {[
-                  'CÓDIGO',
-                  'DESCRIÇÃO',
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow className={classe.tableHead}>
+                  {[
+                    'CÓDIGO',
+                    'DESCRIÇÃO',
+                    month1,
+                    month2,
+                    month3,
+                    'TOTAL',
+                    'M.TRI',
+                    'M.SEM',
+                    'PEND.',
+                    'EST/ASS',
+                    'PED',
+                    'COMP'
+                  ].map((th, i) => (
+                    <TableCell  color={'black'} key={i}>{th}</TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {productsReport[0].map( product => (
+                  <TableRow key={product.COD_ORIGINAL} className={classe.rowBody}>
+                    <TableCell>{product.COD_ORIGINAL}</TableCell>
+                    <TableCell>{product.NOME}</TableCell>
+                    <TableCell>{product.QTD_MES1}</TableCell>
+                    <TableCell>{product.QTD_MES2}</TableCell>
+                    <TableCell>{product.QTD_MES3}</TableCell>
+                    <TableCell>{product.Tot}</TableCell>
+                    <TableCell>{product.MedMen}</TableCell>
+                    <TableCell>{product.MedSem}</TableCell>
+                    <TableCell>{product.PENDENTE}</TableCell>
+                    <TableCell>{product.EST_LOJA} / {product.EST_DEPOSITO}</TableCell>
+                    <TableCell>{product.PEDIDO}</TableCell>
+                    <TableCell>
+                      {product.Result}
+                    </TableCell>
+                  </TableRow>
+                  ))}
+              </TableBody>
+              { productsFilter.length <= 47 && <TableFooter>
+                <TableRow className={classe.rowBody}>
+                  <TableCell colSpan={2}>TOTAIS</TableCell>
+                  <TableCell>{result.valueMonth1}</TableCell>
+                  <TableCell>{result.valueMonth2}</TableCell>
+                  <TableCell>{result.valueMonth3}</TableCell>
+                  <TableCell>{result.valueMonth1 + result.valueMonth2 + result.valueMonth3}</TableCell>
+                  <TableCell>{Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/3)}</TableCell>
+                  <TableCell>{Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/9)}</TableCell>
+                  <TableCell>{result.valuePend}</TableCell>
+                  <TableCell>{result.valueEstLoja} / {result.valueEstDep}</TableCell>
+                  <TableCell>{result.valuePed}</TableCell>
+                  <TableCell>
+                    {(Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/9) + result.valuePend)-result.valueEstLoja-result.valuePed}
+                  </TableCell>
+                </TableRow>
+              </TableFooter>}
+            </Table>
+          </TableContainer>
+        </Box>
+        {productsReport.length > 1 && 
+          productsReport.map(( products, i ) => {
+            if (i !== 0) {
+              return <PageReport 
+                products={products}
+                lastPage={productsReport.length - 1 === i}
+                result={result}
+                classe={classe}
+                key={i}
+                pageNumber={i+1}
+                months={{
                   month1,
                   month2,
-                  month3,
-                  'TOTAL',
-                  'M.TRI',
-                  'M.SEM',
-                  'PEND.',
-                  'EST/ASS',
-                  'PED',
-                  'COMP'
-                ].map((th, i) => (
-                  <TableCell  color={'black'} key={i}>{th}</TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-            {productsFilter.map( product => (
-              <TableRow key={product.COD_ORIGINAL} className={classe.rowBody}>
-                <TableCell style={{fontSize: 10}}>{product.COD_ORIGINAL}</TableCell>
-                <TableCell style={{fontSize: 10}}>{product.NOME}</TableCell>
-                <TableCell>{product.QTD_MES1}</TableCell>
-                <TableCell>{product.QTD_MES2}</TableCell>
-                <TableCell>{product.QTD_MES3}</TableCell>
-                <TableCell>{product.Tot}</TableCell>
-                <TableCell>{product.MedMen}</TableCell>
-                <TableCell>{product.MedSem}</TableCell>
-                <TableCell>{product.PENDENTE}</TableCell>
-                <TableCell>{product.EST_LOJA} / {product.EST_DEPOSITO}</TableCell>
-                <TableCell>{product.PEDIDO}</TableCell>
-                <TableCell>
-                  {product.Result}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-          <TableFooter>
-            <TableRow className={classe.rowBody}>
-              <TableCell colSpan={2}>TOTAIS</TableCell>
-              <TableCell>{valueMonth1}</TableCell>
-              <TableCell>{valueMonth2}</TableCell>
-              <TableCell>{valueMonth3}</TableCell>
-              <TableCell>{valueMonth1 + valueMonth2 + valueMonth3}</TableCell>
-              <TableCell>{Math.floor((valueMonth1 + valueMonth2 + valueMonth3)/3)}</TableCell>
-              <TableCell>{Math.floor((valueMonth1 + valueMonth2 + valueMonth3)/9)}</TableCell>
-              <TableCell>{valuePend}</TableCell>
-              <TableCell>{valueEstLoja} / {valueEstDep}</TableCell>
-              <TableCell>{valuePed}</TableCell>
-              <TableCell>
-                {(Math.floor((valueMonth1 + valueMonth2 + valueMonth3)/9) + valuePend)-valueEstLoja-valuePed}
-              </TableCell>
-            </TableRow>
-          </TableFooter>
-          </Table>
-        </TableContainer>
+                  month3
+                }}
+              />
+            } else return null
+          })}
       </ReportContainer>
 
       <Dialog

@@ -53,6 +53,20 @@ export default function ProductsMovement(){
   const navigate = useNavigate()
   const classe = useStyle()
 
+  const result = {
+    inicialInventory: 0,
+    finalInventory: 0,
+    input: 0,
+    output: 0
+  }
+
+  for (let i = 0; i < products.length; i++) {
+    result.inicialInventory += products[i].EST_INI
+    result.finalInventory += products[i].EST_ATUAL
+    result.input += products[i].QTD_ENT
+    result.output += products[i].QTD_SAI
+  }
+
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -124,10 +138,10 @@ export default function ProductsMovement(){
           <TableFooter>
             <TableRow className={classe.rowBody}>
               <TableCell colSpan={2}>TOTAIS</TableCell>
-              <TableCell align='left'>{0}</TableCell>
-              <TableCell align='left'>{0}</TableCell>
-              <TableCell align='left'>{0}</TableCell>
-              <TableCell align='left'>{0}</TableCell>
+              <TableCell>{result.inicialInventory}</TableCell>
+              <TableCell>{result.input}</TableCell>
+              <TableCell>{result.output}</TableCell>
+              <TableCell>{result.finalInventory}</TableCell>
             </TableRow>
           </TableFooter>
         </Table>
@@ -145,6 +159,7 @@ export default function ProductsMovement(){
         date={{dateStart: dateSelect, dateEnd: objDateTime.date}}
         openReport={isOpenReport}
         setOpenReport={setIsOpenReport}
+        result={result}
       />
 
     </Box>

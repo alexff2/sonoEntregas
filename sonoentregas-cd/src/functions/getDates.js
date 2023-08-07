@@ -116,3 +116,56 @@ export function checkDateWarranty(issueDate) {
 
   return warranty >= dateNow
 }
+
+export function dateAndTimeCurrent() {
+  const currentDate = new Date()
+  const currentMonth = currentDate.getMonth()
+  const currentYears = currentDate.getFullYear()
+
+  const month = [
+    'Janeiro',
+    'Fevereiro',
+    'Março',
+    'Abril',
+    'Maio',
+    'Junho',
+    'Julho',
+    'Agosto',
+    'Setembro',
+    'Outubro',
+    'Novembro',
+    'Dezembro'
+  ]
+
+  const monthAbbreviated = [
+    'Jan',
+    'Fev',
+    'Mar',
+    'Abr',
+    'Mai',
+    'Jun',
+    'Jul',
+    'Ago',
+    'Set',
+    'Out',
+    'Nov',
+    'Dez'
+  ]
+
+  const years = []
+
+  for(let i = 2020; i <= currentYears; i++) {
+    years.push(i)
+  }
+
+  const dateTimeBr = currentDate.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })
+
+  return {
+    month,
+    monthAbbreviated,
+    years,
+    currentMonth,
+    currentYears,
+    dateTimeBr
+  }
+}

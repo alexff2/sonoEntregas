@@ -43,11 +43,11 @@ export default function ReportMaint({maint, openModal, setOpenModal}){
           </div>
           <div>
             <label className="labelField">Endereço: </label>
-            <span>{maint.ENDERECO+', '+maint.BAIRRO}</span>
+            <span>{`${maint.ENDERECO} Nº ${maint.NUMERO},  ${maint.BAIRRO}`}</span>
           </div>
           <div>
             <label className="labelField">Telefone: </label>
-            <span>{maint.FONE}</span>
+            <span>{maint.FONE} / {maint.FAX}</span>
             <label className="labelField">Cidade: </label>
             <span>{maint.CIDADE}</span>
             <label className="labelField">UF: </label>

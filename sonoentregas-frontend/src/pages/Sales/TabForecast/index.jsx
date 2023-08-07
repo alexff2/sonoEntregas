@@ -163,7 +163,7 @@ export function TabForecast(){
                           : <strong style={{color: 'var(--green)'}}> - Confirmada</strong>}
                       </>}
                   </span>
-                  <span>{sale.FONE}</span>
+                  <span>{sale.FONE}{sale.FAX && (sale.FAX)}</span>
                   <span><strong>Vendedor: </strong>{sale.VENDEDOR}</span>
                   <div className="btnValidRemove">
                   {(!sale.canRemove && (sale.validationStatus === null || (sale.validationStatus && !sale.requestInvalidate))) && 

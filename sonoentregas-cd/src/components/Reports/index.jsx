@@ -7,34 +7,47 @@ import Modal from '../Modal'
 import './report.css'
 
 export default function Reports({children, save, openModal, setOpenModal}){
-  const generatePDF = ()=>{
-    const report = document.querySelector('#report')
-    const doc = new jsPDF('p', 'px', 'a4')
+  const generatePDF  = async () => {
+    const elementos = document.querySelectorAll('.report')
+    const numPaginas = elementos.length
+    const promises = []
 
     const options = {
       background: 'white',
       scale: 3,
       useCORS: true
-    };
+    }
 
-    html2canvas(report, options)
-      .then( canvas => {
-
-        const img = canvas.toDataURL('image/PNG')
-
-        // Add image Canvas to PDF
-        const edgeX = 0
-        const edgeY = 0
-        const imgProps = doc.getImageProperties(img)
-        const width = doc.internal.pageSize.getWidth() - 2 * edgeX
-        const height = (imgProps.height * width) / imgProps.width
-        console.log(width, height)
-        doc.addImage(img, 'PNG', edgeX, edgeY, width, height, undefined, 'FAST')
-        return doc
+    for (let i = 0; i < numPaginas; i++) {
+      const elemento = elementos[i]
+      const promise = html2canvas(elemento, options).then(canvas => {
+        const imagem = canvas.toDataURL('image/png')
+        return {
+          imagem,
+          altura: canvas.height,
+          largura: canvas.width,
+        }
       })
-      .then((docResult) => {
-        docResult.save(save)
-      })
+
+      promises.push(promise)
+    }
+
+    const paginas = await Promise.all(promises)
+
+    const pdf = new jsPDF('p', 'pt', 'a4')
+
+    for (let i = 0; i < numPaginas; i++) {
+      const pagina = paginas[i]
+      const altura = pagina.altura * 595 / pagina.largura
+
+      pdf.addImage(pagina.imagem, 'PNG', 0, 0, 595, altura, undefined, 'FAST')
+
+      if (i < numPaginas - 1) {
+        pdf.addPage()
+      }
+    }
+
+    pdf.save(`${save}.pdf`)
   }
 
   return(
@@ -47,9 +60,8 @@ export default function Reports({children, save, openModal, setOpenModal}){
           <span>{save}</span>
           <button onClick={generatePDF}>Gerar PDF</button>
         </div>
-        <div id="report">
-          {children}
-        </div>
+
+        {children}
       </div>
     </Modal>
   )

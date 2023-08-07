@@ -25,6 +25,7 @@ import ReportContainer from '../../../components/Reports'
 import EnhancedTableHead from '../../../components/EnhancedTableHead'
 
 import { getComparator, stableSort } from '../../../functions/orderTable'
+import splitReportTable from '../../../functions/splitReportTable'
 import { getDateBr } from '../../../functions/getDates'
 
 import { useStyle } from '../style'
@@ -39,6 +40,35 @@ const BoxFlex = (props) => (
     {...props}
   />
 )
+
+const PageReport = ({ sales, classe, pageNumber, dateTimeBr }) => {
+
+  return(
+  <Box className="report">
+    <Box display='flex' justifyContent='space-between' mb={1}>
+      <Typography style={{ fontSize: 11 }}>{dateTimeBr}</Typography>
+      <Typography style={{ fontSize: 11 }}>Pagina {pageNumber}</Typography>
+    </Box>
+
+    <TableContainer>
+      <Table>
+        <TableBody>
+          {sales.map(( sale, i) => (
+            <TableRow key={i} className={classe.rowBody}>
+              <TableCell>{sale.ID_SALES}</TableCell>
+              <TableCell>{sale.NOMECLI}</TableCell>
+              <TableCell>{getDateBr(sale.EMISSAO)}</TableCell>
+              <TableCell>{sale.DIAS_EMIS}</TableCell>
+              <TableCell>{getDateBr(sale.D_ENVIO)}</TableCell>
+              <TableCell>{sale.DIAS_ENVIO}</TableCell>
+              <TableCell style={sale.DIF_DIAS > 1 ? {color: 'red'} : {color: 'black'}}>{sale.DIF_DIAS}</TableCell>
+              <TableCell>{sale.SHOP}</TableCell>
+            </TableRow>))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  </Box>
+)}
 
 export default function SalesOpen(){
   const [ order, setOrder ] = useState('desc')
@@ -108,6 +138,8 @@ export default function SalesOpen(){
   if (onlyLateSales) {
     salesFiltered = salesFiltered.filter(sale => sale.lateDays > 0)
   }
+
+  const salesFilteredReport = splitReportTable(salesFiltered, 51, 47)
 
   let shops = []
   sales.forEach(sale => {
@@ -245,38 +277,51 @@ return(
       setOpenModal={setOpenReport}
       save={`Relatório de DAVs Abertas.pdf`}
     >
-      <Typography>
-        {dateTimeBr}
-      </Typography>
-      <Typography align='center'>
-        Relatório de DAVs abertas
-      </Typography>
-
-      <TableContainer>
-        <Table>
-        <EnhancedTableHead
-          order={order}
-          orderBy={orderBy}
-          onRequestSort={handleRequestSort}
-          headCells={headCells}
-          classe={classe}
-        />
-        <TableBody>
-          {stableSort(salesFiltered, getComparator(order, orderBy)).map((sale, i) => (
-            <TableRow key={i} className={classe.rowBody}>
-              <TableCell>{sale.ID_SALES}</TableCell>
-              <TableCell>{sale.NOMECLI}</TableCell>
-              <TableCell>{getDateBr(sale.EMISSAO)}</TableCell>
-              <TableCell>{sale.DIAS_EMIS}</TableCell>
-              <TableCell>{getDateBr(sale.D_ENVIO)}</TableCell>
-              <TableCell>{sale.DIAS_ENVIO}</TableCell>
-              <TableCell style={sale.DIF_DIAS > 1 ? {color: 'red'} : {color: 'black'}}>{sale.DIF_DIAS}</TableCell>
-              <TableCell>{sale.SHOP}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      </TableContainer>
+      <Box className="report">
+        <Typography>
+          {dateTimeBr}
+        </Typography>
+        <Typography align='center'>
+          Relatório de DAVs abertas
+        </Typography>
+        <TableContainer>
+          <Table>
+            <EnhancedTableHead
+              order={order}
+              orderBy={orderBy}
+              onRequestSort={handleRequestSort}
+              headCells={headCells}
+              classe={classe}
+            />
+            <TableBody>
+              {stableSort(salesFilteredReport[0], getComparator(order, orderBy)).map((sale, i) => (
+                <TableRow key={i} className={classe.rowBody}>
+                  <TableCell>{sale.ID_SALES}</TableCell>
+                  <TableCell>{sale.NOMECLI}</TableCell>
+                  <TableCell>{getDateBr(sale.EMISSAO)}</TableCell>
+                  <TableCell>{sale.DIAS_EMIS}</TableCell>
+                  <TableCell>{getDateBr(sale.D_ENVIO)}</TableCell>
+                  <TableCell>{sale.DIAS_ENVIO}</TableCell>
+                  <TableCell style={sale.DIF_DIAS > 1 ? {color: 'red'} : {color: 'black'}}>{sale.DIF_DIAS}</TableCell>
+                  <TableCell>{sale.SHOP}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
+      {salesFilteredReport.length > 1 && 
+          salesFilteredReport.map(( salesItem, i ) => {
+            if (i !== 0) {
+              return <PageReport 
+                sales={salesItem}
+                classe={classe}
+                key={i}
+                pageNumber={i+1}
+                dateTimeBr={dateTimeBr}
+              />
+            } else return null
+          })}
     </ReportContainer>
   </Box>)
 }

@@ -27,11 +27,50 @@ import BrMonetaryValue from '../../../components/BrMonetaryValue'
 import PurchaseProducts from './PurchaseProducts'
 
 import { getComparator, stableSort } from '../../../functions/orderTable'
-import { getDateBr } from '../../../functions/getDates'
+import splitReportTable from '../../../functions/splitReportTable'
+import { getDateBr, dateAndTimeCurrent } from '../../../functions/getDates'
+
 
 import { useStyle } from '../style'
+import tableStyle from './style'
 
 import api from '../../../services/api'
+
+const PageReport = ({ purchaseRequest, classesTable, pageNumber, order, orderBy, handleRequestSort, headCellsReport }) => {
+  const { dateTimeBr } = dateAndTimeCurrent()
+
+  return(
+  <Box className="report">
+    <Box display='flex' justifyContent='space-between' mb={1}>
+      <Typography style={{ fontSize: 11 }}>{dateTimeBr}</Typography>
+      <Typography style={{ fontSize: 11 }}>Pagina {pageNumber}</Typography>
+    </Box>
+
+    <TableContainer>
+      <Table>
+        <EnhancedTableHead
+          order={order}
+          orderBy={orderBy}
+          onRequestSort={handleRequestSort}
+          headCells={headCellsReport}
+          classe={classesTable}
+        />
+        <TableBody>
+          {purchaseRequest.map(( item, i) => (
+            <TableRow key={i} className={classesTable.rowBody}>
+              <TableCell>{item.CODIGOPEDIDO}</TableCell>
+              <TableCell>{getDateBr(item.EMISSAO)}</TableCell>
+              <TableCell>{item.DIAS_EMIS}</TableCell>
+              <TableCell>{item.VALORBRUTO.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
+              <TableCell>{item.VALOR_CHEGADA.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
+              <TableCell>{item.CODALTERNATIVO}</TableCell>
+              <TableCell>{item.OBS}</TableCell>
+            </TableRow>))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  </Box>
+)}
 
 const BoxFlex = (props) => (
   <Box
@@ -49,12 +88,13 @@ export default function PurchaseRequests(){
   const [ openReport, setOpenReport ] = useState(false)
   const [ typeSearch, setTypeSearch ] = useState('COD_PED')
   const [ search, setSearch ] = useState('')
-  const [ onlyGreaterThan10, setOnlyGreaterThan10 ] = useState(false)
+  const [ onlyGreaterThan5, setOnlyGreaterThan5 ] = useState(false)
   const [ partial, setPartial ] = useState(false)
   const [ purchaseRequests, setPurchaseRequests ] = useState([])
   const [ purchaseSelect, setPurchaseSelect ] = useState({})
   const navigate = useNavigate()
   const classe = useStyle()
+  const classesTable = tableStyle.useStyle()
 
   const currentDate = new Date()
   const dateTimeBr = currentDate.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })
@@ -94,8 +134,8 @@ export default function PurchaseRequests(){
     {id: 'EMISSAO', label: 'EMISSÃO'},
     {id: 'DIAS_EMIS', label: 'DIAS'},
     {id: 'VALORBRUTO', label: 'VALOR'},
-    {id: 'VALORCHEGADA', label: 'VL CHEGOU'},
-    {id: 'CODALTERNATIVO', label: 'PED FOR'},
+    {id: 'VALORCHEGADA', label: 'VL CHEG', class: classesTable.headCellValuePurchase},
+    {id: 'CODALTERNATIVO', label: 'PED FOR', class: classesTable.headCellNumberPurchase},
     {id: 'OBS', label: 'OBSERVAÇÃO'},
   ]
 
@@ -109,13 +149,29 @@ export default function PurchaseRequests(){
     purchaseRequestsFiltered = purchaseRequestsFiltered.filter(item => item.CODALTERNATIVO.toString().includes(search))
   }
 
-  if (onlyGreaterThan10) {
-    purchaseRequestsFiltered = purchaseRequestsFiltered.filter(item => item.DIAS_EMIS > 10)
+  if (onlyGreaterThan5) {
+    purchaseRequestsFiltered = purchaseRequestsFiltered.filter(item => item.DIAS_EMIS > 5)
   }
 
   if (partial) {
     purchaseRequestsFiltered = purchaseRequestsFiltered.filter(item => item.difValue !== item.VALORBRUTO)
   }
+
+  let numberLinesHeader = 49, numberLinesBody = 51
+
+  if (purchaseRequestsFiltered.length > 0) {
+    purchaseRequestsFiltered.forEach((item, i) => {
+      if (item.OBS !== null && item.OBS.length > 50) {
+        if (i <= numberLinesHeader) {
+          numberLinesHeader -= 1
+        } else {
+          numberLinesBody -= 1
+        }
+      }
+    })
+  }
+
+  const purchaseRequestsFilteredReport = splitReportTable(purchaseRequestsFiltered, numberLinesBody, numberLinesHeader)
 
 return(
   <Box  component={Paper} p={2}>
@@ -123,7 +179,7 @@ return(
       component='h1'
       align='center'
     >
-      Relatório de Pedidos de compra abertas
+      Relatório de Pedidos de compra abertos
     </Typography>
 
     <BoxFlex mt={2} mb={2}>
@@ -167,12 +223,12 @@ return(
       <FormControlLabel
         control={
           <Checkbox
-            checked={onlyGreaterThan10}
-            onChange={e => setOnlyGreaterThan10(e.target.checked)}
+            checked={onlyGreaterThan5}
+            onChange={e => setOnlyGreaterThan5(e.target.checked)}
           />
         }
         className={classe.inputRoot}
-        label="Maior que 10 dias"
+        label="Maior que 5 dias"
       />
 
       <FormControlLabel
@@ -223,44 +279,58 @@ return(
     <ReportContainer
       openModal={openReport}
       setOpenModal={setOpenReport}
-      save={`Relatório de DAVs Abertas.pdf`}
+      save={`Relatório de pedidos abertos`}
     >
-      <Typography>
-        {dateTimeBr}
-      </Typography>
+      <Box className="report">
+        <Box display='flex' justifyContent='space-between'>
+          <Typography style={{ fontSize: 11 }}>{dateTimeBr}</Typography>
+          <Typography style={{ fontSize: 11 }}>Pagina 1</Typography>
+        </Box>
 
-      <Typography align='center'>
-        Relatório de DAVs abertas
-      </Typography>
+        <Typography align='center' style={{ fontSize: 12, color: '#000', fontWeight: 'bold' }}>
+          Relatório de pedidos abertos
+        </Typography>
 
-      <TableContainer>
-        <Table>
-          <EnhancedTableHead
-            order={order}
-            orderBy={orderBy}
-            onRequestSort={handleRequestSort}
-            headCells={headCellsReport}
-            classe={classe}
-          />
-          <TableBody>
-            {stableSort(purchaseRequestsFiltered, getComparator(order, orderBy)).map((item, i) => (
-              <TableRow key={i} className={classe.rowBody}>
-                <TableCell>{item.CODIGOPEDIDO}</TableCell>
-                <TableCell>{getDateBr(item.EMISSAO)}</TableCell>
-                <TableCell>{item.DIAS_EMIS}</TableCell>
-                <TableCell>
-                  <BrMonetaryValue value={item.VALORBRUTO}/>
-                </TableCell>
-                <TableCell>
-                  <BrMonetaryValue value={item.VALOR_CHEGADA}/>
-                </TableCell>
-                <TableCell>{item.CODALTERNATIVO}</TableCell>
-                <TableCell>{item.OBS}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+        <TableContainer>
+          <Table>
+            <EnhancedTableHead
+              order={order}
+              orderBy={orderBy}
+              onRequestSort={handleRequestSort}
+              headCells={headCellsReport}
+              classe={classesTable}
+            />
+            <TableBody>
+              {stableSort(purchaseRequestsFilteredReport[0], getComparator(order, orderBy)).map((item, i) => (
+                <TableRow key={i} className={classesTable.rowBody}>
+                  <TableCell>{item.CODIGOPEDIDO}</TableCell>
+                  <TableCell>{getDateBr(item.EMISSAO)}</TableCell>
+                  <TableCell>{item.DIAS_EMIS}</TableCell>
+                  <TableCell>{item.VALORBRUTO.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
+                  <TableCell>{item.VALOR_CHEGADA.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
+                  <TableCell>{item.CODALTERNATIVO}</TableCell>
+                  <TableCell>{item.OBS}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
+      {purchaseRequestsFilteredReport.length > 1 && 
+        purchaseRequestsFilteredReport.map(( purchaseRequest, i ) => {
+          if (i !== 0) {
+            return <PageReport 
+              purchaseRequest={purchaseRequest}
+              classesTable={classesTable}
+              key={i}
+              pageNumber={i+1}
+              order={order}
+              orderBy={orderBy}
+              handleRequestSort={handleRequestSort}
+              headCellsReport={headCellsReport}
+            />
+          } else return null
+        })}
     </ReportContainer>
 
     <Modal

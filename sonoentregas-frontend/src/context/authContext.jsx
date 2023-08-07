@@ -49,7 +49,7 @@ export default function AuthProvider({ children }){
           setAlert('Rede')
         } else if (e.response.status === 401){
           console.log(e.response.data)
-          setAlert('Sua senha venceu, entre novamente na aplicação!')
+          setAlert('Sua sessão expirou, entre novamente na aplicação!')
           setIsAuthenticated(false)
           localStorage.clear()
         } else if (e.response.status === 400){
