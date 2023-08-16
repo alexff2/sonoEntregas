@@ -10,8 +10,9 @@ import Users from '../pages/Users'
 import Sales from '../pages/Sales'
 import Maintenance from '../pages/Maintenance'
 import Product from '../pages/Product'
+import Goals from '../pages/Goals'
 
-export default function PriveteRoutes(){
+export default function PrivateRoutes(){
   return(
     <Routes>
       <Route path="/" element={<App />}>
@@ -21,6 +22,7 @@ export default function PriveteRoutes(){
         <Route path="/product" element={<Product />}/>
         <Route path="/maintenance" element={<Maintenance />}/>
         <Route path="/users" element={<Users />}/>
+        <Route path="/goals" element={<Goals />}/>
         <Route path="*" element={<Navigate to="/"/>} />
       </Route>
     </Routes>

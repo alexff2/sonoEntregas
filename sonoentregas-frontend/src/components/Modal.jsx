@@ -7,8 +7,9 @@ export default function Modal({ children, openModal, styleModal, setOpenModal })
         <div className="modal-overlaw"
           style={{display: 'flex'}}
           onClick={e => {
-            e.target.className === "modal-overlaw"
-              && setOpenModal(false)
+            if(setOpenModal){
+              e.target.className === "modal-overlaw" && setOpenModal(false)
+            }
           }}
         >
           <div className="modal" style={ styleModal ? styleModal : {} }>

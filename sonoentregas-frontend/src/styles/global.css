@@ -203,6 +203,20 @@ tbody td {
 }
 
 /* BUTTONS ========================================*/
+.btnAdd {
+  background-color: var(--blue);
+  color: var(--white);
+  border: none;
+  border-radius: 0.25rem;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: filter 0.2s;
+}
+
+.btnAdd:hover {
+  filter: brightness(0.9);
+}
+
 .circle-add {
   width: 4rem;
   height: 4rem;
@@ -289,6 +303,17 @@ tbody td {
 .flexRowCenter {
   display: flex;
   align-items: center;
+}
+
+.flexRowSpaceBetween {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.field input {
+  width: 80px;
+  border: solid 1px var(--gray-line);
 }
 
 .marginTop {

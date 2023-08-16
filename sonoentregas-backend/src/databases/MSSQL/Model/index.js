@@ -156,6 +156,31 @@ class Model {
 
     return ID
   }
+
+  async create(loja, values, id = false, log=false) {
+    var script
+
+    if (!id) {
+      //Search first id in table
+      const lastId = await this.findAll(loja, `MAX(id) AS 'id'`)
+
+      id = lastId[0].id ? lastId[0].id + 1 : 1
+
+      const { column, value } = this.setCreateValues(values, id)
+
+      script = `INSERT INTO ${this.tab} (id, ${column}) VALUES ${value}`
+
+    } else {
+      const { column, value } = this.setCreateValues(values)
+      
+      script = `INSERT INTO ${this.tab} (${column}) VALUES ${value}`
+    }
+    await this._query(loja, script, QueryTypes.INSERT, log)
+
+    const data = await this.findSome(loja, `id = ${id}`)
+
+    return data[0]
+  }
   async creatorNotReturn(loja, values, id = false, log=false) {
     //Buscando ultimo ID lançado na tabela se não fornecido
     if (!id) {

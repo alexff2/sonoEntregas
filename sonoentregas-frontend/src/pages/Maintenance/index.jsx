@@ -18,7 +18,7 @@ export default function Vendas(){
   const { OFFICE } =  userAuth
 
   useEffect(() => {
-    setUserMas((OFFICE === 'Dev' || OFFICE === 'Master'))
+    setUserMas((OFFICE === 'Dev' || OFFICE === 'Master' || OFFICE === 'Manager'))
   }, [OFFICE])
 
   const openTab = (tab, e) => {

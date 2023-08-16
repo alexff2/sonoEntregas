@@ -1,0 +1,11 @@
+#goal {
+  width: 120px;
+}
+
+.fieldGoal {
+  padding: 10px;
+}
+
+.amountBtn {
+  cursor: pointer;
+}

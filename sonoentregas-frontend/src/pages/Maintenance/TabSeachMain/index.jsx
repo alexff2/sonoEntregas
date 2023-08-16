@@ -138,7 +138,7 @@ export default function TabSeachMain() {
             </select>
           }
           { typesStatus === 'close' && 
-            <div className="inputsSeachSales">
+            <div className="inputsSearchSales">
               <AiOutlineSearch />
                 <input
                   type="date" 
@@ -147,7 +147,7 @@ export default function TabSeachMain() {
             </div>
           }
           { typeSeach !== 'STATUS' && 
-            <div className="inputsSeachSales">
+            <div className="inputsSearchSales">
               <AiOutlineSearch />
               <input
                 type="text"

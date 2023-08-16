@@ -1,6 +1,6 @@
 const { QueryTypes } = require('sequelize')
 const connections = require('../databases/MSSQL/connections')
-const Empresa = require('../models/Empresas')
+const Shops = require('../models/tables/Shops')
 
 module.exports = {
   async findConnections(req, res) {
@@ -8,9 +8,9 @@ module.exports = {
   },
   async findShops(req, res) {
     try {
-      const empresas = await Empresa._query(0, 'SELECT * FROM LOJAS', QueryTypes.SELECT)
+      const shops = await Shops.findAll(0)
 
-      return res.send(empresas)
+      return res.send(shops)
     } catch (error) {
       console.log(error)      
     }
