@@ -35,7 +35,7 @@ declare @codvenda char(15), @date datetime, @horas varchar(8), @OBS VARCHAR(80)
 set @codvenda = '688'
 set @date = '2023-03-29'
 set @horas = '11:53:00'
-SET @OBS = 'Troca da DAV da LOJA S. SHOPPING'
+SET @OBS = 'Devolução da venda 16077, Ref a troca da Loja S. da Ilha'
 INSERT KARDEX_PRODUTOS_HISTORICO
 ([CODIGO]
            ,[CODLOJA]
