@@ -29,6 +29,7 @@ const reportsController = require('./controllers/rerportsController')
 const devController = require('./controllers/devController')
 const catDefController = require('./controllers/catDefController')
 const goalsController = require('./controllers/goalsController')
+const onSaleController = require('./controllers/onSaleController')
 
 //Routes
 //Connections
@@ -134,11 +135,14 @@ routes.get('/reports', reportsController.listProducts)
 routes.get('/reports/sales/open', reportsController.salesOpen)
 routes.get('/reports/products/movement', reportsController.productsMovement)
 routes.get('/reports/purchase/requests', reportsController.purchaseRequest)
-// Golas and OnSale
+// Golas
 routes.get('/goals', goalsController.index)
 routes.post('/goals', ensureAuthenticated, goalsController.create)
 routes.put('/goals/:id', ensureAuthenticated, goalsController.update)
 routes.get('/goals/getAmount', goalsController.getAmountReached)
+// OnSale
+routes.get('/onSale/open', ensureAuthenticated, onSaleController.onSalesOpen)
+routes.post('/onSale', ensureAuthenticated, onSaleController.create)
 //Developer 
 routes.get('/dev', devController.getTable)
 

@@ -9,3 +9,68 @@
 .amountBtn {
   cursor: pointer;
 }
+
+.formOnSale {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 400px;
+}
+
+.fieldOnSale {
+  width: 100%;
+}
+.fieldOnSale input {
+  padding: 0.75;
+  width: 100%;
+  outline: none;
+}
+
+.fieldsOnSaleDate {
+  display: flex;
+  width: 100%;
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.bodyCreateOnSale {
+  margin: 16px 0 0 0;
+}
+
+#valueProduct {
+  border: none;
+  outline: none;
+  width: 100px;
+}
+
+.bodyCreateOnSale table {
+  margin: 4px 0 0 0;
+}
+.bodyCreateOnSale tbody tr:hover {
+  background-color: #ECEDEF;
+}
+
+.fieldOnSaleProduct {
+  position: relative;
+}
+
+.resultaSearchProduct {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 150px;
+  overflow-y: scroll;
+  background-color: #FFF;
+  border: 2px solid #FFF;
+  border-radius: 4px;
+  z-index: 9999;
+}
+.resultaSearchProduct table tr {
+  background-color: #FFF;
+}
+.resultaSearchProduct table td { 
+  font-size: 11px;
+  border-right: 2px solid #FFF;
+  border-bottom: 2px solid #FFF;
+}

@@ -1,17 +1,72 @@
-import React, { useState } from "react"
-import { AiOutlineSearch } from 'react-icons/ai'
+import React, { useState, useEffect } from "react"
+import { AiOutlineSearch, AiOutlineArrowDown, AiOutlineArrowUp } from 'react-icons/ai'
 
 import Modal from "../../../components/Modal"
 import ModaCreate from "./ModalCreate"
+
+import { toLocString } from "../../../functions/toLocString"
+
+import api from "../../../services/api"
+
+const ProductsOnSale = ({ product }) => {
+  return (
+    <tr>
+      <td>{product.COD_ORIGINAL}</td>
+      <td>{product.NOME}</td>
+      <td>{toLocString(product.valueOnSales)}</td>
+    </tr>
+  )
+}
+
+const RowOnSale = ({ onSale }) => {
+  const [ open, setOpen ] = useState(false)
+
+  return (
+    <>
+      <tr key={onSale.id}>
+        <td style={{width: 10}} onClick={() => setOpen(!open)}>
+          { open ? <AiOutlineArrowUp /> : <AiOutlineArrowDown /> }
+        </td>
+        <td>{onSale.id}</td>
+        <td>{onSale.description}</td>
+        <td>{onSale.dateStart}</td>
+        <td>{onSale.dateFinish}</td>
+      </tr>
+
+      <tr>
+        <td colSpan="5">
+          <div className={open ? 'tabProdSeach openDiv': 'tabProdSeach'}>
+            <table>
+              <tbody>
+                {onSale.products.map(product => (
+                  <ProductsOnSale product={product} key={product.COD_ORIGINAL}/>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </td>
+      </tr>
+    </>
+  )
+}
 
 export default function TabGoals() {
   const [ search, setSearch ] = useState('')
   const [ typeSearch, setTypeSearch ] = useState('STATUS')
   const [ typesStatus, setTypesStatus ] = useState('open')
-  const [ isOpenModalCreateOnSale, setIsOpenModalCreateOnSale ] = useState(true)
-  const [ onSale, setOnSale ] = useState([])
+  const [ isOpenModalCreateOnSale, setIsOpenModalCreateOnSale ] = useState(false)
+  const [ onSales, setOnSale ] = useState([])
 
-  const searchOnSale = async () => console.log('searchOnSale')
+  useEffect(() => {
+    const getOnSales = async () => {
+      const { data } = await api.get('/onSale/open')
+
+      setOnSale(data)
+    }
+    getOnSales()
+  }, [])
+
+  const searchOnSale = async () => console.log(onSales)
 
   return (
     <>
@@ -72,9 +127,25 @@ export default function TabGoals() {
         <button onClick={searchOnSale}>PESQUISAR</button>
       </div>
 
-      {onSale.length === 0
+      {onSales.length === 0
         ? <div className="red">Nenhuma promoção cadastrada!</div>
-        : <table className="tableSales"></table>}
+        : <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Código</th>
+                <th>Descrição</th>
+                <th>Data Inicial</th>
+                <th>Data Final</th>
+              </tr>
+            </thead>
+            <tbody>
+              {onSales.map(onSale => (
+                <RowOnSale key={onSale.id} onSale={onSale} />
+              ))}
+            </tbody>
+          </table>
+      }
 
       <button 
         className="circle-add"
@@ -85,7 +156,7 @@ export default function TabGoals() {
         openModal={isOpenModalCreateOnSale}
         setOpenModal={setIsOpenModalCreateOnSale}
       >
-        <ModaCreate />
+        <ModaCreate setOpenModalCreateOnSale={setIsOpenModalCreateOnSale} setOnSale={setOnSale}/>
       </Modal>
     </>
   )

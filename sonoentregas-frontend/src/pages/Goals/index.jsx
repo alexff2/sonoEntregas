@@ -7,8 +7,8 @@ import './styles.css'
 
 export default function Goals() {
   const [ tabs, setTabs ] = useState({
-    tab1: true,
-    tab2: false,
+    tab1: false,
+    tab2: true,
   })
 
   const openTab = (tab, e) => {
@@ -34,25 +34,21 @@ export default function Goals() {
     <div className='container sales-container'>
       <div className="tab">
         <input 
-          className="tablinks active"
+          className="tablinks"
           value="METAS"
           type="button"
           onClick={e => openTab('tab1',e)} />
 
         <input
-          className="tablinks"
+          className="tablinks active"
           value="PROMOÇÕES"
           type="button"
           onClick={e => openTab('tab2', e)} />
       </div>
 
       <div className="tab-body body-container">
-        {tabs.tab1 &&
-          <TabGoals />
-        }
-        {tabs.tab2 &&
-          <TabOnSale />
-        }
+        {tabs.tab1 && <TabGoals />}
+        {tabs.tab2 && <TabOnSale />}
       </div>
     </div>
   )

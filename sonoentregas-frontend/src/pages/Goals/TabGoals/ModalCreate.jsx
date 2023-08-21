@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 import api from '../../../services/api'
+import { coinMask, coinToFloat } from '../../../functions/toLocString'
 
 import { dateAndTimeCurrent } from '../../../functions/getDate'
 
@@ -77,7 +78,7 @@ export default function ModalCreate({ setIsOpenModalCreateGoals, getGoals }){
 
         <div className='fieldGoal field'>
           <label htmlFor="goal">Meta: </label>
-          <input id='goal' type='number' onChange={e => setGoalValue(e.target.value)} required/>
+          <input id='goal' type='text' onInput={coinMask} onChange={e => setGoalValue(coinToFloat(e.target.value))} required/>
         </div>
 
         <div>

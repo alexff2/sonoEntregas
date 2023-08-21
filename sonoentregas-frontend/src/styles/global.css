@@ -211,6 +211,7 @@ tbody td {
   font-weight: 600;
   font-size: 1rem;
   transition: filter 0.2s;
+  text-align: center;
 }
 
 .btnAdd:hover {
@@ -257,6 +258,38 @@ tbody td {
 }
 
 .btnBorderCiclo:disabled {
+  opacity: 1;
+  cursor: no-drop;
+}
+
+.btnBox {
+  display: flex;
+  justify-content: space-between;
+}
+
+.btnBox button {
+  width: 50%;
+  padding: 10px;
+  border-radius: 4px;
+  border: none;
+  outline: none;
+  background-color: var(--green);
+  color: #FFF;
+  font-weight: bold;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: 0.3s;
+}
+
+.btnBox button:last-child {
+  background-color: var(--red);
+}
+
+.btnBox button:hover {
+  opacity: 1;
+}
+
+.btnBox button:disabled {
   opacity: 1;
   cursor: no-drop;
 }

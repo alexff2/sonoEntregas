@@ -1,7 +1,9 @@
 //@ts-check
 
 class DateTime {
-  constructor(date) {
+  constructor(date, onlyDate = false) {
+    date = onlyDate ? date.replace('-', '/') : date
+
     if (date) {
       this.date = new Date(date)
     } else {
