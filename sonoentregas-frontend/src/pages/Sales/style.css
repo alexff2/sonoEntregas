@@ -112,6 +112,13 @@
   padding: 0.6rem 1rem;
   background-color:  var(--gray-bold);
   color: var(--white);
+  opacity: 1;
+  transition: 0.3s;
+}
+
+.fieldsSearchSales button:hover {
+  opacity: 0.8;
+  color: var(--gray-line);
 }
 
 .tabProdSeach {

@@ -29,7 +29,8 @@ const reportsController = require('./controllers/rerportsController')
 const devController = require('./controllers/devController')
 const catDefController = require('./controllers/catDefController')
 const goalsController = require('./controllers/goalsController')
-const onSaleController = require('./controllers/onSaleController')
+const promotionController = require('./controllers/promotionController')
+const syncController = require('./controllers/syncController')
 
 //Routes
 //Connections
@@ -140,9 +141,11 @@ routes.get('/goals', goalsController.index)
 routes.post('/goals', ensureAuthenticated, goalsController.create)
 routes.put('/goals/:id', ensureAuthenticated, goalsController.update)
 routes.get('/goals/getAmount', goalsController.getAmountReached)
-// OnSale
-routes.get('/onSale/open', ensureAuthenticated, onSaleController.onSalesOpen)
-routes.post('/onSale', ensureAuthenticated, onSaleController.create)
+// Promotion
+routes.get('/promotion/open', ensureAuthenticated, promotionController.promotionOpen)
+routes.post('/promotion', ensureAuthenticated, promotionController.create)
+//Synchro
+routes.post('/synchronize', ensureAuthenticated, syncController.synchronize)
 //Developer 
 routes.get('/dev', devController.getTable)
 

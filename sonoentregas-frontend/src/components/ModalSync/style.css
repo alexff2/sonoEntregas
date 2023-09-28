@@ -1,0 +1,33 @@
+.shopSync p {
+  font-weight: 600;
+}
+.shopSync span {
+  font-weight: 400;
+  margin-left: 0.5rem;
+}
+.shopSync button {
+  border: none;
+  border-radius: 30px;
+  padding: 0.3rem 0.5rem;
+  opacity: 1;
+  transition: all 0.3s ease-in-out;
+}
+.shopSync button:hover {
+  opacity: 0.8;
+}
+
+.shopSync .blink {
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 0.2;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.2;
+  }
+}

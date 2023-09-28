@@ -12,7 +12,7 @@ module.exports = {
         return res.status(200).json([])
       }
 
-      const shops = await Shops.findAny(0, { in: {CODLOJA: goals.map(goal => goal.idShop)} }, '*', true)
+      const shops = await Shops.findAny(0, { in: {CODLOJA: goals.map(goal => goal.idShop)} })
 
       shops.forEach(shop => {
         shop['goals'] = goals.filter(goal => shop.CODLOJA === goal.idShop)

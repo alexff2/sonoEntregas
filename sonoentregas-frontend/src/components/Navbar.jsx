@@ -1,12 +1,12 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-import { useAuthenticate } from '../context/authContext'
+//import { useAuthenticate } from '../context/authContext'
 
 import '../styles/components/navbar.css'
 
 export default function Navbar(){
-  const { userAuth } = useAuthenticate()
+  //const { userAuth } = useAuthenticate()
 
   const activeLink = e => {
     for (let i = 0; i < e.currentTarget.children.length; i++) {
@@ -22,9 +22,7 @@ export default function Navbar(){
       <Link to="/maintenance">Assistência</Link>
       <Link to="/product">Produtos</Link>
       <Link to="/users">Usuários</Link>
-      { (userAuth.OFFICE  === 'Master' || userAuth.OFFICE  === 'Dev') &&
-        <Link to="/goals">Metas/Promo</Link>
-      }
+      { /* (userAuth.OFFICE  === 'Master' || userAuth.OFFICE  === 'Dev') && <Link to="/goals">Metas/Promo</Link>  */}
     </nav>
   )
 }

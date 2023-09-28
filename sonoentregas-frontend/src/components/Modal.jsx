@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function Modal({ children, openModal, styleModal, setOpenModal }){
+export default function Modal({ children, openModal, styleModal, setOpenModal, closeOnOverLaw = true }){
   return(
     <React.Fragment>
       {openModal &&
@@ -8,7 +8,7 @@ export default function Modal({ children, openModal, styleModal, setOpenModal })
           style={{display: 'flex'}}
           onClick={e => {
             if(setOpenModal){
-              e.target.className === "modal-overlaw" && setOpenModal(false)
+              (e.target.className === "modal-overlaw" && closeOnOverLaw) && setOpenModal(false)
             }
           }}
         >

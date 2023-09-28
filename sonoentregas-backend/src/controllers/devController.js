@@ -1,28 +1,23 @@
 const { QueryTypes } = require('sequelize')
-
-const Model = require('../databases/MSSQL/Model')
-const { dateTime } = require('../functions/getDate')
-
-class DevModel extends Model {
-  constructor(){
-    super('CAT_DEFECT_MAIN', 'ID, DESCRIPTION')
-  }
-}
-
+const DevMod = require('../models/Cars')
 
 module.exports = {
   async getTable(req, res) {
-    const DevMod = new DevModel()
-    /* const DevMod = new DevModel()
+    const script = `SELECT * FROM EMPRESA`
 
-    const forecast = await DevMod._query(0, 'SELECT * FROM FORECAST WHERE ID = 1', QueryTypes.SELECT)
-    const objDateTime = dateTime(forecast[0].createdAt) */
+    const data = [], dataError = []
 
-    const script = `UPDATE FORECAST SET DATE = '2023-05-28' WHERE ID = 1\n`+
-    `UPDATE FORECAST SET DATE = '2023-05-29' WHERE ID = 3`
+    for (let i = 0; i <= 4; i++) {
+      try {
+        const response = await DevMod._query(i, script, QueryTypes.RAW)
 
-    const response = await DevMod._query(0, script, QueryTypes.RAW)
+        data.push(response)
+      } catch (e) {
+        console.log(e.original.code)
+        dataError.push( e )
+      }
+    }
 
-    return res.json( response )
+    return res.status(200).json({ data, dataError })
   }
 }

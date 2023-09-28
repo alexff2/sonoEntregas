@@ -7,30 +7,31 @@ import ModaCreate from "./ModalCreate"
 import { toLocString } from "../../../functions/toLocString"
 
 import api from "../../../services/api"
+import ModalSync from "../../../components/ModalSync"
 
-const ProductsOnSale = ({ product }) => {
+const ProductsPromotion = ({ product }) => {
   return (
     <tr>
-      <td>{product.COD_ORIGINAL}</td>
+      <td>{product.idProduct}</td>
       <td>{product.NOME}</td>
-      <td>{toLocString(product.valueOnSales)}</td>
+      <td>{toLocString(product.pricePromotion)}</td>
     </tr>
   )
 }
 
-const RowOnSale = ({ onSale }) => {
+const RowPromotion = ({ promotion }) => {
   const [ open, setOpen ] = useState(false)
 
   return (
     <>
-      <tr key={onSale.id}>
+      <tr key={promotion.id}>
         <td style={{width: 10}} onClick={() => setOpen(!open)}>
           { open ? <AiOutlineArrowUp /> : <AiOutlineArrowDown /> }
         </td>
-        <td>{onSale.id}</td>
-        <td>{onSale.description}</td>
-        <td>{onSale.dateStart}</td>
-        <td>{onSale.dateFinish}</td>
+        <td>{promotion.id}</td>
+        <td>{promotion.description}</td>
+        <td>{promotion.dateStart}</td>
+        <td>{promotion.dateFinish}</td>
       </tr>
 
       <tr>
@@ -38,8 +39,8 @@ const RowOnSale = ({ onSale }) => {
           <div className={open ? 'tabProdSeach openDiv': 'tabProdSeach'}>
             <table>
               <tbody>
-                {onSale.products.map(product => (
-                  <ProductsOnSale product={product} key={product.COD_ORIGINAL}/>
+                {promotion.products.map(product => (
+                  <ProductsPromotion product={product} key={product.idProduct}/>
                 ))}
               </tbody>
             </table>
@@ -55,79 +56,86 @@ export default function TabGoals() {
   const [ typeSearch, setTypeSearch ] = useState('STATUS')
   const [ typesStatus, setTypesStatus ] = useState('open')
   const [ isOpenModalCreateOnSale, setIsOpenModalCreateOnSale ] = useState(false)
-  const [ onSales, setOnSale ] = useState([])
+  const [ isOpenModalSync, setIsOpenModalSync ] = useState(false)
+  const [ promotions, setPromotions ] = useState([])
 
   useEffect(() => {
-    const getOnSales = async () => {
-      const { data } = await api.get('/onSale/open')
+    const getPromotions = async () => {
+      const { data } = await api.get('/promotion/open')
 
-      setOnSale(data)
+      setPromotions(data)
     }
-    getOnSales()
+    getPromotions()
   }, [])
 
-  const searchOnSale = async () => console.log(onSales)
+  const searchOnSale = async () => console.log('searchOnSale')
 
   return (
     <>
-      <div className="fieldsSearchSales">
-        <select 
-          name="typeSales"
-          id="typeSales" 
-          className="selectSearchSales"
-          onChange={e => {
-            setTypeSearch(e.target.value)
-            setSearch('')
-            e.target.value === 'STATUS'
-              ? setTypesStatus('open')
-              : setTypesStatus('')
-          }}
-        >
-          <option value={'STATUS'}>Status</option>
-          <option value={'ID_SALE'}>Código Promoção</option>
-          <option value={'NOMECLI'}>Descrição</option>
-        </select>
-
-          { typeSearch === 'STATUS' &&
-            <select 
-              name="statusSales"
-              id="statusSales" 
-              className="selectSearchSales"
-              onChange={e => {
-                setSearch(e.target.value) 
-                setTypesStatus(e.target.value)
-              }}
-            >
-              <option value={'open'}>Abertas</option>
-              <option value={'close'}>Finalizadas</option>
-            </select>
-          }
-          { typesStatus === 'close' && 
-            <div className="inputsSearchSales">
-              <AiOutlineSearch />
+      <div className="fieldsSearchSales flexRowSpaceBetween">
+        <div className="searchOnSale">
+          <select
+            name="typeSales"
+            id="typeSales"
+            className="selectSearchSales"
+            onChange={e => {
+              setTypeSearch(e.target.value)
+              setSearch('')
+              e.target.value === 'STATUS'
+                ? setTypesStatus('open')
+                : setTypesStatus('')
+            }}
+          >
+            <option value={'STATUS'}>Status</option>
+            <option value={'ID_SALE'}>Código Promoção</option>
+            <option value={'NOMECLI'}>Descrição</option>
+          </select>
+            { typeSearch === 'STATUS' &&
+              <select
+                name="statusSales"
+                id="statusSales"
+                className="selectSearchSales"
+                onChange={e => {
+                  setSearch(e.target.value)
+                  setTypesStatus(e.target.value)
+                }}
+              >
+                <option value={'open'}>Abertas</option>
+                <option value={'close'}>Finalizadas</option>
+              </select>
+            }
+            { typesStatus === 'close' &&
+              <div className="inputsSearchSales">
+                <AiOutlineSearch />
+                  <input
+                    type="date"
+                    onChange={e => setSearch(e.target.value)}
+                  />
+              </div>
+            }
+            { typeSearch !== 'STATUS' &&
+              <div className="inputsSearchSales">
+                <AiOutlineSearch />
                 <input
-                  type="date" 
+                  type="text"
+                  placeholder="Pesquisar…"
                   onChange={e => setSearch(e.target.value)}
+                  onKeyPress={e => e.key === 'Enter' ? searchOnSale() : null}
+                  value={search}
                 />
-            </div>
-          }
-          { typeSearch !== 'STATUS' && 
-            <div className="inputsSearchSales">
-              <AiOutlineSearch />
-              <input
-                type="text"
-                placeholder="Pesquisar…"
-                onChange={e => setSearch(e.target.value)}
-                onKeyPress={e => e.key === 'Enter' ? searchOnSale() : null}
-                value={search}
-              />
-            </div>
-          }
+              </div>
+            }
+          <button onClick={searchOnSale}>PESQUISAR</button>
+        </div>
 
-        <button onClick={searchOnSale}>PESQUISAR</button>
+        <div>
+          <button onClick={() => setIsOpenModalSync(true)}>
+            Sincronizar
+          </button>
+        </div>
       </div>
 
-      {onSales.length === 0
+      {promotions.length === 0
         ? <div className="red">Nenhuma promoção cadastrada!</div>
         : <table>
             <thead>
@@ -140,8 +148,8 @@ export default function TabGoals() {
               </tr>
             </thead>
             <tbody>
-              {onSales.map(onSale => (
-                <RowOnSale key={onSale.id} onSale={onSale} />
+              {promotions.map(promotion => (
+                <RowPromotion key={promotion.id} promotion={promotion} />
               ))}
             </tbody>
           </table>
@@ -156,7 +164,15 @@ export default function TabGoals() {
         openModal={isOpenModalCreateOnSale}
         setOpenModal={setIsOpenModalCreateOnSale}
       >
-        <ModaCreate setOpenModalCreateOnSale={setIsOpenModalCreateOnSale} setOnSale={setOnSale}/>
+        <ModaCreate setOpenModalCreateOnSale={setIsOpenModalCreateOnSale} setPromotions={setPromotions}/>
+      </Modal>
+
+      <Modal
+        openModal={isOpenModalSync}
+        setOpenModal={setIsOpenModalSync}
+        closeOnOverLaw={false}
+      >
+        <ModalSync setIsOpenModalSync={setIsOpenModalSync}/>
       </Modal>
     </>
   )

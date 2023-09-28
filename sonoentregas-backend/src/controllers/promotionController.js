@@ -1,12 +1,12 @@
-const OnSaleService = require('../services/OnSaleService')
-const OnSaleRules = require('../rules/OnSaleRules')
+const PromotionService = require('../services/PromotionService')
+const PromotionRules = require('../rules/PromotionRules')
 
 module.exports = {
-  async onSalesOpen(request, response){
+  async promotionOpen(request, response){
     try {
-      const onSales = await OnSaleService.onSalesOpen()
+      const promotion = await PromotionService.promotionsOpen()
 
-      return response.status(200).json(onSales)
+      return response.status(200).json(promotion)
     } catch (e) {
       console.log(e)
 
@@ -26,11 +26,11 @@ module.exports = {
       if (!dateFinish) throw { status: 400, error: 'dateFinish não informado' }
       if (!products || products.length === 0) throw { status: 400, error: 'products não informado' }
 
-      await OnSaleRules.validateDates(dateStart, dateFinish, products)
+      await PromotionRules.validateDates(dateStart, dateFinish, products)
   
-      const onSale = await OnSaleService.create({ description, dateStart, dateFinish, products, idUser: user_id })
+      const promotion = await PromotionService.create({ description, dateStart, dateFinish, products, idUser: user_id })
 
-      return response.status(200).json(onSale)
+      return response.status(200).json(promotion)
     } catch (e) {
       console.log(e)
 
@@ -39,5 +39,5 @@ module.exports = {
 
       return response.status(status).json(error)
     }
-  },
+  }
 }

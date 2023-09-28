@@ -5,7 +5,7 @@ import { useModalAlert } from '../../../context/modalAlertContext'
 import { coinMask, coinToFloat } from '../../../functions/toLocString'
 import api from '../../../services/api'
 
-export default function ModalCreate({ setOpenModalCreateOnSale, setOnSale }){
+export default function ModalCreate({ setOpenModalCreateOnSale, setPromotions }){
   const [ productsSearch, setProductsSearch ] = useState([])
   const [ productsResultSearch, setProductsResultSearch ] = useState([])
   const [ description, setDescription ] = useState('')
@@ -29,7 +29,7 @@ export default function ModalCreate({ setOpenModalCreateOnSale, setOnSale }){
   }
 
   const addProductsResultSearch = (product) => {
-    if (productsResultSearch.find(item => item.COD_ORIGINAL === product.COD_ORIGINAL)) {
+    if (productsResultSearch.find(productResultSearch => productResultSearch.COD_ORIGINAL === product.COD_ORIGINAL)) {
       return
     }
 
@@ -43,7 +43,7 @@ export default function ModalCreate({ setOpenModalCreateOnSale, setOnSale }){
       let productsWhitValueOnSale = true
 
       productsResultSearch.forEach(async product => {
-        if (!product.valueOnSales) {
+        if (!product.pricePromotion) {
           alert(`O produto ${product.NOME} não possui valor de promoção`)
           productsWhitValueOnSale = false
         }
@@ -53,14 +53,14 @@ export default function ModalCreate({ setOpenModalCreateOnSale, setOnSale }){
         return
       }
 
-      const { data } = await api.post('/onSale', {
+      const { data } = await api.post('/promotion', {
         description,
         dateStart,
         dateFinish,
         products: productsResultSearch
       })
 
-      setOnSale(onSale => [...onSale, data])
+      setPromotions(onSale => [...onSale, data])
 
       setOpenModalCreateOnSale(false)
     } catch (error) {
@@ -118,7 +118,7 @@ export default function ModalCreate({ setOpenModalCreateOnSale, setOnSale }){
                     <td>{product.COD_ORIGINAL}</td>
                     <td>{product.NOME}</td>
                     <td>
-                      <input id='valueProduct' type="text" onInput={coinMask} onChange={e => product.valueOnSales = coinToFloat(e.target.value)}/>
+                      <input id='valueProduct' type="text" onInput={coinMask} onChange={e => product.pricePromotion = coinToFloat(e.target.value)}/>
                     </td>
                   </tr>))}
               </tbody>

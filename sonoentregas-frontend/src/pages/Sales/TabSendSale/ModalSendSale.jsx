@@ -207,8 +207,8 @@ export default function ModalSendSale({
                   <th>Estoque</th>
                   <th>Disponível</th>
                   <th>Qtd</th>
-                  <th>Enviar? / Brinde?</th>
-                  <th>Satus</th>
+                  <th>Enviar? / Premiação?</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               <tbody>

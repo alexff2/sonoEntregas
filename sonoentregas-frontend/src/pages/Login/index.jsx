@@ -38,15 +38,15 @@ export default function Login(){
           <div className="panel left-panel">
             <div className="content">
               <img src={logo3} width="200px" alt="Logo Sono e Arte" />
-              <h3>Não tem usuário?</h3>
-              <p>Clique no botão abaixou para se cadastrar!</p>
-              <button
+              <h3>Sistema</h3>
+              <p>Seu sono, nosso compromisso!</p>
+              {/* <button
                 className="btn transparent"
                 id="sign-up-btn"
 
               >
                 Cadastro
-              </button>
+              </button> */}
             </div>
             <img src={log} className="image" alt="" />
           </div>
@@ -54,7 +54,7 @@ export default function Login(){
             <div className="content">
               <h3>Digite seus dados ao lado</h3>
               <p>
-                Atenção! Após se cadatrar, seu usuário deve-rá ser liberado pelo departamento de TI, entre em contato solicitando.
+                Atenção! Após se cadastrar, seu usuário deve-rá ser liberado pelo departamento de TI, entre em contato solicitando.
               </p>
               <button
                 className="btn transparent"
