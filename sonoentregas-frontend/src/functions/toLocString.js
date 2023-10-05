@@ -3,7 +3,7 @@ export function toLocStringBr(value) {
 }
 
 export function toLocString(value) {
-  return value ? value.toLocaleString('pt-br', {minimumFractionDigits: 2}) : '0,00'
+  return value ? value.toLocaleString('pt-br', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0,00'
 }
 
 export function coinMask(event) {

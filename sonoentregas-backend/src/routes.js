@@ -136,6 +136,7 @@ routes.get('/reports', reportsController.listProducts)
 routes.get('/reports/sales/open', reportsController.salesOpen)
 routes.get('/reports/products/movement', reportsController.productsMovement)
 routes.get('/reports/purchase/requests', reportsController.purchaseRequest)
+routes.get('/reports/dre', reportsController.dre)
 // Golas
 routes.get('/goals', goalsController.index)
 routes.post('/goals', ensureAuthenticated, goalsController.create)

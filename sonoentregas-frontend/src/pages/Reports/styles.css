@@ -1,0 +1,56 @@
+.reports {
+  margin-top: 50px;
+}
+
+.reports h1 {
+  text-align: center;
+}
+
+.report-box {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 50px;
+}
+
+.reports .box {
+  width: 25%;
+  padding: 10px;
+  margin-bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px solid transparent;
+}
+
+.reports .box:hover {
+  border: 1px solid var(--orange);
+}
+
+.reports .box h2 {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.reports .box p {
+  text-align: center;
+}
+
+.reports .box a {
+  margin-top: 4px;
+  padding: 8px 16px;
+  background: var(--orange);
+  border-radius: 20px;
+  color: var(--white);
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+.reports .box a:hover {
+  opacity: 1;
+}

@@ -8,7 +8,7 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import ModalALert2 from '../components/ModalAlert2'
 
-export default function App() {
+export function App() {
   const { open } = useModalAlert()
   return(
     <>
@@ -25,6 +25,16 @@ export default function App() {
       </main>
 
       <Footer />
+    </>
+  )
+}
+
+export function AppExternal() {
+  const { open } = useModalAlert()
+  return(
+    <>
+      <Outlet />
+        {open && <ModalALert2 />}
     </>
   )
 }

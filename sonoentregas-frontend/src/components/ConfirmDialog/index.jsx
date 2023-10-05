@@ -3,7 +3,6 @@ import './style.css'
 
 function DialogBox({ title, body, onCancel, onConfirm }) {
   const [isLoading, setIsLoading] = useState(false)
-  const [isDisable, setIsDisable] = useState(false)
   const [show, setShow] = useState(true)
 
   React.useEffect(() => {
@@ -20,7 +19,6 @@ function DialogBox({ title, body, onCancel, onConfirm }) {
   }
 
   const handleConfirm = async () => {
-    setIsDisable(true)
     setIsLoading(true)
     onConfirm().then(() => {
       setShow(false)
@@ -37,7 +35,7 @@ function DialogBox({ title, body, onCancel, onConfirm }) {
           <button className="dialog-button-cancel" onClick={handleCancel}>
             Cancelar
           </button>
-          <button className="dialog-button-confirm" onClick={handleConfirm} disabled={isDisable}>
+          <button className="dialog-button-confirm" onClick={handleConfirm} disabled={isLoading}>
             Confirmar
             {isLoading &&
               <div className="spinner-container">

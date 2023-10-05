@@ -26,6 +26,7 @@ const { QueryTypes } = require('sequelize')
 const Products = require('../models/Produtos')
 const SalesService = require('../services/salesService')
 const PurchaseService = require('../services/PurchaseService')
+const DreService = require('../services/DreService')
 
 module.exports = {
   /**
@@ -250,6 +251,74 @@ module.exports = {
       const getProductsMovement = await Products._query(1, script, QueryTypes.SELECT)
 
       return res.json(getProductsMovement)
+    } catch (e) {
+      console.log(e)
+
+      let status = e.status ? e.status : 400
+      let error = e.error ? e.error : e
+
+      return res.status(status).json(error)
+    }
+  },
+  /**
+   * @param {any} req
+   * @param {any} res
+   */
+  async dre(req, res) {
+    try {
+      const { dateStart, dateEnd, shop } = req.query
+
+      if (!dateStart || !dateEnd || !shop) {
+        throw {
+          status: 409,
+          error: {
+            message: 'pleases provide dates!'
+          }
+        }
+      }
+
+      if (dateEnd < dateStart) {
+        throw {
+          status: 409,
+          error: {
+            message: 'date end is less than date start!'
+          }
+        }
+      }
+
+      const revenues = await DreService.revenues({ shop, dateStart, dateEnd })
+      const variableExpenses = await DreService.variableExpenses({ shop, dateStart, dateEnd, totRevenues: revenues.total })
+      const fixedExpenses = await DreService.FixedExpenses({ shop, dateStart, dateEnd, totRevenues: revenues.total })
+      const financialSummary = await DreService.financialSummary({ shop, dateStart, dateEnd })
+      const currentStock = await DreService.currentStock({ shop })
+
+      variableExpenses.total.value = variableExpenses.total.value - revenues.salesReturns.cost.value
+
+      const grossContributionMargin = {
+        value: revenues.total - variableExpenses.total.value,
+        percent: ((revenues.total - variableExpenses.total.value) / revenues.total) * 100
+      }
+
+      const netResult = {
+        value: grossContributionMargin.value - fixedExpenses.total.value,
+        percent: ((grossContributionMargin.value - fixedExpenses.total.value) / revenues.total) * 100
+      }
+
+      const balancePoint = {
+        value: (fixedExpenses.total.value / grossContributionMargin.percent) * 100,
+        percent: (((fixedExpenses.total.value / grossContributionMargin.percent) * 100) / revenues.total) * 100
+      }
+
+      return res.json({
+        revenues,
+        variableExpenses,
+        grossContributionMargin,
+        fixedExpenses,
+        netResult,
+        balancePoint,
+        financialSummary,
+        currentStock
+      })
     } catch (e) {
       console.log(e)
 
