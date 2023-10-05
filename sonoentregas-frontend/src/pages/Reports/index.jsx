@@ -12,7 +12,7 @@ export default function Reports() {
         <div className="box">
           <h2>Relatório de DRE</h2>
           <p>Relatório de Demonstração de Resultados do Exercício</p>
-          <a href="http://localhost:3333/report/dre" target="_blank" rel="noopener noreferrer">Acessar</a>
+          <a href={`${process.env.REACT_APP_BASE_URL_FRONT}/report/dre`} target="_blank" rel="noopener noreferrer">Acessar</a>
         </div>
       </div>
     </div>
