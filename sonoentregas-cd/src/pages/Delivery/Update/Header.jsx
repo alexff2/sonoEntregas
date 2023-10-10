@@ -47,7 +47,7 @@ export default function Header({ data, type }) {
   const { setDelivery } = useDelivery()
 
   useEffect(() => {
-    if (data) {
+    if (data && type === 'route') {
       const dateArray = data.D_MOUNTING.split('/')
 
       setDescription(data.DESCRIPTION)
@@ -56,7 +56,7 @@ export default function Header({ data, type }) {
       setCodAssistant(data.ID_ASSISTANT)
       setCodCar(data.ID_CAR)
     }
-  }, [data])
+  }, [data, type])
 
   const classes = useStyles()
 
@@ -178,16 +178,17 @@ export default function Header({ data, type }) {
               ))}
             </Select>
           </FormControl>
+
+          <Box pt={2}>
+            {!disabled 
+              ?<>
+                <ButtonSuccess loading={disabledBtn} disabled={disabledBtn} onClick={handleSubmit}>Gravar</ButtonSuccess>
+                <ButtonCancel disabled={disabled} onClick={handleCancel}>Cancelar</ButtonCancel>
+              </>
+              :<Button variant='outlined' onClick={handleCancel}>Editar</Button>}
+          </Box>
         </div>
       }
-      <Box pt={2}>
-        {!disabled 
-          ?<>
-            <ButtonSuccess loading={disabledBtn} disabled={disabledBtn} onClick={handleSubmit}>Gravar</ButtonSuccess>
-            <ButtonCancel disabled={disabled} onClick={handleCancel}>Cancelar</ButtonCancel>
-          </>
-          :<Button variant='outlined' onClick={handleCancel}>Editar</Button>}
-      </Box>
     </Box>
   );
 }
