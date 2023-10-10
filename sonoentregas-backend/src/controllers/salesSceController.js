@@ -139,6 +139,20 @@ module.exports = {
   
           await OrcParc.creator(0, valuesOrcParc, true)
         }
+      } else if (saleFind[0].STATUS === 'Cancelada') {
+        const valuesSales = `TOTAL_PROD = ${VALORPROD}, DESCONTO = ${DESCONTO}, TOTAL = ${TOTALVENDA}, ENDERECO = '${ENDERECO}', STATUS = 'Aberta', NUMERO = '${NUMERO}', BAIRRO = '${BAIRRO}', CIDADE = '${CIDADE}', ESTADO = '${ESTADO}', PONTOREF = '${PONTOREF}', OBS = '${OBS}', D_ENTREGA1 = '${D_ENTREGA1}', D_ENVIO = '${D_ENVIO}', VENDEDOR = '${VENDEDOR}', FONE = '${FONE}', CGC_CPF = '${CGC_CPF}', INS_RG = '${INS_RG}', FAX = '${fone_2}', O_V = '${O_V}', OBS2 = '${OBS2}', HAVE_OBS2 = '${HAVE_OBS2 ? 1 : 0}', isWithdrawal = ${isWithdrawal ? 1 : 0}`
+
+        await Sales._query(0, `UPDATE SALES SET ${valuesSales} WHERE ID_SALES = ${CODIGOVENDA} AND CODLOJA = ${loja}`)
+
+        await OrcParc._query(0, `DELETE ORCPARC WHERE ID_SALES = ${CODIGOVENDA} AND CODLOJA = ${loja}`)
+
+        for (let i = 0; i < orcParc.length; i++) {
+          const { TITULO, PARCELA, VENCIMENTO, VALOR, FORMPAGTO } = orcParc[i]
+  
+          let valuesOrcParc = `${TITULO}, ${loja}, ${PARCELA}, '${VENCIMENTO}', ${VALOR}, '${FORMPAGTO}'`
+  
+          await OrcParc.creator(0, valuesOrcParc, true)
+        }
       }
 
       const currentSale = saleFind.length === 0 ? await Sales._query(0, 'SELECT MAX(ID) ID FROM SALES', QueryTypes.SELECT) : saleFind
@@ -183,12 +197,20 @@ module.exports = {
 
       const ProdSales = await SalesProd.findSome(0, `ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`)
 
-      if (ProdSales.length === 0) {
-        await SalesProd._query(0, `DELETE SALES WHERE ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`)        
-        await SalesProd._query(0, `DELETE ORCPARC WHERE ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`)
-        await Sales._query(CODLOJA, `UPDATE NVENDA2 SET STATUS = NULL WHERE CODIGOVENDA = ${ID_SALES}`)
+      const forecastSale = await Sales._query(0, `SELECT * FROM SALES A INNER JOIN FORECAST_SALES B ON A.ID = B.idSale WHERE A.ID_SALES = ${ID_SALES} AND A.CODLOJA = ${CODLOJA}`, QueryTypes.SELECT)
 
-        return res.json({msg: 'Venda também excluída!', venda: true})
+      if (ProdSales.length === 0) {
+        if (forecastSale.length === 0) {
+          await SalesProd._query(0, `DELETE SALES WHERE ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`)        
+          await SalesProd._query(0, `DELETE ORCPARC WHERE ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`)
+          await Sales._query(CODLOJA, `UPDATE NVENDA2 SET STATUS = NULL WHERE CODIGOVENDA = ${ID_SALES}`)
+
+          return res.json({msg: 'Venda também excluída!', venda: true})
+        } else {
+          await Sales.updateAny(0, { STATUS: 'Cancelada' }, { ID_SALES, CODLOJA })
+
+          return res.json({msg: 'Venda cancelada!', venda: false})
+        }
       }
       return res.json({msg: 'Produto excluído com sucesso!', venda: false})
     } catch (error) {

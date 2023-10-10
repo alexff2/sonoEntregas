@@ -86,7 +86,7 @@ routes.post('/delivery/sale/rmv', ensureAuthenticated, deliverysController.rmvSa
 routes.delete('/deliverys/:id', ensureAuthenticated, deliverysController.delete)
 
 routes.post('/delivery/withdrawal', ensureAuthenticated, deliveryUpdateController.withdrawalSale)
-routes.put('/deliverys/:id/header', ensureAuthenticated, deliveryUpdateController.updateHeader)
+routes.put('/delivery/:id/header', ensureAuthenticated, deliveryUpdateController.updateHeader)
 routes.put('/delivery/:id/delivering/developing', ensureAuthenticated, deliveryUpdateController.delivering)
 routes.put('/delivery/:id/finish/developing', ensureAuthenticated, deliveryUpdateController.finish)
 routes.put('/deliverys/status/:id', ensureAuthenticated, deliveryUpdateController.updateStatus)

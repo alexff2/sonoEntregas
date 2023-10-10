@@ -7,11 +7,12 @@ import {
   AppBar,
   Divider
 } from '@material-ui/core'
+
 import Table from './Table'
+import Header from './Header'
 
 import { useForecasts } from '../../../context/forecastsContext'
 import { useDelivery } from '../../../context/deliveryContext'
-import { getDateBr } from '../../../functions/getDates'
 
 function AppBarTitle({ type }) {
   return (
@@ -28,6 +29,7 @@ function SalesTable({ sales }) {
     </Box>
   );
 }
+
 
 export default function Update(){
   const { forecasts } = useForecasts()
@@ -51,10 +53,7 @@ export default function Update(){
         <AppBarTitle type={type} />
       </AppBar>
 
-      <Box padding={4}>
-        <strong>Descrição: </strong>
-        { type === 'forecast' ? `Previsão de ${getDateBr(data?.date)}` : `${data?.ID} - ${data?.DESCRIPTION}`}
-      </Box>
+      <Header data={data} type={type} />
 
       <Divider />
 

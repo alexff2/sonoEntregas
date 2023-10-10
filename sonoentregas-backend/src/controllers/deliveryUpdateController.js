@@ -23,14 +23,15 @@ module.exports = {
     try {
       const { id } = req.params
       const { id: user_id } = req.user
-      const { description, ID_CAR, ID_DRIVER, ID_ASSISTANT } = req.body
+      const { description, D_MOUNTING, ID_CAR, ID_DRIVER, ID_ASSISTANT } = req.body
 
       await Deliveries.updateAny(0, {
         description,
+        D_MOUNTING,
         ID_CAR,
         ID_DRIVER,
         ID_ASSISTANT
-      }, id)
+      }, { id })
 
       return res.json({ message: `Update by${user_id}` })
     } catch (e) {

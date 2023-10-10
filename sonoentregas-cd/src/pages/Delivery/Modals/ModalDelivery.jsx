@@ -256,6 +256,9 @@ export default function ModalDelivery({ setOpen, type }){
         if (e.response.data.message === 'Product was out of stock!') {
           setErrorMsg('Atenção! Existe produtos que ficaram com estoque negativo, por favor verifique as vendas que estão com Qtd Disp negativo e de cor vermelha!')
         }
+        if (e.response.data.message === 'Forecast date must be greater than the current date!') {
+          setErrorMsg('Atenção!Já existe previsão criada com essa data!')
+        }
       } else if (e.response.status === 400){
         console.log(e.response.data)
         setAlert('Servidor')
