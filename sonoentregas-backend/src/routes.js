@@ -80,7 +80,7 @@ routes.put('/forecast/:id/finish', ensureAuthenticated, forecastController.finis
 //Deliveries
 routes.get('/deliverys/:status', deliverysController.index)
 routes.get('/deliverys/:status/:date', deliverysController.index)
-routes.post('/deliverys', ensureAuthenticated, deliverysController.create)
+routes.post('/deliveries', ensureAuthenticated, deliverysController.create)
 routes.post('/delivery/:id/sales/add', ensureAuthenticated, deliverysController.addSale)
 routes.post('/delivery/sale/rmv', ensureAuthenticated, deliverysController.rmvSale)
 routes.delete('/deliverys/:id', ensureAuthenticated, deliverysController.delete)

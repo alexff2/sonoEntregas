@@ -288,6 +288,20 @@ class ForecastService {
 
     await Sale.updateAny(0, { STATUS: 'Aberta' }, { ID: forecastSale.idSale })
   }
+
+  async setIdDeliveryInForecastSales({ salesProd, idDelivery }){
+    const idForecastSale = salesProd.map(prod => prod.idForecastSale)
+
+    await ForecastSales.updateAny(0, { idDelivery }, { in: { id: idForecastSale } })
+  }
+
+  async setIdDeliveryNullInForecastSales({ idDelivery, idSale }){
+    await ForecastSales._query(0, `UPDATE FORECAST_SALES SET idDelivery = NULL WHERE idDelivery = ${idDelivery} AND idSale = ${idSale}`, QueryTypes.UPDATE)
+  }
+
+  async setIdDeliveryNullInAllForecastSales({ idDelivery }){
+    await ForecastSales._query(0, `UPDATE FORECAST_SALES SET idDelivery = NULL WHERE idDelivery = (${idDelivery})`, QueryTypes.UPDATE)
+  }
 }
 
 module.exports = new ForecastService()

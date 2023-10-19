@@ -60,6 +60,19 @@ class ForecastRules {
     }
   }
 
+  async checkExistForecastWithDate({ date }){
+    const forecast = await Forecast.findAny(0, { date })
+
+    if (forecast.length > 0) {
+      throw {
+        status: 409,
+        error: {
+          message: 'There is already a forecast for that date!'
+        }
+      }
+    }
+  }
+
   async checkExistForecast({ id }){
     const forecast = await Forecast.findAny(0, { id })
 
@@ -297,63 +310,29 @@ class ForecastRules {
       if (sale.validationStatus === null) {
         throw {
           status: 409,
-          error: 'There are unconfirmed sales in this forecast!'
+          error: {message: 'There are unconfirmed sales in this forecast!'}
         }
       }
     })
+  }
 
-    /**@type {import('../services/ForecastService').IForecastProduct[]} */
-    const forecastProduct = await ForecastProduct.findAny(0, { in: { idForecastSale: forecastSales.map( sale => sale.id) }})
-
-    let salesId = []
-
-    for (let i = 0; i < forecastSales.length; i++) {
-      if (forecastSales[i].validationStatus) {
-        const ID_SALE_ID = forecastSales[i].idSale
-
-        const COD_ORIGINAL = forecastProduct
-          .filter(product => product.idForecastSale === forecastSales[i].id)
-          .map(product => product.COD_ORIGINAL)
-
-        const saleProd = await SalesProd.findAny(0, { ID_SALE_ID, STATUS: 'Em Previsão', in: { COD_ORIGINAL } })
-
-        if (saleProd.length > 0) {
-          saleProd.forEach( prod => {
-            const saleId = salesId.find( saleId => saleId === prod.ID_SALES)
-            if (!saleId) {
-              salesId = [...salesId, prod.ID_SALES]
-            }
-          })
-        }
-      }
-    }
+  async checkForecastIsDelivering({ id }){
+    const salesId = await SalesProd._query(0, `
+    SELECT D.ID_SALES
+    FROM FORECAST_SALES A
+    INNER JOIN FORECAST_PRODUCT B ON A.id = B.idForecastSale
+    LEFT JOIN DELIVERYS C ON A.idDelivery = C.ID
+    INNER JOIN SALES D ON D.ID = A.idSale
+    WHERE A.idForecast = ${id} AND (C.[STATUS] IS NULL OR C.[STATUS] = 'Em lançamento') AND A.validationStatus = 1
+    GROUP BY D.ID_SALES
+    `, QueryTypes.SELECT)
 
     if (salesId.length > 0) {
       throw {
         status: 409,
         error: {
-          message: "There are confirmed sales in this forecast!",
-          salesId
-        }
-      }
-    }
-  }
-
-  async checkForecastProductStatus({ id }){
-    const prodStatus = await SalesProd._query(0, `
-      SELECT A.idForecast, A.idSale, B.*, C.[STATUS], A.validationStatus
-      FROM FORECAST_SALES A
-      INNER JOIN FORECAST_PRODUCT B ON A.id = B.idForecastSale
-      INNER JOIN SALES_PROD C ON C.COD_ORIGINAL = B.COD_ORIGINAL AND C.ID_SALE_ID = A.idSale
-      WHERE A.idForecast = ${id} AND [STATUS] = 'Em Previsão' AND validationStatus = 1
-    `, QueryTypes.SELECT)
-
-    if (prodStatus.length > 0) {
-      throw {
-        status: 409,
-        error: {
           message: "Sales products aren't on routes!",
-          sales: prodStatus
+          salesId: salesId.map( saleId => saleId.ID_SALES)
         }
       }
     }

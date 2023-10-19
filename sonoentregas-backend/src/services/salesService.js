@@ -244,12 +244,12 @@ module.exports = {
     }
 
     const scriptProduct = 
-    `SELECT B.*, A.quantityForecast FROM VIEW_SALES_PROD B
+    `SELECT B.*, A.quantityForecast, A.idForecastSale FROM VIEW_SALES_PROD B
     INNER JOIN (SELECT A.*, B.idSale
                 FROM FORECAST_PRODUCT A
                 INNER JOIN FORECAST_SALES B ON A.idForecastSale = B.id) A
     ON A.idSale = B.ID_SALE_ID AND A.COD_ORIGINAL = B.COD_ORIGINAL
-    WHERE B.STATUS = 'Em Previsão'
+    WHERE (B.STATUS = 'Em Previsão' OR B.STATUS = 'Enviado')
     AND A.idForecastSale in (${forecastSales.map(sale => sale.idForecastSale)})`
 
     /**@type {IProduct[]} */

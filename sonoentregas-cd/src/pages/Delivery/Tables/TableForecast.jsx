@@ -194,13 +194,11 @@ export default function TabForecast() {
         console.log(e.response.data)
 
         setAlert('Servidor')
-      } else if (e.response.data.message === `There are confirmed sales in this forecast!`) {
+      } else if (e.response.data.message === `Sales products aren't on routes!`) {
         console.log(e.response.data)
 
-        setAlert('Existe vendas confirmadas nesta previsão que não foram para rota! Vendas: '+e.response.data.salesId)
+        setAlert('Vendas confirmadas pendentes de entrega: '+e.response.data.salesId)
       } else if (e.response.data.message === `There are unconfirmed sales in this forecast!`) {
-        console.log(e.response.data.sales)
-
         setAlert('Existe vendas pendentes de confirmação nesta previsão!')
       } else {
         console.log(e.response.data)
@@ -267,10 +265,10 @@ export default function TabForecast() {
       <Modal
         open={openModalForecasView}
         setOpen={setOpenModalForecastView}
-        title={`Visualização - ${forecastSelect.sales.length } vendas lançadas`}
+        title={`Visualização - ${forecastSelect.sales.length } venda(s) lançada(s)`}
       >
         <ForecastView 
-          forecast={forecastSelect}
+          forecastId={forecastSelect.id}
           handleInvalidationSale={handleInvalidationSale}
         />
       </Modal>

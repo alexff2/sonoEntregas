@@ -166,7 +166,7 @@ export default function ModalDelivery({ setOpen, type }){
         salesProd = [ ...salesProd,...sale.products]
       })
 
-      await api.post('deliverys', {
+      await api.post('deliveries', {
         description: description,
         ID_CAR: codCar,
         ID_DRIVER: codDriver,
@@ -257,8 +257,13 @@ export default function ModalDelivery({ setOpen, type }){
           setErrorMsg('Atenção! Existe produtos que ficaram com estoque negativo, por favor verifique as vendas que estão com Qtd Disp negativo e de cor vermelha!')
         }
         if (e.response.data.message === 'Forecast date must be greater than the current date!') {
+          setErrorMsg('A data de previsão deve ser superior a data atual!')
+        }
+        
+        if (e.response.data.message === 'There is already a forecast for that date!') {
           setErrorMsg('Atenção!Já existe previsão criada com essa data!')
         }
+        
       } else if (e.response.status === 400){
         console.log(e.response.data)
         setAlert('Servidor')
@@ -340,18 +345,18 @@ export default function ModalDelivery({ setOpen, type }){
         
         return
       }
-
-      if (data[0].isWithdrawal) {
-        setErrorMsg('Venda para retirada, sem permissão para adicionar na previsão!')
-
-        return
-      }
   
       if (data.length === 0) {
         setErrorMsg( typeSearch === 'idSale'
           ? 'Venda FECHADA já lançada em rota, consultar no menu VENDAS para saber STATUS da rota'
           : 'Atenção erro em venda(s) desse produto!'
         )
+
+        return
+      }
+
+      if (data[0].isWithdrawal) {
+        setErrorMsg('Venda para retirada, sem permissão para adicionar na previsão!')
 
         return
       }

@@ -73,6 +73,8 @@ module.exports = {
 
       await ForecastsRules.checkDateInsertForecast({ date })
 
+      await ForecastsRules.checkExistForecastWithDate({ date })
+
       await ForecastsRules.checkForecastSalesIsClosed(sales)
 
       await ForecastsRules.checkSaleIsWithdrawal(sales)
@@ -234,7 +236,7 @@ module.exports = {
 
       await ForecastsRules.checkForecastSaleIsValidatedToFinish({ id })
 
-      await ForecastsRules.checkForecastProductStatus({ id })
+      await ForecastsRules.checkForecastIsDelivering({ id })
 
       await ForecastService.finishForecastService({ id })
 

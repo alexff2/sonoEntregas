@@ -12,6 +12,7 @@ const SalesProd = require('../models/SalesProd')
 
 const Date = require('../class/Date')
 const DeliveriesService = require('../services/DeliveryService')
+const ForecastService = require('../services/ForecastService')
 
 module.exports = {
   /**
@@ -63,6 +64,8 @@ module.exports = {
 
       await DeliveriesService.addSale({ salesProd, idDelivery: dataDelivery[0].ID })
 
+      await ForecastService.setIdDeliveryInForecastSales({salesProd, idDelivery: dataDelivery[0].ID})
+
       return res.json({ success: true})
     } catch (error) {
       console.log(error)
@@ -82,6 +85,8 @@ module.exports = {
 
       await DeliveriesService.addSale({ salesProd, idDelivery: id })
 
+      await ForecastService.setIdDeliveryInForecastSales({salesProd, idDelivery: id })
+
       return res.json({ message: `Update by${user_id}` })
     } catch (e) {
       console.log(e)
@@ -100,6 +105,8 @@ module.exports = {
 
       await DeliveriesService.rmvSale({ salesProd })
 
+      await ForecastService.setIdDeliveryNullInForecastSales({ idDelivery: salesProd[0].ID_DELIVERY, idSale: salesProd[0].ID_SALE_ID })
+
       return res.json({ message: `Update by${user_id}` })
     } catch (e) {
       console.log(e)
@@ -116,6 +123,8 @@ module.exports = {
       const { id } = req.params
       
       const deliveryProd = await DeliveryProd.findSome(0, `ID_DELIVERY = ${id}`)
+
+      await ForecastService.setIdDeliveryNullInAllForecastSales({ idDelivery: id })
       
       for (let i = 0; i < deliveryProd.length; i++) {        
         await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = 'Em Previsão' WHERE ID_SALES = ${deliveryProd[i].ID_SALE} AND CODLOJA = ${deliveryProd[i].CODLOJA} AND COD_ORIGINAL = '${deliveryProd[i].COD_ORIGINAL}'`)

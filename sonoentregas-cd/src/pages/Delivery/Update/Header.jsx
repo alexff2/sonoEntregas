@@ -47,7 +47,7 @@ export default function Header({ data, type }) {
   const { setDelivery } = useDelivery()
 
   useEffect(() => {
-    if (data && type === 'route') {
+    if (data && type === 'delivery') {
       const dateArray = data.D_MOUNTING.split('/')
 
       setDescription(data.DESCRIPTION)
@@ -91,93 +91,91 @@ export default function Header({ data, type }) {
         ? <Typography variant='h6'>
           {`Previsão para o dia ${getDateBr(data?.date)}`}
         </Typography>
-        :<div className={classes.divFormControl}>
-          <TextField
-            id="description"
-            label="Descrição"
-            placeholder="Descrição da entrega"
-            style={{width: '52%'}}
-            InputLabelProps={{
-              shrink: true,
-            }}
-            variant="outlined"
-            value={description}
-            disabled={disabled}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-          />
-
-          <TextField
-            label="Data"
-            type="date"
-            variant="outlined"
-            className={classes.formControl}
-            disabled={disabled}
-            value={date}
-            style={{ width: 171}}
-            InputLabelProps={{
-              shrink: true,
-            }}
-            onChange={e => setDate(e.target.value)}
-          />
-
-          <FormControl variant="outlined" className={classes.formControl}>
-            <InputLabel id="driverLabel">Motorista</InputLabel>
-            <Select
-              labelId="driverLabel"
-              label="Motorista"
-              id="driver"
-              defaultValue={0}
-              value={codDriver}
-              onChange={(e) => setCodDriver(e.target.value)}
+        :<div>
+          <div className={classes.divFormControl}>
+            <TextField
+              id="description"
+              label="Descrição"
+              placeholder="Descrição da entrega"
+              style={{width: '52%'}}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              variant="outlined"
+              value={description}
               disabled={disabled}
-            >
-              <MenuItem value={0}>
-                <em>None</em>
-              </MenuItem>
-              {drivers.map( item => (
-                <MenuItem key={item.ID} value={item.ID}>{item.DESCRIPTION}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl variant="outlined" className={classes.formControl}>
-            <InputLabel id="assistantLabel">Auxiliar</InputLabel>
-            <Select
-              labelId="assistantLabel"
-              label="Auxiliar"
-              id="assistant"
-              value={codAssistant}
-              onChange={(e) => setCodAssistant(e.target.value)}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+            />
+            <TextField
+              label="Data"
+              type="date"
+              variant="outlined"
+              className={classes.formControl}
               disabled={disabled}
-            >
-              <MenuItem value={0}>
-                <em>None</em>
-              </MenuItem>
-              {assistants.map( item => (
-                <MenuItem key={item.ID} value={item.ID}>{item.DESCRIPTION}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl variant="outlined" className={classes.formControl}>
-            <InputLabel id="carLabel">Veículo</InputLabel>
-            <Select
-              labelId="carLabel"
-              id="car"
-              label="Veículo"
-              value={codCar}
-              onChange={(e) => setCodCar(e.target.value)}
-              disabled={disabled}
-            >
-              <MenuItem value={0}>
-                <em>None</em>
-              </MenuItem>
-              {cars.map( item => (
-                <MenuItem key={item.ID} value={item.ID}>{item.DESCRIPTION}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+              value={date}
+              style={{ width: 171}}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              onChange={e => setDate(e.target.value)}
+            />
+            <FormControl variant="outlined" className={classes.formControl}>
+              <InputLabel id="driverLabel">Motorista</InputLabel>
+              <Select
+                labelId="driverLabel"
+                label="Motorista"
+                id="driver"
+                defaultValue={0}
+                value={codDriver}
+                onChange={(e) => setCodDriver(e.target.value)}
+                disabled={disabled}
+              >
+                <MenuItem value={0}>
+                  <em>None</em>
+                </MenuItem>
+                {drivers.map( item => (
+                  <MenuItem key={item.ID} value={item.ID}>{item.DESCRIPTION}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl variant="outlined" className={classes.formControl}>
+              <InputLabel id="assistantLabel">Auxiliar</InputLabel>
+              <Select
+                labelId="assistantLabel"
+                label="Auxiliar"
+                id="assistant"
+                value={codAssistant}
+                onChange={(e) => setCodAssistant(e.target.value)}
+                disabled={disabled}
+              >
+                <MenuItem value={0}>
+                  <em>None</em>
+                </MenuItem>
+                {assistants.map( item => (
+                  <MenuItem key={item.ID} value={item.ID}>{item.DESCRIPTION}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl variant="outlined" className={classes.formControl}>
+              <InputLabel id="carLabel">Veículo</InputLabel>
+              <Select
+                labelId="carLabel"
+                id="car"
+                label="Veículo"
+                value={codCar}
+                onChange={(e) => setCodCar(e.target.value)}
+                disabled={disabled}
+              >
+                <MenuItem value={0}>
+                  <em>None</em>
+                </MenuItem>
+                {cars.map( item => (
+                  <MenuItem key={item.ID} value={item.ID}>{item.DESCRIPTION}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </div>
 
           <Box pt={2}>
             {!disabled 

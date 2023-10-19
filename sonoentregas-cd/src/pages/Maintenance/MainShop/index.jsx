@@ -15,7 +15,8 @@ import {
   MenuItem, 
   FormControl, 
   InputLabel,
-  Box
+  Box,
+  Typography
 } from "@material-ui/core"
 import SearchIcon from '@material-ui/icons/Search'
 
@@ -245,7 +246,9 @@ export default function TableMain() {
           className={classes.btnSearch}
           onClick={searchMain}
         >Pesquisar</Button>
-        <Box> - QTD:{maintenance.length}</Box>
+        <Box mt={1} ml={1}>
+          <Typography color='secondary' style={{fontWeight: 'bold'}}> - QTD:{maintenance.length}</Typography>
+        </Box>
       </Box>
 
       <TableContainer className={classes.paperTable} component={Paper}>
