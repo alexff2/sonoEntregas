@@ -56,6 +56,7 @@ module.exports = {
       }
 
       const { secret, expiresIn } = jwt
+
       const token = sign({}, secret, {
         subject: String(sendUser.ID),
         expiresIn
@@ -82,6 +83,10 @@ module.exports = {
   async validationToken(req, res){
     try {
       const { token } = req.query
+
+      if (typeof token !== 'string') {
+        throw new Error('Token error internal')
+      }
 
       verify(token, jwt.secret)
 

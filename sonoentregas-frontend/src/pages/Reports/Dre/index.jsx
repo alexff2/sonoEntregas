@@ -137,7 +137,7 @@ export default function Dre(){
 
         <div className="line"></div>
         <div className="dreHeader">
-          <h1>Demonstrativo de resultados: 01/09/2023 até 30/09/2023</h1>
+          <h1>Demonstrativo de resultados: {dateStart} até {dateEnd}</h1>
           <p>Nome da Loja</p>
           <p>Endereço da loja</p>
           <p>** Fones: (98) 3241-1220 **</p>
