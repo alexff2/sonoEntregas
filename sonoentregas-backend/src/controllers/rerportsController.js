@@ -27,6 +27,7 @@ const Products = require('../models/Produtos')
 const SalesService = require('../services/salesService')
 const PurchaseService = require('../services/PurchaseService')
 const DreService = require('../services/DreService')
+const connections = require('../databases/MSSQL/connections')
 
 module.exports = {
   /**
@@ -54,7 +55,7 @@ module.exports = {
        INNER JOIN PRODLOJAS D ON D.CODIGO = A.CODIGO
        LEFT JOIN (
         SELECT COD_ORIGINAL, SUM(QUANTIDADE) QTD
-        FROM SONOENTREGAS..SALES_PROD where STATUS IN ('Enviado', 'Em Previsão', 'Em Lançamento')
+        FROM ${connections[0].database}..SALES_PROD where STATUS IN ('Enviado', 'Em Previsão', 'Em Lançamento')
         GROUP BY COD_ORIGINAL
        ) B ON A.ALTERNATI = B.COD_ORIGINAL
        LEFT JOIN (

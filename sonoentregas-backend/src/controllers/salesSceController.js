@@ -103,6 +103,7 @@ module.exports = {
 
       return res.json({ productsSceShop, orcparc })
     } catch (error) {
+      console.log(error)
       return res.status(400).json(error)
     }
   },
@@ -121,7 +122,9 @@ module.exports = {
 
       const D_ENVIO = ObjDate.getDate()
 
-      const D_ENTREGA1 = ObjDate.setDaysInDate(EMISSAO.split('T')[0], 6) //Objetivo do sistema
+      const days = Number(process.env.DAYS || '10')
+
+      const D_ENTREGA1 = ObjDate.setDaysInDate(EMISSAO.split('T')[0], days) //Objetivo do sistema
       const DOWN_EST = O_V == 0 ? 1 : 'NULL'
 
       const saleFind = await Sales.findSome(0, `ID_SALES = ${CODIGOVENDA} AND CODLOJA = ${loja}`)
@@ -214,6 +217,7 @@ module.exports = {
       }
       return res.json({msg: 'Produto excluído com sucesso!', venda: false})
     } catch (error) {
+      console.log(error)
       return res.status(400).json(error)
     }
   },
@@ -232,6 +236,7 @@ module.exports = {
 
       return res.json({msg: 'Estoque estornado!'})
     } catch (error) {
+      console.log(error)
       return res.status(400).json(error)
     }
   },
@@ -241,12 +246,18 @@ module.exports = {
    * @returns
    */
   async updateAddressClient(req, res) {
-    const { idSale } = req.params
+    try {
+      const { idSale } = req.params
+  
+      await SalesService.updateAddress(idSale)
+  
+      const sale = await SalesService.findSales(`ID = ${idSale}`)
+  
+      return res.json(sale[0])
+    } catch (error) {
+      console.log(error)
 
-    await SalesService.updateAddress(idSale)
-
-    const sale = await SalesService.findSales(`ID = ${idSale}`)
-
-    return res.json(sale[0])
+      return res.status(400).json(error)
+    }
   }
 }

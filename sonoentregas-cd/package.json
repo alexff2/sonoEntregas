@@ -30,14 +30,14 @@
   },
   "scripts": {
     "start-react": "react-scripts --openssl-legacy-provider start",
-    "start-react-dev": "PORT=3334 react-scripts --openssl-legacy-provider start",
+    "start-react-dev": "react-scripts --openssl-legacy-provider start",
     "build-react": "react-scripts build",
     "test-react": "react-scripts test --env=jsdom",
     "eject-react": "react-scripts eject",
     "build-electron": "electron-builder",
     "build": "yarn build-react && yarn build-electron",
-    "start": "set PORT=3334 && concurrently \"cross-env BROWSER=none yarn start-react\" \"wait-on http://localhost:3334 && electron .\"",
-    "dev": "set PORT=3334 && concurrently \"cross-env BROWSER=none yarn start-react-dev\" \"wait-on http://localhost:3334 && electron .\""
+    "start": "concurrently \"cross-env BROWSER=none yarn start-react\" \"wait-on http://localhost:3334 && electron .\"",
+    "dev": "concurrently \"cross-env BROWSER=none yarn start-react-dev\" \"wait-on http://localhost:3334 && electron .\""
   },
   "eslintConfig": {
     "extends": "react-app"
