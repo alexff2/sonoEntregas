@@ -1,0 +1,14 @@
+version: '3.1'
+
+services:
+  api:
+    image: mcr.microsoft.com/mssql/server:latest
+    ports:
+      - 1433:1433
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=!@12QWqw
+
+# Comando: docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=!@12QWqw" -p 1433:1433 --name sql1 -d mcr.microsoft.com/mssql/server:latest
+# Roda com: docker compose up -d
+# Copiar .bak para container: docker cp /Database/base/sono.bak $idContainer:/var/opt/mssql/data
