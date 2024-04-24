@@ -1,11 +1,30 @@
 {
   "cSpell.words": [
+    "ALTERNATI",
+    "CODCF",
+    "CODIGO",
     "CODLOJA",
-    "Entr",
+    "CODPRODUTO",
+    "codvenda",
+    "datetime",
+    "DELIV",
     "DESCRICAO",
-    "NOMECLI",
+    "DEVOLUCAO",
+    "EMISSAO",
     "ENDERECO",
+    "Entr",
+    "HISTORICO",
+    "KARDEX",
+    "MENORUN",
+    "NOMECF",
+    "NOMECLI",
+    "NVTOTAL",
     "PONTOREF",
-    "CODPRODUTO"
+    "PRODLOJAS",
+    "TIPOCLI",
+    "UNITARIO",
+    "USUARIO",
+    "VALORUNITARIO",
+    "varchar"
   ]
 }

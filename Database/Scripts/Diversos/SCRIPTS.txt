@@ -1,11 +1,13 @@
 ﻿declare @IdSale int, @loja int
 set @IdSale = 12703
 set @loja = 5
---SELECT * FROM SALES WHERE ID_SALES = @IdSale
+SELECT B.DESCRICAO, A.* FROM SALES A, LOJAS B WHERE A.CODLOJA = B.CODLOJA AND ID_SALES = @IdSale
 --SELECT * FROM SALES WHERE CODLOJA = @loja AND ID_SALES = @IdSale
 --SELECT * FROM SALES_PROD WHERE CODLOJA = @loja AND ID_SALES = @IdSale
 --SELECT * FROM DELIVERYS_PROD WHERE CODLOJA = @loja AND ID_SALE = @IdSale
 --SELECT B.ALTERNATI, B.NOME, EST_ATUAL FROM SONO..PRODLOJAS A INNER JOIN SONO..PRODUTOS B ON A.CODIGO = B.CODIGO INNER JOIN DELIVERYS_PROD C ON B.ALTERNATI = C.COD_ORIGINAL WHERE A.CODLOJA = 1 AND C.CODLOJA = @loja AND C.ID_SALE = @IdSale
+--SELECT * FROM FORECAST_SALES WHERE idSale IN (SELECT ID FROM SALES WHERE CODLOJA = @loja AND ID_SALES = @IdSale)
+
 --update SALES set STATUS = 'Aberta' WHERE CODLOJA = @loja AND ID_SALES = @IdSale
 --update SALES_PROD set STATUS = 'Devolvido' WHERE CODLOJA = @loja AND ID_SALES = @IdSale -- and STATUS = 'Finalizada'
 --UPDATE SONO..PRODLOJAS SET EST_ATUAL = EST_ATUAL + C.QTD_DELIV, EST_LOJA = EST_LOJA + C.QTD_DELIV FROM SONO..PRODLOJAS A INNER JOIN SONO..PRODUTOS B ON A.CODIGO = B.CODIGO INNER JOIN DELIVERYS_PROD C ON B.ALTERNATI = C.COD_ORIGINAL WHERE A.CODLOJA = 1 AND C.CODLOJA = @loja AND C.ID_SALE = @IdSale
@@ -14,20 +16,54 @@ set @loja = 5
 --UPDATE DELIVERYS_PROD SET DELIVERED = 1 WHERE CODLOJA = 2 AND ID_SALE = 128333 AND COD_ORIGINAL = '2880-6' AND ID_DELIVERY = 573
 --select * from VIEW_DELIVERYS WHERE D_DELIVERED = '2022-07-08'
 --INSERT DELIVERYS_PROD SELECT 1747, ID_SALES, CODLOJA, QUANTIDADE, COD_ORIGINAL, '2022-07-08', '2022-07-08','2022-07-08', 0, NULL FROM SALES_PROD WHERE CODLOJA = @loja AND ID_SALES = @IdSale
+--SELECT * FROM SONO..VIEW_KARDEX_DIF_EST WHERE DIF <> 0
+--UPDATE SONO..PRODLOJAS SET EST_ATUAL = B.ESTOQUE_KARDEX, EST_LOJA = B.ESTOQUE_KARDEX FROM SONO..PRODLOJAS A INNER JOIN SONO..VIEW_KARDEX_DIF_EST B ON A.CODIGO = B.CODIGO WHERE A.CODLOJA = 1 AND B.DIF <> 0
 
-declare @qtd int, @codvenda int, @codprod int
-set @qtd = 1
-set @codvenda = 127915
-set @codprod = 1997
-update nvendi2 set status = null where numvenda = @codvenda and codproduto = @codprod
-update prodlojas set EST_ATUAL = EST_ATUAL - @qtd, EST_LOJA = EST_LOJA - @qtd where codigo = @codprod and codloja = 1
+-------------------------------- vendas não concretizada
+SELECT C.DESCRICAO, A.EMISSAO, A.ID_SALES, A.NOMECLI, B.DESCRICAO, B.QUANTIDADE, B.UNITARIO1, B.DESCONTO, B.NVTOTAL FROM SALES A 
+INNER JOIN SALES_PROD B ON A.ID = B.ID_SALE_ID
+INNER JOIN LOJAS C ON C.CODLOJA = A.CODLOJA
+WHERE B.GIFT = 0
+AND A.O_V = '0'
+AND EMISSAO BETWEEN '2024-03-01' AND '2024-03-31'
+AND B.STATUS = 'Finalizada'
+order by c.CODLOJA
+-----------------------------------
+UPDATE PRODLOJAS SET EST_ATUAL = B.ESTOQUE_KARDEX, EST_LOJA = B.ESTOQUE_KARDEX
+--SELECT *
+FROM PRODLOJAS A, VIEW_KARDEX_DIF_EST B
+WHERE A.CODIGO = B.CODIGO
+AND A.CODLOJA = 1
+AND B.DIF <> 0
 ------------------------------------------- Relatório de balanço para importar para execel
 SELECT A.CODIGO, ALTERNATI, A.NOME, APLICACAO TAMANHO, B.NOME SUB_GRUPO, C.NOME GRUPO
 FROM PRODUTOS A
 INNER JOIN SUB_GRUPOS B ON A.SUBG = B.CODIGO
 INNER JOIN GRUPOS C ON A.GRUPO = C.CODIGO
 WHERE ATIVO = 'S'
-------------- Verificar vendas finalizadas que estao com status sem estar finalizadas
+-------------- VERIFICA VENDAS COM STATUS ABERTO QUE DEVERIAM ESTAR FINALIZADAS
+SELECT * FROM SALES WHERE ID IN (
+select B.ID_SALE_ID from SALES a
+inner join SALES_PROD b on a.id = b.ID_SALE_ID
+where b.STATUS not in ('Enviado', 'Sem Agendamento') and a.STATUS = 'Aberta')
+and id not in (
+select ID_SALE_ID from SALES_PROD where ID_SALE_ID in (
+select b.ID_SALE_ID from SALES a
+inner join SALES_PROD b on a.id = b.ID_SALE_ID
+where b.STATUS not in ('Enviado', 'Sem Agendamento') and a.STATUS = 'Aberta')
+and STATUS = 'Enviado')
+
+UPDATE SALES SET STATUS = 'Fechada' FROM SALES WHERE ID IN (
+select B.ID_SALE_ID from SALES a
+inner join SALES_PROD b on a.id = b.ID_SALE_ID
+where b.STATUS not in ('Enviado', 'Sem Agendamento') and a.STATUS = 'Aberta')
+and id not in (
+select ID_SALE_ID from SALES_PROD where ID_SALE_ID in (
+select b.ID_SALE_ID from SALES a
+inner join SALES_PROD b on a.id = b.ID_SALE_ID
+where b.STATUS not in ('Enviado', 'Sem Agendamento') and a.STATUS = 'Aberta')
+and STATUS = 'Enviado')
+------------- Verificar produtos finalizados que estao com status sem estar finalizados
 select * 
 from SALES_PROD a
 inner join DELIVERYS_PROD b on a.CODLOJA = b.codloja and a.ID_SALES = b.id_sale and a.COD_ORIGINAL = b.COD_ORIGINAL
@@ -166,10 +202,9 @@ AND A.CODPRODUTO <> 1672
 -------------------------- importar usando drive ACE OLEDB 12
 SELECT * FROM OPENROWSET('Microsoft.ACE.OLEDB.12.0', 'Excel 12.0;Database=C:\Users\User\Desktop\Produtos Sono.xlsx', [Página1$])
 
-SELECT * 
-INTO ProdutosExcel
-FROM OPENDATASOURCE('Microsoft.ACE.OLEDB.12.0', 'Data Source=C:\Users\User\Desktop\Produtos Sono.xlsx;Extended Properties=Excel 12.0')...[Página1$]
-
+SELECT REPLACE(ALTERNATI, 'X1', '') as ALTERNATI, DESCRICAO, EST, CONT, Dif
+INTO Produtos
+FROM OPENDATASOURCE('Microsoft.ACE.OLEDB.12.0', 'Data Source=C:\Siti Brasil\Balanco.xlsx;Extended Properties=Excel 12.0')...[Plan1$]
 TIPO ALTERNATI: ALTER TABLE ProdutosExcel ADD COD VARCHAR(20) COLLATE SQL_Latin1_General_CP850_CI_AI
 
 EXEC sp_configure 'show advanced options', 1
@@ -187,7 +222,12 @@ WHERE ALTERNATI IS NOT NULL
 
 resolve problema de null
 https://www.aspsnippets.com/Articles/The-OLE-DB-provider-Microsoft.Ace.OLEDB.12.0-for-linked-server-null.aspx
-
+USE [master] 
+GO 
+EXEC master.dbo.sp_MSset_oledb_prop N'Microsoft.ACE.OLEDB.12.0', N'AllowInProcess', 1 
+GO 
+EXEC master.dbo.sp_MSset_oledb_prop N'Microsoft.ACE.OLEDB.12.0', N'DynamicParameters', 1 
+GO 
 --------------------------------------------------------------------
 
 --select B.ALTERNATI, A.NOME, B.NOME
@@ -227,3 +267,27 @@ substring(APLICACAO,  charindex(' X ', APLICACAO) +2 , 4) as COMP,
 substring(substring(APLICACAO,  charindex(' X ', APLICACAO) + 2, LEN(APLICACAO)), charindex(' X ', substring(APLICACAO,  charindex(' X ', APLICACAO) + 2, LEN(APLICACAO)))+2, 9) as LARG,
 APLICACAO
 FROM PRODUTOS WHERE ATIVO = 'S'
+----------------------------------------- Conferencia de balanço
+SELECT A.CODIGO, A.ALTERNATI, A.NOME, B.EST_ATUAL
+FROM PRODUTOS A
+INNER JOIN PRODLOJAS B ON A.CODIGO = B.CODIGO
+INNER JOIN SUB_GRUPOS C ON C.CODIGO = A.SUBG
+INNER JOIN GRUPOS D ON D.CODIGO = A.GRUPO
+WHERE B.CODLOJA = 1
+AND A.ATIVO = 'S'
+ORDER BY D.NOME, C.NOME
+------------------------ Verificando Poder de usuário
+select * from USUARIONEW where codigo in (119, 123, 124, 1)
+
+--'1111111111111110000000000'
+
+--0E988A46A8700A21BE0DE6A7F476C057	0E988A46A8700A21BE0DE6A7F476C057
+
+select * from CONFIG_ACESSUPERFISCAL where codigousuario in (119)
+
+select CODIGOUSUARIO, PERMITIR from CONFIG_ACESSUPERFISCAL where codigousuario in (123, 124, 1) group by CODIGOUSUARIO, PERMITIR
+
+--update CONFIG_ACESSUPERFISCAL set PERMITIR = 0 where CODIGOUSUARIO = 119
+-----------------------
+
+
