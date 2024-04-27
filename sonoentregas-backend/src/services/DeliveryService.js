@@ -24,7 +24,7 @@ const DeliveryProd = require('../models/DeliveryProd')
 const SalesProd = require('../models/SalesProd')
 const ViewDeliverySales = require('../models/ViewDeliverySales')
 const ViewDeliveryProd2 = require('../models/ViewDeliveryProd2')
-const Empresas = require('../models/Empresas')
+const Empresas = require('../models/ShopsSce')
 const Sales = require('../models/Sales')
 
 const MainService = require('../services/MainService')

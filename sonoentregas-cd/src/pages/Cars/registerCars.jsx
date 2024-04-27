@@ -12,7 +12,7 @@ import api from '../../services/api'
 import { validateFields } from '../../functions/validateFields'
 
 function RegisterCars({ 
-    selectCar, setValue, setIsDesableFind, setIsDesableRegister, setIsDesableUpdate
+    selectCar, setValue, setIsDisableFind, setIsDisableRegister, setIsDisableUpdate
   }) {
   const [ openMOdalAlert, setOpenModalAlert ] = useState(false)
   const [ childrenAlert, setChildrenAlert ] = useState()
@@ -63,9 +63,9 @@ function RegisterCars({
       setOpenModalAlert(true)
       
       setValue(0)
-      setIsDesableFind(false)
-      setIsDesableRegister(false)
-      setIsDesableUpdate(true)
+      setIsDisableFind(false)
+      setIsDisableRegister(false)
+      setIsDisableUpdate(true)
     } catch (error) {
       setChildrenAlert('Erro ao conectr com servidor, entre em contado com servidor!')
       setOpenModalAlert(true)
@@ -77,9 +77,9 @@ function RegisterCars({
   }
   const cancelUpdate = () => {
     setValue(0)
-    setIsDesableFind(false)
-    setIsDesableRegister(false)
-    setIsDesableUpdate(true)
+    setIsDisableFind(false)
+    setIsDisableRegister(false)
+    setIsDisableUpdate(true)
   }
   return(
     <Box>

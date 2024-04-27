@@ -30,7 +30,7 @@ const { QueryTypes } = require('sequelize')
 const Sales = require('../models/Sales')
 const ViewVendas = require('../models/ViewVendas')
 const ViewSalesProd = require('../models/ViewSalesProd')
-const Empresas = require('../models/Empresas')
+const Empresas = require('../models/ShopsSce')
 const Forecast = require('../models/tables/Forecast')
 const { difDate } = require('../functions/getDate')
 

@@ -1,17 +1,11 @@
-import React, { createContext, useState, useContext, useEffect } from 'react'
+import React, { createContext, useState, useContext } from 'react'
 
-import api from '../services/api'
+/* import api from '../services/api' */
 
 const DeliveryContext = createContext()
 
 export default function DeliveryProvider({ children }){
   const [delivery, setDelivery] = useState([])
-
-  useEffect(()=>{
-    api
-      .get('deliverys/open')
-      .then( resp => setDelivery(resp.data))
-  },[])
 
   return (
     <DeliveryContext.Provider

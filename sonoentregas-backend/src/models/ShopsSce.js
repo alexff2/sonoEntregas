@@ -1,9 +1,9 @@
 const Model = require('../databases/MSSQL/Model')
 
-class Empresa extends Model {
+class ShopsSce extends Model {
   constructor(){
     super('EMPRESA', 'CODIGO, NOME, RAZAO, CGC, INSC')
   }
 }
 
-module.exports = new Empresa()
+module.exports = new ShopsSce()

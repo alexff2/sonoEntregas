@@ -18,7 +18,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function PedidoCompra({ supplier }) {
+export default function PurchaseRequestsProducts({ supplier }) {
   const classes = useStyles();
 
   return (
@@ -44,7 +44,7 @@ export default function PedidoCompra({ supplier }) {
           </TableHead>
           <TableBody>
             {supplier.products.map((produto, i) => (
-              <TableRow hover role="checkbox" tabIndex={-1} key={i}>
+              <TableRow hover key={i}>
                 <TableCell>{produto.CODPRODUTO}</TableCell>
                 <TableCell>{produto.NOME}</TableCell>
                 <TableCell>{produto.QTE_PEDIDO}</TableCell>

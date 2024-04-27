@@ -10,9 +10,9 @@ export default function SimpleTabs() {
   const classes = useStyles();
   const [value, setValue] = useState(0);
   const [car, setCar] = useState({});
-  const [ isDesableFind, setIsDesableFind ] = useState(false)
-  const [ isDesableRegister, setIsDesableRegister ] = useState(false)
-  const [ isDesableUpdate, setIsDesableUpdate ] = useState(true)
+  const [ isDisableFind, setIsDisableFind ] = useState(false)
+  const [ isDisableRegister, setIsDisableRegister ] = useState(false)
+  const [ isDisableUpdate, setIsDisableUpdate ] = useState(true)
 
   return (
     <div className={classes.root}>
@@ -23,18 +23,18 @@ export default function SimpleTabs() {
           aria-label="simple tabs example"
           variant="fullWidth"
         >
-          <Tab label="Consulta" {...a11yProps(0)} disabled={isDesableFind}/>
-          <Tab label="Cadastrar" {...a11yProps(1)} disabled={isDesableRegister}/>
-          <Tab label="Alterar" {...a11yProps(2)} disabled={isDesableUpdate}/>
+          <Tab label="Consulta" {...a11yProps(0)} disabled={isDisableFind}/>
+          <Tab label="Cadastrar" {...a11yProps(1)} disabled={isDisableRegister}/>
+          <Tab label="Alterar" {...a11yProps(2)} disabled={isDisableUpdate}/>
         </Tabs>
       </AppBar>
 
       <TabPanel value={value} index={0}>
         <TableCars 
           setValue={setValue}
-          setIsDesableFind={setIsDesableFind}
-          setIsDesableRegister={setIsDesableRegister}
-          setIsDesableUpdate={setIsDesableUpdate}
+          setIsDisableFind={setIsDisableFind}
+          setIsDisableRegister={setIsDisableRegister}
+          setIsDisableUpdate={setIsDisableUpdate}
           setCar={setCar}
         />
       </TabPanel>
@@ -51,9 +51,9 @@ export default function SimpleTabs() {
           setValue={setValue}
           selectCar={car}
           setSelectCar={setCar}
-          setIsDesableFind={setIsDesableFind}
-          setIsDesableRegister={setIsDesableRegister}
-          setIsDesableUpdate={setIsDesableUpdate}
+          setIsDisableFind={setIsDisableFind}
+          setIsDisableRegister={setIsDisableRegister}
+          setIsDisableUpdate={setIsDisableUpdate}
         />
       </TabPanel>
     </div>

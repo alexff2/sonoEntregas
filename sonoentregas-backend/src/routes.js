@@ -9,6 +9,7 @@ const connectionsController = require('./controllers/connectionsController')
 const authController = require('./controllers/authController')
 const usersController = require('./controllers/usersController')
 const productsController = require('./controllers/productsController')
+const transferController = require('./controllers/transferController')
 const salesSceController = require('./controllers/salesSceController')
 const salesController = require('./controllers/salesController')
 const carsController = require('./controllers/carsController')
@@ -30,6 +31,7 @@ const devController = require('./controllers/devController')
 const catDefController = require('./controllers/catDefController')
 const goalsController = require('./controllers/goalsController')
 const promotionController = require('./controllers/promotionController')
+const beepController = require('./controllers/beepController')
 const syncController = require('./controllers/syncController')
 
 //Routes
@@ -37,6 +39,7 @@ const syncController = require('./controllers/syncController')
 routes.get('/connections', connectionsController.findConnections)
 //Shops
 routes.get('/shops', connectionsController.findShops)
+routes.get('/shops/sce', connectionsController.findShopsSce)
 //Login
 routes.post('/authenticated', authController.create)
 routes.get('/token/validation', authController.validationToken)
@@ -46,6 +49,14 @@ routes.post('/users', usersController.create)
 routes.put('/users/:userId', usersController.update)
   //Products SCE CD
   routes.get('/products/:typesearch/:search', productsController.index)
+  // Beep
+  routes.get('/beep/serial', beepController.findSerialNumberValid)
+  routes.post('/beep/barcode', beepController.barCode)
+  routes.post('/beep/serial', beepController.serialCreate)
+  // Transfer
+  routes.get('/transfer', transferController.find)
+  routes.get('/transfer/search/product', ensureAuthenticated, transferController.findProduct)
+  routes.post('/transfer', ensureAuthenticated, transferController.create)
   //Sales SCE Shops
   routes.get('/salesshop/:emissao/:loja', salesSceController.salesSce)
   routes.get('/sales/:codDAV/shop/:idShop/products', salesSceController.salesSceProd)

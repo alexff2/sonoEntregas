@@ -18,6 +18,7 @@ import SalesOpen from '../pages/Reports/SalesOpen'
 import PurchaseRequests from '../pages/Reports/PurchaseRequests'
 import ProductsMovements from '../pages/Reports/ProductsMovements'
 import Maintenance from '../pages/Maintenance'
+import Beeping from '../pages/Beeping'
 //import Error from './pages/Error'
 
 export default function PrivateRoutes(){
@@ -32,6 +33,7 @@ export default function PrivateRoutes(){
         <Route path="/app/sales" element={<Sales />} />
         <Route path="/app/products" element={<Products />} />
         <Route path="/app/maintenance" element={<Maintenance />} />
+        <Route path="/app/beeping" element={<Beeping />} />
         <Route path="/app/users" element={<Users />} />
         <Route path="/app/reports" element={<Reports />} />
         <Route path="/app/reports/orderSuggestion" element={<OrderSuggestion />} />

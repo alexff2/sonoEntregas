@@ -4,14 +4,14 @@ import { Delete, Edit } from "@material-ui/icons"
 import { useCars } from '../../context/carsContext'
 
 export default function TableCars({
-  setValue, setIsDesableFind, setIsDesableRegister, setIsDesableUpdate, setCar
+  setValue, setIsDisableFind, setIsDisableRegister, setIsDisableUpdate, setCar
 }) {
   const { cars, setCars } = useCars()
 
   const updateCar = car => {
-    setIsDesableFind(true)
-    setIsDesableRegister(true)
-    setIsDesableUpdate(false)
+    setIsDisableFind(true)
+    setIsDisableRegister(true)
+    setIsDisableUpdate(false)
     setValue(2)
     setCar(car)
   }

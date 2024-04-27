@@ -12,39 +12,42 @@ import DriverProvider from './driverContext'
 import AssistantProvider from './assistantContext'
 import UsersProvider from './usersContext'
 import AlertProvider from './alertContext'
+import AlertSnackbarProvider from './alertSnackbarContext'
 import AddressProvider from './addressContext'
 import MaintenanceProvider from './maintenanceContext'
 
 export default function DefaultContext({children}){
   return (
     <AlertProvider>
-      <AuthProvider>
-        <DateProvider>
-          <ShopProvider>
-            <UsersProvider>
-              <DeliveryProvider>
-                <DeliveryFinishProvider>
-                  <ForecastsProvider>
-                    <AssistantProvider>
-                      <SaleProvider>
-                        <AddressProvider>
-                          <CarsProvider>
-                            <DriverProvider>
-                              <MaintenanceProvider>
-                                {children}
-                              </MaintenanceProvider>
-                            </DriverProvider>
-                          </CarsProvider>
-                        </AddressProvider>
-                      </SaleProvider>
-                    </AssistantProvider>
-                  </ForecastsProvider>
-                </DeliveryFinishProvider>
-              </DeliveryProvider>
-            </UsersProvider>
-          </ShopProvider>
-        </DateProvider>
-      </AuthProvider>
+      <AlertSnackbarProvider>
+        <AuthProvider>
+          <DateProvider>
+            <ShopProvider>
+              <UsersProvider>
+                <DeliveryProvider>
+                  <DeliveryFinishProvider>
+                    <ForecastsProvider>
+                      <AssistantProvider>
+                        <SaleProvider>
+                          <AddressProvider>
+                            <CarsProvider>
+                              <DriverProvider>
+                                <MaintenanceProvider>
+                                  {children}
+                                </MaintenanceProvider>
+                              </DriverProvider>
+                            </CarsProvider>
+                          </AddressProvider>
+                        </SaleProvider>
+                      </AssistantProvider>
+                    </ForecastsProvider>
+                  </DeliveryFinishProvider>
+                </DeliveryProvider>
+              </UsersProvider>
+            </ShopProvider>
+          </DateProvider>
+        </AuthProvider>
+      </AlertSnackbarProvider>
     </AlertProvider>
   )
 }

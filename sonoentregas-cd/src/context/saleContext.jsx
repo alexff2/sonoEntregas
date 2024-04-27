@@ -1,21 +1,9 @@
-import React, { createContext, useContext, useState, useEffect } from 'react'
-
-import api from '../services/api'
+import React, { createContext, useContext, useState } from 'react'
 
 const SaleContext = createContext()
 
 export default function SaleProvider({ children }){
   const [ sales, setSales ] = useState([])
-
-useEffect(()=>{
-    api
-      .get('sales/', {
-        params: {
-          status: 'open'
-        }
-      })
-      .then( resp => setSales(resp.data))
-  },[])
 
   return(
     <SaleContext.Provider

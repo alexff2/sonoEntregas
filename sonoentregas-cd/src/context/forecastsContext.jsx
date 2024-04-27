@@ -1,17 +1,9 @@
-import React, { createContext, useState, useContext, useEffect } from 'react'
-
-import api from '../services/api'
+import React, { createContext, useState, useContext } from 'react'
 
 const ForecastsContext = createContext()
 
 export default function ForecastsProvider({ children }){
   const [forecasts, setForecasts] = useState([])
-
-  useEffect(()=>{
-    api
-      .get('forecast')
-      .then(({data}) => setForecasts(data))
-  },[])
 
   return (
     <ForecastsContext.Provider

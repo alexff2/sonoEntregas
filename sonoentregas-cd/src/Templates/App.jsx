@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { Outlet } from 'react-router-dom'
-import { makeStyles, Box } from '@material-ui/core'
+import { makeStyles, Box, Snackbar } from '@material-ui/core'
 
 //import SetContext from '../context/SetContexts'
 import { useAlert } from '../context/alertContext'
+import { useAlertSnackbar } from '../context/alertSnackbarContext'
 
 import Header from '../components/Header'
 import Nav from '../components/Nav'
@@ -24,16 +25,30 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   toolbar: theme.mixins.toolbar,
+  alert: {
+    '& .MuiSnackbarContent-root': {
+      background: '#FD4659',
+    },
+  }
 }))
 
 export default function App(props) {
   const classes = useStyles()
   const [mobileOpen, setMobileOpen] = useState(false)
   const { childrenModal, open, setOpen, type } = useAlert()
+  const { childrenSnackbar, openSnackbar, setOpenSnackbar } = useAlertSnackbar()
   const { window } = props
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
+  }
+
+  const handleClose = (_event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpenSnackbar(false)
   }
 
   const container = window !== undefined ? () => window().document.body : undefined;
@@ -58,7 +73,18 @@ export default function App(props) {
           open={open}
           setOpen={setOpen}
           type={type}
-        />}
+        />
+      }
+      {
+        <Snackbar
+          open={openSnackbar}
+          anchorOrigin={{vertical: 'top', horizontal: 'center'}}
+          autoHideDuration={4000}
+          onClose={handleClose}
+          message={childrenSnackbar}
+          className={classes.alert}
+        />
+      }
     </Box>
   )
 }
