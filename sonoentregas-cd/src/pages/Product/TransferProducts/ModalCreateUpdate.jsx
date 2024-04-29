@@ -33,10 +33,11 @@ const useStyles = makeStyles(theme => ({
 }))
 
 export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) {
-  const [ typeSearch, setTypeSearch] = useState('code')
+  const [ typeSearch, setTypeSearch] = useState('name')
   const [ search, setSearch] = useState('')
   const [ shopsSce, setShopSce] = useState([])
   const [ productsSearch, setProductsSearch] = useState([])
+  const [ indexSelect, setIndexSelect] = useState(0)
 
   const [ issue, setIssue] = useState(transferUpdate ? transferUpdate.issueIso : getDateSql())
   const [ reason, setReason] = useState(transferUpdate ? transferUpdate.reason : '')
@@ -48,7 +49,9 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
   const classes = useStyles()
   const { setAlertSnackbar } = useAlertSnackbar()
 
-  const handleSelectProduct = product => {
+  const setSelectProduct = () => {
+    const product = productsSearch[indexSelect]
+
     if (quantity <= 0) {
       setAlertSnackbar('🚫 Quantidade não pode ser zero!')
       return
@@ -61,6 +64,7 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
 
     if(products.find(productFind => product.code === productFind.code)){
       setAlertSnackbar('🚫 Produto já lançado nessa transferência!')
+      document.getElementById('searchId').focus()
       return
     }
 
@@ -78,6 +82,39 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
     setProductsSearch([])
     setQuantity(1)
     setSearch('')
+
+    document.getElementById('searchId').focus()
+  }
+
+  const selectRow = indexRow => {
+    (indexSelect !== indexRow) 
+      ? setIndexSelect(indexRow) 
+      : setIndexSelect(-1)
+
+    document.getElementById('quantifyId').focus()
+  }
+
+  const keyPres = (key) => {
+    console.log(key)
+    if (key === 'ArrowUp' ) {
+      if (indexSelect === 0) {
+        return
+      }
+  
+      setIndexSelect(state => state - 1)
+    }
+
+    if (key === 'ArrowDown') {
+      if (indexSelect === productsSearch.length - 1) {
+        return
+      }
+  
+      setIndexSelect(state => state + 1)
+    }
+
+    if (key === 'Enter') {
+      document.getElementById('quantifyId').focus()
+    }
   }
 
   const handleSendTransfer = async e => {
@@ -284,7 +321,7 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
         </FormControl>
 
         <TextField
-          id="search"
+          id="searchId"
           label="Pesquisa"
           variant='outlined'
           value={search}
@@ -294,9 +331,12 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
           }}
           style={{ width: '65%' }}
           margin='dense'
+          onKeyDown={e => keyPres(e.key)}
+          autoComplete='off'
         />
+
         <TextField
-          id="quantify"
+          id="quantifyId"
           label="Quantidade"
           variant='outlined'
           type='number'
@@ -310,9 +350,9 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
           InputLabelProps={{
             shrink: true,
           }}
-          required
           style={{ width: '20%' }}
           margin='dense'
+          onKeyDown={e => e.key === 'Enter' && setSelectProduct()}
         />
       </Box>
 
@@ -329,7 +369,13 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
               </TableHead>
               <TableBody>
                 {productsSearch.map((product, i) => (
-                  <TableRow hover key={i} onClick={() => handleSelectProduct(product)}>
+                  <TableRow
+                    hover
+                    role='check-box'
+                    key={i}
+                    onClick={() => selectRow(i)}
+                    selected={i===indexSelect}
+                  >
                     <TableCell>{product.generalCode}</TableCell>
                     <TableCell>{product.name}</TableCell>
                     <TableCell>{product.stock}</TableCell>
@@ -377,7 +423,7 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
       </Box>
 
       <Box>
-        <ButtonSuccess type='submit'>{transferUpdate ? 'Atualizar' : 'Gravar'}</ButtonSuccess>
+        <ButtonSuccess type='button'>{transferUpdate ? 'Atualizar' : 'Gravar'}</ButtonSuccess>
         <ButtonCancel
           onClick={() => setOpen(false)}
         >Cancelar</ButtonCancel>

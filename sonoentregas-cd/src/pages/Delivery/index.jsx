@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Box,
   Fab,
@@ -25,8 +25,9 @@ import { useForecasts } from '../../context/forecastsContext'
 import { useSale } from '../../context/saleContext'
 import { useAlert } from '../../context/alertContext'
 
-import { getObjDate } from '../../functions/getDates'
+import { getDateSql, getObjDate } from '../../functions/getDates'
 import api from '../../services/api'
+import LoadingCircleModal from '../../components/LoadingCircleModal'
 
 const useStyle = makeStyles(theme => ({
   btnAdd: {
@@ -88,6 +89,7 @@ export default function Delivery() {
   const [ openModalDelivering, setOpenModalDelivering ] = useState(false)
   const [ openFinish, setOpenFinish ] = useState(false)
   const [ openView, setOpenView ] = useState(false)
+  const [ openLoading, setOpenLoading ] = useState(false)
 
   //States
   const [ selectDelivery, setSelectDelivery ] = useState({})
@@ -95,11 +97,39 @@ export default function Delivery() {
 
   const { setDelivery } = useDelivery()
   const { setDeliveryFinish } = useDeliveryFinish()
-  const { forecasts } = useForecasts()
+  const { forecasts, setForecasts } = useForecasts()
   const { setSales } = useSale()
   const { setAlert } = useAlert()
 
   const classes = useStyle()
+
+  useEffect(() => {
+    const updateSys = async () => {
+      setOpenLoading(true)
+      try {
+        const { data: dataDeliveries } = await api.get('deliverys/open')
+        const { data: dataDeliveriesFinished } = await api.get(`deliverys/close/${getDateSql()}`)
+        const { data: dataForecasts } = await api.get('forecast')
+  
+        setDelivery(dataDeliveries)
+        setDeliveryFinish(dataDeliveriesFinished)
+        setForecasts(dataForecasts)
+
+        setOpenLoading(false)
+      } catch (error) {
+        setOpenLoading(false)
+        setAlert('Erro ao atualizar sistema, entre em contato com ADM!')
+        console.log(error)
+      }
+    }
+
+    updateSys()
+  }, [
+    setForecasts,
+    setDelivery,
+    setAlert,
+    setDeliveryFinish
+  ])
 
   const checkDataForecast = (date) => {
     const timezoneForecast = getObjDate(date).setHours(0,0,0,0)
@@ -215,6 +245,8 @@ export default function Delivery() {
 
   return (
     <>
+      <LoadingCircleModal open={openLoading} />
+
       <Box>
         <div className={classes.boxTabHeader} style={{paddingTop: '1rem'}}>
           <span>Previsões</span>
