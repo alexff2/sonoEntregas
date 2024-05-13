@@ -106,7 +106,7 @@ export default function ModalView({ setOpen, selectDelivery, type }){
           })
         })
   
-        const { data } = await api.put(`deliverys/status/${selectDelivery.ID}`, selectDelivery)
+        const { data } = await api.put(`delivery/status/${selectDelivery.ID}`, selectDelivery)
   
         if(data.ID){
           const resp = await api.get('sales/', {
@@ -147,18 +147,41 @@ export default function ModalView({ setOpen, selectDelivery, type }){
 
         <div>
           <p><span>Veículo: </span> {selectDelivery.CAR}</p>
-          {type !== 'close' &&
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4}}>
-              <span>Data da Entrega: </span>&nbsp;&nbsp;
-              <TextField 
-                type="date"
-                required
-                onChange={e => setDate(e.target.value)}
-              />
-            </div>
-          }
+          <p><span>Cubagem: </span> </p>
+        </div>
+
+        <div>
+          <p><span>Custo: </span> {
+            Intl
+              .NumberFormat('pt-br',{style: 'currency', currency: 'BRL'})
+              .format(selectDelivery.COST)
+          }</p>
+          <p><span>Valor: </span>{
+            Intl
+            .NumberFormat('pt-br',{style: 'currency', currency: 'BRL'})
+            .format(selectDelivery.PRICE)
+          }</p>
         </div>
       </div>
+
+      {type !== 'close' &&
+        <div
+          style={{ 
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 4,
+            marginBottom: 4
+          }}
+        >
+          <strong>Data: </strong>
+          <TextField 
+            type="date"
+            required
+            onChange={e => setDate(e.target.value)}
+          />
+        </div>
+      }
 
       <TableContainer component={Paper}>
         <Table aria-label="collapsible table">

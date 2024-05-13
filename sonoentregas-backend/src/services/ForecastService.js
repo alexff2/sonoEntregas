@@ -67,7 +67,7 @@ class ForecastService {
    * @param {string | boolean} codLoja
    * @returns 
    */
-  async findForecast(where, codLoja){//CALCULAR STATUS VENCIDO
+  async findForecast(where, codLoja = false){//CALCULAR STATUS VENCIDO
     /** @type {IForecast[]} */
     const forecasts = where === 'created' 
       ? await Forecast._query(0, 'select * from Forecast where [status] IS NULL OR [status] = 1', QueryTypes.SELECT)

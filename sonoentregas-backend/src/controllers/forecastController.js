@@ -8,6 +8,30 @@ module.exports = {
    * @param {any} req
    * @param {any} res
    */
+  async findForecast(req, res){
+    try {
+      const { id } = req.params
+
+      if (!id) {
+        throw new Error('id not exist!')
+      }
+
+      const forecast = await ForecastService.findForecast({ id })
+
+      return res.status(200).json(forecast[0])
+    } catch (e) {
+      console.log(e)
+
+      let status = e.status ? e.status : 400
+      let error = e.error ? e.error : e
+
+      return res.status(status).json(error)
+    }
+  },
+  /**
+   * @param {any} req
+   * @param {any} res
+   */
   async findCreatedForecast(req, res){
     try {
       const { codLoja, status } = req.query

@@ -85,9 +85,9 @@ export default function ForecastView({ forecastId, handleInvalidationSale }){
   useEffect(() => {
     const getForecast = async () => {
       try {
-        const { data } = await api.get(`/forecast`)
+        const { data } = await api.get(`/forecast/${forecastId}/view`)
 
-        setForecast(data.find(forecast => forecast.id === forecastId))
+        setForecast(data)
       } catch (error) {
         console.log(error)
       }

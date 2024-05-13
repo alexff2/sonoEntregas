@@ -198,7 +198,7 @@ export default function TableSalesUpdate({ sales }) {
       setSelected([])
     } catch (e) {
       console.log(e)
-      const { data } = await api.get('deliverys/open')
+      const { data } = await api.get('delivery/open')
       
       setDelivery(data)
       setSelected([])

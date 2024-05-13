@@ -71,7 +71,7 @@ export default function Header({ data, type }) {
         ID_CAR: codCar
       })
 
-      const { data: dataDelivery } = await api.get('deliverys/status') 
+      const { data: dataDelivery } = await api.get('delivery/status') 
       setDelivery(dataDelivery)
 
       setDisabled(!disabled)

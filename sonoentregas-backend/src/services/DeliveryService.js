@@ -8,6 +8,11 @@
 * @property {number} QTD_MOUNTING
 * @property {number} qtdDelivery
 * 
+* @typedef {Object} IValueDelivery
+* @property {number} ID_DELIVERY
+* @property {number} PRICE
+* @property {number} COST
+* 
 * @typedef {Object} ISale
 * @property {number} ID
 * @property {number} ID_SALES
@@ -37,27 +42,39 @@ module.exports = {
   async findSalesOfDelivery(deliveries){
     try {
       if (deliveries.length > 0) {
-        var idDelivery = ''
+        var idDeliveries = deliveries.map(delivery => delivery.ID)
 
-        for (let i = 0; i < deliveries.length; i++){
-          if ( i === 0 ){
-            idDelivery+= deliveries[i].ID
-          } else {
-            idDelivery+= `, ${deliveries[i].ID}`
-          }
-        }
+        const sales = await ViewDeliverySales.findSome(0, `ID_DELIVERY IN (${idDeliveries})`)
 
-        const sales = await ViewDeliverySales.findSome(0, `ID_DELIVERY IN (${idDelivery})`)
-
-        const vDeliveryProd2 = await ViewDeliveryProd2.findSome(0, `ID_DELIVERY IN (${idDelivery})`)
+        const vDeliveryProd2 = await ViewDeliveryProd2.findSome(0, `ID_DELIVERY IN (${idDeliveries})`)
 
         const shops = await Empresas._query(0, 'SELECT * FROM LOJAS', QueryTypes.SELECT)
 
+        const scriptValuesByDelivery =`
+        SELECT C.ID_DELIVERY, SUM(C.QTD_DELIV * B.PCO_COMPRA) COST, SUM(C.QTD_DELIV * D.UNITARIO1) PRICE FROM SONO..PRODUTOS A
+        INNER JOIN SONO..PRODLOJAS B ON A.CODIGO = B.CODIGO
+        INNER JOIN DELIVERYS_PROD C ON C.COD_ORIGINAL = A.ALTERNATI
+        INNER JOIN SALES_PROD D ON C.ID_SALE = D.ID_SALES AND C.CODLOJA = D.CODLOJA AND C.COD_ORIGINAL = D.COD_ORIGINAL
+        WHERE B.CODLOJA = 1
+        AND C.ID_DELIVERY IN (${idDeliveries})
+        GROUP BY C.ID_DELIVERY`
+
+        /**@type {IValueDelivery[]} */
+        const valuesByDelivery = await ViewDeliverySales._query(0, scriptValuesByDelivery, QueryTypes.SELECT)
+
         deliveries.forEach( delivery => {
           delivery['sales'] = []
+
           delivery.D_MOUNTING = new Date(delivery.D_MOUNTING+'T00:00:00').getBRDateTime().date
           delivery.D_DELIVERING = new Date(delivery.D_DELIVERING+'T00:00:00').getBRDateTime().date
           delivery.D_DELIVERED = new Date(delivery.D_DELIVERED+'T00:00:00').getBRDateTime().date
+
+          const valuesDelivery = valuesByDelivery.find(value => value.ID_DELIVERY === delivery.ID)
+
+          if (valuesDelivery) {
+            delivery.COST = valuesDelivery.COST
+            delivery.PRICE = valuesDelivery.PRICE
+          }
 
           sales.forEach(sale => {
 

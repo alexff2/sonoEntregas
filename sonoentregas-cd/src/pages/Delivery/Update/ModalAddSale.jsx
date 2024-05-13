@@ -268,7 +268,7 @@ export default function ModalAddSale({ setOpen, typeModal }){
 
         await api.post(`/delivery/${id}/sales/add`, { salesProd })
 
-        const { data } = await api.get('deliverys/open')
+        const { data } = await api.get('delivery/open')
 
         setDelivery(data)
       }
@@ -326,7 +326,7 @@ export default function ModalAddSale({ setOpen, typeModal }){
         whoWithdrew
       })
 
-      const { data: dataDelivery } = await api.get('deliverys/status') 
+      const { data: dataDelivery } = await api.get('delivery/status') 
       setDelivery(dataDelivery)
 
       const { data: dataSales } = await api.get('sales/', {

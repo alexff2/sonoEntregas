@@ -107,8 +107,8 @@ export default function Delivery() {
     const updateSys = async () => {
       setOpenLoading(true)
       try {
-        const { data: dataDeliveries } = await api.get('deliverys/open')
-        const { data: dataDeliveriesFinished } = await api.get(`deliverys/close/${getDateSql()}`)
+        const { data: dataDeliveries } = await api.get('delivery/open')
+        const { data: dataDeliveriesFinished } = await api.get(`delivery/close/${getDateSql()}`)
         const { data: dataForecasts } = await api.get('forecast')
   
         setDelivery(dataDeliveries)
@@ -143,9 +143,9 @@ export default function Delivery() {
   //Functions
   const deleteDelivery = async cod => {
     try {
-      const { data } = await api.delete(`deliverys/${cod}`)
+      const { data } = await api.delete(`delivery/${cod}`)
 
-      const { data: dataDeliv } = await api.get('deliverys/status/') 
+      const { data: dataDeliv } = await api.get('delivery/status/') 
       setDelivery(dataDeliv)
 
       if (data.delete) {
@@ -205,7 +205,7 @@ export default function Delivery() {
 
   const searchDeliveryFinished = async e => {
     try {
-      const { data } = await api.get(`deliverys/close/${e.target.value}`)
+      const { data } = await api.get(`delivery/close/${e.target.value}`)
       setDeliveryFinish(data)
     } catch (e) {
       if (!e.response){

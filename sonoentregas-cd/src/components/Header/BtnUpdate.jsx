@@ -49,8 +49,8 @@ export default function BtnUpdate(){
           status: 'open'
         }
       })
-      const { data: dataDeliveries } = await api.get('deliverys/open')
-      const { data: dataDeliveriesFinished } = await api.get(`deliverys/close/${getDateSql()}`)
+      const { data: dataDeliveries } = await api.get('delivery/open')
+      const { data: dataDeliveriesFinished } = await api.get(`delivery/close/${getDateSql()}`)
       const { data: dataForecasts } = await api.get('forecast')
       const { data: dataMain } = await api.get('/maintenancedeliv')
       
