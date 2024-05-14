@@ -22,7 +22,7 @@ export function TabSalesProcess() {
 
   useEffect(() => {
     setLoading(true)
-    api.get(`/deliverys/open`)
+    api.get(`/delivery/open`)
       .then( resp => {
         let salesMountingOfThisStore = []
         let salesDeliveringOfThisStore = []
