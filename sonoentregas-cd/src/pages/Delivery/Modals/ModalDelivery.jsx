@@ -175,7 +175,7 @@ export default function ModalDelivery({ setOpen, type }){
         salesProd
       })
 
-      const { data: dataDelivery } = await api.get('deliverys/status') 
+      const { data: dataDelivery } = await api.get('delivery/status') 
       setDelivery(dataDelivery)
 
       const { data: dataSales } = await api.get('sales/', {

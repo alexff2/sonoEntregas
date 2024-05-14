@@ -63,9 +63,9 @@ export default function ModalDelivering({ setOpen, selectDelivery }){
         }
       )})
 
-      await api.put(`deliverys/status/${selectDelivery.ID}`, selectDelivery)
+      await api.put(`delivery/status/${selectDelivery.ID}`, selectDelivery)
 
-      const {data} = await api.get('deliverys/open')
+      const {data} = await api.get('delivery/open')
       setDelivery(data)
 
       setOpen(false)
