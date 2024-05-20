@@ -205,23 +205,6 @@ class TransferServices {
 
     await TransferProduct.create(1, transfersProducts, false)
   }
-
-  async findProduct(type, search) {
-    console.log(type)
-    const script = type === 'code' 
-    ? `SELECT A.CODIGO code, B.ALTERNATI generalCode, B.NOME name, A.EST_ATUAL stock, A.PCO_COMPRA, B.CBARRA barCode
-      FROM PRODLOJAS A
-      INNER JOIN PRODUTOS B ON A.CODIGO = B.CODIGO
-      WHERE A.CODLOJA = 1 AND B.ALTERNATI LIKE '${search}%'AND B.ATIVO = 'S'`
-    : `SELECT A.CODIGO code, B.ALTERNATI generalCode, B.NOME name, A.EST_ATUAL stock, A.PCO_COMPRA, B.CBARRA barCode
-    FROM PRODLOJAS A
-    INNER JOIN PRODUTOS B ON A.CODIGO = B.CODIGO
-    WHERE A.CODLOJA = 1 AND B.NOME LIKE '${search}%'AND B.ATIVO = 'S'`
-
-    const products = await TransferProduct._query(1, script, QueryTypes.SELECT)
-
-    return products
-  }
 }
 
 module.exports = new TransferServices()

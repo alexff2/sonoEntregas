@@ -31,17 +31,5 @@ module.exports = {
 
       return response.status(400).json('Error')
     }
-  },
-  async findProduct(request, response) {
-    try {
-      const { search, type } = request.query
-
-      const products = await TransferServices.findProduct(type, search)
-
-      return response.status(200).json(products)
-    } catch (error) {
-      console.log(error)
-      return response.status(400).json('Error')
-    }
   }
 }

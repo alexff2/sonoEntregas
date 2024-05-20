@@ -78,8 +78,8 @@ export default function ModalStartMain({ selectMain, setOpen }) {
   const [isDisabled, setIsDisabled] = useState(false)
   const [idDelivMain, setIdDelivMain] = useState(0)
   const [idCar, setIdCar] = useState(0)
-  const [idDriver, setidDriver] = useState(0)
-  const [idAssist, setidAssist] = useState(0)
+  const [idDriver, setIdDriver] = useState(0)
+  const [idAssist, setIdAssist] = useState(0)
   const [obs, setObs] = useState('')
   const { setChildrenModal, setOpen: setOpenAlert } = useAlert()
   const { cars } = useCars()
@@ -104,20 +104,20 @@ export default function ModalStartMain({ selectMain, setOpen }) {
       const newDev = delivery.filter(deliv => deliv.ID === e.target.value)
       setIdDelivMain(newDev[0].ID)
       setIdCar(newDev[0].ID_CAR)
-      setidDriver(newDev[0].ID_DRIVER)
-      setidAssist(newDev[0].ID_ASSISTANT)
+      setIdDriver(newDev[0].ID_DRIVER)
+      setIdAssist(newDev[0].ID_ASSISTANT)
       setIsDisabled(true)
     } else if (e.target.value === 0) {
       setIdDelivMain(0)
       setIdCar(0)
-      setidDriver(0)
-      setidAssist(0)
+      setIdDriver(0)
+      setIdAssist(0)
       setIsDisabled(false)
     } else if (e.target.value === 1){
       setIdDelivMain(0)
       setIdCar(0)
-      setidDriver(48)
-      setidAssist(49)
+      setIdDriver(48)
+      setIdAssist(49)
       setIsDisabled(true)
     }
   }
@@ -202,7 +202,7 @@ export default function ModalStartMain({ selectMain, setOpen }) {
                 id="driver"
                 value={idDriver}
                 disabled={isDisabled}
-                onChange={e => setidDriver(e.target.value)}
+                onChange={e => setIdDriver(e.target.value)}
                 required
               >
                 <MenuItem value={0}>
@@ -222,7 +222,7 @@ export default function ModalStartMain({ selectMain, setOpen }) {
                 id="assistant"
                 value={idAssist}
                 disabled={isDisabled}
-                onChange={e => setidAssist(e.target.value)}
+                onChange={e => setIdAssist(e.target.value)}
                 required
               >
                 <MenuItem value={0}>

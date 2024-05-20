@@ -44,7 +44,7 @@ body {
 }
 
 
-/*Defaut styles ==================================*/
+/*Default styles ==================================*/
 body, input, textarea, button, footer {
   font: 400 1rem "inter", sans-serif;
 }
@@ -294,7 +294,7 @@ tbody td {
   cursor: no-drop;
 }
 
-/*Outhers Components ==============================*/
+/*Others Components ==============================*/
 .selectTransparent {
   background-color: transparent;
   border: none;

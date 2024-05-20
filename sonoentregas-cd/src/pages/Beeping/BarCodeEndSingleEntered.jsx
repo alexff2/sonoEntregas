@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react'
 import {
   Box,
   FormControl,
+  Input,
   InputBase,
   InputLabel,
   MenuItem,
+  Paper,
   Select,
   Table,
   TableBody,
@@ -25,6 +27,8 @@ export default function BarCode({ handleRenderBox }) {
   const [ productsSearch, setProductsSearch ] = useState([])
   const [ productSelect, setProductSelect ] = useState()
   const [ barCode, setBarCode ] = useState('')
+  const [ serialNumberSelect, setSerialNumberSelect ] = useState('')
+  const [ serialsNumber, setSerialsNumber ] = useState([])
   const [ disable, setDisable ] = useState(false)
   const classes = useStyles()
   const { setAlertSnackbar } = useAlertSnackbar()
@@ -63,6 +67,14 @@ export default function BarCode({ handleRenderBox }) {
     if (!!product.barCode) {
       setBarCode(product.barCode)
       setDisable(true)
+
+      const { data } = await api.get('serial/product', {
+        params: { code: product.code }
+      })
+
+      setSerialsNumber(data)
+
+      document.getElementById('serialNumberId').focus()
       return
     }
 
@@ -77,8 +89,9 @@ export default function BarCode({ handleRenderBox }) {
         return
       }
 
-      await api.put('product/barcode', { barCode, code: productSelect.code })
+      await api.post('product/barcode', { barCode, code: productSelect.code })
 
+      document.getElementById('serialNumberId').focus() 
     } catch (error) {
       console.log(error)
       setDisable(false)
@@ -97,11 +110,39 @@ export default function BarCode({ handleRenderBox }) {
     }
   }
 
+  const handleCreateSerial = async () => {
+    try {
+      setSerialNumberSelect('')
+
+      if (barCode !== '') {
+        await api.post('serial/first', {
+          serialNumber: serialNumberSelect,
+          productId: productSelect.code,
+          module: 'single'
+        })
+  
+        setSerialsNumber([...serialsNumber, serialNumberSelect])
+      }
+    } catch (error) {
+      console.log(error)
+
+      if (error.response) {
+        console.log(error.response.data)
+
+        if (error.response.data === 'serial number is already!') {
+          setAlertSnackbar('Número de série já usado!')
+        }
+      }
+    }
+  }
+
   const handleReset = () => {
     setSearch('')
     setDisable(false)
     setProductsSearch([])
     setBarCode('')
+    setSerialNumberSelect('')
+    setSerialsNumber([])
     setTimeout(()=> {
       document.getElementById('searchProduct').focus()
     }, [10])
@@ -189,6 +230,29 @@ export default function BarCode({ handleRenderBox }) {
 
         </Box>
       </form>
+
+      <Input
+        id='serialNumberId'
+        style={{ width: '85%', marginTop: 20}}
+        placeholder='Leitura número de série'
+        value={serialNumberSelect}
+        onChange={e => setSerialNumberSelect(e.target.value)}
+        onKeyPress={e => e.key === 'Enter' && handleCreateSerial()}
+      />
+
+      <Box component={Paper} style={{ marginTop: 20}}>
+        <TableContainer>
+          <Table size='small'>
+            <TableBody>
+              {serialsNumber.map((serialNumber, i) => (
+                <TableRow hover key={i}> 
+                  <TableCell>{serialNumber}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
 
       <ButtonSuccess onClick={handleReset} style={{marginTop: 12}}>Novo Produto</ButtonSuccess>
       <ButtonSuccess onClick={handleRenderBox} className={classes.btnAdd}>Voltar</ButtonSuccess>

@@ -117,7 +117,7 @@ export default function ModalView({ setOpen, selectDelivery, type }){
           stateSales.setSales(resp.data)
         }
 
-        const { data: dataDelivery } = await api.get('deliverys/status/') 
+        const { data: dataDelivery } = await api.get('delivery/status/') 
         setDelivery(dataDelivery)
         setDeliveryFinish([...deliveryFinish, selectDelivery])
         setOpen(false)

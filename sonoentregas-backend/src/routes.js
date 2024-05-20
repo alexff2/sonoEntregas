@@ -27,7 +27,7 @@ const devController = require('./controllers/devController')
 const catDefController = require('./controllers/catDefController')
 const goalsController = require('./controllers/goalsController')
 const promotionController = require('./controllers/promotionController')
-const beepController = require('./controllers/beepController')
+const serieController = require('./controllers/serieController')
 const syncController = require('./controllers/syncController')
 
 //Routes
@@ -43,15 +43,28 @@ routes.get('/token/validation', authController.validationToken)
 routes.get('/users/:loja', usersController.index)
 routes.post('/users', usersController.create)
 routes.put('/users/:userId', usersController.update)
-  //Products SCE CD
+    //Products SCE CD
   routes.get('/products/:typesearch/:search', productsController.index)
+  routes.get('/product', ensureAuthenticated, productsController.findProduct)
+  routes.put('/product/barcode', productsController.updateBarCode)
   // Beep
-  routes.get('/beep/serial', beepController.findSerialNumberValid)
-  routes.post('/beep/barcode', beepController.barCode)
-  routes.post('/beep/serial', beepController.serialCreate)
+  routes.get('/serial/product', serieController.findOpenSeriesByProduct)
+  routes.post('/serial/first', serieController.createFirst)
+/*
+Disponível
+SELECT A.CODIGO, A.ALTERNATI, A.NOME, ISNULL(B.ESTOQUE, 0) ESTOQUE
+FROM PRODUTOS A
+LEFT JOIN (
+	SELECT productId, COUNT(productId) ESTOQUE
+	FROM PRODLOJAS_SERIES
+	WHERE dateIsOut IS NULL
+	GROUP BY productId
+	) B ON A.CODIGO = B.productId
+WHERE A.CODIGO LIKE '2%'
+*/
+
   // Transfer
   routes.get('/transfer', transferController.find)
-  routes.get('/transfer/search/product', ensureAuthenticated, transferController.findProduct)
   routes.post('/transfer', ensureAuthenticated, transferController.create)
   //Sales SCE Shops
   routes.get('/salesshop/:emissao/:loja', salesSceController.salesSce)
@@ -126,7 +139,7 @@ routes.get('/reports/sales/open', reportsController.salesOpen)
 routes.get('/reports/products/movement', reportsController.productsMovement)
 routes.get('/reports/purchase/requests', reportsController.purchaseRequest)
 routes.get('/reports/dre', reportsController.dre)
-// Golas
+// Goals
 routes.get('/goals', goalsController.index)
 routes.post('/goals', ensureAuthenticated, goalsController.create)
 routes.put('/goals/:id', ensureAuthenticated, goalsController.update)

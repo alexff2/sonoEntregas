@@ -5,7 +5,22 @@ import {
   Typography
 } from '@material-ui/core'
 
+import { useAuthenticate } from '../../context/authContext'
+
 import BarCode from './BarCode'
+import BarCodeEndSingleEntered from './BarCodeEndSingleEntered'
+import EntryNote from './EntryNote'
+import OutDeliveries from './OutDeliveries'
+import Transfers from './Transfers'
+
+const userAuthToSingleEntered = (userName) => {
+  const users = [
+    'ALEXANDRE',
+    'ANDRESSA'
+  ]
+
+  return !!users.find(user => user === userName)
+}
 
 const BoxBeep = ({ children, ...props }) => {
   return (
@@ -26,6 +41,7 @@ const BoxBeep = ({ children, ...props }) => {
 export default function Beeping() {
   const [ renderBeepBox, setRenderBeepBox ] = useState(false)
   const [ screenId, setScreenId ] = useState(0)
+  const { userAuth } = useAuthenticate()
 
   const handleRenderBox = (screenId = 1) => {
     setRenderBeepBox(!renderBeepBox)
@@ -40,18 +56,27 @@ export default function Beeping() {
 
       {
         !renderBeepBox
-        ? <>
-          <BoxBeep onClick={() => {handleRenderBox(1)}}>Cadastro de C. Barras</BoxBeep>
-          <BoxBeep>Notas de entrada</BoxBeep>
-          <BoxBeep>Entregas</BoxBeep>
-          <BoxBeep>Transferências</BoxBeep>
-        </>
-        : <>
+        ? 
+          <>
+            <BoxBeep onClick={() => {handleRenderBox(1)}}>Cadastro de C. Barras</BoxBeep>
+            {
+              userAuthToSingleEntered(userAuth.DESCRIPTION) &&
+              <BoxBeep onClick={() => {handleRenderBox(2)}}>Cadastro de C. Barras e Entrada avulsa</BoxBeep>
+            }
+            <BoxBeep onClick={() => {handleRenderBox(3)}}>Nota de entrada</BoxBeep>
+            <BoxBeep onClick={() => {handleRenderBox(4)}}>Rotas de entregas</BoxBeep>
+            <BoxBeep onClick={() => {handleRenderBox(5)}}>Transferências</BoxBeep>
+          </>
+        : 
+          <>
             {screenId === 1 && <BarCode handleRenderBox={handleRenderBox} />}
-            {screenId === 2 && (<Box>Telas 2</Box>)}
-            {screenId === 3 && (<Box>Telas 3</Box>)}
-            {screenId === 4 && (<Box>Telas 4</Box>)}
-            {screenId === 5 && (<Box>Telas 5</Box>)}
+            {
+              (screenId === 2 && userAuthToSingleEntered(userAuth.DESCRIPTION))
+              && <BarCodeEndSingleEntered handleRenderBox={handleRenderBox} />
+            }
+            {screenId === 3 && <EntryNote handleRenderBox={handleRenderBox} />}
+            {screenId === 4 && <OutDeliveries handleRenderBox={handleRenderBox} />}
+            {screenId === 5 && <Transfers handleRenderBox={handleRenderBox} />}
           </>
       }
 

@@ -28,10 +28,10 @@ export function ButtonSuccess({children, loading=false, ...other}) {
     <Button
       className={classes.btnSuccess}
       style={ loading ? {cursor: 'progress'}: {cursor: 'pointer'}}
+      disabled={loading ? true : false}
       {...other}
     >
-      <span style={loading ? {marginRight: 8} : {}}>{ children }</span> 
-      {loading &&  <CircularProgress size={25}/> }
+      { loading ?  <CircularProgress size={24} style={{ color: 'white'}}/> : children }
     </Button>
   )
 }

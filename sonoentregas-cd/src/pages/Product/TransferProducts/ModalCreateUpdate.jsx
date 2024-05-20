@@ -177,7 +177,7 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
 
   useEffect(() => {
     if (search.length > 3) {
-      api.get('transfer/search/product', {
+      api.get('product', {
         params: {
           type: typeSearch,
           search
