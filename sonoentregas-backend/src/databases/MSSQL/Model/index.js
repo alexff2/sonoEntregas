@@ -45,38 +45,38 @@ class Model {
     return values
   }
 
-  async findAll(loja, columns = this.columns, log=false){
+  async findAll(loja, columns = this.columns, t, log=false){
     const script = `SELECT ${columns} FROM ${this.tab}`
 
-    const data = await this._query(loja, script, QueryTypes.SELECT, log)
+    const data = await this._query(loja, script, QueryTypes.SELECT, t, log)
     return data
   }
-  async findSome(loja, where, columns = this.columns, log=false){
+  async findSome(loja, where, columns = this.columns, t, log=false){
     const script = `SELECT ${columns} FROM ${this.tab} WHERE ${where}`
 
-    const data = await this._query(loja, script, QueryTypes.SELECT, log)
+    const data = await this._query(loja, script, QueryTypes.SELECT, t, log)
 
     return data
   }
-  async find({loja, where = {}, columns = this.columns, toCompare = '='}, log=false){
+  async find({loja, where = {}, columns = this.columns, toCompare = '='}, t, log=false){
     where = Object.keys(where).length === 0 
       ? '' 
       : `WHERE ${this.getObj(where, ' AND ', toCompare)}`
 
     const script = `SELECT ${columns} FROM ${this.tab} ${where}`
 
-    const data = await this._query(loja, script, QueryTypes.SELECT, log)
+    const data = await this._query(loja, script, QueryTypes.SELECT, t, log)
 
     return data
   }
-  async findAny(loja, where = {}, columns = this.columns, log=false){
+  async findAny(loja, where = {}, columns = this.columns, t, log=false){
     where = Object.keys(where).length === 0 
       ? '' 
       : `WHERE ${this.getObj(where, ' AND ')}`
 
     const script = `SELECT ${columns} FROM ${this.tab} ${where}`
 
-    const data = await this._query(loja, script, QueryTypes.SELECT, log)
+    const data = await this._query(loja, script, QueryTypes.SELECT, t, log)
 
     return data
   }
@@ -84,11 +84,11 @@ class Model {
   /*async innerJoin(loja, where, ){
     const script = `SELECT ${columns} FROM ${this.tab} WHERE ${where}`
 
-    const data = await this._query(loja, script, log)
+    const data = await this._query(loja, script, log), t
     return data
   }*/
 
-  async creator(loja, values, id = false, log=false) {
+  async creator(loja, values, id = false, t, log=false) {
     //Buscando ultimo ID lançado na tabela se não fornecido
     if (!id) {
       const lastId = await this.findAll(loja, `MAX(ID) AS 'ID'`)
@@ -97,7 +97,7 @@ class Model {
 
       const script = `INSERT INTO ${this.tab} (${this.columns}) VALUES (${ID}, ${values})`
 
-      await this._query(loja, script, QueryTypes.INSERT, log)
+      await this._query(loja, script, QueryTypes.INSERT, t, log)
 
       const data = await this.findSome(loja, `ID = ${ID}`)
 
@@ -105,7 +105,7 @@ class Model {
     } else {
       const script = `INSERT INTO ${this.tab} (${this.columns}) VALUES (${values})`
 
-      await this._query(loja, script, QueryTypes.INSERT, log)
+      await this._query(loja, script, QueryTypes.INSERT, t, log)
     }
   }
 
@@ -134,7 +134,7 @@ class Model {
     return { column, value }
   }
 
-  async creatorAny(loja, values, id = false, log=false) {
+  async creatorAny(loja, values, id = false, t, log=false) {
     var script, ID
 
     if (!id) {
@@ -152,12 +152,12 @@ class Model {
       
       script = `INSERT INTO ${this.tab} (${column}) VALUES ${value}`
     }
-    await this._query(loja, script, QueryTypes.INSERT, log)
+    await this._query(loja, script, QueryTypes.INSERT, t, log)
 
     return ID
   }
 
-  async create(loja, values, isThereId = true, log=false) {
+  async create(loja, values, isThereId = true, t, log=false) {
     var script
 
     if (isThereId) {
@@ -169,7 +169,7 @@ class Model {
 
       script = `INSERT INTO ${this.tab} (id, ${column}) VALUES ${value}`
 
-      await this._query(loja, script, QueryTypes.INSERT, log)
+      await this._query(loja, script, QueryTypes.INSERT, t, log)
 
       const data = await this.findSome(loja, `id = ${id}`)
   
@@ -179,12 +179,12 @@ class Model {
       
       script = `INSERT INTO ${this.tab} (${column}) VALUES ${value}`
 
-      await this._query(loja, script, QueryTypes.INSERT, log)
+      await this._query(loja, script, QueryTypes.INSERT, t, log)
 
       return
     }
   }
-  async creatorNotReturn(loja, values, id = false, log=false) {
+  async creatorNotReturn(loja, values, id = false, t, log=false) {
     //Buscando ultimo ID lançado na tabela se não fornecido
     if (!id) {
       const lastId = await this.findAll(loja, `MAX(ID) AS 'ID'`)
@@ -193,34 +193,34 @@ class Model {
       
       const script = `INSERT INTO ${this.tab} (${this.columns}) VALUES (${ID}, ${values})`
       
-      await this._query(loja, script, QueryTypes.INSERT, log)
+      await this._query(loja, script, QueryTypes.INSERT, t, log)
       
     } else {
       const script = `INSERT INTO ${this.tab} (${this.columns}) VALUES (${values})`
       
-      await this._query(loja, script, QueryTypes.INSERT, log)
+      await this._query(loja, script, QueryTypes.INSERT, t, log)
     }
   }
 
-  async update(loja, values, id, colum = 'ID', log=false) {
+  async update(loja, values, id, colum = 'ID', t, log=false) {
     const script = `UPDATE ${this.tab} SET ${values} WHERE ${colum} = ${id}`
     
-    await this._query(loja, script, QueryTypes.UPDATE, log)
+    await this._query(loja, script, QueryTypes.UPDATE, t, log)
     
     const data = await this.findSome(loja, `${colum} = ${id}`)
     
     return data[0]
   }
-  async updateNotReturn(loja, values, id, colum = 'ID', log=false) {
+  async updateNotReturn(loja, values, id, colum = 'ID', t, log=false) {
     const script = `UPDATE ${this.tab} SET ${values} WHERE ${colum} = ${id}`
     
-    await this._query(loja, script, QueryTypes.UPDATE, log)
+    await this._query(loja, script, QueryTypes.UPDATE, t, log)
   }
-  async updateAny(loja, obJValues, where, log=false) {
+  async updateAny(loja, obJValues, where, t, log=false) {
     
     const script = `UPDATE ${this.tab} SET ${this.getObj(obJValues)} WHERE ${this.getObj(where, ' AND ')}`
     
-    await this._query(loja, script, QueryTypes.UPDATE, log)
+    await this._query(loja, script, QueryTypes.UPDATE, t, log)
   }
   updateTw() {
 
@@ -239,39 +239,43 @@ class Model {
 
     /* const script = `UPDATE ${this.tab} SET ${values} WHERE ${where}`
 
-    await this._query(loja, script, QueryTypes.UPDATE) */
+    await this._query(loja, script, QueryTypes.UPDATE, t) */
 
     return obj
   }
   
-  async delete(loja, id, colum = 'ID', log=false) {
+  async delete(loja, id, colum = 'ID', t, log=false) {
     const script = `DELETE FROM ${this.tab} WHERE ${colum} = ${id}`
     
-    const data = await this._query(loja, script, QueryTypes.DELETE, log)
+    const data = await this._query(loja, script, QueryTypes.DELETE, t, log)
     
     return data
   }
-  async deleteNotReturn(loja, id, colum = 'ID', log=false) {
+  async deleteNotReturn(loja, id, colum = 'ID', t, log=false) {
     const script = `DELETE FROM ${this.tab} WHERE ${colum} = ${id}`
     
-    await this._query(loja, script, QueryTypes.DELETE, log)
+    await this._query(loja, script, QueryTypes.DELETE, t, log)
   }
 
-  async count(loja, where = '', groupBy = '', log=false){
+  async count(loja, where = '', groupBy = '', t, log=false){
     const group = groupBy === '' ? groupBy : `, ${groupBy}`
     const groupby = groupBy === '' ? groupBy : `GROUP BY ${groupBy}`
 
     const script = `SELECT COUNT(*) AS ${this.tab}${group} FROM ${this.tab} ${where} ${groupby}`
 
-    return await this._query(loja, script, QueryTypes.SELECT, log)
+    return await this._query(loja, script, QueryTypes.SELECT, t, log)
   }
-  
-  async _query(loja, script, type, log){
+
+  async _query(loja, script, type, t, log){
     log && console.log(script)
     const connection = connections[loja]
     const sequelize = new Sequelize(connection)
 
-    const results = await sequelize.query(script, { type })
+    const config = t
+      ? { type, transaction: t}
+      : { type }
+
+    const results = await sequelize.query(script, config)
     return results
   }
 }

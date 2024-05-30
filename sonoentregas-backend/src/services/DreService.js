@@ -30,7 +30,7 @@ class DreService {
 
     const revenues = await ViewVenda._query(shop, script, QueryTypes.SELECT)
 
-    const total = revenues.reduce((acc, cur) => acc + cur.value, 0) - resultReturns[0].value
+    const total = revenues.reduce((acc, cur) => acc + cur.value, 0)
 
     revenues.forEach(revenue => {
       revenue.percent = (revenue.value / total) * 100

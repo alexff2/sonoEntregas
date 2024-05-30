@@ -29,9 +29,9 @@ module.exports = {
   async findProduct(type, search) {
     const script = 
     `SELECT A.CODIGO code, B.ALTERNATI generalCode, B.NOME name, A.EST_ATUAL stock, A.PCO_COMPRA, B.CBARRA barCode
-      FROM PRODLOJAS A
-      INNER JOIN PRODUTOS B ON A.CODIGO = B.CODIGO
-      WHERE A.CODLOJA = 1 AND ${type === 'code' ? 'B.ALTERNATI' : 'B.NOME'} LIKE '${search}%'AND B.ATIVO = 'S'`
+    FROM PRODLOJAS A
+    INNER JOIN PRODUTOS B ON A.CODIGO = B.CODIGO
+    WHERE A.CODLOJA = 1 AND ${type === 'code' ? 'B.ALTERNATI' : 'B.NOME'} LIKE '${search}%'AND B.ATIVO = 'S'`
 
     const products = await ProductModel._query(1, script, QueryTypes.SELECT)
 

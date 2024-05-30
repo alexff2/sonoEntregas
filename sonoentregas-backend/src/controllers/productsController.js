@@ -27,6 +27,10 @@ module.exports = {
     try {
       const { search, type } = request.query
 
+      if (search === '' || search === '%') {
+        return response.status(200).json([])
+      }
+
       const products = await ProductsService.findProduct(type, search)
 
       return response.status(200).json(products)

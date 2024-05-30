@@ -1,23 +1,25 @@
 ﻿declare @IdSale int, @loja int
-set @IdSale = 12703
-set @loja = 5
-SELECT B.DESCRICAO, A.* FROM SALES A, LOJAS B WHERE A.CODLOJA = B.CODLOJA AND ID_SALES = @IdSale
+set @IdSale = 132180
+set @loja = 3
+--SELECT B.DESCRICAO, A.* FROM SALES A, LOJAS B WHERE A.CODLOJA = B.CODLOJA AND ID_SALES = @IdSale
 --SELECT * FROM SALES WHERE CODLOJA = @loja AND ID_SALES = @IdSale
 --SELECT * FROM SALES_PROD WHERE CODLOJA = @loja AND ID_SALES = @IdSale
---SELECT * FROM DELIVERYS_PROD WHERE CODLOJA = @loja AND ID_SALE = @IdSale
+--SELECT * FROM DELIVERYS_PROD WHERE CODLOJA = @loja AND ID_SALE = @IdSale ORDER BY ID_DELIVERY
 --SELECT B.ALTERNATI, B.NOME, EST_ATUAL FROM SONO..PRODLOJAS A INNER JOIN SONO..PRODUTOS B ON A.CODIGO = B.CODIGO INNER JOIN DELIVERYS_PROD C ON B.ALTERNATI = C.COD_ORIGINAL WHERE A.CODLOJA = 1 AND C.CODLOJA = @loja AND C.ID_SALE = @IdSale
 --SELECT * FROM FORECAST_SALES WHERE idSale IN (SELECT ID FROM SALES WHERE CODLOJA = @loja AND ID_SALES = @IdSale)
 
 --update SALES set STATUS = 'Aberta' WHERE CODLOJA = @loja AND ID_SALES = @IdSale
 --update SALES_PROD set STATUS = 'Devolvido' WHERE CODLOJA = @loja AND ID_SALES = @IdSale -- and STATUS = 'Finalizada'
 --UPDATE SONO..PRODLOJAS SET EST_ATUAL = EST_ATUAL + C.QTD_DELIV, EST_LOJA = EST_LOJA + C.QTD_DELIV FROM SONO..PRODLOJAS A INNER JOIN SONO..PRODUTOS B ON A.CODIGO = B.CODIGO INNER JOIN DELIVERYS_PROD C ON B.ALTERNATI = C.COD_ORIGINAL WHERE A.CODLOJA = 1 AND C.CODLOJA = @loja AND C.ID_SALE = @IdSale
---update DELIVERYS_PROD set DELIVERED = 1, REASON_RETURN = 'A cliente ia passar o endereço correto' WHERE CODLOJA = @loja AND ID_SALE = @IdSale
+--update DELIVERYS_PROD set DELIVERED = 1, REASON_RETURN = 'CLIENTE IRA AGENDAR UMA NOVA DATA NOVAMENTE' WHERE CODLOJA = @loja AND ID_SALE = @IdSale AND ID_DELIVERY = 5100
 --delete DELIVERYS_PROD WHERE CODLOJA = @loja AND ID_SALE = @IdSale
 --UPDATE DELIVERYS_PROD SET DELIVERED = 1 WHERE CODLOJA = 2 AND ID_SALE = 128333 AND COD_ORIGINAL = '2880-6' AND ID_DELIVERY = 573
 --select * from VIEW_DELIVERYS WHERE D_DELIVERED = '2022-07-08'
 --INSERT DELIVERYS_PROD SELECT 1747, ID_SALES, CODLOJA, QUANTIDADE, COD_ORIGINAL, '2022-07-08', '2022-07-08','2022-07-08', 0, NULL FROM SALES_PROD WHERE CODLOJA = @loja AND ID_SALES = @IdSale
 --SELECT * FROM SONO..VIEW_KARDEX_DIF_EST WHERE DIF <> 0
 --UPDATE SONO..PRODLOJAS SET EST_ATUAL = B.ESTOQUE_KARDEX, EST_LOJA = B.ESTOQUE_KARDEX FROM SONO..PRODLOJAS A INNER JOIN SONO..VIEW_KARDEX_DIF_EST B ON A.CODIGO = B.CODIGO WHERE A.CODLOJA = 1 AND B.DIF <> 0
+--SELECT * FROM VIEW_KARDEX_DIF_EST WHERE DIF <> 0
+--UPDATE PRODLOJAS SET EST_ATUAL = B.ESTOQUE_KARDEX, EST_LOJA = B.ESTOQUE_KARDEX FROM PRODLOJAS A INNER JOIN VIEW_KARDEX_DIF_EST B ON A.CODIGO = B.CODIGO WHERE A.CODLOJA = 1 AND B.DIF <> 0
 
 -------------------------------- vendas não concretizada
 SELECT C.DESCRICAO, A.EMISSAO, A.ID_SALES, A.NOMECLI, B.DESCRICAO, B.QUANTIDADE, B.UNITARIO1, B.DESCONTO, B.NVTOTAL FROM SALES A 
@@ -43,26 +45,28 @@ INNER JOIN GRUPOS C ON A.GRUPO = C.CODIGO
 WHERE ATIVO = 'S'
 -------------- VERIFICA VENDAS COM STATUS ABERTO QUE DEVERIAM ESTAR FINALIZADAS
 SELECT * FROM SALES WHERE ID IN (
-select B.ID_SALE_ID from SALES a
-inner join SALES_PROD b on a.id = b.ID_SALE_ID
-where b.STATUS not in ('Enviado', 'Sem Agendamento') and a.STATUS = 'Aberta')
-and id not in (
-select ID_SALE_ID from SALES_PROD where ID_SALE_ID in (
-select b.ID_SALE_ID from SALES a
-inner join SALES_PROD b on a.id = b.ID_SALE_ID
-where b.STATUS not in ('Enviado', 'Sem Agendamento') and a.STATUS = 'Aberta')
-and STATUS = 'Enviado')
+	select B.ID_SALE_ID from SALES a
+	inner join SALES_PROD b on a.id = b.ID_SALE_ID
+	where b.STATUS not in ('Enviado', 'Sem Agendamento') and a.STATUS = 'Aberta'
+	and id not in (
+		select ID_SALE_ID 
+		from SALES_PROD a
+		inner join sales b on a.ID_SALE_ID = b.id
+		where a.STATUS in ('Enviado', 'Sem Agendamento') 
+	)
+)
 
 UPDATE SALES SET STATUS = 'Fechada' FROM SALES WHERE ID IN (
-select B.ID_SALE_ID from SALES a
-inner join SALES_PROD b on a.id = b.ID_SALE_ID
-where b.STATUS not in ('Enviado', 'Sem Agendamento') and a.STATUS = 'Aberta')
-and id not in (
-select ID_SALE_ID from SALES_PROD where ID_SALE_ID in (
-select b.ID_SALE_ID from SALES a
-inner join SALES_PROD b on a.id = b.ID_SALE_ID
-where b.STATUS not in ('Enviado', 'Sem Agendamento') and a.STATUS = 'Aberta')
-and STATUS = 'Enviado')
+	select B.ID_SALE_ID from SALES a
+	inner join SALES_PROD b on a.id = b.ID_SALE_ID
+	where b.STATUS not in ('Enviado', 'Sem Agendamento') and a.STATUS = 'Aberta'
+	and id not in (
+		select ID_SALE_ID 
+		from SALES_PROD a
+		inner join sales b on a.ID_SALE_ID = b.id
+		where a.STATUS in ('Enviado', 'Sem Agendamento') 
+	)
+)
 ------------- Verificar produtos finalizados que estao com status sem estar finalizados
 select * 
 from SALES_PROD a

@@ -301,8 +301,8 @@ module.exports = {
       }
 
       const netResult = {
-        value: grossContributionMargin.value - fixedExpenses.total.value,
-        percent: ((grossContributionMargin.value - fixedExpenses.total.value) / revenues.total) * 100
+        value: grossContributionMargin.value - fixedExpenses.total.value - revenues.salesReturns.value,
+        percent: ((grossContributionMargin.value - fixedExpenses.total.value - revenues.salesReturns.value) / revenues.total) * 100
       }
 
       const balancePoint = {

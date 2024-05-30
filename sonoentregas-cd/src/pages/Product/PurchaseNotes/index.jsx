@@ -1,17 +1,31 @@
 import React, { useState } from 'react'
-import { Box, Button, Fab, FormControl, InputBase, InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core'
-import { Add, Search as SearchIcon } from '@material-ui/icons'
+import { Box,
+  Button,
+  FormControl,
+  InputBase,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow
+} from '@material-ui/core'
+import { Search as SearchIcon } from '@material-ui/icons'
 
 import useStyles from '../style'
 import Modal from '../../../components/Modal'
-import ModalEntryProductsNotes from './ModalEntryProductsNotes'
+import ModalNotesProducts from './ModalNotesProducts'
 
-export default function EntryProductsNotes() {
-  const [ openModalEntry, setOpenModalEntry ] = useState(false)
+export default function PurchaseNotes() {
+  const [ openModalNotesProducts, setOpenModalNotesProducts ] = useState(false)
   const [ noteSelected, setNoteSelected ] = useState()
   const [ search, setSearch ] = useState()
   const [ typeSearch, setTypeSearch ] = useState('noteNumber')
-  const [ entryProductsNotes, setEntryProductsNotes ] = useState([])
+  const [ purchase, setPurchase ] = useState([])
 
   const classes = useStyles()
 
@@ -19,7 +33,7 @@ export default function EntryProductsNotes() {
     try {
       console.log(search)
 
-      setEntryProductsNotes([
+      setPurchase([
         {
           status: 'pedente',
           supplier: 'Maranhão Colchões',
@@ -187,7 +201,7 @@ export default function EntryProductsNotes() {
 
   const handleSelectNote = note => {
     setNoteSelected(note)
-    setOpenModalEntry(true)
+    setOpenModalNotesProducts(true)
   }
 
   return (
@@ -240,7 +254,7 @@ export default function EntryProductsNotes() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {entryProductsNotes.map((entryProductsNote, i) => (
+            {purchase.map((entryProductsNote, i) => (
               <TableRow key={i}>
                 <TableCell>{entryProductsNote.status}</TableCell>
                 <TableCell
@@ -259,21 +273,13 @@ export default function EntryProductsNotes() {
         </Table>
       </TableContainer>
 
-      <Fab
-        color="primary"
-        className={classes.btnAdd}
-        onClick={() => console.log(true)}
-      >
-        <Add />
-      </Fab>
-
       <Modal
         title={'Notas de entrada'}
-        open={openModalEntry}
-        setOpen={setOpenModalEntry}
+        open={openModalNotesProducts}
+        setOpen={setOpenModalNotesProducts}
       >
-        <ModalEntryProductsNotes
-          setOpen={setOpenModalEntry}
+        <ModalNotesProducts
+          setOpen={setOpenModalNotesProducts}
           note={noteSelected}
           type={'view'}
         />

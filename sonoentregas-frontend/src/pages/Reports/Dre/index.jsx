@@ -160,13 +160,6 @@ export default function Dre(){
                 <td>{toLocString(revenues.total)}</td>
                 <td>100,00 %</td>
               </tr>
-              { salesReturns.value > 0 &&
-                <tr>
-                  <td>(-) 000 - DEVOLUÇÕES</td>
-                  <td>{toLocString(salesReturns.value)}</td>
-                  <td>{toLocString(salesReturns.percent)} %</td>
-                </tr>
-              }
               {revenues.revenues?.map(revenue => (
                 <tr key={revenue.id}>
                   <td>{((revenue.id).toString()).length === 1 ? '00' : '0'}{revenue.id} - {revenue.name}</td>
@@ -217,6 +210,13 @@ export default function Dre(){
                   <td>{toLocString(fixedExpense.percent)} %</td>
                 </tr>
               ))}
+              { salesReturns.value > 0 &&
+                <tr className='trHeader'>
+                  <td>DEVOLUÇÕES</td>
+                  <td>{toLocString(salesReturns.value)}</td>
+                  <td>{toLocString(salesReturns.percent)} %</td>
+                </tr>
+              }
             </tbody>
 
             <tfoot>

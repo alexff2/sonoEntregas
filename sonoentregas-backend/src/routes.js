@@ -10,6 +10,7 @@ const authController = require('./controllers/authController')
 const usersController = require('./controllers/usersController')
 const productsController = require('./controllers/productsController')
 const transferController = require('./controllers/transferController')
+const purchaseOrderController = require('./controllers/purchaseOrderController')
 const salesSceController = require('./controllers/salesSceController')
 const salesController = require('./controllers/salesController')
 const carsController = require('./controllers/carsController')
@@ -46,10 +47,13 @@ routes.put('/users/:userId', usersController.update)
     //Products SCE CD
   routes.get('/products/:typesearch/:search', productsController.index)
   routes.get('/product', ensureAuthenticated, productsController.findProduct)
-  routes.put('/product/barcode', productsController.updateBarCode)
+  routes.put('/product/barcode', ensureAuthenticated, productsController.updateBarCode)
   // Beep
   routes.get('/serial/product', serieController.findOpenSeriesByProduct)
-  routes.post('/serial/first', serieController.createFirst)
+  routes.post('/serial/first', ensureAuthenticated, serieController.createFirst)
+  // Purchase
+  routes.get('/purchase/order', purchaseOrderController.findPurchaseOrder)
+  routes.get('/purchase/order/:id/products', purchaseOrderController.findPurchaseOrderProduct)
 /*
 Disponível
 SELECT A.CODIGO, A.ALTERNATI, A.NOME, ISNULL(B.ESTOQUE, 0) ESTOQUE

@@ -36,13 +36,26 @@ class PurchaseService {
     return purchases
   }
 
-  async findProductPurchase(idsPurchase){
+  async findPurchaseOrderByCodeOrIssue(code = '', issue ='') {
+    const script = `
+    SELECT CODIGOPEDIDO code, FORMAT(VALORPED, 'C', 'pt-br') value, CONVERT(VARCHAR, EMISSAO, 103) issue, OBSERVACAO obs
+    FROM PEDFOR
+    WHERE CODIGOPEDIDO = '${code}'
+    OR EMISSAO = '${issue}'
+    `
+
+    const purchaseOrder = await Produtos._query(1, script, QueryTypes.SELECT)
+
+    return purchaseOrder
+  }
+
+  async findProductPurchase(idsPurchase, order = 'NOME'){
     const script = `
       SELECT A.*, B.NOME, B.ALTERNATI
       FROM VIEW_SALDO_PEDIDO_PRODUTO_VALOR A
       INNER JOIN PRODUTOS B ON A.CODPRODUTO = B.CODIGO
       WHERE A.NUMPEDIDO IN (${idsPurchase})
-      ORDER BY NOME
+      ORDER BY ${order}
     `
 
     const productsPurchase = await Produtos._query(1, script, QueryTypes.SELECT)
