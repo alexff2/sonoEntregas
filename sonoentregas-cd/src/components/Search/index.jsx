@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Box,
   Button,
@@ -48,12 +48,26 @@ const useStyles = makeStyles(theme => ({
 }))
 
 export function Search({
-  title
+  title,
+  open,
+  setOpen,
+  fieldsSearch,
+  fieldsModel,
+  headerTable,
+  rows
 }) {
+  const [typeSearch, setTypeSearch] = useState('')
+  const [modelSearch, setModelTypeSearch] = useState('')
   const classe = useStyles()
+
+  useEffect(() => {
+    setTypeSearch(fieldsSearch[0].value)
+    setModelTypeSearch(fieldsModel[0])
+    setTimeout(() => document.getElementById('searchDefaultId').focus(), 500)
+  }, [])
   return (
     <Dialog
-      open={true}
+      open={open}
       maxWidth='lg'
       onKeyDown={e => e.key === 'F2' && console.log(e.key)}
     >
@@ -64,7 +78,7 @@ export function Search({
           className={classe.header}
         >
           <span>{title}</span>
-          <Close/>
+          <Close onClick={() => setOpen(false)} style={{cursor: 'pointer'}}/>
         </header>
         <Box
           border='1px solid #CCC'
@@ -91,14 +105,16 @@ export function Search({
                 <Select
                   id='typeSearchDefaultId'
                   variant='outlined'
-                  defaultValue='name'
+                  value={typeSearch}
+                  onChange={e => setTypeSearch(e.target.value)}
                   style={{
                     height: 40,
                     background: '#FFF',
                   }}
                 >
-                  <MenuItem value='name'>Pelo Nome</MenuItem>
-                  <MenuItem value='code'>Pelo Código</MenuItem>
+                  { fieldsSearch.map((field, i) => (
+                    <MenuItem key={i} value={field.value}>{field.description}</MenuItem>
+                  ))}
                 </Select>
               </Box>
               <Box
@@ -110,14 +126,16 @@ export function Search({
                 <Select
                   id='modelDefaultId'
                   variant='outlined'
-                  defaultValue='name'
+                  value={modelSearch}
+                  onChange={e => setModelTypeSearch(e.target.value)}
                   style={{
                     height: 40,
                     background: '#FFF',
                   }}
                 >
-                  <MenuItem value='name'>Iniciar com</MenuItem>
-                  <MenuItem value='code'>Código</MenuItem>
+                  { fieldsModel.map((model, i) => (
+                    <MenuItem key={i} value={model}>{model}</MenuItem>
+                  ))}
                 </Select>
               </Box>
             </Box>
@@ -159,36 +177,64 @@ export function Search({
             boxShadow='inset 1px 1px 2px 2px #CCCB, inset -1px -1px 2px 2px #CCC7'
             borderTop='2px solid #A2A3A099'
             padding='2px'
-            height='67.5%'
+            height='66.5%'
           >
             <table className={classe.tableContainer}>
               <thead>
                 <tr className={classe.tableRow}>
                   <th></th>
-                  <th>Código</th>
-                  <th>Nome</th>
+                  {
+                    headerTable.map((headerName, i) => (
+                      <th key={i}>{headerName}</th>
+                    ))
+                  }
                 </tr>
               </thead>
               <tbody>
-                <tr className={classe.tableRow}>
-                  <td style={{background: 'transparent', width: 16, textAlign: 'right'}}>
-                    <div className='tri'></div>
-                  </td>
-                  <td style={{width: 60}}>1</td>
-                  <td>ALEXANDRE</td>
-                </tr>
+                {
+                  rows.length > 0 
+                  ? rows.map((row, i) => (
+                    <tr key={i} className={classe.tableRow}>
+                      <td style={{background: 'transparent', width: 16, textAlign: 'right'}}>
+                        <div className='tri'></div>
+                      </td>
+                      {Object.entries(row).map((value, i) => (
+                        <td key={i}>{value[1]}</td>
+                      ))}
+                    </tr>
+                  ))
+                  :<tr className={classe.tableRow}>
+                    <td style={{background: 'transparent', width: 16, textAlign: 'right'}}>
+                      <div className='tri'></div>
+                    </td>
+                    {
+                      headerTable.map((_headerName, i) => (
+                        <th key={i} style={i === 0 ? {width: 60} : {}}></th>
+                      ))
+                    }
+                  </tr>
+                }
               </tbody>
             </table>
           </Box>
           <Box
             display='flex'
+            border='1px solid #CCC'
+            marginTop='2px'
             padding={1}
             style={{
               gap: 10
             }}
           >
-            <Button variant='contained' style={{width: 100}}>Gravar</Button>
-            <Button variant='contained' style={{width: 100}}>Sair</Button>
+            <Button
+              variant='contained'
+              style={{width: 100}}
+            >Ok</Button>
+            <Button
+              variant='contained'
+              style={{width: 100}}
+              onClick={() => setOpen(false)}
+            >Sair</Button>
           </Box>
         </Box>
       </Box>

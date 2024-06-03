@@ -73,7 +73,7 @@ module.exports = {
         script_month1 = `
           SELECT A.COD_ORIGINAL, B.NOME, SUM(A.QTD_DELIV) QTD_MES1
           FROM SALES_PROD A
-          INNER JOIN SONO..PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
+          INNER JOIN ${process.env.CD_BASE}..PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
           INNER JOIN SALES C ON A.CODLOJA = C.CODLOJA AND A.ID_SALES = C.ID_SALES
           WHERE SUBSTRING(CONVERT(CHAR(8),C.EMISSAO,112),1,6)='${yearBase-1}${month1}'
           AND B.ATIVO = 'S'
@@ -84,7 +84,7 @@ module.exports = {
         script_month1 = `
           SELECT A.COD_ORIGINAL, B.NOME, SUM(A.QUANTIDADE) QTD_MES1
           FROM SALES_PROD A
-          INNER JOIN SONO..PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
+          INNER JOIN ${process.env.CD_BASE}..PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
           INNER JOIN SALES C ON A.CODLOJA = C.CODLOJA AND A.ID_SALES = C.ID_SALES
           WHERE SUBSTRING(CONVERT(CHAR(8),C.EMISSAO,112),1,6)='${yearBase-1}${month1}'
           AND B.ATIVO = 'S'
@@ -94,7 +94,7 @@ module.exports = {
         script_month1 = `
           SELECT A.COD_ORIGINAL, B.NOME, SUM(A.QUANTIDADE) QTD_MES1
           FROM SALES_PROD A
-          INNER JOIN SONO..PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
+          INNER JOIN ${process.env.CD_BASE}..PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
           INNER JOIN SALES C ON A.CODLOJA = C.CODLOJA AND A.ID_SALES = C.ID_SALES
           WHERE SUBSTRING(CONVERT(CHAR(8),C.EMISSAO,112),1,6)='${yearBase}${monthBase.length === 1 ? '0'+month1 : month1}'
           AND B.ATIVO = 'S'
@@ -110,7 +110,7 @@ module.exports = {
         script_month2 = `
           SELECT A.COD_ORIGINAL, B.NOME, SUM(A.QUANTIDADE) QTD_MES2
           FROM SALES_PROD A
-          INNER JOIN SONO..PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
+          INNER JOIN ${process.env.CD_BASE}..PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
           INNER JOIN SALES C ON A.CODLOJA = C.CODLOJA AND A.ID_SALES = C.ID_SALES
           WHERE SUBSTRING(CONVERT(CHAR(8),C.EMISSAO,112),1,6)='${yearBase-1}${month2}'
           AND B.ATIVO = 'S'
@@ -120,7 +120,7 @@ module.exports = {
         script_month2 = `
           SELECT A.COD_ORIGINAL, B.NOME, SUM(A.QUANTIDADE) QTD_MES2
           FROM SALES_PROD A
-          INNER JOIN SONO..PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
+          INNER JOIN ${process.env.CD_BASE}..PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
           INNER JOIN SALES C ON A.CODLOJA = C.CODLOJA AND A.ID_SALES = C.ID_SALES
           WHERE SUBSTRING(CONVERT(CHAR(8),C.EMISSAO,112),1,6)='${yearBase}${monthBase.length === 1 ? '0'+ month2 : month2}'
           AND B.ATIVO = 'S'
@@ -134,7 +134,7 @@ module.exports = {
       script_month3 = `
         SELECT A.COD_ORIGINAL, B.NOME, SUM(A.QUANTIDADE) QTD_MES3
         FROM SALES_PROD A
-        INNER JOIN SONO..PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
+        INNER JOIN ${process.env.CD_BASE}..PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
         INNER JOIN SALES C ON A.CODLOJA = C.CODLOJA AND A.ID_SALES = C.ID_SALES
         WHERE SUBSTRING(CONVERT(CHAR(8),C.EMISSAO,112),1,6)='${yearBase}${monthBase.length === 1 ? '0'+month3 : month3}'
           AND B.ATIVO = 'S'

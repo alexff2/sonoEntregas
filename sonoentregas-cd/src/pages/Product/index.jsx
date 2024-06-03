@@ -11,7 +11,7 @@ import useStyles from './style'
 
 export default function Products() {
   const classes = useStyles()
-  const [value, setValue] = useState(0)
+  const [value, setValue] = useState(1)
 
   return (
     <div className={classes.root}>

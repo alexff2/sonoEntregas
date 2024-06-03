@@ -1,17 +1,19 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   AppBar,
   Box,
-  Button,
+  FormControl,
+  FormControlLabel,
   IconButton,
   MenuItem,
   Paper,
+  Radio,
+  RadioGroup,
   Select,
   Table,
   TableBody,
   TableCell,
   TableContainer,
-  TableFooter,
   TableHead,
   TableRow,
   TextField,
@@ -21,14 +23,16 @@ import {
 } from '@material-ui/core'
 import {
   Close as CloseIcon,
-  Cancel
+  Cancel,
+  Search as SearchIcon
 } from '@material-ui/icons'
 
+import BrMonetaryValue from '../../../../components/BrMonetaryValue'
+import {ButtonCancel, ButtonSuccess} from '../../../../components/Buttons'
 import { debounce } from '../../../../functions/debounce'
 import { useBackdrop } from '../../../../context/backdropContext'
 import { useAlertSnackbar } from '../../../../context/alertSnackbarContext'
-import { Search } from '../../../../components/Search'
-import BrMonetaryValue from '../../../../components/BrMonetaryValue'
+/* import { Search } from '../../../../components/Search' */
 
 import api from '../../../../services/api'
 
@@ -76,7 +80,9 @@ export default function CreateUpdatePurchaseOrder({
   noteUpdate
 }){
   const [typeSearch, setTypeSearch] = useState('name')
-  const [openDialogSearch, setOpenDialogSearch] = useState(true)
+  const [search, setSearch] = useState('')
+  /* const [openSearchEmployees, setOpenSearchEmployees] = useState(true)
+  const [employees, setEmployees] = useState([]) */
   const [disablePurchaseOrderId, setDisablePurchaseOrderId] = useState(false)
   const [purchaseOrderId, setPurchaseOrderId] = useState('')
   const [quantifyInput, setQuantifyInput] = useState(1)
@@ -88,40 +94,18 @@ export default function CreateUpdatePurchaseOrder({
   const { setOpenBackDrop } = useBackdrop()
   const classes = useStyles()
 
-  const handleImportPurchaseOrder = async purchaseOrderSearchId => {
-    try {
-      setOpenBackDrop(true)
-
-      if (typeof purchaseOrderSearchId === 'number') 
-        setPurchaseOrderId(purchaseOrderSearchId)
-
-      const id = (typeof purchaseOrderSearchId === 'number')
-        ? purchaseOrderSearchId
-        : purchaseOrderId
-
-      const { data } = await api.get(`purchase/order/${id}/products`)
-
-      setProductsNote(data.productsPurchaseOrder)
-
-      setOpenBackDrop(false)
-      setDisablePurchaseOrderId(true)
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  const handleSearchProduct = value => {
+  useEffect(() => {
     debounce(async () => {
       const {data} = await api.get('product', {
         params: {
-          search: value,
+          search,
           type: typeSearch
         }
       })
 
       setSearchProduct(data)
     }, 1300)
-  }
+  }, [search, typeSearch])
 
   const handleSelectSearchProduct = prod => {
     setSearchProductSelect(prod)
@@ -149,6 +133,7 @@ export default function CreateUpdatePurchaseOrder({
     ])
 
     setSearchProduct([])
+    setSearch('')
   }
 
   const handleChangeQuantify = prod => {
@@ -193,58 +178,53 @@ export default function CreateUpdatePurchaseOrder({
           <Typography variant="h6" className={classes.title}>
             {!noteUpdate ? 'Lançamento de Nota de Entrada' : 'Atualização de Nota de Entrada'}
           </Typography>
-          <Button autoFocus color="inherit" onClick={handleCreateNote}>
-            save
-          </Button>
         </Toolbar>
       </AppBar>
+
       <Box
         padding={2}
-        bgcolor={'#F9F8F8'}
-        height={'100%'}
+        bgcolor='#F9F8F8'
+        height='100%'
+        display='flex'
+        flexDirection='column'
       >
         <Box
           border='1px solid #CCC'
           padding={1}
-          display={'flex'}
-          alignItems={'center'}
-          justifyContent={'space-between'}
+          display='flex'
+          alignItems='center'
+          justifyContent='space-between'
         >
-          <Input
-            id="noteNumber"
-            label="Nº da Nota"
-            variant='outlined'
-            onChange={e => setNote(state => ({...state, id: Number(e.target.value)}))}
-          />
           <Input
             id="issue"
             label="Emissão"
             type='date'
             onChange={e => setNote(state => ({...state, issue: e.target.value}))}
           />
-          <Input
-            id="arrival"
-            label="Chegada"
-            type='date'
-            onChange={e => setNote(state => ({...state, arrival: e.target.value}))}
-          />
           <Box
-            display={'flex'}
-            alignItems={'center'}
-            width={'220px'}
-            style={{
-              gap: 8
-            }}
+            display='flex'
+            alignItems='center'
           >
             <Input
-              id="noteOrder"
-              label="Nº do Pedido"
-              variant='outlined'
-              value={purchaseOrderId}
-              onChange={e => setPurchaseOrderId(e.target.value)}
-              disable={disablePurchaseOrderId}
+              id='employeeId'
+              label='Comprador'
+              disable={true}
+              style={{
+                marginRight: 4
+              }}
             />
+            <SearchIcon />
           </Box>
+          <Input
+            id='factoryData'
+            label='Dados da Fabrica'
+          />
+          <FormControl component='fieldset'>
+            <RadioGroup aria-label='gender' name='gender1'>
+              <FormControlLabel value='normal' control={<Radio style={{padding: 2}}/>} label='Normal' />
+              <FormControlLabel value='maintenance' control={<Radio style={{padding: 2}}/>} label='Assistência' />
+            </RadioGroup>
+          </FormControl>
         </Box>
         <Box
           border='1px solid #CCC'
@@ -267,13 +247,14 @@ export default function CreateUpdatePurchaseOrder({
                 margin: '8px 0 4px 0'
               }}
             >
-              <MenuItem value='name'>Descrição</MenuItem>
-              <MenuItem value='code'>Código</MenuItem>
+              <MenuItem value='name'>Pelo Nome</MenuItem>
+              <MenuItem value='code'>Pelo Código</MenuItem>
             </Select>
             <Input
               width='72%'
-              placeholder='Procure por código ou descrição...'
-              onChange={e => handleSearchProduct(e.target.value)}
+              placeholder='Digite aqui...'
+              value={search}
+              onChange={e => setSearch(e.target.value)}
             />
             <Input
               id={'quantifyId'}
@@ -332,12 +313,13 @@ export default function CreateUpdatePurchaseOrder({
         <Box
           border='1px solid #CCC'
           padding={1}
+          flex='1'
         >
           <TableContainer
             component={Paper}
             style={{
               background: 'transparent',
-              height: 600
+              height: '100%'
             }}
           >
             <Table size='small' stickyHeader>
@@ -399,32 +381,55 @@ export default function CreateUpdatePurchaseOrder({
                   ))
                 }
               </TableBody>
-              <TableFooter>
-                <TableRow>
-                  <TableCell colSpan={4}>Totais</TableCell>
-                  <TableCell align='right'>
-                  <BrMonetaryValue value={quantifyFull}/>
-                  </TableCell>
-                  <TableCell
-                    colSpan={2}
-                    align='right'
-                    style={{
-                      color: 'green',
-                      fontWeight: 900
-                    }}
-                  >
-                    <BrMonetaryValue value={valueTotalFull} />
-                  </TableCell>
-                </TableRow>
-              </TableFooter>
             </Table>
           </TableContainer>
         </Box>
+        <Box
+          border='1px solid #CCC'
+          padding={1}
+          display='flex'
+          alignItems='center'
+        >
+          Total: &nbsp;
+          <Input
+            style={{margin: 0}}
+            disable={true}
+            value={Intl.NumberFormat('pt-br',{style: 'currency', currency: 'BRL'}).format(valueTotalFull)}
+          />&nbsp;&nbsp;&nbsp;
+          Total Qte:&nbsp;
+          <Input
+            style={{margin: 0}}
+            disable={true}
+            value={quantifyFull}
+          />&nbsp;&nbsp;&nbsp;
+          Itens:&nbsp;
+          <Input
+            style={{margin: 0}}
+            disable={true}
+            value={quantifyFull}
+          />
+        </Box>
+        <Box
+          border='1px solid #CCC'
+          padding={1}
+        >
+          <ButtonSuccess>Gravar</ButtonSuccess>
+          <ButtonCancel>Cancelar</ButtonCancel>
+        </Box>
       </Box>
 
-      <Search
+      {/* <Search
         title='Consulta de Func./Compradores'
-      />
+        setOpen={setOpenSearchEmployees}
+        open={openSearchEmployees}
+        fieldsSearch={[
+          {value: 'name', description: 'Pelo Nome'},
+          {value: 'code', description: 'Pelo Código'},
+        ]}
+        fieldsModel={['Iniciar com', 'Contem']}
+        headerTable={['Código', 'Nome']}
+        rows={employees}
+      /> */}
     </>
   )
 }
