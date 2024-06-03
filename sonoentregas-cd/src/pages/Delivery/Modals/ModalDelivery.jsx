@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { 
   TextField,
   makeStyles,
@@ -133,16 +133,29 @@ export default function ModalDelivery({ setOpen, type }){
   const [ errorMsg, setErrorMsg ] = useState('')
   const [ disabledBtnSave, setDisabledBtnSave ] = useState(false)
 
-  const { cars } = useCars()
-  const { drivers } = useDrivers()
-  const { assistants } = useAssistants()
+  const { cars, setCars } = useCars()
+  const { drivers, setDrivers } = useDrivers()
+  const { assistants, setAssistants } = useAssistants()
   const { setDelivery } = useDelivery()
   const { setForecasts } = useForecasts()
   const { setSales } = useSale()
   const { setAlert } = useAlert()
-
-  //Styes
   const classes = useStyles()
+
+  useEffect(() => {
+    const searchUsers = async () => {
+      if (assistants.length === 0) {
+        const { data: usersResponse } = await api.get('users/0')
+        const { data: carsResponse } = await api.get('cars')
+
+        setCars(carsResponse)
+        setDrivers(usersResponse.filter(user => user.OFFICE === 'Driver'))
+        setAssistants(usersResponse.filter(user => user.OFFICE === 'Assistant'))
+      }
+    }
+
+    searchUsers()
+  }, [setCars, setDrivers, setAssistants, assistants])
 
   //Functions Other
   const createDelivery = async () => {

@@ -1,17 +1,9 @@
-import React, { createContext, useContext, useState, useEffect } from 'react'
-
-import api from '../services/api'
+import React, { createContext, useContext, useState } from 'react'
 
 const CarsContext = createContext()
 
 export default function CarsProvider({ children }){
   const [ cars, setCars ] = useState([])
-
-  useEffect(()=>{
-    api
-      .get('cars')
-      .then( resp => setCars(resp.data))
-  },[])
 
   return(
     <CarsContext.Provider value={{cars, setCars}}>

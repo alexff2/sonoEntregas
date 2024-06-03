@@ -1,7 +1,5 @@
 import React, { createContext, useState, useContext } from 'react'
 
-/* import api from '../services/api' */
-
 const DeliveryContext = createContext()
 
 export default function DeliveryProvider({ children }){

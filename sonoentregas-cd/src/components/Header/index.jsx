@@ -14,7 +14,6 @@ import {
 import { AccountCircle, ExitToApp, Assessment, Menu as MenuIcon } from '@material-ui/icons'
 
 import { useAuthenticate } from '../../context/authContext'
-import BtnUpdate from './BtnUpdate'
 
 const StyledMenu = withStyles({
   paper: {
@@ -97,7 +96,7 @@ export default function Header({ handleDrawerToggle }) {
         >
           <MenuIcon />
         </IconButton>
-        <BtnUpdate />
+        <div></div>
 
         <p className={classes.toolbar}>
           Seja bem vindo(a), 

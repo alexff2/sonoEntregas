@@ -7,6 +7,9 @@ import {
   makeStyles
 } from '@material-ui/core'
 import { LocalShipping, ShoppingCart } from '@material-ui/icons'
+
+import { useBackdrop } from '../../context/backdropContext'
+
 import api from '../../services/api'
 
 import { useSale } from '../../context/saleContext'
@@ -80,12 +83,35 @@ const Item = ({classes, title, icon: Icon, value, searchHome}) => {
 export default function Home(){
   const [ itens, setItens ] = useState([])
   const classes = useStyles()
+  const { setOpenBackDrop } = useBackdrop()
 
   useEffect(()=>{
-    searchHome()
+    setItens([
+      {
+        icon: ShoppingCart,
+        value: '',
+        title: 'Vendas Pendentes',
+      },
+      {
+        icon: ShoppingCart,
+        value: '',
+        title: 'Vendas em processo',
+      },
+      {
+        icon: LocalShipping,
+        value: '',
+        title: 'Rotas em lançamento',
+      },
+      {
+        icon: LocalShipping,
+        value: '',
+        title: 'Rotas em deslocamento',
+      }
+    ])
   },[])
 
   const searchHome = () => {
+    setOpenBackDrop(true)
     api
       .get('/home')
       .then(resp => {
@@ -111,8 +137,12 @@ export default function Home(){
             title: 'Rotas em deslocamento',
           }
         ])
+        setOpenBackDrop(false)
       })
-      .catch(e => console.log(e))
+      .catch(e => {
+        console.log(e)
+        setOpenBackDrop(false)
+      })
   }
 
   return(

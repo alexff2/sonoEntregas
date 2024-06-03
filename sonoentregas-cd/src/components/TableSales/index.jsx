@@ -252,7 +252,7 @@ export default function TableSales({
     <TableContainer
       component={Paper}
       className={classes.tabContainer}
-      style={type === 'home' ? { maxHeight: '600px' } : { height: 'calc(100vh - 490px)' }}
+      style={type === 'home' ? { height: 'calc(100vh - 280px)' } : { height: 'calc(100vh - 490px)' }}
     >
       <Table>
 

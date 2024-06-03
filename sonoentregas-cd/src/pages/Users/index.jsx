@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { 
   Box,
   Fab,
@@ -17,6 +17,7 @@ import { useAssistants } from '../../context/assistantContext'
 import { useUsers } from '../../context/usersContext'
 import Modal from '../../components/Modal'
 import ModalUsers from './ModalUsers'
+import api from '../../services/api'
 
 const useStyles = makeStyles( theme => ({
   headerCell: {
@@ -25,7 +26,7 @@ const useStyles = makeStyles( theme => ({
     fontWeight: theme.typography.fontWeightBold
   },
   btnAdd: {
-    position: 'absolute',
+    position: 'fixed',
     bottom: '1.5rem',
     right: '1.5rem'
   }
@@ -35,10 +36,19 @@ export default function Users() {
   const [ openRegisterUser, setOpenRegisterUser ] = useState(false)
   const [ openUpdateUser, setOpenUpdateUser ] = useState(false)
   const [ userUpdate, setUserUpdate ] = useState()
-  const { drivers } = useDrivers()
-  const { assistants } = useAssistants()
-  const { users } = useUsers()
+  const { drivers, setDrivers } = useDrivers()
+  const { assistants, setAssistants } = useAssistants()
+  const { users, setUsers } = useUsers()
   const classes = useStyles()
+
+  useEffect(() => {
+    api.get('users/0')
+      .then(({data}) => {
+        setDrivers(data.filter(user => user.OFFICE === 'Driver'))
+        setAssistants(data.filter(user => user.OFFICE === 'Assistant'))
+        setUsers(data.filter(user => user.OFFICE === 'User'))
+      })
+  }, [setDrivers, setAssistants, setUsers])
 
   //Functions
   const updateUser = (item, office) => {
@@ -49,8 +59,8 @@ export default function Users() {
   return(
     <Box>
 
-      <TableContainer component={Paper}>
-        <Table>
+      <TableContainer component={Paper} style={{height: 'calc(100vh - 133px)'}}>
+        <Table stickyHeader>
           <TableHead>
             <TableRow>
               {['Código', 'Nome Completo', 'Cargo', ''].map((value, index) => (

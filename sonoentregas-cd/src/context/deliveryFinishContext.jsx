@@ -1,8 +1,5 @@
 import React, { createContext, useState, useContext } from 'react'
 
-/* import api from '../services/api' */
-/* import { getDateSql } from '../functions/getDates' */
-
 const DeliveryFinishContext = createContext()
 
 export default function DeliveryFinishProvider({ children }){

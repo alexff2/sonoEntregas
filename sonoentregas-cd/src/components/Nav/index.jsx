@@ -1,4 +1,3 @@
-//Module import
 import React from 'react'
 import {
   Box,
@@ -18,11 +17,10 @@ import {
   Build
 } from '@material-ui/icons'
 
-//files import
 import NavItem from './NavItem'
+import { useAuthenticate } from '../../context/authContext'
 import logo from '../../img/SolftFlex.jpeg';
 
-//System variables
 const widthDrawer = 256
 
 const itens = [
@@ -127,6 +125,7 @@ function Nav({
   mobileOpen
 }) {
   const classes = useStyle()
+  const { userAuth } = useAuthenticate()
 
   const drawer = (
     <Box
@@ -145,7 +144,7 @@ function Nav({
       <Divider />
       <Box p={2}>
         <List>
-          {itens.map(item => (
+          {itens.filter(item => (userAuth.OFFICE === 'Dev' || item.title !== 'Usuários')).map(item => (
             <NavItem
               key={item.title}
               title={item.title}

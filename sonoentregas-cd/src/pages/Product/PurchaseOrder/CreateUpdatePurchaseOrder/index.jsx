@@ -21,15 +21,13 @@ import {
 } from '@material-ui/core'
 import {
   Close as CloseIcon,
-  Search,
-  GetApp,
   Cancel
 } from '@material-ui/icons'
 
 import { debounce } from '../../../../functions/debounce'
 import { useBackdrop } from '../../../../context/backdropContext'
 import { useAlertSnackbar } from '../../../../context/alertSnackbarContext'
-import SearchPurchaseOrder from './SearchPurchaseOrder'
+import { Search } from '../../../../components/Search'
 import BrMonetaryValue from '../../../../components/BrMonetaryValue'
 
 import api from '../../../../services/api'
@@ -78,7 +76,7 @@ export default function CreateUpdatePurchaseOrder({
   noteUpdate
 }){
   const [typeSearch, setTypeSearch] = useState('name')
-  const [openDialogSearch, setOpenDialogSearch] = useState(false)
+  const [openDialogSearch, setOpenDialogSearch] = useState(true)
   const [disablePurchaseOrderId, setDisablePurchaseOrderId] = useState(false)
   const [purchaseOrderId, setPurchaseOrderId] = useState('')
   const [quantifyInput, setQuantifyInput] = useState(1)
@@ -246,33 +244,6 @@ export default function CreateUpdatePurchaseOrder({
               onChange={e => setPurchaseOrderId(e.target.value)}
               disable={disablePurchaseOrderId}
             />
-            { !disablePurchaseOrderId &&
-              <>
-                <Box
-                  bgcolor={'orange'}
-                  color={'white'}
-                  padding={'4px'}
-                  display={'flex'}
-                  alignItems={'center'}
-                  style={{cursor: 'pointer'}}
-                  onClick={() => setOpenDialogSearch(true)}
-                >
-                  <Search />
-                </Box>
-                <Box
-                  bgcolor={'green'}
-                  color={'white'}
-                  padding={'4px'}
-                  display={'flex'}
-                  alignItems={'center'}
-                  style={{cursor: 'pointer'}}
-                  onClick={handleImportPurchaseOrder}
-                >
-                  <GetApp />
-                </Box>
-              </>
-            }
-            
           </Box>
         </Box>
         <Box
@@ -451,10 +422,8 @@ export default function CreateUpdatePurchaseOrder({
         </Box>
       </Box>
 
-      <SearchPurchaseOrder
-        openDialogSearch={openDialogSearch}
-        setOpenDialogSearch={setOpenDialogSearch}
-        handleImportPurchaseOrder={handleImportPurchaseOrder}
+      <Search
+        title='Consulta de Func./Compradores'
       />
     </>
   )

@@ -1,17 +1,9 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
-
-import api from '../services/api'
+import React, { createContext, useContext, useState } from 'react'
 
 const ShopContext = createContext()
 
 export default function ShopProvider({ children }){
   const [ shop, setShop ] = useState([])
-
-  useEffect(()=>{
-    api
-      .get('shops')
-      .then( resp => setShop(resp.data))
-  },[])
 
   return(
     <ShopContext.Provider

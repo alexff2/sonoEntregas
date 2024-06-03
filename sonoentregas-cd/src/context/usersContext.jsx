@@ -1,16 +1,9 @@
-import React, { createContext, useContext, useState, useEffect } from 'react'
-
-import api from '../services/api'
+import React, { createContext, useContext, useState } from 'react'
 
 const UsersContext = createContext()
 
 export default function UsersProvider({ children }){
   const [ users, setUsers ] = useState([])
-
-  useEffect(() => {
-    api.get('users/0')
-      .then( resp => setUsers(resp.data.filter( item => item.OFFICE === 'User')))
-  },[])
 
   return(
     <UsersContext.Provider value={{ users, setUsers }}>

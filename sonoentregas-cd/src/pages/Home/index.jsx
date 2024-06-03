@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import {
   Box,
   makeStyles
@@ -9,8 +9,6 @@ import BoxInfo from '../../components/BoxInfo'
 import Cards from './Cards'
 //Contexts
 import { useSale } from '../../context/saleContext'
-
-import api from '../../services/api'
 
 const useStyles = makeStyles((theme) => ({
   sales: {
@@ -28,15 +26,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Home(){
   const classes = useStyles()
-  const { setSales, sales } = useSale()
-
-  useEffect(() => {
-    api.get('sales/', {
-      params: {
-        status: 'open'
-      }
-    }).then(({ data }) => setSales(data))
-  }, [setSales])
+  const { sales } = useSale()
 
   return(
     <Box className={classes.container}>
