@@ -3,6 +3,7 @@ import Modal from '../../../components/Modal'
 
 import api from '../../../services/api'
 import { toLocString } from '../../../functions/toLocString'
+import { dateSqlToReact } from '../../../functions/getDate'
 
 import { useModalAlert } from '../../../context/modalAlertContext'
 import { useAuthenticate } from '../../../context/authContext'
@@ -13,7 +14,8 @@ export default function Dre(){
   const [isOpenFilter, setIsOpenFilter] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
   const [renderDre, setRenderDre] = useState(false)
-  const [ selectShop, setSelectShop ] = useState('')
+  const [ selectShopId, setSelectShopId ] = useState()
+  const [ selectShop, setSelectShop ] = useState({})
   const [ shops, setShops ] = useState([])
   const [ dateStart, setDateStart ] = useState('')
   const [ dateEnd, setDateEnd ] = useState('')
@@ -75,15 +77,18 @@ export default function Dre(){
     stock: 0
   })
   const { setAlert } = useModalAlert()
-  const { shopAuth } = useAuthenticate()
+  const { shopAuth, userAuth } = useAuthenticate()
 
   useEffect(() => {
     api
       .get('connections')
       .then( resp => {
-        const datas = resp.data.filter((shop, i) => i > 1)
-        setShops(datas)
-        setSelectShop((shopAuth.cod-2).toString())
+        if (userAuth.OFFICE === 'Dev' | userAuth.OFFICE === 'Master') {
+          const datas = resp.data.filter((shop, i) => i > 1)
+          setShops(datas)
+        }
+
+        setSelectShopId(shopAuth.cod)
       })
       .catch( e => {
         console.log(e)
@@ -91,7 +96,7 @@ export default function Dre(){
           ? setAlert('Erro ao conectar com servidor, entre em contato com Bruno!')
           : setAlert('Erro ao processar requisição ao servidor, entre em contato com Alexandre!')
       })
-  },[setAlert, shopAuth])
+  },[setAlert, shopAuth, userAuth])
 
   const submitFilter = async e => {
     e.preventDefault()
@@ -101,10 +106,11 @@ export default function Dre(){
         params: {
           dateStart,
           dateEnd,
-          shop: parseFloat(selectShop)+2
+          shop: parseInt(selectShopId)
         }
       })
 
+      setSelectShop(data.shopSelected)
       setRevenues(data.revenues)
       setSalesReturns(data.revenues.salesReturns)
       setVariableExpenses(data.variableExpenses)
@@ -137,9 +143,9 @@ export default function Dre(){
 
         <div className="line"></div>
         <div className="dreHeader">
-          <h1>Demonstrativo de resultados: {dateStart} até {dateEnd}</h1>
-          <p>Nome da Loja</p>
-          <p>Endereço da loja</p>
+          <h1>Demonstrativo de resultados: {dateSqlToReact(dateStart)} até {dateSqlToReact(dateEnd)}</h1>
+          <p>{selectShop.name}</p>
+          <p>{selectShop.address}</p>
           <p>** Fones: (98) 3241-1220 **</p>
         </div>
 
@@ -300,18 +306,21 @@ export default function Dre(){
           <h2>Filtro Demonstrativo de Resultados</h2>
 
           <hr />
-          <div className="filterDate">
-            <label htmlFor="shops">Loja: </label>
-            <select
-              id="shops"
-              className='selectShops'
-              value={selectShop}
-              onChange={(e) => setSelectShop(e.target.value)}
-              required
-            >
-              {shops.map((shop, i) => <option value={i} key={i}>{shop.database}</option>)}
-            </select>
-          </div>
+          { (userAuth.OFFICE === 'Dev' | userAuth.OFFICE === 'Master') ?
+            <div className="filterDate">
+              <label htmlFor="shops">Loja: </label>
+              <select
+                id="shops"
+                className='selectShops'
+                value={selectShopId}
+                onChange={(e) => setSelectShopId(e.target.value)}
+                required
+              >
+                {shops.map((shop, i) => <option value={i+2} key={i}>{shop.database}</option>)}
+              </select>
+            </div>
+            : null
+          }
           <div className="filterDate">
             <label htmlFor="dateStart">Data Inicial: </label>
             <input

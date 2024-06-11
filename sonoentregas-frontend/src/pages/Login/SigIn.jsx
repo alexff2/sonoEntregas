@@ -21,6 +21,7 @@ export default function SignIn() {
       .then( resp => {
         const datas = resp.data.filter((shop, i) => i > 1)
         setShops(datas)
+        setSelectShop({cod: 2, description: datas[0].database})
       })
       .catch( e => {
         console.log(e)

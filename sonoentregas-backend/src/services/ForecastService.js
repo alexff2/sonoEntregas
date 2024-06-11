@@ -266,7 +266,7 @@ class ForecastService {
           .filter(product => product.idForecastSale === forecastSales[i].id)
           .map(product => product.COD_ORIGINAL)
 
-        await SalesProd.updateAny(0, { STATUS: 'Enviado' }, { ID_SALE_ID, in: { COD_ORIGINAL } }, true)
+        await SalesProd.updateAny(0, { STATUS: 'Enviado' }, { ID_SALE_ID, in: { COD_ORIGINAL } })
       }
 
       await Sale.updateAny(0, { STATUS: 'Aberta' }, { in: { ID: forecastSales.map( sale => sale.idSale)} })      

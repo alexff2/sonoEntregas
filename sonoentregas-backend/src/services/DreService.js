@@ -172,7 +172,7 @@ class DreService {
     SUM( C_AQUIS * EST_ATUAL ) purchaseCostPrice, 
     SUM( PCO_COMPRA * EST_ATUAL ) purchasePrice FROM VPRODUTOS_APR P 
     WHERE (PCO_REMAR > 0) AND (C_AQUIS > 0) AND (PCO_LIQ > 0)
-    AND (PCO_COMPRA > 0) AND (EST_ATUAL > 0)
+    AND (PCO_COMPRA > 0) AND (EST_ATUAL > 0) AND P.CODLOJA = 1
     `
 
     const result = await ViewVenda._query(shop, script, QueryTypes.SELECT)

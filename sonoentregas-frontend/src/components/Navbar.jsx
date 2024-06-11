@@ -23,7 +23,7 @@ export default function Navbar(){
       <Link to="/product">Produtos</Link>
       <Link to="/users">Usuários</Link>
       { (userAuth.OFFICE  === 'Dev') && <Link to="/goals">Metas/Promo</Link>}
-      { (userAuth.OFFICE  === 'Master' || userAuth.OFFICE  === 'Dev') && <Link to="/reports">Relatórios</Link>}
+      <Link to="/reports">Relatórios</Link>
     </nav>
   )
 }

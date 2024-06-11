@@ -27,6 +27,7 @@ const Products = require('../models/Produtos')
 const SalesService = require('../services/salesService')
 const PurchaseOrderService = require('../services/PurchaseOrderService')
 const DreService = require('../services/DreService')
+const ShopSceService = require('../services/ShopSceService')
 const connections = require('../databases/MSSQL/connections')
 
 module.exports = {
@@ -287,6 +288,8 @@ module.exports = {
         }
       }
 
+      const shopSelected = await ShopSceService.findByShop(shop)
+      console.log(shopSelected)
       const revenues = await DreService.revenues({ shop, dateStart, dateEnd })
       const variableExpenses = await DreService.variableExpenses({ shop, dateStart, dateEnd, totRevenues: revenues.total })
       const fixedExpenses = await DreService.FixedExpenses({ shop, dateStart, dateEnd, totRevenues: revenues.total })
@@ -318,7 +321,8 @@ module.exports = {
         netResult,
         balancePoint,
         financialSummary,
-        currentStock
+        currentStock,
+        shopSelected
       })
     } catch (e) {
       console.log(e)
