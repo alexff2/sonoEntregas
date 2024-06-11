@@ -25,7 +25,7 @@
 const { QueryTypes } = require('sequelize')
 const Products = require('../models/Produtos')
 const SalesService = require('../services/salesService')
-const PurchaseService = require('../services/PurchaseService')
+const PurchaseOrderService = require('../services/PurchaseOrderService')
 const DreService = require('../services/DreService')
 const connections = require('../databases/MSSQL/connections')
 
@@ -203,7 +203,7 @@ module.exports = {
    */
   async purchaseRequest(req, res){
     try {
-      const purchase = await PurchaseService.findPurchaseRequestToReport()
+      const purchase = await PurchaseOrderService.findToReport()
 
       return res.json(purchase)
     } catch (e) {

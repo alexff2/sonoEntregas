@@ -32,7 +32,7 @@ import {ButtonCancel, ButtonSuccess} from '../../../../components/Buttons'
 import { debounce } from '../../../../functions/debounce'
 import { useBackdrop } from '../../../../context/backdropContext'
 import { useAlertSnackbar } from '../../../../context/alertSnackbarContext'
-/* import { Search } from '../../../../components/Search' */
+import { Search } from '../../../../components/Search'
 
 import api from '../../../../services/api'
 
@@ -51,6 +51,7 @@ const Input = ({
   label,
   width='140px',
   type='text',
+  style,
   disable=false,
   ...props
 }) => {
@@ -68,80 +69,210 @@ const Input = ({
       size='small'
       style={{
         width,
-        backgroundColor: 'white',
+        backgroundColor: disable ? 'transparent' : 'white',
+        ...style
       }}
       {...props}
     />
   )
 }
 
+const purchaseOrderStates = {
+  id: 0,
+  issue: '2010-01-01',
+  type: 'normal',
+  factoryData: '',
+  employeeId: '',
+  employeeName: '',
+  obs: ''
+}
+
 export default function CreateUpdatePurchaseOrder({
   setOpen,
-  noteUpdate
+  setPurchaseOrders
 }){
+  const [openSearchEmployees, setOpenSearchEmployees] = useState(false)
   const [typeSearch, setTypeSearch] = useState('name')
   const [search, setSearch] = useState('')
-  /* const [openSearchEmployees, setOpenSearchEmployees] = useState(true)
-  const [employees, setEmployees] = useState([]) */
-  const [disablePurchaseOrderId, setDisablePurchaseOrderId] = useState(false)
-  const [purchaseOrderId, setPurchaseOrderId] = useState('')
-  const [quantifyInput, setQuantifyInput] = useState(1)
   const [searchProduct, setSearchProduct] = useState([])
-  const [searchProductSelect, setSearchProductSelect] = useState(null)
-  const [productsNote, setProductsNote] = useState([])
-  const [note, setNote] = useState({})
+  const [indexProductSearchSelected, setIndexProductSearchSelected] = useState(0)
+  const [quantityInput, setQuantityInput] = useState('')
+  const [productsPurchaseOrder, setProductsPurchaseOrder] = useState([])
+  const [purchaseOrder, setPurChaseOrder] = useState(purchaseOrderStates)
   const { setAlertSnackbar } = useAlertSnackbar()
   const { setOpenBackDrop } = useBackdrop()
   const classes = useStyles()
 
   useEffect(() => {
-    debounce(async () => {
-      const {data} = await api.get('product', {
-        params: {
-          search,
-          type: typeSearch
-        }
+    async function createOpenPurchaseOrder(){
+      setOpenBackDrop(true)
+
+      const { data } = await api.post('purchase/order')
+
+      setPurChaseOrder({
+        id: data.purchaseOrder.id,
+        issue: data.purchaseOrder.issueToInput,
+        type: data.purchaseOrder.type,
+        factoryData: data.purchaseOrder.factoryData,
+        obs: data.purchaseOrder.obs,
+        employeeId: data.purchaseOrder.employeeId,
+        employeeName: data.purchaseOrder.employeeName,
       })
 
-      setSearchProduct(data)
+      setProductsPurchaseOrder(data.purchaseOrder.products)
+
+      setOpenBackDrop(false)
+    }
+
+    createOpenPurchaseOrder()
+  }, [setOpenBackDrop])
+
+  useEffect(() => {
+    debounce(async () => {
+      if (search !== '') {
+        const {data} = await api.get('product', {
+          params: {
+            search,
+            type: typeSearch
+          }
+        })
+  
+        setSearchProduct(data)
+      }
     }, 1300)
   }, [search, typeSearch])
 
-  const handleSelectSearchProduct = prod => {
-    setSearchProductSelect(prod)
-    document.getElementById('quantifyId').focus()
+  const handleChange = async e => {
+    try {
+      setPurChaseOrder(state => ({...state, [e.target.id]: e.target.value}))
+
+      debounce(async () => {
+        setOpenBackDrop(true)
+        await api.put(`purchase/order/${purchaseOrder.id}`, {
+          fieldToUpdate: e.target.id,
+          value: e.target.value
+        })
+
+        setOpenBackDrop(false)
+      }, 1300)
+    } catch (error) {
+      console.log(error)
+      setAlertSnackbar('Erro interno!')
+    }
   }
 
-  const handleAddProductNote = () => {
-    if (quantifyInput < 1) {
-      setAlertSnackbar('Valor não pode ser menor ou igual a 0!')
+  const handleSetEmployee = async employee => {
+    setPurChaseOrder(state => ({
+      ...state,
+      employeeId: employee.id,
+      employeeName: employee.name
+    }))
+    await api.put(`purchase/order/${purchaseOrder.id}`, {
+      fieldToUpdate: 'employeeId',
+      value: employee.id
+    })
+  }
 
-      setQuantifyInput(1)
-      return
+  const handleSelectSearchProductByKey = (key) => {
+    if (key === 'ArrowUp' ) {
+      if (indexProductSearchSelected === 0) {
+        return
+      }
+  
+      setIndexProductSearchSelected(state => state - 1)
     }
 
-    setProductsNote([
-      ...productsNote,
-      {
-        item: productsNote.length + 1,
-        ...searchProductSelect,
-        originalCode: searchProductSelect.generalCode,
-        value: searchProductSelect.PCO_COMPRA,
-        total: searchProductSelect.PCO_COMPRA * quantifyInput,
-        quantify: quantifyInput 
+    if (key === 'ArrowDown') {
+      if (indexProductSearchSelected === searchProduct.length - 1) {
+        return
       }
-    ])
+  
+      setIndexProductSearchSelected(state => state + 1)
+    }
 
-    setSearchProduct([])
-    setSearch('')
+    if (key === 'Enter' && searchProduct.length > 0) {
+      document.getElementById('quantityId').focus()
+    }
   }
 
-  const handleChangeQuantify = prod => {
-    setProductsNote(
+  const handleSelectSearchProduct = index => {
+    setIndexProductSearchSelected(index)
+    document.getElementById('quantityId').focus()
+  }
+
+  const handleChangeQuantityInput = e => {
+    if (e.target.value === '') setQuantityInput(e.target.value)
+    else if (!isNaN(parseInt(e.target.value))) setQuantityInput(Number(e.target.value))
+    else setAlertSnackbar('Digite apenas números')
+  }
+
+  const handleAddProduct = async () => {
+    try {
+      if (quantityInput < 1) {
+        setAlertSnackbar('Valor não pode ser menor ou igual a 0!')
+  
+        setQuantityInput(1)
+        return
+      }
+  
+      const searchProductSelect = searchProduct[indexProductSearchSelected]
+  
+      const {data} = await api.post(`purchase/order/${purchaseOrder.id}/product`, {
+        productId: searchProductSelect.code,
+        productName: searchProductSelect.name,
+        quantity: quantityInput,
+        value: searchProductSelect.purchasePrice
+      })
+  
+      setProductsPurchaseOrder([
+        ...productsPurchaseOrder,
+        {
+          item: data.itemId,
+          ...searchProductSelect,
+          originalCode: searchProductSelect.generalCode,
+          value: searchProductSelect.purchasePrice,
+          total: searchProductSelect.purchasePrice * quantityInput,
+          quantity: quantityInput 
+        }
+      ])
+  
+      setSearchProduct([])
+      setSearch('')
+      setQuantityInput('')
+      document.getElementById('searchId').focus()
+    } catch (error) {
+      console.log(error)
+
+      if (error.response.data === 'Product already added') {
+        setAlertSnackbar('Produto já adicionado ao pedido de compra!')
+
+        return
+      }
+
+      setAlertSnackbar('Erro interno!')
+    }
+  }
+
+  const handleRmvProduct = async prod => {
+    await api.delete(`purchase/order/${purchaseOrder.id}/product/${prod.item}`)
+
+    setProductsPurchaseOrder(
+      states => states.filter(
+        state => state.item !== prod.item
+      )
+    )
+  }
+
+  const handleChangeQuantity = async prod => {
+    await api.put(`purchase/order/${purchaseOrder.id}/product/${prod.item}`,{
+      quantity: prod.quantity
+    })
+
+    setProductsPurchaseOrder(
       states => (states.map(state => {
         if (state.item === prod.item) {
-          state.quantify = prod.quantify
-          state.total = prod.quantify * state.value
+          state.quantity = prod.quantity
+          state.total = prod.quantity * state.value
         }
 
         return state
@@ -149,22 +280,48 @@ export default function CreateUpdatePurchaseOrder({
     )
   }
 
-  const handleCreateNote = () => {
+  const handleClosePurchaseOrder = async () => {
     try {
-      if (!note.id) {
-        
+      setOpenBackDrop(true)
+      if (!purchaseOrder.employeeId) {
+        setAlertSnackbar('Selecione o comprador!')
+        setOpenBackDrop(false)
+        return
       }
-      console.log(note)
-      //setOpen(false)
+
+      if (productsPurchaseOrder.length === 0) {
+        setAlertSnackbar('Selecione pelo menos 1 produto!')
+        setOpenBackDrop(false)
+        return
+      }
+
+      await api.patch(`purchase/order/${purchaseOrder.id}/close`)
+
+      await handleClose()
+      setOpenBackDrop(false)
     } catch (error) {
       console.log(error)
     }
   }
 
-  let quantifyFull = 0, valueTotalFull = 0
+  const handleClose = async () => {
+    try {
+      setOpenBackDrop(true)
+      const {data} = await api.get('purchase/order/open')
+      setPurchaseOrders(data.purchaseOrder)
+      setOpen(false)
+      setOpenBackDrop(false)
+    } catch (error) {
+      setOpenBackDrop(false)
+      console.log(error)
+      setAlertSnackbar('Erro no servidor')
+    }
+  }
 
-  productsNote.forEach(prod => {
-    quantifyFull += prod.quantify
+  let quantityFull = 0, valueTotalFull = 0
+
+  productsPurchaseOrder.forEach(prod => {
+    quantityFull += prod.quantity
     valueTotalFull += prod.total
   })
 
@@ -172,11 +329,11 @@ export default function CreateUpdatePurchaseOrder({
     <>
       <AppBar className={classes.appBar}>
         <Toolbar>
-          <IconButton edge="start" color="inherit" onClick={() => setOpen(false)} aria-label="close">
+          <IconButton edge="start" color="inherit" onClick={handleClose} aria-label="close">
             <CloseIcon />
           </IconButton>
           <Typography variant="h6" className={classes.title}>
-            {!noteUpdate ? 'Lançamento de Nota de Entrada' : 'Atualização de Nota de Entrada'}
+            Lançamento de Nota de Pedido de compra
           </Typography>
         </Toolbar>
       </AppBar>
@@ -196,10 +353,17 @@ export default function CreateUpdatePurchaseOrder({
           justifyContent='space-between'
         >
           <Input
+            id="purchaseId"
+            label="Código"
+            disable={true}
+            value={purchaseOrder.id}
+          />
+          <Input
             id="issue"
             label="Emissão"
             type='date'
-            onChange={e => setNote(state => ({...state, issue: e.target.value}))}
+            value={purchaseOrder.issue}
+            onChange={handleChange}
           />
           <Box
             display='flex'
@@ -209,20 +373,44 @@ export default function CreateUpdatePurchaseOrder({
               id='employeeId'
               label='Comprador'
               disable={true}
+              width={210}
+              value={purchaseOrder.employeeName}
               style={{
-                marginRight: 4
+                marginRight: 4,
+                backgroundColor: 'transparent'
               }}
             />
-            <SearchIcon />
+            <SearchIcon
+              onClick={() => setOpenSearchEmployees(true)}
+              style={{
+                cursor: 'pointer'
+              }}
+            />
           </Box>
           <Input
             id='factoryData'
             label='Dados da Fabrica'
+            width={210}
+            value={purchaseOrder.factoryData}
+            onChange={handleChange}
           />
           <FormControl component='fieldset'>
-            <RadioGroup aria-label='gender' name='gender1'>
-              <FormControlLabel value='normal' control={<Radio style={{padding: 2}}/>} label='Normal' />
-              <FormControlLabel value='maintenance' control={<Radio style={{padding: 2}}/>} label='Assistência' />
+            <RadioGroup
+              aria-label='type'
+              name='type1'
+              value={purchaseOrder.type}
+              onChange={handleChange}
+            >
+              <FormControlLabel
+                value='normal'
+                control={<Radio id='type' style={{padding: 2}}/>}
+                label='Normal'
+              />
+              <FormControlLabel
+                value='maintenance'
+                control={<Radio id='type' style={{padding: 2}}/>}
+                label='Assistência'
+              />
             </RadioGroup>
           </FormControl>
         </Box>
@@ -234,7 +422,7 @@ export default function CreateUpdatePurchaseOrder({
           <Box
             display={'flex'}
             alignItems={'center'}
-            justifyContent={'space-between'}
+            gridGap={8}
           >
             <Select
               variant='outlined'
@@ -242,6 +430,7 @@ export default function CreateUpdatePurchaseOrder({
               onChange={e => setTypeSearch(e.target.value)}
               style={{
                 width: '15%',
+                minWidth: '126px',
                 height: 40,
                 background: '#FFF',
                 margin: '8px 0 4px 0'
@@ -251,19 +440,20 @@ export default function CreateUpdatePurchaseOrder({
               <MenuItem value='code'>Pelo Código</MenuItem>
             </Select>
             <Input
-              width='72%'
+              id='searchId'
+              style={{flex: 1}}
               placeholder='Digite aqui...'
               value={search}
               onChange={e => setSearch(e.target.value)}
+              onKeyDown={e => handleSelectSearchProductByKey(e.key)}
             />
             <Input
-              id={'quantifyId'}
-              type='number'
+              id={'quantityId'}
               placeholder='Qtd'
               width='10%'
-              value={quantifyInput}
-              onChange={e => setQuantifyInput(Number(e.target.value))}
-              onKeyDown={e => e.key === 'Enter' && handleAddProductNote()}
+              value={quantityInput}
+              onChange={handleChangeQuantityInput}
+              onKeyDown={e => e.key === 'Enter' && handleAddProduct()}
             />
           </Box>
           {
@@ -283,24 +473,25 @@ export default function CreateUpdatePurchaseOrder({
                     <TableCell>Código</TableCell>
                     <TableCell>Alternativo</TableCell>
                     <TableCell>Nome</TableCell>
-                    <TableCell>Estoque</TableCell>
-                    <TableCell>Custo</TableCell>
+                    <TableCell align='right'>Estoque</TableCell>
+                    <TableCell align='right'>Custo</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {
-                    searchProduct.map( prod => (
+                    searchProduct.map((prod, index) => (
                       <TableRow
                         hover
                         key={prod.code}
-                        onClick={() => handleSelectSearchProduct(prod)}
+                        onClick={() => handleSelectSearchProduct(index)}
+                        selected={index === indexProductSearchSelected}
                       >
                         <TableCell>{prod.code}</TableCell>
                         <TableCell>{prod.generalCode}</TableCell>
                         <TableCell>{prod.name}</TableCell>
                         <TableCell align='right'>{prod.stock}</TableCell>
                         <TableCell align='right'>
-                          <BrMonetaryValue value={prod.PCO_COMPRA}/>
+                          <BrMonetaryValue value={prod.purchasePrice}/>
                         </TableCell>
                       </TableRow>
                     ))
@@ -337,7 +528,7 @@ export default function CreateUpdatePurchaseOrder({
               </TableHead>
               <TableBody style={{background: 'white'}}>
                 {
-                  productsNote.map((prod, index) => (
+                  productsPurchaseOrder.map((prod, index) => (
                     <TableRow hover key={index}>
                       <TableCell>{prod.item}</TableCell>
                       <TableCell>{prod.code}</TableCell>
@@ -351,10 +542,10 @@ export default function CreateUpdatePurchaseOrder({
                             textAlign: 'right'
                           }}
                           type='number'
-                          value={prod.quantify}
-                          onChange={e => handleChangeQuantify({
+                          value={prod.quantity}
+                          onChange={e => handleChangeQuantity({
                             item: prod.item,
-                            quantify: Number(e.target.value)
+                            quantity: Number(e.target.value)
                           })}
                         />
                       </TableCell>
@@ -368,13 +559,7 @@ export default function CreateUpdatePurchaseOrder({
                         <Cancel
                           color='error'
                           style={{cursor: 'pointer'}}
-                          onClick={() => {
-                            setProductsNote(
-                              states => states.filter(
-                                state => state.item !== prod.item
-                              )
-                            )
-                          }}
+                          onClick={() => handleRmvProduct(prod)}
                         />
                       </TableCell>
                     </TableRow>
@@ -390,7 +575,7 @@ export default function CreateUpdatePurchaseOrder({
           display='flex'
           alignItems='center'
         >
-          Total: &nbsp;
+          Total Vlr: &nbsp;
           <Input
             style={{margin: 0}}
             disable={true}
@@ -400,36 +585,47 @@ export default function CreateUpdatePurchaseOrder({
           <Input
             style={{margin: 0}}
             disable={true}
-            value={quantifyFull}
+            value={quantityFull}
           />&nbsp;&nbsp;&nbsp;
           Itens:&nbsp;
           <Input
             style={{margin: 0}}
             disable={true}
-            value={quantifyFull}
+            value={productsPurchaseOrder.length}
+          />&nbsp;&nbsp;&nbsp;
+          Observações: &nbsp;
+          <Input
+            id='obs'
+            style={{margin: 0, flex: 1}}
+            value={purchaseOrder.obs}
+            onChange={handleChange}
           />
         </Box>
         <Box
           border='1px solid #CCC'
           padding={1}
         >
-          <ButtonSuccess>Gravar</ButtonSuccess>
-          <ButtonCancel>Cancelar</ButtonCancel>
+          <ButtonSuccess
+            onClick={handleClosePurchaseOrder}
+          >Gravar</ButtonSuccess>
+          <ButtonCancel
+            onClick={handleClose}
+          >Cancelar</ButtonCancel>
         </Box>
       </Box>
 
-      {/* <Search
+      <Search
         title='Consulta de Func./Compradores'
+        route='employee'
         setOpen={setOpenSearchEmployees}
         open={openSearchEmployees}
         fieldsSearch={[
           {value: 'name', description: 'Pelo Nome'},
           {value: 'code', description: 'Pelo Código'},
         ]}
-        fieldsModel={['Iniciar com', 'Contem']}
         headerTable={['Código', 'Nome']}
-        rows={employees}
-      /> */}
+        handleSelect={handleSetEmployee}
+      />
     </>
   )
 }

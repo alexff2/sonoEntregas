@@ -11,6 +11,9 @@ import {
 } from '@material-ui/core'
 import { Close } from '@material-ui/icons'
 
+import { useAlertSnackbar } from '../../context/alertSnackbarContext'
+import api from '../../services/api'
+
 const useStyles = makeStyles(theme => ({
   container: {
     padding: 4
@@ -27,6 +30,10 @@ const useStyles = makeStyles(theme => ({
     width: '100%'
   },
   tableRow: {
+    '&:hover': {
+      background: theme.palette.action.hover,
+      cursor: 'pointer'
+    },
     '& > th' : {
       border: 'solid 1px #CCC',
       padding: '2px 4px'
@@ -49,27 +56,73 @@ const useStyles = makeStyles(theme => ({
 
 export function Search({
   title,
+  route,
   open,
   setOpen,
   fieldsSearch,
-  fieldsModel,
   headerTable,
-  rows
+  handleSelect
 }) {
   const [typeSearch, setTypeSearch] = useState('')
-  const [modelSearch, setModelTypeSearch] = useState('')
+  const [modelSearch, setModelTypeSearch] = useState('beginsWith')
+  const [searchAll, setSearchAll] = useState(false)
+  const [search, setSearch] = useState('')
+  const [dataSearch, setDataSearch] = useState([])
+  const [dataSelect, setDataSelect] = useState()
+  const {setAlertSnackbar} = useAlertSnackbar()
   const classe = useStyles()
 
   useEffect(() => {
     setTypeSearch(fieldsSearch[0].value)
-    setModelTypeSearch(fieldsModel[0])
-    setTimeout(() => document.getElementById('searchDefaultId').focus(), 500)
-  }, [])
+    setTimeout(() => document.getElementById('searchDefaultId')?.focus(), 500)
+  }, [fieldsSearch])
+
+  useEffect(() => {
+    if (searchAll) {
+      api.get(route).then(({data}) => setDataSearch(data))
+    }
+  }, [searchAll, route])
+
+  const handleClose = () => {
+    setSearch('')
+    setDataSearch([])
+    setDataSelect()
+    setModelTypeSearch('beginsWith')
+    setSearchAll(false)
+    setOpen(false)
+  }
+
+  const handleSearch = async () => {
+    try {
+      if (search === '') {
+        setAlertSnackbar('Digite algo na pesquisa!')
+        return
+      }
+      const { data } = await api.get(route, {
+        params: {
+          typeSearch,
+          modelSearch,
+          search
+        }
+      })
+
+      setDataSearch(data)
+    } catch (error) {
+      console.log(error)
+      setAlertSnackbar('Error na requisição, contate o ADM!')
+    }
+  }
+
+  const handleSelectData = async () => {
+    await handleSelect(dataSelect)
+    handleClose()
+  }
+
   return (
     <Dialog
       open={open}
       maxWidth='lg'
-      onKeyDown={e => e.key === 'F2' && console.log(e.key)}
+      onKeyDown={e => e.key === 'F2' && setSearchAll(!searchAll)}
     >
       <Box
         padding={1}
@@ -78,7 +131,7 @@ export function Search({
           className={classe.header}
         >
           <span>{title}</span>
-          <Close onClick={() => setOpen(false)} style={{cursor: 'pointer'}}/>
+          <Close onClick={() => handleClose()} style={{cursor: 'pointer'}}/>
         </header>
         <Box
           border='1px solid #CCC'
@@ -133,9 +186,9 @@ export function Search({
                     background: '#FFF',
                   }}
                 >
-                  { fieldsModel.map((model, i) => (
-                    <MenuItem key={i} value={model}>{model}</MenuItem>
-                  ))}
+                  <MenuItem value='beginsWith'>Começa com</MenuItem>
+                  <MenuItem value='contain'>Contêm</MenuItem>
+                  <MenuItem value='endsWith'>Termina com</MenuItem>
                 </Select>
               </Box>
             </Box>
@@ -146,7 +199,11 @@ export function Search({
               >
                 <label htmlFor='searchDefaultId'>Dados a pesquisar</label>
                 <Box>
-                  <Checkbox style={{padding: 0}}/> F2 - Todos
+                  <Checkbox
+                    checked={searchAll}
+                    onChange={e => setSearchAll(e.target.checked)}
+                    style={{padding: 0}}
+                  /> F2 - Todos
                 </Box>
               </Box>
               <Box
@@ -157,18 +214,25 @@ export function Search({
                   id='searchDefaultId'
                   variant='outlined'
                   size='small'
+                  autoComplete='off'
                   style={{
-                    backgroundColor: 'white',
+                    backgroundColor: `${searchAll ? 'transparent': 'white'}`,
                     width: '80%',
                     margin: 0
                   }}
+                  disabled={searchAll}
+                  value={search}
+                  onChange={e => setSearch(e.target.value.toUpperCase())}
+                  onKeyDown={e => e.key === 'Enter' && handleSearch()}
                 />
                 <Button
                   variant='contained'
+                  disabled={searchAll}
                   style={{
                     width: '19%',
                     height: 38
                   }}
+                  onClick={handleSearch}
                 >Pesquisar</Button>
               </Box>
             </Box>
@@ -185,18 +249,18 @@ export function Search({
                   <th></th>
                   {
                     headerTable.map((headerName, i) => (
-                      <th key={i}>{headerName}</th>
+                      <th key={i} style={i === 0 ? {width: 60} : {}}>{headerName}</th>
                     ))
                   }
                 </tr>
               </thead>
               <tbody>
                 {
-                  rows.length > 0 
-                  ? rows.map((row, i) => (
-                    <tr key={i} className={classe.tableRow}>
-                      <td style={{background: 'transparent', width: 16, textAlign: 'right'}}>
-                        <div className='tri'></div>
+                  dataSearch.length > 0 
+                  ? dataSearch.map((row, i) => (
+                    <tr key={i} className={classe.tableRow} onClick={() => setDataSelect(row)}>
+                      <td style={{background: 'transparent', width: 25, textAlign: 'right'}}>
+                        { (dataSelect?.id === row.id) ? <div className='tri'></div> : null}
                       </td>
                       {Object.entries(row).map((value, i) => (
                         <td key={i}>{value[1]}</td>
@@ -204,12 +268,10 @@ export function Search({
                     </tr>
                   ))
                   :<tr className={classe.tableRow}>
-                    <td style={{background: 'transparent', width: 16, textAlign: 'right'}}>
-                      <div className='tri'></div>
-                    </td>
+                    <td style={{background: 'transparent', width: 25, height: 25, textAlign: 'right'}}></td>
                     {
                       headerTable.map((_headerName, i) => (
-                        <th key={i} style={i === 0 ? {width: 60} : {}}></th>
+                        <td key={i}></td>
                       ))
                     }
                   </tr>
@@ -229,11 +291,12 @@ export function Search({
             <Button
               variant='contained'
               style={{width: 100}}
+              onClick={handleSelectData}
             >Ok</Button>
             <Button
               variant='contained'
               style={{width: 100}}
-              onClick={() => setOpen(false)}
+              onClick={() => handleClose()}
             >Sair</Button>
           </Box>
         </Box>

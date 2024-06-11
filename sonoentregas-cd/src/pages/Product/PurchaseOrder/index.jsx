@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Box,
   Button,
   Dialog,
@@ -19,10 +19,13 @@ import { Box,
 } from '@material-ui/core'
 import { Search as SearchIcon, Add } from '@material-ui/icons'
 
-import useStyles from '../style'
 import Modal from '../../../components/Modal'
 import CreateUpdatePurchaseOrder from './CreateUpdatePurchaseOrder'
 import PurchaseOderProducts from './PurchaseOrderProducts'
+import { useAlertSnackbar } from '../../../context/alertSnackbarContext'
+import useStyles from '../style'
+import api from '../../../services/api'
+import { debounce } from '../../../functions/debounce'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />
@@ -30,187 +33,94 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 export default function PurchaseOrder() {
   const [openPurchaseOrderProducts, setOpenPurchaseOrderProducts] = useState(false)
-  const [openPurchaseCreateUpdate, setOpenPurchaseCreateUpdate] = useState(true)
-  const [noteSelected, setNoteSelected] = useState()
-  const [search, setSearch] = useState()
-  const [typeSearch, setTypeSearch] = useState('noteNumber')
+  const [openPurchaseCreateUpdate, setOpenPurchaseCreateUpdate] = useState(false)
+  const [openChangeFactoryData, setOpenChangeFactoryData] = useState(false)
+  const [purchaseOrderSelected, setPurchaseOrderSelected] = useState()
+  const [search, setSearch] = useState('')
+  const [typeSearch, setTypeSearch] = useState('code')
   const [purchaseOrders, setPurchaseOrders] = useState([])
+  const { setAlertSnackbar } = useAlertSnackbar()
+
+  useEffect(() => {
+    api.get('purchase/order/open')
+      .then(({data}) => setPurchaseOrders(data.purchaseOrder))
+      .catch((error) => {
+        console.log(error)
+        setAlertSnackbar('Erro no servidor')
+      })
+  }, [setAlertSnackbar])
 
   const classes = useStyles()
 
-  const searchPurchaseOrder = () => {
+  const searchPurchaseOrder = async () => {
     try {
-      console.log(search)
+      if (search === '') {
+        setAlertSnackbar('Pesquisa vazia')
+      }
 
-      setPurchaseOrders([
-        {
-          status: 'pedente',
-          supplier: 'Maranhão Colchões',
-          noteNumber: 12345,
-          purchaseNumber: 12345,
-          issue: '01/04/2024',
-          release: '01/04/2024',
-          timeRelease: '05:05:05',
-          valueTotal: '10.800,00',
-          products: [
-            { 
-              code: '123-4',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            },
-            { 
-              code: '123-5',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            },
-            { 
-              code: '123-6',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            },
-            { 
-              code: '123-6',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            },
-            { 
-              code: '123-6',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            },
-            { 
-              code: '123-6',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            },
-            { 
-              code: '123-6',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            },
-            { 
-              code: '123-6',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            },
-            { 
-              code: '123-6',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            },
-        ] },
-        {
-          status: 'pedente',
-          supplier: 'Maranhão Colchões',
-          noteNumber: 12346,
-          purchaseNumber: 12346,
-          issue: '01/04/2024',
-          release: '01/04/2024',
-          timeRelease: '05:05:05',
-          valueTotal: '10.800,00',
-          products: [
-            { 
-              code: '123-4',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            }
-        ] },
-        {
-          status: 'pedente',
-          supplier: 'Maranhão Colchões',
-          noteNumber: 12347,
-          purchaseNumber: 12347,
-          issue: '01/04/2024',
-          release: '01/04/2024',
-          timeRelease: '05:05:05',
-          valueTotal: '10.800,00',
-          products: [
-            { 
-              code: '123-4',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            }
-        ] },
-        {
-          status: 'pedente',
-          supplier: 'Maranhão Colchões',
-          noteNumber: 12348,
-          purchaseNumber: 12348,
-          issue: '01/04/2024',
-          release: '01/04/2024',
-          timeRelease: '05:05:05',
-          valueTotal: '10.800,00',
-          products: [
-            { 
-              code: '123-4',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            }
-        ] },
-        {
-          status: 'pedente',
-          supplier: 'Maranhão Colchões',
-          noteNumber: 12349,
-          purchaseNumber: 12349,
-          issue: '01/04/2024',
-          release: '01/04/2024',
-          timeRelease: '05:05:05',
-          valueTotal: '10.800,00',
-          products: [
-            { 
-              code: '123-4',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            }
-        ] },
-      ])
+      const {data} = await api.get('purchase/order', {
+        params: {
+          type: typeSearch,
+          search
+        }
+      })
+
+      setPurchaseOrders(data.purchaseOrder)
     } catch (error) {
       console.log(error)
     }
   }
 
   const handleSelectPurchaseOrder = purchaseOrder => {
-    setNoteSelected(purchaseOrder)
+    setPurchaseOrderSelected(purchaseOrder)
     setOpenPurchaseOrderProducts(true)
+  }
+
+  const handleOpenPurchaseOrder = async id => {
+    try {
+      await api.patch(`purchase/order/${id}/open`)
+
+      setPurchaseOrders(state => state.map(po => {
+        if (po.id === id) {
+          return {
+            ...po,
+            open: '1'
+          }
+        }
+
+        return po
+      }))
+    } catch (error) {
+      console.log(error)
+
+      if (error.response.status === 409) {
+        setAlertSnackbar('Existe um pedido com status aberto, finalize-o primeiro para abrir este!')
+      }
+    }
+  }
+
+  const handleChangeFactoryData = e => {
+    try {
+      setPurchaseOrderSelected(state => ({...state, factoryData: e.target.value}))
+
+      debounce(async () => {
+        await api.put(`purchase/order/${purchaseOrderSelected.id}`, {
+          fieldToUpdate: 'factoryData',
+          value: e.target.value
+        })
+
+        setPurchaseOrders(state => state.map(purchaseOrder => {
+          if (purchaseOrder.id === purchaseOrderSelected.id) {
+            purchaseOrder.factoryData = e.target.value
+          }
+
+          return purchaseOrder
+        }))
+      }, 1300)
+    } catch (error) {
+      console.log(error)
+      setAlertSnackbar('Erro interno!')
+    }
   }
 
   return (
@@ -222,11 +132,11 @@ export default function PurchaseOrder() {
             label="Tipo"
             labelId="fieldSearch"
             className={classes.fieldSearch}
+            value={typeSearch}
             onChange={e => setTypeSearch(e.target.value)}
-            defaultValue={typeSearch}
           >
-            <MenuItem value={'noteNumber'}>Nº Nota</MenuItem>
-            <MenuItem value={'dateIssue'}>Emissão</MenuItem>
+            <MenuItem value={'code'}>Código</MenuItem>
+            <MenuItem value={'issue'}>Emissão</MenuItem>
           </Select>
         </FormControl>
 
@@ -235,7 +145,7 @@ export default function PurchaseOrder() {
             <SearchIcon/>
           </div>
           <InputBase
-            type={typeSearch === 'dateIssue' ? "date": "text"}
+            type={typeSearch === 'issue' ? "date": "text"}
             placeholder="Pesquisar…"
             classes={{
               root: classes.inputRoot,
@@ -254,27 +164,60 @@ export default function PurchaseOrder() {
           <TableHead>
             <TableRow className={classes.rowHeader}>
               <TableCell>Status</TableCell>
-              <TableCell>Nº da nota</TableCell>
               <TableCell>Nº do pedido</TableCell>
               <TableCell>Emissão</TableCell>
-              <TableCell align="right">Lançamento</TableCell>
-              <TableCell align="right">Hora lançamento</TableCell>
-              <TableCell align="right">R$ Total Nota</TableCell>
+              <TableCell>Lançamento</TableCell>
+              <TableCell>Comprador</TableCell>
+              <TableCell align="right">Dados Fab.</TableCell>
+              <TableCell align="right">R$ Total</TableCell>
+              <TableCell align="right">Nº da nota</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {purchaseOrders.map((purchaseOrder, i) => (
               <TableRow key={i}>
-                <TableCell>{purchaseOrder.status}</TableCell>
+                <TableCell>{
+                  purchaseOrder.open === '1'
+                  ? <Box
+                      style={{
+                        background: 'var(--red)',
+                        color: 'var(--white)',
+                        textAlign: 'center'
+                      }}
+                    >Aberta</Box>
+                  : <Box
+                      style={{
+                        background: 'var(--green)',
+                        color: 'var(--white)',
+                        textAlign: 'center',
+                        cursor: 'pointer'
+                      }}
+                      onClick={() => handleOpenPurchaseOrder(purchaseOrder.id)}
+                    >Fechada</Box>
+                }</TableCell>
                 <TableCell
-                  onClick={() => handleSelectPurchaseOrder(purchaseOrder)}
-                  style={{ cursor: 'pointer'}}
-                >{purchaseOrder.noteNumber}</TableCell>
-                <TableCell>{purchaseOrder.purchaseNumber}</TableCell>
+                  onClick={() =>handleSelectPurchaseOrder(purchaseOrder)}
+                  style={{
+                    cursor: 'pointer'
+                  }}
+                >{purchaseOrder.id}</TableCell>
                 <TableCell>{purchaseOrder.issue}</TableCell>
-                <TableCell align="right">{purchaseOrder.release}</TableCell>
-                <TableCell align="right">{purchaseOrder.timeRelease}</TableCell>
-                <TableCell align="right">{purchaseOrder.valueTotal}</TableCell>
+                <TableCell>{purchaseOrder.release}</TableCell>
+                <TableCell>{purchaseOrder.employeeName}</TableCell>
+                <TableCell
+                  align="right"
+                  style={{
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => {
+                    setPurchaseOrderSelected(purchaseOrder)
+                    setOpenChangeFactoryData(true)
+                  }}
+                >
+                  {purchaseOrder.factoryData}
+                </TableCell>
+                <TableCell align="right">{purchaseOrder.value}</TableCell>
+                <TableCell align="right">{purchaseOrder.noteNumber}</TableCell>
               </TableRow>
             ))
             }
@@ -285,6 +228,11 @@ export default function PurchaseOrder() {
       <Fab 
         color="primary"
         onClick={() => setOpenPurchaseCreateUpdate(true)}
+        style={{
+          position: 'fixed',
+          right: 40,
+          bottom: 40
+        }}
       >
         <Add />
       </Fab>
@@ -295,9 +243,7 @@ export default function PurchaseOrder() {
         setOpen={setOpenPurchaseOrderProducts}
       >
         <PurchaseOderProducts
-          setOpen={setOpenPurchaseOrderProducts}
-          note={noteSelected}
-          type={'view'}
+          purchaseOrder={purchaseOrderSelected}
         />
 
       </Modal>
@@ -310,8 +256,30 @@ export default function PurchaseOrder() {
       >
         <CreateUpdatePurchaseOrder
           setOpen={setOpenPurchaseCreateUpdate}
+          setPurchaseOrders={setPurchaseOrders}
         />
       </Dialog>
+
+      {
+        openChangeFactoryData &&
+        <Dialog
+          open={openChangeFactoryData}
+          onClose={() => {
+            setOpenChangeFactoryData(false)
+            setPurchaseOrderSelected()
+          }}
+        >
+          <InputBase
+            placeholder="Digite a PEDIDO LOTE CARGA"
+            style={{
+              width: '270px',
+              padding: 8
+            }}
+            value={purchaseOrderSelected.factoryData}
+            onChange={handleChangeFactoryData}
+          />
+        </Dialog>
+      }
     </Box>
   )
 }

@@ -7,10 +7,10 @@ import {
   TextField
 } from '@material-ui/core'
 
-import { useAlertSnackbar } from '../../context/alertSnackbarContext' 
+import { useAlertSnackbar } from '../../../context/alertSnackbarContext' 
 
-import { BeepReading } from '../../components/BeepReading'
-import { ButtonSuccess } from '../../components/Buttons'
+import { BeepReading } from '../../../components/BeepReading'
+import { ButtonSuccess } from '../../../components/Buttons'
 
 const mokeData = [
   {

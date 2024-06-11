@@ -40,6 +40,25 @@ class DateTime {
 
     return objDateTime
   }
+
+  getISODateTimeBr2() {
+    const dateStringBr = this.date.toLocaleString("pt-BR", {timeZone: "America/Sao_Paulo"})
+
+    const timeBr = dateStringBr.split(' ')[1]
+    const dateIsoArray = dateStringBr.split(',')[0].split('/')
+    const [day, month, year] = dateIsoArray
+
+    const dateFull = `${year}-${month}-${day}`
+
+    const objDateTime =  {
+      date: dateFull,
+      time: timeBr,
+      dateTime: `${dateFull} ${timeBr}`,
+      dateTimeIsoBr: `${dateFull}T${timeBr}`
+    }
+
+    return objDateTime
+  }
 }
 
 

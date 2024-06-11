@@ -8,6 +8,7 @@ const { ensureAuthenticated } = require('./middlewares/ensureAuthenticated')
 const connectionsController = require('./controllers/connectionsController')
 const authController = require('./controllers/authController')
 const usersController = require('./controllers/usersController')
+const employeeController = require('./controllers/employeeController')
 const productsController = require('./controllers/productsController')
 const transferController = require('./controllers/transferController')
 const purchaseOrderController = require('./controllers/purchaseOrderController')
@@ -44,7 +45,10 @@ routes.get('/token/validation', authController.validationToken)
 routes.get('/users/:loja', usersController.index)
 routes.post('/users', usersController.create)
 routes.put('/users/:userId', usersController.update)
-    //Products SCE CD
+
+  //Employees
+  routes.get('/employee', ensureAuthenticated, employeeController.index)
+  //Products SCE CD
   routes.get('/products/:typesearch/:search', productsController.index)
   routes.get('/product', ensureAuthenticated, productsController.findProduct)
   routes.put('/product/barcode', ensureAuthenticated, productsController.updateBarCode)
@@ -52,8 +56,16 @@ routes.put('/users/:userId', usersController.update)
   routes.get('/serial/product', serieController.findOpenSeriesByProduct)
   routes.post('/serial/first', ensureAuthenticated, serieController.createFirst)
   // Purchase
-  routes.get('/purchase/order', purchaseOrderController.findPurchaseOrder)
-  routes.get('/purchase/order/:id/products', purchaseOrderController.findPurchaseOrderProduct)
+  routes.get('/purchase/order', purchaseOrderController.find)
+  routes.get('/purchase/order/open', purchaseOrderController.findOpen)
+  routes.get('/purchase/order/:id/products', purchaseOrderController.findProducts)
+  routes.post('/purchase/order', purchaseOrderController.create)
+  routes.post('/purchase/order/:id/product', purchaseOrderController.addProduct)
+  routes.put('/purchase/order/:id', purchaseOrderController.update)
+  routes.delete('/purchase/order/:id/product/:item', purchaseOrderController.rmvProduct)
+  routes.put('/purchase/order/:id/product/:item', purchaseOrderController.changeQuantity)
+  routes.patch('/purchase/order/:id/close', purchaseOrderController.close)
+  routes.patch('/purchase/order/:id/open', purchaseOrderController.open)
 /*
 Disponível
 SELECT A.CODIGO, A.ALTERNATI, A.NOME, ISNULL(B.ESTOQUE, 0) ESTOQUE

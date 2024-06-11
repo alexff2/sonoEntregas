@@ -13,10 +13,10 @@ import {
   TableHead,
   TableRow
 } from '@material-ui/core'
-import { ButtonSuccess } from '../../../../../components/Buttons'
+import { ButtonSuccess } from '../../../../components/Buttons'
 
-import api from '../../../../../services/api'
-import { useAlertSnackbar } from '../../../../../context/alertSnackbarContext'
+import api from '../../../../services/api'
+import { useAlertSnackbar } from '../../../../context/alertSnackbarContext'
 
 export default function SearchPurchaseOrder({
   openDialogSearch,
