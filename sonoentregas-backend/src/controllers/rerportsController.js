@@ -289,7 +289,6 @@ module.exports = {
       }
 
       const shopSelected = await ShopSceService.findByShop(shop)
-      console.log(shopSelected)
       const revenues = await DreService.revenues({ shop, dateStart, dateEnd })
       const variableExpenses = await DreService.variableExpenses({ shop, dateStart, dateEnd, totRevenues: revenues.total })
       const fixedExpenses = await DreService.FixedExpenses({ shop, dateStart, dateEnd, totRevenues: revenues.total })
