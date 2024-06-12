@@ -10,7 +10,7 @@ module.exports = {
       PREVCHEGA, NFCHEGADA, CHEGADA, MARGEMBRUTA, CODALTERNATIVO, OBSERVACAO, CODLOJA, SEQUENCIA, CODPLANO, VALORBRUTO, PERDESCONTO, TIPO_PEDIDO, CFOP, CREATE_AT, FACTORY_DATA)
     values
       (${id}, '${issue}', 1, 1, 0, 0, 0, 'CIF', 0, 0, 0, '${issue}',
-      NULL, NULL, NULL, 0, NULL, NULL, 1.0, ${sequence}, 0, 0, 0,'1', 1, '${issue}', ')`
+      NULL, NULL, NULL, 0, NULL, NULL, 1.0, ${sequence}, 0, 0, 0,'1', 1, '${issue}', NULL)`
 
     return script
   },
@@ -117,12 +117,3 @@ module.exports = {
     WHERE A.CODIGOPEDIDO = ${id}`
   }
 }
-
-/*
-ALTER TABLE PEDFOR ADD CREATE_AT DATETIME
-UPDATE PEDFOR SET CREATE_AT = EMISSAO
-
-ALTER TABLE PEDFOR ADD FACTORY_DATA VARCHAR(25)
-UPDATE PEDFOR SET FACTORY_DATA = CODALTERNATIVO
-
-*/

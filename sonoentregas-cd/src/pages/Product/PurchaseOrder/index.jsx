@@ -23,9 +23,10 @@ import Modal from '../../../components/Modal'
 import CreateUpdatePurchaseOrder from './CreateUpdatePurchaseOrder'
 import PurchaseOderProducts from './PurchaseOrderProducts'
 import { useAlertSnackbar } from '../../../context/alertSnackbarContext'
-import useStyles from '../style'
-import api from '../../../services/api'
+import { useBackdrop } from '../../../context/backdropContext'
 import { debounce } from '../../../functions/debounce'
+import api from '../../../services/api'
+import useStyles from '../style'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />
@@ -40,15 +41,20 @@ export default function PurchaseOrder() {
   const [typeSearch, setTypeSearch] = useState('code')
   const [purchaseOrders, setPurchaseOrders] = useState([])
   const { setAlertSnackbar } = useAlertSnackbar()
+  const { setOpenBackDrop } = useBackdrop()
 
   useEffect(() => {
+    setOpenBackDrop(true)
     api.get('purchase/order/open')
-      .then(({data}) => setPurchaseOrders(data.purchaseOrder))
+      .then(({data}) => {
+        setPurchaseOrders(data.purchaseOrder)
+        setOpenBackDrop(false)
+      })
       .catch((error) => {
         console.log(error)
         setAlertSnackbar('Erro no servidor')
       })
-  }, [setAlertSnackbar])
+  }, [setAlertSnackbar, setOpenBackDrop])
 
   const classes = useStyles()
 

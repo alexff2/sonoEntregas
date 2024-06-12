@@ -67,7 +67,7 @@ class PurchaseOrderService {
 
     await DB._query(1, script)
 
-    const purchaseStart = await this.findPurchaseOrderByCodeOrIssueOrOpen({})
+    const purchaseStart = await this.findByCodeOrIssueOrOpen({})
 
     return purchaseStart[0]
   }
