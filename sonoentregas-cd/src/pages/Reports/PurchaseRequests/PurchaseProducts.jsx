@@ -19,6 +19,7 @@ const useStyles = makeStyles({
 });
 
 export default function PurchaseRequestsProducts({ supplier }) {
+  console.log(supplier)
   const classes = useStyles();
 
   return (

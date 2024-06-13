@@ -10,7 +10,7 @@ class PurchaseOrderService {
     const script = scriptPurchaseOrder.findPurchaseOrderToReport()
 
     const purchases = await Produtos._query(1, script, QueryTypes.SELECT)
-    const purchasesProducts = await this.findProductPurchase(purchases.map( purchase => purchase.CODIGOPEDIDO))
+    const purchasesProducts = await this.findProducts(purchases.map( purchase => purchase.CODIGOPEDIDO))
 
     purchases.forEach(purchase => {
       const millisecondsIssuance = new Date(purchase.EMISSAO).setHours(0,0,0,0)
@@ -49,7 +49,8 @@ class PurchaseOrderService {
         quantity: prod.QTE_PEDIDO,
         quantityArrived: prod.QTE_CHEGADA,
         value: prod.VLUNITARIO,
-        total: prod.QTE_PEDIDO * prod.VLUNITARIO
+        total: prod.QTE_PEDIDO * prod.VLUNITARIO,
+        ...prod,
       }))
   }
 
