@@ -12,15 +12,7 @@ class PurchaseOrderService {
     const purchases = await Produtos._query(1, script, QueryTypes.SELECT)
     const purchasesProducts = await this.findProducts(purchases.map( purchase => purchase.CODIGOPEDIDO))
 
-    purchases.forEach(purchase => {
-      const millisecondsIssuance = new Date(purchase.EMISSAO).setHours(0,0,0,0)
-      const millisecondsNow = new Date().setHours(0,0,0,0)
-
-      const daysIssuance = difDate(millisecondsIssuance, millisecondsNow)
-
-      purchase['DIAS_EMIS'] = daysIssuance
-      purchase['difValue'] = purchase.VALORBRUTO - purchase.VALOR_CHEGADA
-
+    purchases.forEach(purchase => {0
       purchase['products'] = purchasesProducts.filter(product => product.NUMPEDIDO === purchase.CODIGOPEDIDO)
     })
 

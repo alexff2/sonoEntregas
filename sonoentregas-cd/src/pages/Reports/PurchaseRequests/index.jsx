@@ -26,6 +26,8 @@ import EnhancedTableHead from '../../../components/EnhancedTableHead'
 import BrMonetaryValue from '../../../components/BrMonetaryValue'
 import PurchaseProducts from './PurchaseProducts'
 
+import { useBackdrop } from '../../../context/backdropContext'
+
 import { getComparator, stableSort } from '../../../functions/orderTable'
 import splitReportTable from '../../../functions/splitReportTable'
 import { getDateBr, dateAndTimeCurrent } from '../../../functions/getDates'
@@ -95,17 +97,26 @@ export default function PurchaseRequests(){
   const navigate = useNavigate()
   const classe = useStyle()
   const classesTable = tableStyle.useStyle()
+  const { setOpenBackDrop } = useBackdrop()
 
   const currentDate = new Date()
   const dateTimeBr = currentDate.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })
 
   useEffect(() => {
-    getPurchase()
-  },[])
+    const getPurchaseNotes = async () => {
+      setOpenBackDrop(true)
+      const { data } = await api.get('reports/purchase/requests')
+      setPurchaseRequests(data)
+      setOpenBackDrop(false)
+    }
+    getPurchaseNotes()
+  },[setOpenBackDrop])
 
   const getPurchase = async () => {
+    setOpenBackDrop(true)
     const { data } = await api.get('reports/purchase/requests')
     setPurchaseRequests(data)
+    setOpenBackDrop(false)
   }
 
   const handleRequestSort = (event, property) => {

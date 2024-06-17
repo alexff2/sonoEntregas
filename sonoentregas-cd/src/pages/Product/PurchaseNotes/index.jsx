@@ -18,184 +18,39 @@ import { Search as SearchIcon } from '@material-ui/icons'
 
 import useStyles from '../style'
 import Modal from '../../../components/Modal'
+import { useAlertSnackbar } from '../../../context/alertSnackbarContext'
+import { useBackdrop } from '../../../context/backdropContext'
 import ModalNotesProducts from './ModalNotesProducts'
+import api from '../../../services/api'
 
 export default function PurchaseNotes() {
   const [ openModalNotesProducts, setOpenModalNotesProducts ] = useState(false)
   const [ noteSelected, setNoteSelected ] = useState()
-  const [ search, setSearch ] = useState()
-  const [ typeSearch, setTypeSearch ] = useState('noteNumber')
-  const [ purchase, setPurchase ] = useState([])
+  const [ search, setSearch ] = useState('')
+  const [ typeSearch, setTypeSearch ] = useState('docNumber')
+  const [ purchaseNotes, setPurchaseNotes ] = useState([])
 
+  const { setAlertSnackbar } = useAlertSnackbar()
+  const { setOpenBackDrop } = useBackdrop()
   const classes = useStyles()
 
-  const searchNoteEntry = () => {
-    try {
-      console.log(search)
+  const searchNoteEntry = async () => {
+    setOpenBackDrop(true)
 
-      setPurchase([
-        {
-          status: 'pedente',
-          supplier: 'Maranhão Colchões',
-          noteNumber: 12345,
-          purchaseNumber: 12345,
-          issue: '01/04/2024',
-          release: '01/04/2024',
-          timeRelease: '05:05:05',
-          valueTotal: '10.800,00',
-          products: [
-            { 
-              code: '123-4',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            },
-            { 
-              code: '123-5',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            },
-            { 
-              code: '123-6',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            },
-            { 
-              code: '123-6',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            },
-            { 
-              code: '123-6',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            },
-            { 
-              code: '123-6',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            },
-            { 
-              code: '123-6',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            },
-            { 
-              code: '123-6',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            },
-            { 
-              code: '123-6',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            },
-        ] },
-        {
-          status: 'pedente',
-          supplier: 'Maranhão Colchões',
-          noteNumber: 12346,
-          purchaseNumber: 12346,
-          issue: '01/04/2024',
-          release: '01/04/2024',
-          timeRelease: '05:05:05',
-          valueTotal: '10.800,00',
-          products: [
-            { 
-              code: '123-4',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            }
-        ] },
-        {
-          status: 'pedente',
-          supplier: 'Maranhão Colchões',
-          noteNumber: 12347,
-          purchaseNumber: 12347,
-          issue: '01/04/2024',
-          release: '01/04/2024',
-          timeRelease: '05:05:05',
-          valueTotal: '10.800,00',
-          products: [
-            { 
-              code: '123-4',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            }
-        ] },
-        {
-          status: 'pedente',
-          supplier: 'Maranhão Colchões',
-          noteNumber: 12348,
-          purchaseNumber: 12348,
-          issue: '01/04/2024',
-          release: '01/04/2024',
-          timeRelease: '05:05:05',
-          valueTotal: '10.800,00',
-          products: [
-            { 
-              code: '123-4',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            }
-        ] },
-        {
-          status: 'pedente',
-          supplier: 'Maranhão Colchões',
-          noteNumber: 12349,
-          purchaseNumber: 12349,
-          issue: '01/04/2024',
-          release: '01/04/2024',
-          timeRelease: '05:05:05',
-          valueTotal: '10.800,00',
-          products: [
-            { 
-              code: '123-4',
-              name: 'Base sued chocolate bordada 100X200X21',
-              quantity: 2,
-              quantityBeeped: 1,
-              unitValue: '900,00',
-              valueTotal: '1.800,00',
-            }
-        ] },
-      ])
+    try {
+      const { data } = await api.get('purchase/notes', {
+        params: {
+          typeSearch,
+          search
+        }
+      })
+
+      setPurchaseNotes(data.purchaseNotes)
+      setOpenBackDrop(false)
     } catch (error) {
       console.log(error)
+      setAlertSnackbar('Erro interno!')
+      setOpenBackDrop(false)
     }
   }
 
@@ -213,11 +68,11 @@ export default function PurchaseNotes() {
             label="Tipo"
             labelId="fieldSearch"
             className={classes.fieldSearch}
+            value={typeSearch}
             onChange={e => setTypeSearch(e.target.value)}
-            defaultValue={typeSearch}
           >
-            <MenuItem value={'noteNumber'}>Nº Nota</MenuItem>
-            <MenuItem value={'dateIssue'}>Emissão</MenuItem>
+            <MenuItem value={'docNumber'}>Nº Nota</MenuItem>
+            <MenuItem value={'issue'}>Emissão</MenuItem>
           </Select>
         </FormControl>
 
@@ -226,7 +81,7 @@ export default function PurchaseNotes() {
             <SearchIcon/>
           </div>
           <InputBase
-            type={typeSearch === 'dateIssue' ? "date": "text"}
+            type={typeSearch === 'issue' ? "date": "text"}
             placeholder="Pesquisar…"
             classes={{
               root: classes.inputRoot,
@@ -244,7 +99,6 @@ export default function PurchaseNotes() {
         <Table size='small'>
           <TableHead>
             <TableRow className={classes.rowHeader}>
-              <TableCell>Status</TableCell>
               <TableCell>Nº da nota</TableCell>
               <TableCell>Nº do pedido</TableCell>
               <TableCell>Emissão</TableCell>
@@ -254,18 +108,17 @@ export default function PurchaseNotes() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {purchase.map((entryProductsNote, i) => (
+            {purchaseNotes.map((note, i) => (
               <TableRow key={i}>
-                <TableCell>{entryProductsNote.status}</TableCell>
                 <TableCell
-                  onClick={() => handleSelectNote(entryProductsNote)}
+                  onClick={() => handleSelectNote(note)}
                   style={{ cursor: 'pointer'}}
-                >{entryProductsNote.noteNumber}</TableCell>
-                <TableCell>{entryProductsNote.purchaseNumber}</TableCell>
-                <TableCell>{entryProductsNote.issue}</TableCell>
-                <TableCell align="right">{entryProductsNote.release}</TableCell>
-                <TableCell align="right">{entryProductsNote.timeRelease}</TableCell>
-                <TableCell align="right">{entryProductsNote.valueTotal}</TableCell>
+                >{note.docNumber}</TableCell>
+                <TableCell>{note.purchaseOrderId}</TableCell>
+                <TableCell>{note.issue}</TableCell>
+                <TableCell align="right">{note.release}</TableCell>
+                <TableCell align="right">{note.releaseTime}</TableCell>
+                <TableCell align="right">{note.value}</TableCell>
               </TableRow>
             ))
             }

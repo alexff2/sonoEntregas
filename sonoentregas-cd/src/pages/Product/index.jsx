@@ -3,15 +3,15 @@ import { AppBar, Tabs, Tab } from '@material-ui/core'
 
 import { TabPanel, a11yProps } from '../../components/TabPanel'
 import PurchaseOrder from './PurchaseOrder'
-/* import PurchaseNotes from './PurchaseNotes'
-import TransferProducts from './TransferProducts' */
+import PurchaseNotes from './PurchaseNotes'
+import TransferProducts from './TransferProducts'
 import SearchProducts from './SearchProducts'
 
 import useStyles from './style'
 
 export default function Products() {
   const classes = useStyles()
-  const [value, setValue] = useState(0)
+  const [value, setValue] = useState(3)
 
   return (
     <div className={classes.root}>
@@ -23,8 +23,8 @@ export default function Products() {
         >
           <Tab label="Consulta" {...a11yProps(0)}/>
           <Tab label="Compras - Pedidos" {...a11yProps(1)}/>
-          {/* <Tab label="Compras - Notas" {...a11yProps(2)}/>
-          <Tab label="Transferências" {...a11yProps(3)}/> */}
+          <Tab label="Compras - Notas" {...a11yProps(2)}/>
+          <Tab label="Transferências" {...a11yProps(3)}/>
         </Tabs>
       </AppBar>
 
@@ -36,13 +36,13 @@ export default function Products() {
         <PurchaseOrder />
       </TabPanel>
 
-      {/* <TabPanel value={value} index={2}>
+      <TabPanel value={value} index={2}>
         <PurchaseNotes />
       </TabPanel>
 
       <TabPanel value={value} index={3}>
         <TransferProducts />
-      </TabPanel> */}
+      </TabPanel>
     </div>
   )
 }
