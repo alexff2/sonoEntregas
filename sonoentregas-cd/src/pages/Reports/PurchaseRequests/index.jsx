@@ -65,7 +65,7 @@ const PageReport = ({ purchaseRequest, classesTable, pageNumber, order, orderBy,
               <TableCell>{item.DIAS_EMIS}</TableCell>
               <TableCell>{item.VALORBRUTO.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
               <TableCell>{item.VALOR_CHEGADA.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
-              <TableCell>{item.CODALTERNATIVO}</TableCell>
+              <TableCell>{item.FACTORY_DATA}</TableCell>
               <TableCell>{item.OBS}</TableCell>
             </TableRow>))}
         </TableBody>
@@ -136,7 +136,7 @@ export default function PurchaseRequests(){
     {id: 'DIAS_EMIS', label: 'DIAS'},
     {id: 'VALORBRUTO', label: 'VALOR'},
     {id: 'VALORCHEGADA', label: 'VL CHEGOU'},
-    {id: 'CODALTERNATIVO', label: 'PED FORNECEDOR'},
+    {id: 'FACTORY_DATA', label: 'PED FORNECEDOR'},
     {id: 'OBS', label: 'OBSERVAÇÃO'},
   ]
 
@@ -146,7 +146,7 @@ export default function PurchaseRequests(){
     {id: 'DIAS_EMIS', label: 'DIAS'},
     {id: 'VALORBRUTO', label: 'VALOR'},
     {id: 'VALORCHEGADA', label: 'VL CHEG', class: classesTable.headCellValuePurchase},
-    {id: 'CODALTERNATIVO', label: 'PED FOR', class: classesTable.headCellNumberPurchase},
+    {id: 'FACTORY_DATA', label: 'PED FOR', class: classesTable.headCellNumberPurchase},
     {id: 'OBS', label: 'OBSERVAÇÃO'},
   ]
 
@@ -279,7 +279,7 @@ return(
               <TableCell>
                 <BrMonetaryValue value={item.VALOR_CHEGADA}/>
               </TableCell>
-              <TableCell>{item.CODALTERNATIVO}</TableCell>
+              <TableCell>{item.FACTORY_DATA}</TableCell>
               <TableCell>{item.OBS}</TableCell>
             </TableRow>
           ))}
@@ -319,7 +319,7 @@ return(
                   <TableCell>{item.DIAS_EMIS}</TableCell>
                   <TableCell>{item.VALORBRUTO.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
                   <TableCell>{item.VALOR_CHEGADA.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
-                  <TableCell>{item.CODALTERNATIVO}</TableCell>
+                  <TableCell>{item.FACTORY_DATA}</TableCell>
                   <TableCell>{item.OBS}</TableCell>
                 </TableRow>
               ))}

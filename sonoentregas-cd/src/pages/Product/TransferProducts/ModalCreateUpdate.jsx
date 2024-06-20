@@ -7,6 +7,7 @@ import { CellStatus } from '.'
 
 import { useAlertSnackbar } from '../../../context/alertSnackbarContext'
 import { getDateSql } from '../../../functions/getDates'
+import { debounce } from '../../../functions/debounce'
 
 import api from '../../../services/api'
 
@@ -44,46 +45,33 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
   const [ observation, setObservation] = useState(transferUpdate ? transferUpdate.observation : '')
   const [ originId, setOriginId] = useState(0)
   const [ destinyId, setDestinyId] = useState(0)
+  const [ disableDestinyId, setDisableDestinyId] = useState(false)
+
   const [ products, setProducts] = useState(transferUpdate ? transferUpdate.products : [])
-  const [ quantity, setQuantity] = useState(1)
+  const [ quantity, setQuantity] = useState('')
   const classes = useStyles()
   const { setAlertSnackbar } = useAlertSnackbar()
 
-  const setSelectProduct = () => {
-    const product = productsSearch[indexSelect]
-
-    if (quantity <= 0) {
-      setAlertSnackbar('🚫 Quantidade não pode ser zero!')
-      return
+  const changeOriginId = e => {
+    const value = Number(e.target.value)
+    setOriginId(value)
+    if (value === 1) {
+      setDisableDestinyId(false)
+      setDestinyId(2)
+    } else {
+      setDisableDestinyId(true)
+      setDestinyId(1)
     }
+  }
 
-    if (product.stock < quantity) {
-      setAlertSnackbar('🚫 Quantidade maior que estoque!')
-      return
+  const changeDestinyId = e => {
+    const value = Number(e.target.value)
+    setDestinyId(value)
+    if (value === 1) {
+      setOriginId(2)
+    } else {
+      setOriginId(1)
     }
-
-    if(products.find(productFind => product.code === productFind.code)){
-      setAlertSnackbar('🚫 Produto já lançado nessa transferência!')
-      document.getElementById('searchId').focus()
-      return
-    }
-
-    setProducts(state => {
-      return [
-        ...state,
-        {
-          item: state.length + 1,
-          quantity,
-          status: 'P',
-          ...product
-        },
-      ]
-    })
-    setProductsSearch([])
-    setQuantity(1)
-    setSearch('')
-
-    document.getElementById('searchId').focus()
   }
 
   const selectRow = indexRow => {
@@ -95,7 +83,6 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
   }
 
   const keyPres = (key) => {
-    console.log(key)
     if (key === 'ArrowUp' ) {
       if (indexSelect === 0) {
         return
@@ -117,6 +104,45 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
     }
   }
 
+  const setSelectProduct = async () => {
+    let product = productsSearch[indexSelect]
+
+    if (quantity <= 0) {
+      setAlertSnackbar('🚫 Quantidade não pode ser zero!')
+      return
+    }
+
+    if (originId === 1 && product.stock < quantity) {
+      setAlertSnackbar('🚫 Quantidade maior que estoque!')
+      return
+    }
+
+    if(products.find(productFind => product.code === productFind.code)){
+      setAlertSnackbar('🚫 Produto já lançado nessa transferência!')
+      document.getElementById('searchId').focus()
+      return
+    }
+
+    product = {
+      item: products.length + 1,
+      quantity,
+      status: 'P',
+      id: product.code,
+      ...product,
+    }
+
+    if (transferUpdate) {
+      await api.put(`/transfer/${transferUpdate.id}/product/add`, { product })
+    }
+
+    setProducts([...products, product])
+    setProductsSearch([])
+    setQuantity('')
+    setSearch('')
+
+    document.getElementById('searchId').focus()
+  }
+
   const handleSendTransfer = async e => {
     e.preventDefault()
 
@@ -124,7 +150,7 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
       const originShop = shopsSce.filter(shop => shop.code === originId).map(shop => shop.name)
       const destinyShop = shopsSce.filter(shop => shop.code === destinyId).map(shop => shop.name)
   
-      const dataCreate = {
+      const transferRequest = {
         issue,
         reason,
         observation,
@@ -135,9 +161,9 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
         products,
       }
 
-      const { data } = await api.post('transfer', dataCreate)
+      const { data } = await api.post('transfer', { transferRequest })
   
-      setTransfers(state => [...state, data])
+      setTransfers(state => [...state, ...data])
       setOpen(false)
     } catch (error) {
       console.log(error)
@@ -146,46 +172,43 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
     }
   }
 
-  const handleUpdateTransfer = e => {
+  const handleUpdateTransfer = async e => {
     e.preventDefault()
 
-    const originShop = shopsSce.filter(shop => shop.code === originId).map(shop => shop.name)
-    const destinyShop = shopsSce.filter(shop => shop.code === destinyId).map(shop => shop.name)
+    const { data } = await api.put(
+      `transfer/${transferUpdate.id}`, 
+      {
+        transferOfProductRequest: {
+          issue,
+          reason,
+          observation,
+          products,
+        }
+      }
+    )
 
-    const data = {
-      status: transferUpdate.status,
-      code: transferUpdate.code,
-      issue,
-      issueIso: issue,
-      reason,
-      observation,
-      originId,
-      origin: originShop,
-      destinyId,
-      destiny: destinyShop,
-      user: transferUpdate.user,
-      products,
-    }
+    const { transferOfProducts } = data
 
-    setTransfers(state => state.map(transf => transf.code === data.code ? data : transf))
+    setTransfers(state => state.map(transf => transf.id === transferOfProducts.id ? transferOfProducts : transf))
     setOpen(false)
   }
 
-  const handleDeleteProduct = code => {
-    setProducts(state => state.filter(product => product.code !== code))
+  const handleDeleteProduct = async id => {
+    if (transferUpdate) {
+      await api.put(`/transfer/${transferUpdate.id}/product/${id}/rmv`)
+    }
+    setProducts(state => state.filter(product => product.id !== id))
   }
 
   useEffect(() => {
-    if (search.length > 3) {
+    debounce(() => {
       api.get('product', {
         params: {
           type: typeSearch,
           search
         }
       }).then(({ data }) => setProductsSearch(data))
-    } else {
-      setProductsSearch([])
-    }
+    }, 1300)
   }, [search, typeSearch])
 
   useEffect(() => {
@@ -199,14 +222,14 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
   }, [transferUpdate])
 
   return (
-    <form onSubmit={!transferUpdate ? handleSendTransfer : handleUpdateTransfer}>
+    <form>
       <Box mb={2} className={classes.boxField}>
         <TextField
           id="code"
           label="Código"
           variant='outlined'
           placeholder=''
-          value={transferUpdate ? transferUpdate.code : ''}
+          value={transferUpdate ? transferUpdate.id : ''}
           InputLabelProps={{
             shrink: true,
           }}
@@ -264,7 +287,8 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
             label="Origem"
             id="origin"
             value={originId}
-            onChange={e => setOriginId(Number(e.target.value))}
+            onChange={changeOriginId}
+            disabled={(transferUpdate ? true : false) || products.length > 0}
             margin='dense'
           >
             <MenuItem value={0}>
@@ -285,9 +309,10 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
             label="Destino"
             id="destiny"
             value={destinyId}
-            onChange={e => setDestinyId(Number(e.target.value))}
+            onChange={changeDestinyId}
             defaultValue={0}
             margin='dense'
+            disabled={disableDestinyId || (transferUpdate ? true : false) || products.length > 0}
           >
             <MenuItem value={0}>
               <em>None</em>
@@ -339,10 +364,10 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
           id="quantifyId"
           label="Quantidade"
           variant='outlined'
-          type='number'
           value={quantity}
           onChange={e => {
             if (e.target.value <= 0) {
+              setAlertSnackbar('Valor não pode ser menor que 0')
               return
             }
             setQuantity(Number(e.target.value))
@@ -409,7 +434,7 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
                   <TableCell>
                     { (!transferUpdate || product.status === 'P') &&
                       <Tooltip title='Excluir produto'>
-                        <IconButton onClick={() => handleDeleteProduct(product.code)}>
+                        <IconButton onClick={() => handleDeleteProduct(product.id)}>
                           <Delete />
                         </IconButton>
                       </Tooltip>
@@ -423,10 +448,17 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
       </Box>
 
       <Box>
-        <ButtonSuccess type='button'>{transferUpdate ? 'Atualizar' : 'Gravar'}</ButtonSuccess>
+        <ButtonSuccess
+          type='button'
+          onClick={!transferUpdate ? handleSendTransfer : handleUpdateTransfer}
+        >
+          {transferUpdate ? 'Atualizar' : 'Gravar'}
+        </ButtonSuccess>
         <ButtonCancel
           onClick={() => setOpen(false)}
-        >Cancelar</ButtonCancel>
+        >
+          Cancelar
+        </ButtonCancel>
       </Box>
     </form>
   )

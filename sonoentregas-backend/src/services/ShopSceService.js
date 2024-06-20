@@ -12,14 +12,16 @@
 const ShopsSceModel = require('../models/ShopsSce')
 
 class ShopsSce {
-  async find() {
+  async find(connection) {
     /**@type {IShops[]} */
-    const shops = await ShopsSceModel.findAll(1)
+    const shops = await ShopsSceModel.findAll(1, '*', connection)
 
     const shopsMap = shops.map(shop => {
       return {
         code: shop.CODIGO,
-        name: shop.NOME
+        name: shop.NOME,
+        address: `${shop.ENDERECO}, ${shop.CIDADE} - ${shop.ESTADO}`,
+        fone: shop.FONE
       }
     })
 

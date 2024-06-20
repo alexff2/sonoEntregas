@@ -2,8 +2,10 @@ CREATE TABLE PRODLOJAS_SERIES (
 	id INT PRIMARY KEY,
 	productId FLOAT NOT NULL FOREIGN KEY REFERENCES PRODUTOS(CODIGO),
 	serialNumber INT,
-	dateEntered DATETIME NOT NULL,
 	moduleEntered VARCHAR(12) NOT NULL,
-	dateIsOut VARCHAR(12),
-	moduleIsOut VARCHAR(12)
+	moduleEnteredId INT,
+	dateBeepEntered DATETIME NOT NULL,
+	moduleIsOut VARCHAR(12),
+	moduleIsOutId INT,
+	dateBeepIsOut VARCHAR(12)
 )

@@ -6,6 +6,7 @@ import useStyles from '../style'
 
 import api from '../../../services/api'
 
+import { useBackdrop } from '../../../context/backdropContext'
 import { useAlertSnackbar } from '../../../context/alertSnackbarContext'
 
 import { getDateSql } from '../../../functions/getDates'
@@ -50,7 +51,7 @@ const Row = ({ transfer, handleOpenCreateUpdate }) => {
           </IconButton>
         </TableCell>
         <CellStatus>{transfer.status}</CellStatus>
-        <TableCell>{transfer.code}</TableCell>
+        <TableCell>{transfer.id}</TableCell>
         <TableCell>{transfer.issue}</TableCell>
         <TableCell>{transfer.originId} - {transfer.origin}</TableCell>
         <TableCell>{transfer.destinyId} - {transfer.destiny}</TableCell>
@@ -83,12 +84,14 @@ export default function Transfer() {
   const [ transfers, setTransfers ] = useState([])
   const [ transferUpdate, setTransferUpdate ] = useState(null)
   const [ search, setSearch ] = useState('')
-  const [ typeSearch, setTypeSearch ] = useState('code')
+  const [ typeSearch, setTypeSearch ] = useState('id')
 
   const classes = useStyles()
+  const { setOpenBackDrop } = useBackdrop()
   const { setAlertSnackbar } = useAlertSnackbar()
 
   const searchTransferProduct = async () => {
+    setOpenBackDrop(true)
     try {
       if (search === '') {
         setAlertSnackbar('Digite a pesquisa')
@@ -104,8 +107,10 @@ export default function Transfer() {
       })
 
       setTransfers(data)
+      setOpenBackDrop(false)
     } catch (error) {
       setAlertSnackbar('Error no servidor entre em contato com administrador')
+      setOpenBackDrop(false)
       console.log(error)
     }
   }
@@ -116,7 +121,7 @@ export default function Transfer() {
   }
 
   const handleChangeTypeSearch = e => {
-    e.target.value === 'code' ? setSearch('') : setSearch(getDateSql())
+    e.target.value === 'id' ? setSearch('') : setSearch(getDateSql())
 
     setTypeSearch(e.target.value)
   }
@@ -134,8 +139,8 @@ export default function Transfer() {
             onChange={handleChangeTypeSearch}
             defaultValue={typeSearch}
           >
-            <MenuItem value={'code'}>Nº Transf.</MenuItem>
-            <MenuItem value={'dateIssue'}>Emissão</MenuItem>
+            <MenuItem value={'id'}>Nº Transf.</MenuItem>
+            <MenuItem value={'issue'}>Emissão</MenuItem>
           </Select>
         </FormControl>
 
@@ -144,7 +149,7 @@ export default function Transfer() {
             <SearchIcon/>
           </div>
           <InputBase
-            type={typeSearch === 'dateIssue' ? "date": "text"}
+            type={typeSearch === 'issue' ? "date": "text"}
             placeholder="Pesquisar…"
             classes={{
               root: classes.inputRoot,
@@ -153,6 +158,7 @@ export default function Transfer() {
             inputProps={{ 'aria-label': 'search' }}
             value={search}
             onChange={e => setSearch(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && searchTransferProduct()}
           />
         </div>
 
@@ -178,7 +184,7 @@ export default function Transfer() {
           <TableBody>
             {transfers.map( transfer => (
               <Row
-                key={transfer.code}
+                key={transfer.id}
                 transfer={transfer}
                 handleOpenCreateUpdate={handleOpenCreateUpdate}
               />

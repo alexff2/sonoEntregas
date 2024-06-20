@@ -7,9 +7,9 @@ const InsertKardex = require('./InsertKardex')
  * @property {string} MODULO
  * @property {string} DOC
  * @property {string} OBS
- * @property {number} VALOR
  * @property {string} USUARIO
- * @property {string} tipo
+ * @property {string} VALOR
+ * @property {'E' |'S'} tipo
  */
 
 module.exports = {
@@ -61,7 +61,8 @@ module.exports = {
 
     prod["saldo"] = estAtual
     prod["CODIGO"] = prodLoja.CODIGO
+    prod["value"] = kardex.VALOR
 
-    await InsertKardex.createKardex(prod, kardex)
+    await InsertKardex.createKardex(prod, kardex, null)
   }
 }

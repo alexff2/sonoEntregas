@@ -19,9 +19,9 @@ export default function ShowProductsTransfer({ products }) {
         <TableHead>
           <TableRow>
             <TableCell>Item</TableCell>
-            <TableCell>Quantidade</TableCell>
-            <TableCell>Descrição</TableCell>
             <TableCell>Código</TableCell>
+            <TableCell>Descrição</TableCell>
+            <TableCell>Quantidade</TableCell>
             <TableCell>Status</TableCell>
           </TableRow>
         </TableHead>
@@ -34,9 +34,9 @@ export default function ShowProductsTransfer({ products }) {
               onClick={() => handleOpenModalSerialNumber(product.serialNumbers)}
             >
               <TableCell>{product.item}</TableCell>
-              <TableCell>{product.quantity}</TableCell>
+              <TableCell>{product.id}</TableCell>
               <TableCell>{product.name}</TableCell>
-              <TableCell>{product.code}</TableCell>
+              <TableCell>{product.quantity}</TableCell>
               <CellStatus>{product.status}</CellStatus>
             </TableRow>
           ))}

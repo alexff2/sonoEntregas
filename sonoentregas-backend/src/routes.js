@@ -86,6 +86,10 @@ WHERE A.CODIGO LIKE '2%'
   // Transfer
   routes.get('/transfer', transferController.find)
   routes.post('/transfer', ensureAuthenticated, transferController.create)
+  routes.put('/transfer/:id', ensureAuthenticated, transferController.update)
+  routes.put('/transfer/:id/product/add', ensureAuthenticated, transferController.addProduct)
+  routes.put('/transfer/:id/product/:productId/rmv', ensureAuthenticated, transferController.rmvProduct)
+  routes.delete('/transfer/:id', ensureAuthenticated, transferController.delete)
   //Sales SCE Shops
   routes.get('/salesshop/:emissao/:loja', salesSceController.salesSce)
   routes.get('/sales/:codDAV/shop/:idShop/products', salesSceController.salesSceProd)
