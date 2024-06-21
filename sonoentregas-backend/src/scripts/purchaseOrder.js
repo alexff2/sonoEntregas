@@ -33,6 +33,7 @@ module.exports = {
     CONVERT(VARCHAR, EMISSAO, 103) issue,
     CONVERT(VARCHAR, EMISSAO, 23) issueToInput,
     CONVERT(VARCHAR, CREATE_AT, 103) release,
+    CASE WHEN TIPO_PEDIDO = '1' THEN 'normal' ELSE 'bonus' END AS [type1],
     CASE WHEN TIPOFRETE = 'CIF' THEN 'normal' ELSE 'maintenance' END AS [type]
     FROM PEDFOR A
     LEFT JOIN FUNCIONARIO B ON A.COMPRADOR = B.CODIGO

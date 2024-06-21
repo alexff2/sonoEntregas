@@ -1,3 +1,5 @@
+//@ts-check
+const ProductModel = require('../models/Produtos')
 const PurchaseOrderService = require('../services/PurchaseOrderService')
 
 module.exports = {
@@ -51,21 +53,24 @@ module.exports = {
     }
   },
   async create(_request, response){
+    const { sequelize, transaction } = await ProductModel._query(1)
     try {
       let purchaseOrder = await PurchaseOrderService.findByCodeOrIssueOrOpen({})
 
       if (purchaseOrder.length === 0) {
-        purchaseOrder = await PurchaseOrderService.create()
+        purchaseOrder = await PurchaseOrderService.create({ sequelize, transaction })
       } else {
         purchaseOrder = purchaseOrder[0]
       }
 
       purchaseOrder['products'] = await PurchaseOrderService.findProducts(purchaseOrder.id, 'ITEM')
 
+      await transaction.commit()
       return response.status(200).json({ 
         purchaseOrder
       })
     } catch (e) {
+      await transaction.rollback()
       console.log(e)
 
       let status = e.status ? e.status : 400
@@ -75,14 +80,17 @@ module.exports = {
     }
   },
   async update(request, response){
+    const { sequelize, transaction } = await ProductModel._query(1)
     try {
       const { id } = request.params
       const { fieldToUpdate, value } = request.body
 
-      await PurchaseOrderService.update(fieldToUpdate, value, id)
+      await PurchaseOrderService.update(fieldToUpdate, value, id, { sequelize, transaction })
 
+      await transaction.commit()
       return response.status(200).json('')
     } catch (e) {
+      await transaction.rollback()
       console.log(e)
 
       let status = e.status ? e.status : 400
@@ -92,14 +100,16 @@ module.exports = {
     }
   },
   async addProduct(request, response){
+    const { id } = request.params
+    const {
+      productId,
+      productName,
+      quantity,
+      value,
+      type1
+    } = request.body
+    const { sequelize, transaction } = await ProductModel._query(1)
     try {
-      const { id } = request.params
-      const {
-        productId,
-        productName,
-        quantity,
-        value
-      } = request.body
 
       const purchaseOrder = await PurchaseOrderService.findByCodeOrIssueOrOpen({
         code: id
@@ -126,13 +136,17 @@ module.exports = {
         productId,
         productName,
         quantity,
-        value
+        value,
+        type1,
+        connection: { sequelize, transaction }
       })
 
-      await PurchaseOrderService.updateValues(id)
+      await PurchaseOrderService.updateValues(id, { sequelize, transaction })
 
+      await transaction.commit()
       return response.status(201).json({ itemId })
     } catch (e) {
+      await transaction.rollback()
       console.log(e)
 
       let status = e.status ? e.status : 400
@@ -142,15 +156,18 @@ module.exports = {
     }
   },
   async rmvProduct(request, response) {
+    const { sequelize, transaction } = await ProductModel._query(1)
     try {
       const { id, item } = request.params
 
-      await PurchaseOrderService.rmvProduct({ id, item })
+      await PurchaseOrderService.rmvProduct({ id, item }, { sequelize, transaction })
 
-      await PurchaseOrderService.updateValues(id)
+      await PurchaseOrderService.updateValues(id, { sequelize, transaction })
 
+      await transaction.commit()
       return response.status(200).json('')
     } catch (e) {
+      await transaction.rollback()
       console.log(e)
 
       let status = e.status ? e.status : 400
@@ -160,6 +177,7 @@ module.exports = {
     }
   },
   async changeQuantity(request, response) {
+    const { sequelize, transaction } = await ProductModel._query(1)
     try {
       const { id, item } = request.params
       const { quantity } = request.body
@@ -168,12 +186,14 @@ module.exports = {
         id,
         item,
         quantity
-      })
+      }, { sequelize, transaction })
 
-      await PurchaseOrderService.updateValues(id)
+      await PurchaseOrderService.updateValues(id, { sequelize, transaction })
 
+      await transaction.commit()
       return response.status(200).json('')
     } catch (e) {
+      await transaction.rollback()
       console.log(e)
 
       let status = e.status ? e.status : 400
@@ -183,13 +203,16 @@ module.exports = {
     }
   },
   async close(request, response) {
+    const { sequelize, transaction } = await ProductModel._query(1)
     try {
       const { id } = request.params
 
-      await PurchaseOrderService.close(id)
+      await PurchaseOrderService.close(id, { sequelize, transaction })
 
+      await transaction.commit()
       return response.status(200).json('')
     } catch (e) {
+      await transaction.rollback()
       console.log(e)
 
       let status = e.status ? e.status : 400
@@ -199,6 +222,7 @@ module.exports = {
     }
   },
   async open(request, response) {
+    const { sequelize, transaction } = await ProductModel._query(1)
     try {
       const { id } = request.params
 
@@ -211,10 +235,12 @@ module.exports = {
         }
       }
 
-      await PurchaseOrderService.open(id)
+      await PurchaseOrderService.open(id, { sequelize, transaction })
 
+      await transaction.commit()
       return response.status(200).json('')
     } catch (e) {
+      await transaction.rollback()
       console.log(e)
 
       let status = e.status ? e.status : 400

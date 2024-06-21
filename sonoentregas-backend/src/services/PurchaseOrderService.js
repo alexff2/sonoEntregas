@@ -1,3 +1,4 @@
+// @ts-check
 const { QueryTypes } = require('sequelize')
 const Produtos = require("../models/Produtos")
 const DB = require("../models/Produtos")
@@ -46,11 +47,11 @@ class PurchaseOrderService {
       }))
   }
 
-  async create() {
+  async create(connection) {
     const date = new DateTime().getISODateTimeBr2().date
 
-    const maxId = await DB._query(1, scriptPurchaseOrder.maxId(), QueryTypes.SELECT)
-    const maxSequence = await DB._query(1, scriptPurchaseOrder.maxSequence(), QueryTypes.SELECT)
+    const maxId = await DB._query(1, scriptPurchaseOrder.maxId(), QueryTypes.SELECT, connection)
+    const maxSequence = await DB._query(1, scriptPurchaseOrder.maxSequence(), QueryTypes.SELECT, connection)
 
     const script = scriptPurchaseOrder.insert({
       id: 1 + maxId[0].MAX_ID,
@@ -58,17 +59,18 @@ class PurchaseOrderService {
       sequence: 1 + maxSequence[0].MAX_SEQUENCIA
     })
 
-    await DB._query(1, script)
+    await DB._query(1, script, QueryTypes.INSERT, connection)
 
     const purchaseStart = await this.findByCodeOrIssueOrOpen({})
 
     return purchaseStart[0]
   }
 
-  async update(field, value, id) {
+  async update(field, value, id, connection) {
     const fieldData = {
       issue: 'EMISSAO',
       type: 'TIPOFRETE',
+      type1: 'TIPO_PEDIDO',
       factoryData: 'FACTORY_DATA',
       obs: 'OBSERVACAO',
       employeeId: 'COMPRADOR',
@@ -78,11 +80,15 @@ class PurchaseOrderService {
       value = value === 'normal' ? 'CIF' : 'FOB'
     }
 
+    if (field === 'type1') {
+      value = value === 'normal' ? '1' : '0'
+    }
+
     if (fieldData[field] === undefined) {
       throw new Error('Error interno!')
     }
 
-    await DB._query(1, scriptPurchaseOrder.updateByField(fieldData[field], value, id))
+    await DB._query(1, scriptPurchaseOrder.updateByField(fieldData[field], value, id), QueryTypes.UPDATE, connection)
   }
 
   async addProduct({
@@ -90,9 +96,11 @@ class PurchaseOrderService {
     productId,
     productName,
     quantity,
-    value
+    value,
+    type1,
+    connection
   }) {
-    const itemDb = await DB._query(1, scriptPurchaseOrder.maxItem(id), QueryTypes.SELECT)
+    const itemDb = await DB._query(1, scriptPurchaseOrder.maxItem(id), QueryTypes.SELECT, connection)
 
     const item = !itemDb[0].MAX_ITEM ? 1 : itemDb[0].MAX_ITEM + 1
 
@@ -101,43 +109,43 @@ class PurchaseOrderService {
       productId,
       productName,
       quantity,
-      value,
+      value: type1 === 'normal' ? value : 0,
       item
     })
 
-    await DB._query(1, script)
+    await DB._query(1, script, QueryTypes.INSERT, connection)
 
     return item
   }
 
-  async updateValues(id) {
+  async updateValues(id, connection) {
     const script = scriptPurchaseOrder.updateValues(id)
 
-    await DB._query(1, script)
+    await DB._query(1, script, QueryTypes.UPDATE, connection)
   }
 
-  async rmvProduct({id, item}) {
+  async rmvProduct({id, item}, connection) {
     const script = scriptPurchaseOrder.rmvProduct(id, item)
 
-    await DB._query(1, script)
+    await DB._query(1, script, QueryTypes.DELETE, connection)
   }
 
-  async changeQuantity({ id, item, quantity}) {
+  async changeQuantity({ id, item, quantity}, connection) {
     const script = scriptPurchaseOrder.changeQuantity(id, item, quantity)
 
-    await DB._query(1, script)
+    await DB._query(1, script, QueryTypes.UPDATE, connection)
   }
 
-  async close(id) {
+  async close(id, connection) {
     const script = scriptPurchaseOrder.close(id)
 
-    await DB._query(1, script)
+    await DB._query(1, script, QueryTypes.UPDATE, connection)
   }
 
-  async open(id) {
+  async open(id, connection) {
     const script = scriptPurchaseOrder.open(id)
 
-    await DB._query(1, script)
+    await DB._query(1, script, QueryTypes.UPDATE, connection)
   }
 }
 

@@ -81,6 +81,7 @@ const purchaseOrderStates = {
   id: 0,
   issue: '2010-01-01',
   type: 'normal',
+  type1: 'normal',
   factoryData: '',
   employeeId: '',
   employeeName: '',
@@ -113,6 +114,7 @@ export default function CreateUpdatePurchaseOrder({
         id: data.purchaseOrder.id,
         issue: data.purchaseOrder.issueToInput,
         type: data.purchaseOrder.type,
+        type1: data.purchaseOrder.type1,
         factoryData: data.purchaseOrder.factoryData,
         obs: data.purchaseOrder.obs,
         employeeId: data.purchaseOrder.employeeId,
@@ -413,7 +415,27 @@ export default function CreateUpdatePurchaseOrder({
               />
             </RadioGroup>
           </FormControl>
+          <FormControl component='fieldset'>
+            <RadioGroup
+              aria-label='type'
+              name='type12'
+              value={purchaseOrder.type1}
+              onChange={handleChange}
+            >
+              <FormControlLabel
+                value='normal'
+                control={<Radio id='type1' style={{padding: 2}}/>}
+                label='Normal'
+              />
+              <FormControlLabel
+                value='bonus'
+                control={<Radio id='type1' style={{padding: 2}}/>}
+                label='Bonificado'
+              />
+            </RadioGroup>
+          </FormControl>
         </Box>
+
         <Box
           border='1px solid #CCC'
           padding={1}
@@ -501,6 +523,7 @@ export default function CreateUpdatePurchaseOrder({
             </TableContainer>
           }
         </Box>
+
         <Box
           border='1px solid #CCC'
           padding={1}
@@ -569,6 +592,7 @@ export default function CreateUpdatePurchaseOrder({
             </Table>
           </TableContainer>
         </Box>
+
         <Box
           border='1px solid #CCC'
           padding={1}
@@ -601,6 +625,7 @@ export default function CreateUpdatePurchaseOrder({
             onChange={handleChange}
           />
         </Box>
+
         <Box
           border='1px solid #CCC'
           padding={1}
