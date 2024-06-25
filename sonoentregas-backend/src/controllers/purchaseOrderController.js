@@ -63,7 +63,10 @@ module.exports = {
         purchaseOrder = purchaseOrder[0]
       }
 
-      purchaseOrder['products'] = await PurchaseOrderService.findProducts(purchaseOrder.id, 'ITEM')
+      purchaseOrder['products'] = await PurchaseOrderService.findProducts(purchaseOrder.id, 'ITEM', {
+        sequelize,
+        transaction
+      })
 
       await transaction.commit()
       return response.status(200).json({ 

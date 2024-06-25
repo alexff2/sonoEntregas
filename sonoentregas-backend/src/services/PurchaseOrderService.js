@@ -20,18 +20,18 @@ class PurchaseOrderService {
     return purchases
   }
 
-  async findByCodeOrIssueOrOpen({code = '', issue ='', open = true}) {
+  async findByCodeOrIssueOrOpen({code = '', issue ='', open = true}, connection) {
     const script = scriptPurchaseOrder.purchaseOrder({code, issue, open})
 
-    const purchaseOrder = await Produtos._query(1, script, QueryTypes.SELECT)
+    const purchaseOrder = await Produtos._query(1, script, QueryTypes.SELECT, connection)
 
     return purchaseOrder
   }
 
-  async findProducts(idsPurchase, order = 'NOME'){
+  async findProducts(idsPurchase, order = 'NOME', connection){
     const script = scriptPurchaseOrder.purchaseOrderProduct(idsPurchase, order)
 
-    const productsPurchaseOrder = await Produtos._query(1, script, QueryTypes.SELECT)
+    const productsPurchaseOrder = await Produtos._query(1, script, QueryTypes.SELECT, connection)
 
     return productsPurchaseOrder
       .map(prod => ({
@@ -61,7 +61,7 @@ class PurchaseOrderService {
 
     await DB._query(1, script, QueryTypes.INSERT, connection)
 
-    const purchaseStart = await this.findByCodeOrIssueOrOpen({})
+    const purchaseStart = await this.findByCodeOrIssueOrOpen({}, connection)
 
     return purchaseStart[0]
   }
