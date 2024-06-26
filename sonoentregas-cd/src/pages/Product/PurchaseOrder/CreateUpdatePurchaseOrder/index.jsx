@@ -232,8 +232,8 @@ export default function CreateUpdatePurchaseOrder({
           item: data.itemId,
           ...searchProductSelect,
           originalCode: searchProductSelect.generalCode,
-          value: searchProductSelect.purchasePrice,
-          total: searchProductSelect.purchasePrice * quantityInput,
+          value: purchaseOrder.type1 === 'normal' ? searchProductSelect.purchasePrice : 0,
+          total: purchaseOrder.type1 === 'normal' ? searchProductSelect.purchasePrice * quantityInput : 0,
           quantity: quantityInput 
         }
       ])

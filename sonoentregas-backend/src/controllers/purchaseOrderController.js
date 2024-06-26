@@ -108,8 +108,7 @@ module.exports = {
       productId,
       productName,
       quantity,
-      value,
-      type1
+      value
     } = request.body
     const { sequelize, transaction } = await ProductModel._query(1)
     try {
@@ -140,7 +139,7 @@ module.exports = {
         productName,
         quantity,
         value,
-        type1,
+        type1: purchaseOrder[0].type1,
         connection: { sequelize, transaction }
       })
 
