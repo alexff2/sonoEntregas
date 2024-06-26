@@ -35,82 +35,71 @@ module.exports = {
   /**
    * @param {number} id 
    * @param {Object} maint 
+   * @param {Object} connections
    */
-  async moveToMaint(id, maint){
-    try {
-      //Valores para Kardex
-      const kardex = {
-        MODULO: 'ASSISTENCIA',
-        DOC: maint.ID_SALE,
-        OBS: `Entrega de assistência Nº ${maint.ID}`,
-        VALOR: maint.UNITARIO1,
-        USUARIO: 'DEFAULT',
-        tipo: 'S'
-      }
+  async moveToMaint(id, maint, connections = {entrega: false, sce: false}){
+    const { entrega, sce } = connections
+    await MaintenanceDeliv.updateAny(0, { D_DELIVING: maint.date }, { ID: id }, entrega)
 
-      await MaintenanceDeliv.updateAny(0, { D_DELIVING: maint.date }, { ID: id })
+    if(maint.CHANGE_PROD) await ProdLojaService.updateEstProdloja(maint, {
+      MODULO: 'ASSISTENCIA',
+      DOC: maint.ID_SALE,
+      OBS: `Entrega de assistência Nº ${maint.ID}`,
+      VALOR: maint.UNITARIO1,
+      USUARIO: 'DEFAULT',
+      tipo: 'S'
+    }, sce)
 
-      if(maint.CHANGE_PROD) await ProdLojaService.updateEstProdloja(maint, kardex)
-  
-      await Maintenance.updateAny(0, { STATUS: 'Em deslocamento' }, { ID: maint.ID })
-    } catch (error) {
-      console.log(error)
-    }
+    await Maintenance.updateAny(0, { STATUS: 'Em deslocamento' }, { ID: maint.ID }, entrega)
   },
   /**
-   * 
-   * @param {number} ID 
-   * @param {Object} maint 
+   * @param {number} ID
+   * @param {Object} maint
+   * @param {Object} connection
    */
-  async finishToMaintNotReturn(ID, maint){
-    try {
-      await Maintenance.updateAny(0, { 
-        D_FINISH: maint.date,
-        STATUS: 'Finalizada'
-      }, { ID: maint.ID })
-    } catch (error) {
-      console.log(error)
-    }
+  async finishToMaintNotReturn(ID, maint, connection){
+    await MaintenanceDeliv.updateAny(0, { D_DELIVERED: maint.date }, { ID }, connection)
+
+    await Maintenance.updateAny(0, { 
+      D_FINISH: maint.date,
+      STATUS: 'Finalizada'
+    }, { ID: maint.ID }, connection)
   },
   /**
    * @param {number} ID 
    * @param {Object} maint
+   * @param {Object} connections
    */
-  async finishToMaintReturn(ID, maint){
-    try {
-      //Valores para Kardex
-      const kardex = {
-        MODULO: 'ASSISTÊNCIA',
-        DOC: maint.ID_SALE,
-        OBS: `Retorno de assistência Nº ${maint.ID}`,
-        VALOR: maint.UNITARIO1,
-        USUARIO: 'DEFAULT',
-        tipo: 'E'
-      }
+  async finishToMaintReturn(ID, maint, connections){
+    //Valores para Kardex
+    await MaintenanceDeliv.updateAny(0, {
+      DONE: 0,
+      D_DELIVERED: maint.date,
+      REASON_RETURN: maint.reasonReturn
+    }, { ID })
 
-      await MaintenanceDeliv.updateAny(0, {
-        DONE: 0,
-        D_DELIVERED: maint.date,
-        REASON_RETURN: maint.reasonReturn
-      }, { ID })
+    if(maint.CHANGE_PROD) await ProdLojaService.updateEstProdloja(maint, {
+      MODULO: 'ASSISTÊNCIA',
+      DOC: maint.ID_SALE,
+      OBS: `Retorno de assistência Nº ${maint.ID}`,
+      VALOR: maint.UNITARIO1,
+      USUARIO: 'DEFAULT',
+      tipo: 'E'
+    }, connections.sce)
 
-      if(maint.CHANGE_PROD) await ProdLojaService.updateEstProdloja(maint, kardex)
-
-      await Maintenance.updateAny(0, { STATUS: 'No CD' }, {ID: maint.ID})
-    } catch (error) {
-      console.log(error)
-    }
+    await Maintenance.updateAny(0, { STATUS: 'No CD' }, {ID: maint.ID}, connections.entrega)
   },
   /**
    * @param {string} codloja
    * @param {string} loc
+   * @param {Object | null} connection
    * @returns 
    */
-  async getViewMaint(codloja = '', loc = 'Shop'){
+  async getViewMaint(codloja = '', loc = 'Shop', connection){
     codloja = codloja !== 'null' ? ` AND CODLOJA = ${codloja}` : ''
     loc = loc === 'Shop' ? '' : ' AND TO_CD = 1'
 
-    const maint = await ViewMaintenance.findSome(0, `STATUS <> 'Finalizada'${codloja}${loc} ORDER BY ID`)
+    const maint = await ViewMaintenance.findSome(0, `STATUS <> 'Finalizada'${codloja}${loc} ORDER BY ID`, '*', connection)
 
     for(var i in maint){
       maint[i].DATE_PREV = maint[i].DATE_PREV !== null && ObjDate.setDaysInDate(maint[i].DATE_PREV,2)

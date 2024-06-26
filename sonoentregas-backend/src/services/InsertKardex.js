@@ -47,35 +47,7 @@ module.exports = {
 
     const script = `INSERT KARDEX_PRODUTOS_HISTORICO
     VALUES 
-      (${ID}
-      , 1
-      , '${dateNow}'
-      , '${horasNow}'
-      , '${kardex.MODULO}'
-      , '${kardex.DOC}'
-      , ${prod.CODIGO}
-      , ${qtdEntra}
-      , ${qtdSai}
-      , '${kardex.tipo}'
-      , '${kardex.OBS}'
-      , -1
-      , ''
-      , 1
-      , 'S'
-      , ${prod.VALOR}
-      , 0
-      , -1
-      , '${kardex.USUARIO}'
-      , 1
-      , -1
-      , ${prod.QUANTIDADE}
-      , 'UN'
-      , ${SEQ}
-      , ${prod.saldo}
-      , 'S'
-        , ${kardex.DOC}
-        , NULL 
-        , NULL)`
+      (${ID}, 1, '${dateNow}', '${horasNow}', '${kardex.MODULO}', '${kardex.DOC}', ${prod.CODIGO}, ${qtdEntra}, ${qtdSai}, '${kardex.tipo}', '${kardex.OBS}', -1, '', 1, 'S', ${prod.value}, 0, -1, '${kardex.USUARIO}', 1, -1, ${prod.QUANTIDADE}, 'UN', ${SEQ}, ${prod.saldo}, 'S', ${kardex.DOC}, NULL , NULL)`
     await Produto._query(1, script, QueryTypes.INSERT, connection)
   },
   /**

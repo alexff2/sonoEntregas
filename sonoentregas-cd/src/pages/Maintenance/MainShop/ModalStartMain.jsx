@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Box,
   makeStyles,
@@ -24,6 +24,7 @@ import { useAssistants } from '../../../context/assistantContext'
 import { useDelivery } from '../../../context/deliveryContext'
 import { useAlert } from '../../../context/alertContext'
 import { useMaintenance } from '../../../context/maintenanceContext'
+import { useBackdrop } from '../../../context/backdropContext'
 
 import api from '../../../services/api'
 
@@ -82,13 +83,38 @@ export default function ModalStartMain({ selectMain, setOpen }) {
   const [idAssist, setIdAssist] = useState(0)
   const [obs, setObs] = useState('')
   const { setChildrenModal, setOpen: setOpenAlert } = useAlert()
-  const { cars } = useCars()
-  const { drivers } = useDrivers()
-  const { assistants } = useAssistants()
-  const { delivery } = useDelivery()
+  const { cars, setCars } = useCars()
+  const { drivers, setDrivers } = useDrivers()
+  const { assistants, setAssistants } = useAssistants()
+  const { delivery, setDelivery } = useDelivery()
   const { setMaintenance } = useMaintenance()
+  const { setOpenBackDrop } = useBackdrop()
 
   const classes = useStyles()
+
+  useEffect(() => {
+    const searchUsers = async () => {
+      setOpenBackDrop(true)
+      if (assistants.length === 0) {
+        const { data: usersResponse } = await api.get('users/0')
+        const { data: carsResponse } = await api.get('cars')
+
+        setCars(carsResponse)
+        setDrivers(usersResponse.filter(user => user.OFFICE === 'Driver'))
+        setAssistants(usersResponse.filter(user => user.OFFICE === 'Assistant'))
+      }
+
+      if(delivery.length === 0) {
+        const { data: dataDeliveries } = await api.get('delivery/open')
+
+        setDelivery(dataDeliveries)
+      }
+
+      setOpenBackDrop(false)
+    }
+
+    searchUsers()
+  }, [setCars, setDrivers, setAssistants, assistants, delivery, setDelivery, setOpenBackDrop])
 
   const validateFilds = fields => {
     for(var i = 0; i < fields.length; i++){
@@ -99,7 +125,7 @@ export default function ModalStartMain({ selectMain, setOpen }) {
     }
   }
 
-  const selectDeliv = e => {
+  const onChangeDeliveryId = e => {
     if (e.target.value !== 0 && e.target.value !== 1 ) {
       const newDev = delivery.filter(deliv => deliv.ID === e.target.value)
       setIdDelivMain(newDev[0].ID)
@@ -114,7 +140,7 @@ export default function ModalStartMain({ selectMain, setOpen }) {
       setIdAssist(0)
       setIsDisabled(false)
     } else if (e.target.value === 1){
-      setIdDelivMain(0)
+      setIdDelivMain(1)
       setIdCar(0)
       setIdDriver(48)
       setIdAssist(49)
@@ -128,7 +154,7 @@ export default function ModalStartMain({ selectMain, setOpen }) {
       if(validateFilds([idAssist, idDriver])){
         const {data} = await api.post('maintenancedeliv', {
           idMaint: selectMain.ID,
-          idDelivMain,
+          idDelivMain: idDelivMain === 1 ? 0 : idDelivMain,
           idDriver,
           idAssist,
           obs,
@@ -142,7 +168,7 @@ export default function ModalStartMain({ selectMain, setOpen }) {
       }
     } catch (error) {
       console.log(error)
-      setChildrenModal('Não foi possível conectar com o banco, entre em contato')
+      setChildrenModal('Erro interno, entre em contato com ADM!')
       setOpenAlert(true)
     }
   }
@@ -173,8 +199,8 @@ export default function ModalStartMain({ selectMain, setOpen }) {
                 labelId="RooutLabel"
                 label="Rotas"
                 id="route"
-                defaultValue={0}
-                onChange={selectDeliv}
+                value={idDelivMain}
+                onChange={onChangeDeliveryId}
                 required
               >
                 <MenuItem value={0}>

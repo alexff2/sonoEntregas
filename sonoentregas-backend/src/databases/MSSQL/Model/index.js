@@ -207,7 +207,7 @@ class Model {
     
     await this._query(loja, script, QueryTypes.UPDATE, t, log)
     
-    const data = await this.findSome(loja, `${colum} = ${id}`)
+    const data = await this.findSome(loja, `${colum} = ${id}`, '*', t)
     
     return data[0]
   }

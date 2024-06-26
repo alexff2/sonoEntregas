@@ -1,4 +1,5 @@
 // @ts-check
+const { QueryTypes } = require('sequelize')
 const Prodlojas = require('../models/Produtos')
 const InsertKardex = require('./InsertKardex')
 
@@ -15,16 +16,19 @@ const InsertKardex = require('./InsertKardex')
 module.exports = {
   /**
    * @param {number} prodCodOrig 
+   * @param {Object} connection 
    * @returns 
    */
-  async findProdLoja(prodCodOrig) {
+  async findProdLoja(prodCodOrig, connection) {
     try {
       const prod = await Prodlojas._query(1, 
         `SELECT * FROM PRODUTOS A
         INNER JOIN PRODLOJAS B ON A.CODIGO = B.CODIGO
-        WHERE B.CODLOJA = 1 AND A.ALTERNATI = '${prodCodOrig}'`
+        WHERE B.CODLOJA = 1 AND A.ALTERNATI = '${prodCodOrig}'`,
+        QueryTypes.SELECT,
+        connection
       )
-      return prod[0][0]
+      return prod[0]
     } catch (error) {
       console.log(error)
     }
@@ -32,11 +36,12 @@ module.exports = {
   /**
    * @param {Object} prod 
    * @param {Kardex} kardex 
+   * @param {Object} connection
    */
-  async updateEstProdloja(prod, kardex) {
+  async updateEstProdloja(prod, kardex, connection) {
     var est = 'EST_LOJA'
 
-    const prodLoja = await this.findProdLoja(prod.COD_ORIGINAL)
+    const prodLoja = await this.findProdLoja(prod.COD_ORIGINAL, connection)
 
       var estoque, estAtual
       if(kardex.tipo === 'E'){
@@ -57,12 +62,12 @@ module.exports = {
       UPDATE PRODLOJAS
       SET EST_ATUAL = ${estAtual}, ${est} = ${estoque}
       WHERE CODLOJA = 1 AND CODIGO = ${prodLoja.CODIGO}
-    `)
+    `, QueryTypes.UPDATE, connection)
 
     prod["saldo"] = estAtual
     prod["CODIGO"] = prodLoja.CODIGO
     prod["value"] = kardex.VALOR
 
-    await InsertKardex.createKardex(prod, kardex, null)
+    await InsertKardex.createKardex(prod, kardex, connection)
   }
 }
