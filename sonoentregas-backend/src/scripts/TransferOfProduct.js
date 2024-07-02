@@ -8,7 +8,7 @@ module.exports = {
   },
   findSerialNumbers(ids){
     return `
-    SELECT * FROM PRODLOJAS_SERIES WHERE moduleEntered = 'transfer' AND moduleEnteredId IN (${ids})`
+    SELECT * FROM PRODLOJAS_SERIES_MOVIMENTOS WHERE inputModule = 'transfer' AND inputModuleId IN (${ids})`
   },
   maxCodes(){
     return 'SELECT MAX(CODIGO) maxId, MAX(SEQUENCIA) maxSequence FROM TRANSPRODLOJA'

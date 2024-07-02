@@ -1,0 +1,13 @@
+CREATE TABLE PRODLOJAS_SERIES_MOVIMENTOS (
+	id INT PRIMARY KEY,
+	productId FLOAT NOT NULL FOREIGN KEY REFERENCES PRODUTOS(CODIGO),
+	serialNumber INT NOT NULL,
+	inputModule VARCHAR(12) NOT NULL,
+	inputModuleId INT NOT NULL,
+	inputBeepDate DATETIME NOT NULL,
+	inputUserId INT NOT NULL,
+	outputModule VARCHAR(12),
+	outputModuleId INT,
+	outputBeepDate VARCHAR(12),
+	outputUserId INT,
+)

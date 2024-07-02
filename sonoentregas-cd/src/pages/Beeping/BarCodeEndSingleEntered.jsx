@@ -115,13 +115,13 @@ export default function BarCode({ handleRenderBox }) {
       setSerialNumberSelect('')
 
       if (barCode !== '') {
-        await api.post('serial/first', {
+        const { data } = await api.post('serial/first', {
           serialNumber: serialNumberSelect,
           productId: productSelect.code,
           module: 'single'
         })
   
-        setSerialsNumber([...serialsNumber, serialNumberSelect])
+        setSerialsNumber([...serialsNumber, data.serialNumberResponse])
       }
     } catch (error) {
       console.log(error)
@@ -129,7 +129,7 @@ export default function BarCode({ handleRenderBox }) {
       if (error.response) {
         console.log(error.response.data)
 
-        if (error.response.data === 'serial number is already!') {
+        if (error.response.data === 'the serial number already exists and is not finalized!') {
           setAlertSnackbar('Número de série já usado!')
         }
       }

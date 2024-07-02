@@ -1,5 +1,7 @@
-const { create, findOpenSerieByProduct } = require('../services/SerieService')
-const { createIfDoesNotExist } = require('../rules/SerieRules')
+//@ts-check
+const ProdLojaSeriesMovimentosModel = require('../models/tables/ProdLojaSeriesMovimentos')
+const SerieService = require('../services/SerieService')
+const SerieRules = require('../rules/SerieRules')
 const errorCath = require('../functions/error')
 
 module.exports = {
@@ -7,7 +9,7 @@ module.exports = {
     try {
       const { code } = request.query
 
-      const data = await findOpenSerieByProduct(code)
+      const data = await SerieService.findOpenSerieByProduct(code)
 
       return response.status(200).json(data)
     } catch (error) {
@@ -15,21 +17,67 @@ module.exports = {
     }
   },
   createFirst: async(request, response) => {
-    try {
-      const { serialNumber, productId, module } = request.body
+    const connection = await ProdLojaSeriesMovimentosModel._query(1)
 
-      if (module !== 'single' && module !== 'note') {
+    try {
+      const { serialNumber, productId, module, moduleId } = request.body
+      const { id: userId } = request.user
+
+      if (module !== 'single' && module !== 'purchaseNote' && module !== 'transfer') {
         throw {
           error: 'Module invalid!'
         }
       }
 
-      await createIfDoesNotExist({ serialNumber })
+      if (module !== 'single') await SerieRules.checkModule(module, moduleId)
+      await SerieRules.createIfDoesNotExistFinished({ serialNumber })
 
-      await create({ productId, serialNumber, module })
+      const serialNumberResponse = await SerieService.create({
+        productId,
+        serialNumber,
+        module,
+        moduleId: module === 'single' ? 0 : moduleId,
+        connection,
+        userId
+      })
+
+      await connection.transaction.commit()
+
+      return response.status(200).json({ serialNumberResponse })
+    } catch (erro) {
+      await connection.transaction.rollback()
+      errorCath(erro, response)
+    }
+  },
+  finishesIfOpened: async(request, response) => {
+    const connection = await ProdLojaSeriesMovimentosModel._query(1)
+
+    try {
+      const { serialNumber, module, moduleId } = request.body
+      const { id: userId } = request.user
+
+      if (module !== 'transfer' && module !== 'delivery') {
+        throw {
+          error: 'Module invalid!'
+        }
+      }
+
+      await SerieRules.checkModule(module, moduleId)
+      await SerieRules.finishesIfOpened({ serialNumber })
+
+      await SerieService.output({
+        serialNumber,
+        module,
+        moduleId: module === 'single' ? 0 : moduleId,
+        connection,
+        userId
+      })
+
+      await connection.transaction.commit()
 
       return response.status(200).json(serialNumber)
     } catch (erro) {
+      await connection.transaction.rollback()
       errorCath(erro, response)
     }
   }

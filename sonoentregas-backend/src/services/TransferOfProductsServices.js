@@ -174,7 +174,7 @@ class TransferServices {
     const user = await UserModel.findAny(0, { id: userId })
 
     const scriptInsertMaxSeq = scriptTransferOfProducts
-      .insertMaxSeq(maxCodes[0].maxId + 1)
+      .insertMaxSeq(maxCodes[0].maxSequence + 1)
     await TransferOfProductsModel._query(
       1,
       scriptInsertMaxSeq,

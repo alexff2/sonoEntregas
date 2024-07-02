@@ -14,18 +14,7 @@ class Model {
     let values = ''
 
     Object.entries(obj).forEach(([key,value], i, vet) => {
-      if (key !== 'in') {
-        let keyValue
-        if (value === 'CURRENT_TIMESTAMP'){
-          keyValue = toCompare === '=' ? `${key} = ${value}` : `${key} LIKE ${value}%`
-        } else {
-          keyValue = toCompare === '=' ? `${key} = '${value}'` : `${key} LIKE '${value}%'`
-        }
-  
-        vet.length === i + 1 
-          ? values += keyValue 
-          : values += `${keyValue}${separate} `
-      } else {
+      if (key === 'in') {
         Object.entries(obj.in).forEach(([keyIn,vetValueIn]) => {
           let valueIn
 
@@ -39,6 +28,25 @@ class Model {
             ? values += `${keyIn} IN (${valueIn.toString()})`
             : values += `${keyIn} IN (${valueIn.toString()})${separate} `
         })
+      } else if (key === 'isNull') {
+        vet.length === i + 1 
+          ? values += `${value} is null` 
+          : values += `${value} is null${separate} `
+      } else if (key === 'isNotNull') {
+        vet.length === i + 1 
+          ? values += `${value} is not null` 
+          : values += `${value} is not null${separate} `
+      } else {
+        let keyValue
+        if (value === 'CURRENT_TIMESTAMP'){
+          keyValue = toCompare === '=' ? `${key} = ${value}` : `${key} LIKE ${value}%`
+        } else {
+          keyValue = toCompare === '=' ? `${key} = '${value}'` : `${key} LIKE '${value}%'`
+        }
+  
+        vet.length === i + 1 
+          ? values += keyValue 
+          : values += `${keyValue}${separate} `
       }
     })
 
@@ -99,7 +107,7 @@ class Model {
 
       await this._query(loja, script, QueryTypes.INSERT, t, log)
 
-      const data = await this.findSome(loja, `ID = ${ID}`)
+      const data = await this.findSome(loja, `ID = ${ID}`, '*', t)
 
       return data[0]
     } else {
@@ -171,7 +179,7 @@ class Model {
 
       await this._query(loja, script, QueryTypes.INSERT, t, log)
 
-      const data = await this.findSome(loja, `id = ${id}`)
+      const data = await this.findSome(loja, `id = ${id}`, '*', t)
   
       return data[0]
     } else {

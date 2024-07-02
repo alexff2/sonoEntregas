@@ -1,51 +1,78 @@
 //@ts-check
 /**
- * @typedef {Object} InputCreate
+ * @typedef {Object} InputProps
  * @property {number} serialNumber
  * @property {number} productId
  * @property {string} module
+ * @property {number} moduleId
+ * @property {number} userId
+ * @property {Object} connection
+ * 
+ * @typedef {Object} OutputProps
+ * @property {number} serialNumber
+ * @property {string} module
+ * @property {number} moduleId
+ * @property {number} userId
+ * @property {Object} connection
  * 
  * @typedef {Object} IProdLojaSeries
- * @property {number} id
- * @property {number} serialNumber
  * @property {number} productId
- * @property {string} dateEntered
- * @property {string} moduleEntered
+ * @property {number} serialNumber
+ * @property {string} inputModule
+ * @property {number} inputModuleId
+ * @property {string} inputBeepDate
+ * @property {number} inputUserId
  */
 
-const { QueryTypes } = require('sequelize')
-const ProdLojaSeriesModel = require('../models/tables/ProdLojaSeries')
+const ProdLojaSeriesMovimentosModel = require('../models/tables/ProdLojaSeriesMovimentos')
 
 class SerieService {
-  /**@param {InputCreate} props */
-  async create({productId, serialNumber, module}) {
+  /**@param {InputProps} props */
+  async create({productId, serialNumber, module, moduleId, userId, connection}) {
     /**@type {IProdLojaSeries} */
     const prodLojasSeries = {
-      id: serialNumber,
       productId: productId,
-      dateEntered: new Date().toISOString(),
-      moduleEntered: module,
-      serialNumber
+      serialNumber,
+      inputModule: module,
+      inputModuleId: moduleId,
+      inputBeepDate: new Date().toISOString(),
+      inputUserId: userId
     }
 
-    await ProdLojaSeriesModel.create(1, [prodLojasSeries], false)
+    const prodLojasSeriesResponse = await ProdLojaSeriesMovimentosModel.create(1, [prodLojasSeries], true, connection)
 
-    return prodLojasSeries
+    return prodLojasSeriesResponse.serialNumber
+  }
+
+  /**@param {OutputProps} props */
+  async output({ serialNumber, module, moduleId, userId, connection}) {
+    await ProdLojaSeriesMovimentosModel.updateAny(
+      1,
+      {
+        outputModule: module,
+        outputModuleId: moduleId,
+        outputBeepDate: new Date().toISOString(),
+        outputUserId: userId
+      },
+      {
+        serialNumber,
+        isNull: 'outputBeepDate'
+      },
+      connection
+    )
   }
 
   async findOpenSerieByProduct(code){
-    const script = 
-      `SELECT id FROM PRODLOJAS_SERIES
-      WHERE productId = ${code}
-      AND dateIsOut IS NULL`
-
-      const products = await ProdLojaSeriesModel._query(1, script, QueryTypes.SELECT)
+      const products = await ProdLojaSeriesMovimentosModel.findAny(1, {
+        productId: code,
+        isNull: 'outputBeepDate'
+      })
 
       if (products.length === 0) {
         return []  
       }
 
-      return products.map(product => product.id)
+      return products.map(product => product.serialNumber)
   }
 }
 
