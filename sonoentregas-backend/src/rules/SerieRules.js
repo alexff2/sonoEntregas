@@ -18,7 +18,7 @@ class SerieRules {
     }
   }
 
-  async finishesIfOpened({serialNumber}, connection){
+  async finishesIfOpened({serialNumber, productId}, connection){
     const isAlreadySerialNumber = await ProdLojaSeriesModel.findAny(1, {
       serialNumber,
       isNull: 'outputBeepDate'
@@ -26,7 +26,13 @@ class SerieRules {
 
     if (isAlreadySerialNumber.length === 0) {
       throw {
-        error: 'the serial number already exists and is not finalized!'
+        error: 'the serial number has already been finalized or has not been entered!'
+      }
+    }
+
+    if (isAlreadySerialNumber[0].productId !== productId) {
+      throw {
+        error: 'This serial number does not belong to this product!'
       }
     }
   }

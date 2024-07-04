@@ -36,8 +36,12 @@ export function Products({
   const classes = useStyle()
 
   const handleClickProduct = prod => {
-    setProductSelected(prod)
-    document.getElementById('beep').focus()
+    if (prod.quantityPedding > 0) {
+      setProductSelected(prod)
+      setTimeout(() => {
+        document.getElementById('beep').focus()
+      }, 100)
+    }
   }
 
   return (
@@ -47,7 +51,7 @@ export function Products({
           <Box key={i}>
             <Typography className={classes.headerGroupProduct}>{group.group}</Typography>
             {
-              group.product.map((prod, index) => (
+              group.products.map((prod, index) => (
                 <Box key={index}>
                   <Box
                     style={{
@@ -58,10 +62,14 @@ export function Products({
                     }}
                     onClick={() => handleClickProduct(prod)}
                   >
-                    <Checkbox
-                      inputProps={{ 'aria-label': 'primary checkbox' }}
-                      checked={(!!productSelected && productSelected.id === prod.id)}
-                    />
+                    {
+                      prod.quantityPedding > 0 ?
+                        <Checkbox
+                          inputProps={{ 'aria-label': 'primary checkbox' }}
+                          checked={(!!productSelected && productSelected.id === prod.id)}
+                        /> :
+                        <div style={{marginRight: 10}}></div>
+                    }
                     <Box width='100%' marginRight={4}>
                       <Typography style={{marginBottom: 8, textAlign: 'left'}}>{prod.mask}</Typography>
                       <Box
@@ -76,24 +84,24 @@ export function Products({
                           <Box 
                             className={classes.boxInfo}
                             style={{background: 'gray'}}
-                          >{prod.quantify}</Box>
+                          >{prod.quantity}</Box>
                         </Box>
                         <Box>
                           <Typography>Lido</Typography>
                           <Box 
                             className={classes.boxInfo}
                             style={{background: 'green'}}
-                          >{prod.quantifyBeep}</Box>
+                          >{prod.quantityBeep}</Box>
                         </Box>
                         {
-                          prod.quantifyPedding === 0
+                          prod.quantityPedding === 0
                           ? <CheckCircleOutlineIcon style={{fontSize: 30, color: 'green'}}/>
                           : <Box>
                               <Typography>Pedente</Typography>
                               <Box 
                                 className={classes.boxInfo}
                                 style={{background: 'orange'}}
-                              >{prod.quantifyPedding}</Box>
+                              >{prod.quantityPedding}</Box>
                             </Box>
                         }
                         

@@ -38,5 +38,16 @@ module.exports = {
       console.log(error)
       return response.status(400).json('Error')
     }
+  },
+  async findStock(request, response) {
+    try {
+      const { typeSearch, search } = request.query
+
+      const products = await ProductsService.findStock(typeSearch, search)
+
+      return response.json({ products })
+    } catch (error) {
+      return errorCath(error, response)
+    }
   }
 }

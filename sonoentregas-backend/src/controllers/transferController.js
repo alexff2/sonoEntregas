@@ -4,6 +4,22 @@ const TransferOfProductsModel = require('../models/tables/TransferOfProducts')
 const TransferOfProductRules = require('../rules/TransferOfProductRules')
 
 module.exports = {
+  async findToBeep(request, response) {
+    const { id } = request.params
+
+    try {
+      const products = await TransferOfProductsServices.findToBeep(id)
+
+      return response.json({ products })
+    } catch (e) {
+      console.log(e)
+
+      let status = e.status ? e.status : 400
+      let error = e.error ? e.error : e
+
+      return response.status(status).json(error)
+    }
+  },
   async find(request, response) {
     const { search, type } = request.query
 

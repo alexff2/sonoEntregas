@@ -74,10 +74,10 @@ const useStyles = makeStyles(theme => ({
     color: theme.palette.common.white
   },
   rowHeader: {
-    background: theme.palette.primary.light,
     '& > *': {
+      background: theme.palette.primary.light,
       color: '#FFF'
-    }
+    },
   },
   btnAdd: {
     position: 'fixed',

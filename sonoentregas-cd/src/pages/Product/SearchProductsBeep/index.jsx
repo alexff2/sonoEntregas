@@ -25,19 +25,26 @@ import api from '../../../services/api'
 
 export default function SearchProducts() {
   const [ products, setProducts ] = useState([])
-  const [ search, setSearch ] = useState()
-  const [ typeSearch, setTypeSearch ] = useState('NOME')
+  const [ search, setSearch ] = useState('')
+  const [ typeSearch, setTypeSearch ] = useState('name')
   const classes = useStyles()
   const { setAlertSnackbar } = useAlertSnackbar()
   
   const searchProduct = async () => {
     try {
-      if (search !== '') {
-        const { data } = await api.get(`products/${typeSearch}/${search}`)
-        setProducts(data)
-      } else {
+      if ((typeSearch === 'name' || typeSearch === 'generalCode') && search === '') {
+        setAlertSnackbar('Digite algo na pesquisa!')        
         setProducts([])
-      }
+        return
+      } 
+
+      const { data } = await api.get('products/stock', {
+        params: {
+          typeSearch,
+          search
+        }
+      })
+      setProducts(data.products)
     } catch (e) {
       setAlertSnackbar(e)
       setProducts([])
@@ -53,11 +60,14 @@ export default function SearchProducts() {
             label="Tipo"
             labelId="fieldSearch"
             className={classes.fieldSearch}
+            style={{width: 162}}
             onChange={e => setTypeSearch(e.target.value)}
-            defaultValue={'NOME'}
+            value={typeSearch}
           >
-            <MenuItem value={'NOME'}>Descrição</MenuItem>
-            <MenuItem value={'COD_ORIGINAL'}>Código</MenuItem>
+            <MenuItem value={'name'}>Descrição</MenuItem>
+            <MenuItem value={'generalCode'}>Alternativo</MenuItem>
+            <MenuItem value={'maior'}>Maior que 0</MenuItem>
+            <MenuItem value={'igual'}>Igual a 0</MenuItem>
           </Select>
         </FormControl>
 
@@ -65,43 +75,43 @@ export default function SearchProducts() {
           <div className={classes.searchIcon}>
             <SearchIcon/>
           </div>
-          <InputBase
-            placeholder="Pesquisar…"
-            classes={{
-              root: classes.inputRoot,
-              input: classes.inputInput,
-            }}
-            inputProps={{ 'aria-label': 'search' }}
-            onChange={e => setSearch(e.target.value)}
-            onKeyDown={ e => e.key === 'Enter' && searchProduct()}
-          />
+          { (typeSearch === 'generalCode' || typeSearch === 'name') &&
+            <InputBase
+              placeholder="Pesquisar…"
+              classes={{
+                root: classes.inputRoot,
+                input: classes.inputInput,
+              }}
+              inputProps={{ 'aria-label': 'search' }}
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && searchProduct()}
+            />
+          }
         </div>
 
         <Button className={classes.btnSearch} onClick={searchProduct}>Pesquisar</Button>
       </Box>
 
-      <TableContainer component={Paper}>
-        <Table>
+      <TableContainer component={Paper} style={{maxHeight: 'calc(100vh - 300px)'}}>
+        <Table stickyHeader>
           <TableHead>
             <TableRow className={classes.rowHeader}>
               <TableCell>Código</TableCell>
+              <TableCell>Alternativo</TableCell>
               <TableCell>Descrição</TableCell>
-              <TableCell align="right">Qtd. Total</TableCell>
-              <TableCell align="right">Qtd. Reservado</TableCell>
-              <TableCell align="right">Qtd. Disponível</TableCell>
+              <TableCell align="right">Estoque</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {products.map( product => (
-            <TableRow key={product.COD_ORIGINAL}>
-              <TableCell>{product.COD_ORIGINAL}</TableCell>
-              <TableCell>{product.NOME}</TableCell>
-              <TableCell align="right">{product.EST_LOJA}</TableCell>
-              <TableCell align="right">{product.EST_RESERVA}</TableCell>
-              <TableCell align="right">{product.EST_DISPONIVEL}</TableCell>
-            </TableRow>
+              <TableRow key={product.id}>
+                <TableCell>{product.id}</TableCell>
+                <TableCell>{product.generalCode}</TableCell>
+                <TableCell>{product.name}</TableCell>
+                <TableCell align="right">{product.stock}</TableCell>
+              </TableRow>
             ))}
-
           </TableBody>
         </Table>
       </TableContainer>

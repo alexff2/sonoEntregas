@@ -9,6 +9,7 @@
  * @property {Object} connection
  * 
  * @typedef {Object} OutputProps
+ * @property {number} productId
  * @property {number} serialNumber
  * @property {string} module
  * @property {number} moduleId
@@ -45,7 +46,7 @@ class SerieService {
   }
 
   /**@param {OutputProps} props */
-  async output({ serialNumber, module, moduleId, userId, connection}) {
+  async output({ productId, serialNumber, module, moduleId, userId, connection}) {
     await ProdLojaSeriesMovimentosModel.updateAny(
       1,
       {
@@ -56,7 +57,8 @@ class SerieService {
       },
       {
         serialNumber,
-        isNull: 'outputBeepDate'
+        isNull: 'outputBeepDate',
+        productId
       },
       connection
     )

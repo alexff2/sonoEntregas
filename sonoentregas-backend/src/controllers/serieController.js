@@ -17,6 +17,7 @@ module.exports = {
     }
   },
   createFirst: async(request, response) => {
+    const connectionEntrega = await ProdLojaSeriesMovimentosModel._query(0)
     const connection = await ProdLojaSeriesMovimentosModel._query(1)
 
     try {
@@ -29,8 +30,11 @@ module.exports = {
         }
       }
 
-      if (module !== 'single') await SerieRules.checkModule(module, moduleId)
-      await SerieRules.createIfDoesNotExistFinished({ serialNumber })
+      if (module !== 'single') await SerieRules.checkModule(module, moduleId, {
+        sce: connection,
+        entrega: connectionEntrega
+      })
+      await SerieRules.createIfDoesNotExistFinished({ serialNumber }, connection)
 
       const serialNumberResponse = await SerieService.create({
         productId,
@@ -42,10 +46,12 @@ module.exports = {
       })
 
       await connection.transaction.commit()
+      await connectionEntrega.transaction.commit()
 
       return response.status(200).json({ serialNumberResponse })
     } catch (erro) {
       await connection.transaction.rollback()
+      await connectionEntrega.transaction.rollback()
       errorCath(erro, response)
     }
   },
@@ -53,7 +59,7 @@ module.exports = {
     const connection = await ProdLojaSeriesMovimentosModel._query(1)
 
     try {
-      const { serialNumber, module, moduleId } = request.body
+      const { productId, serialNumber, module, moduleId } = request.body
       const { id: userId } = request.user
 
       if (module !== 'transfer' && module !== 'delivery') {
@@ -62,11 +68,12 @@ module.exports = {
         }
       }
 
-      await SerieRules.checkModule(module, moduleId)
-      await SerieRules.finishesIfOpened({ serialNumber })
+      await SerieRules.checkModule(module, moduleId, {sce: connection, entrega: {}})
+      await SerieRules.finishesIfOpened({ serialNumber, productId })
 
       await SerieService.output({
         serialNumber,
+        productId,
         module,
         moduleId: module === 'single' ? 0 : moduleId,
         connection,

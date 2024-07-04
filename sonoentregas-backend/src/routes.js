@@ -52,10 +52,12 @@ routes.put('/users/:userId', usersController.update)
   //Products SCE CD
   routes.get('/products/:typesearch/:search', productsController.index)
   routes.get('/product', ensureAuthenticated, productsController.findProduct)
+  routes.get('/products/stock', ensureAuthenticated, productsController.findStock)
   routes.put('/product/barcode', ensureAuthenticated, productsController.updateBarCode)
   // Beep
   routes.get('/serial/product', serieController.findOpenSeriesByProduct)
   routes.post('/serial/first', ensureAuthenticated, serieController.createFirst)
+  routes.put('/serial/finished', ensureAuthenticated, serieController.finishesIfOpened)
   // Purchase Order
   routes.get('/purchase/order', purchaseOrderController.find)
   routes.get('/purchase/order/open', purchaseOrderController.findOpen)
@@ -70,21 +72,9 @@ routes.put('/users/:userId', usersController.update)
   // Purchase Notes
   routes.get('/purchase/notes', purchaseNoteController.find)
   routes.get('/purchase/note/:id/products', purchaseNoteController.findProducts)
-/*
-Disponível
-SELECT A.CODIGO, A.ALTERNATI, A.NOME, ISNULL(B.ESTOQUE, 0) ESTOQUE
-FROM PRODUTOS A
-LEFT JOIN (
-	SELECT productId, COUNT(productId) ESTOQUE
-	FROM PRODLOJAS_SERIES
-	WHERE dateIsOut IS NULL
-	GROUP BY productId
-	) B ON A.CODIGO = B.productId
-WHERE A.CODIGO LIKE '2%'
-*/
-
   // Transfer
   routes.get('/transfer', transferController.find)
+  routes.get('/transfer/:id/beep', transferController.findToBeep)
   routes.post('/transfer', ensureAuthenticated, transferController.create)
   routes.put('/transfer/:id', ensureAuthenticated, transferController.update)
   routes.put('/transfer/:id/product/add', ensureAuthenticated, transferController.addProduct)

@@ -6,9 +6,21 @@ module.exports = {
     INNER JOIN PRODUTOS B ON A.CODPRODUTO = B.CODIGO
     WHERE A.REGISTRO IN (${ids}) ORDER BY A.ITEM`
   },
-  findSerialNumbers(ids){
+  findProductsQuantity(ids){
     return `
-    SELECT * FROM PRODLOJAS_SERIES_MOVIMENTOS WHERE inputModule = 'transfer' AND inputModuleId IN (${ids})`
+    SELECT A.REGISTRO transferId, A.ITEM item, A.CODPRODUTO id, A.QUANTIDADE quantity, B.TIPODC type
+    FROM TRANSPRODLOJAI A
+    INNER JOIN TRANSPRODLOJA B ON A.REGISTRO = B.CODIGO
+    WHERE REGISTRO IN (${ids}) ORDER BY ITEM`
+  },
+  findSerialNumbers(ids, moduleType){
+    const script = moduleType === 'D' 
+    ? `SELECT * FROM PRODLOJAS_SERIES_MOVIMENTOS
+       WHERE outputModule = 'transfer' AND outputModuleId IN (${ids})` 
+    : `SELECT * FROM PRODLOJAS_SERIES_MOVIMENTOS
+       WHERE inputModule = 'transfer' AND inputModuleId IN (${ids})`
+
+    return script
   },
   maxCodes(){
     return 'SELECT MAX(CODIGO) maxId, MAX(SEQUENCIA) maxSequence FROM TRANSPRODLOJA'

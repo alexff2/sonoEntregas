@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import {
   Dialog,
-  DialogActions,
-  DialogContent,
   DialogTitle,
+  makeStyles,
   TextField
 } from '@material-ui/core'
 
@@ -11,121 +10,28 @@ import { useAlertSnackbar } from '../../context/alertSnackbarContext'
 
 import { BeepReading } from '../../components/BeepReading'
 import { ButtonSuccess } from '../../components/Buttons'
+import api from '../../services/api'
 
-const mokeData = [
-  {
-    group: 'IMPERIAL AUXILIAR MOL/ESPU SOLTEIRAO',
-    product: [
-      {
-        id: 1,
-        mask: '11 X 188 X 93',
-        nameFull: 'PRODUTO: IMPERIAL AUXILIAR MOL/ESPU SOLTEIRAO 11 X 188 X 93',
-        quantify: 2,
-        quantifyBeep: 0,
-        quantifyPedding: 2,
-      },
-      {
-        id: 2,
-        mask: '11 X 100 X 200',
-        nameFull: 'PRODUTO: IMPERIAL AUXILIAR MOL/ESPU SOLTEIRAO 11 X 100 X 200',
-        quantify: 2,
-        quantifyBeep: 2,
-        quantifyPedding: 0,
-      }
-    ]
-  },
-  {
-    group: 'CABECEIRA PISA MARROM',
-    product: [
-      {
-        id: 3,
-        mask: '11 X 188 X 93',
-        nameFull: 'CABECEIRA PISA MARROM 11 X 188 X 93',
-        quantify: 2,
-        quantifyBeep: 1,
-        quantifyPedding: 1,
-      },
-      {
-        id: 4,
-        mask: '140 X 124 X 11',
-        nameFull: 'CABECEIRA PISA MARROM 140 X 124 X 11',
-        quantify: 12,
-        quantifyBeep: 8,
-        quantifyPedding: 4,
-      }
-    ]
-  },
-  {
-    group: 'BASE SUED CHOCOLATE INVERT BORDADA',
-    product: [
-      {
-        id: 7,
-        mask: '26 X 99 X 158',
-        nameFull: 'BASE SUED CHOCOLATE INVERT BORDADA 26 X 99 X 158',
-        quantify: 15,
-        quantifyBeep: 15,
-        quantifyPedding: 0,
-      },
-      {
-        id: 8,
-        mask: '26 X 101,5 X 193',
-        nameFull: 'BASE SUED CHOCOLATE INVERT BORDADA 26 X101,5 X 193',
-        quantify: 2,
-        quantifyBeep: 0,
-        quantifyPedding: 2,
-      }
-    ]
-  },
-  {
-    group: 'BASE SUED CHOCOLATE INVERT BORDADA',
-    product: [
-      {
-        id: 9,
-        mask: '26 X 99 X 158',
-        nameFull: 'BASE SUED CHOCOLATE INVERT BORDADA 26 X 99 X 158',
-        quantify: 15,
-        quantifyBeep: 15,
-        quantifyPedding: 0,
-      },
-      {
-        id: 10,
-        mask: '26 X 101,5 X 193',
-        nameFull: 'BASE SUED CHOCOLATE INVERT BORDADA 26 X101,5 X 193',
-        quantify: 2,
-        quantifyBeep: 0,
-        quantifyPedding: 2,
-      }
-    ]
-  },
-  {
-    group: 'BASE SUED CHOCOLATE INVERT BORDADA',
-    product: [
-      {
-        id: 5,
-        mask: '26 X 99 X 158',
-        nameFull: 'BASE SUED CHOCOLATE INVERT BORDADA 26 X 99 X 158',
-        quantify: 15,
-        quantifyBeep: 15,
-        quantifyPedding: 0,
-      },
-      {
-        id: 6,
-        mask: '26 X 101,5 X 193',
-        nameFull: 'BASE SUED CHOCOLATE INVERT BORDADA 26 X101,5 X 193',
-        quantify: 2,
-        quantifyBeep: 0,
-        quantifyPedding: 2,
-      }
-    ]
-  },
-]
+const useStyle = makeStyles(theme => ({
+  btn: {
+    padding: theme.spacing(2),
+    margin: theme.spacing(1),
+    '&:hover': {
+      background: theme.palette.success.light
+    },
+    background: theme.palette.success.main,
+    color: theme.palette.common.white
+  }
+}))
 
 export default function EntryNote({handleRenderBox}) {
   const [openSearch, setOpenSearch] = useState(true)
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(false)
+  const [products, setProducts] = useState([])
   const [productSelected, setProductSelected] = useState(null)
   const { setAlertSnackbar } = useAlertSnackbar()
+  const classes = useStyle()
 
   useEffect(() => {
     setTimeout(() => {
@@ -147,13 +53,21 @@ export default function EntryNote({handleRenderBox}) {
       }
 
       setLoading(true)
+      const { data } = await api.get(`transfer/${search}/beep`)
+      //console.log(data.products)
+      setProducts(data.products)
 
-      setTimeout(() => {
-        setOpenSearch(false)
-        setLoading(false)
-      }, 1000)
+      setOpenSearch(false)
+      setLoading(false)
     } catch (error) {
-      console.log(error)
+      console.log(error.response)
+
+      if (error.response.data === 'not found transfer!') {
+        setAlertSnackbar('Transferência não encontrada!')
+        setSearch('')
+        document.getElementById('searchId').focus()
+        setLoading(false)
+      }
     }
   }
 
@@ -164,11 +78,16 @@ export default function EntryNote({handleRenderBox}) {
         <BeepReading.Root>
           <BeepReading.Header
             title={'BEEP DA TRANSFERÊNCIA Nº: 123321'}
-            productSelected={productSelected} 
+            productSelected={productSelected}
+            module={{
+              name: 'transfer',
+              type: productSelected?.type
+            }}
+            setProducts={setProducts}
           />
 
           <BeepReading.Products
-            data={mokeData}
+            data={products}
             productSelected={productSelected}
             setProductSelected={setProductSelected}
           />
@@ -179,21 +98,23 @@ export default function EntryNote({handleRenderBox}) {
 
       <Dialog open={openSearch} onClose={handleCloseSearch}>
         <DialogTitle>Digite o número da transferência</DialogTitle>
-        <DialogContent>
-          <TextField
-            id='searchId'
-            placeholder='Digite aqui...'
-            autoComplete='off'
-            onChange={e => setSearch(e.target.value)}
-            onKeyDown={e =>  e.key === 'Enter' && handleSearch()}
-          />
-        </DialogContent>
-        <DialogActions>
-          <ButtonSuccess
-            onClick={handleSearch}
-            loading={loading}
-          >Pesquisar</ButtonSuccess>
-        </DialogActions>
+        <TextField
+          id='searchId'
+          placeholder='Digite aqui...'
+          autoComplete='off'
+          style={{
+            padding: 4,
+            margin: 4
+          }}
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          onKeyDown={e =>  e.key === 'Enter' && handleSearch()}
+        />
+        <ButtonSuccess
+          className={classes.btn}
+          onClick={handleSearch}
+          loading={loading}
+        >Pesquisar</ButtonSuccess>
       </Dialog>
     </React.Fragment>
   )

@@ -1,10 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Box,
   InputBase,
   Typography,
   makeStyles
 } from '@material-ui/core'
+import api from '../../services/api'
+
+import { useAlertSnackbar } from '../../context/alertSnackbarContext'
 
 const useStyle = makeStyles(theme =>({
   header: {
@@ -27,14 +30,84 @@ const useStyle = makeStyles(theme =>({
 
 export function Header({
   productSelected,
-  title
+  title,
+  module,
+  setProducts
 }) {
+  const [serialNumber, setSerialNumber] = useState('')
   const classes = useStyle()
+  const { setAlertSnackbar } = useAlertSnackbar()
+
+  const beepProduct = async () => {
+    if (productSelected.quantityPedding === 0) {
+      return
+    }
+
+    try {
+      if (module.type === 'C') {
+        await api.post('serial/first', {
+          serialNumber,
+          productId: productSelected.id,
+          module: module.name,
+          moduleId: productSelected.transferId
+        })
+      } else {
+        await api.put('serial/finished', {
+          serialNumber,
+          productId: productSelected.id,
+          module: module.name,
+          moduleId: productSelected.transferId
+        })
+      }
+
+      setProducts(productsGroup => {
+        return productsGroup.map(productGroup => {
+          return {
+            ...productGroup,
+            products: productGroup.products.map(product => {
+              if (product.id === productSelected.id) {
+                productSelected.quantityPedding -= 1
+                productSelected.quantityBeep += 1
+
+                return productSelected
+              }
+    
+              return product
+            })
+          }
+        })
+      })
+      setSerialNumber('')
+    } catch (error) {
+      console.log(error)
+
+      if (error.response.data === 'the serial number has already been finalized or has not been entered!') {
+        setAlertSnackbar('o número de série já finalizado ou não foi dado entrada!')
+      } else if (error.response.data === 'This serial number does not belong to this product!') {
+        setAlertSnackbar('Este número de série não pertence a esse produto!')
+      } else if (error.response.data === 'the serial number already exists and is not finalized!') {
+        setAlertSnackbar('Número de série já foi dado entrada em outro produto!')
+      } else {
+        setAlertSnackbar('Erro interno, entre em contato com ADMs!')
+      }
+    }
+  }
+
+  const changeSerialInputSerialNumber = e => {
+    if (productSelected.quantityPedding > 0) {
+      setSerialNumber(e.target.value)
+    }
+  }
+
   return (
     <Box className={classes.header}>
       <InputBase
         id='beep'
         className={classes.fieldSearch}
+        onKeyDown={e => e.key === 'Enter' && beepProduct()}
+        value={serialNumber}
+        disabled={!productSelected}
+        onChange={changeSerialInputSerialNumber}
       />
 
       <Box className={classes.textHeader}>

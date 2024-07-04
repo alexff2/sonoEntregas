@@ -89,7 +89,7 @@ export default function BarCode({ handleRenderBox }) {
         return
       }
 
-      await api.post('product/barcode', { barCode, code: productSelect.code })
+      await api.put('product/barcode', { barCode, code: productSelect.code })
 
       document.getElementById('serialNumberId').focus() 
     } catch (error) {
@@ -130,7 +130,7 @@ export default function BarCode({ handleRenderBox }) {
         console.log(error.response.data)
 
         if (error.response.data === 'the serial number already exists and is not finalized!') {
-          setAlertSnackbar('Número de série já usado!')
+          setAlertSnackbar('Número de série já foi dado entrada em outro produto!')
         }
       }
     }

@@ -34,6 +34,13 @@
  * @property {number} transferId
  * @property {number} purchasePrice
  * 
+ * @typedef {Object} ITransfersToBeep
+ * @property {number} id
+ * @property {number} item
+ * @property {number} quantity
+ * @property {number} transferId
+ * @property {string} type
+ * 
  * @typedef {Object} ITransfersSce
  * @property {number} CODIGO
  * @property {number} CODLOJA
@@ -44,7 +51,7 @@
  * @property {string} MOTIVO
  * @property {string} USUARIO
  * @property {string} OBSERVA
- * @property {string} TIPODC
+ * @property {'C' | 'D'} TIPODC
  * @property {number} SEQUENCIA
  * @property {string} EMITIUNF
  * @property {string} NOME_LOJADESTINO
@@ -74,12 +81,14 @@
  * @property {number} id
  * @property {number} productId
  * @property {number} serialNumber
- * @property {string} moduleEntered
- * @property {number} moduleEnteredId
- * @property {Date} dateBeepEntered
- * @property {string} moduleIsOut
- * @property {number} moduleIsOutId
- * @property {Date} dateBeepIsOut
+ * @property {string} inputModule
+ * @property {number} inputModuleId
+ * @property {Date} inputBeepDate
+ * @property {number} inputUserId
+ * @property {string} outputModule
+ * @property {number} outputModuleId
+ * @property {Date} outputBeepDate
+ * @property {number} outputUserId
  */
 
 const { QueryTypes } = require('sequelize')
@@ -87,8 +96,9 @@ const UserModel = require('../models/Users')
 const TransferOfProductsModel = require('../models/tables/TransferOfProducts')
 const TransferProductModel = require('../models/tables/TransferOfProducts/TransferProduct')
 const scriptTransferOfProducts = require('../scripts/TransferOfProduct')
-const KardexService = require('./InsertKardex')
+const ProductsService = require('./ProductsService')
 const ShopsSceService = require('./ShopSceService')
+const KardexService = require('./InsertKardex')
 const DateTime = require('../class/Date')
 
 class TransferServices {
@@ -117,18 +127,47 @@ class TransferServices {
     /**@type {ITransfersProductsRequestResponse[]} */
     const transferProducts = await TransferProductModel._query(1, scriptProducts, QueryTypes.SELECT, connection)
 
-    const scriptSerialNumbers = scriptTransferOfProducts.findSerialNumbers(ids)
+    const scriptSerialNumbersCredit = scriptTransferOfProducts.findSerialNumbers(ids, 'C')
+    const scriptSerialNumbersDeficit = scriptTransferOfProducts.findSerialNumbers(ids, 'D')
     /**@type {IProdLojasSeries[]} */
-    const prodLojasSeries = await TransferProductModel._query(1, scriptSerialNumbers, QueryTypes.SELECT, connection)
+    const prodLojasSeriesCredit = await TransferProductModel._query(1, scriptSerialNumbersCredit, QueryTypes.SELECT, connection)
+    /**@type {IProdLojasSeries[]} */
+    const prodLojasSeriesDeficit = await TransferProductModel._query(1, scriptSerialNumbersDeficit, QueryTypes.SELECT, connection)
 
     const shops = await ShopsSceService.find(connection)
-    const totalItems = transferProducts.reduce((sum, prod) => sum + prod.quantity, 0)
 
     return transfers.map(transfer => {
       const issueObj = new DateTime(transfer.EMISSAO)
+      let serialNumbersTotal = 0
+
+      const products = transferProducts
+        .filter(product => product.transferId === transfer.CODIGO)
+        .map(product => {
+          let serialNumbers = []
+
+          if (transfer.TIPODC === 'C') {
+            serialNumbers = prodLojasSeriesCredit
+              .filter(serial => serial.productId === product.id && serial.inputModuleId === product.transferId)
+              .map(serial => serial.serialNumber)
+          } else {
+            serialNumbers = prodLojasSeriesDeficit
+              .filter(serial => serial.productId === product.id && serial.outputModuleId === product.transferId)
+              .map(serial => serial.serialNumber)
+          }
+
+          serialNumbersTotal += serialNumbers.length
+
+          return {
+            ...product,
+            serialNumbers,
+            status: serialNumbers.length < product.quantity ? 'P' : 'B'
+          }
+        })
+
+      const totalItems = products.reduce((sum, prod) => sum + prod.quantity, 0)
       return {
-        status: prodLojasSeries.length === totalItems ? 'B' : 'P',
-        type: transfer.TIPODC === 'C' ? 'C' : 'D',
+        status: serialNumbersTotal === totalItems ? 'B' : 'P',
+        type: transfer.TIPODC,
         id: transfer.CODIGO,
         issue: issueObj.getBRDateTime().date,
         issueIso: issueObj.getISODateTimeBr().date,
@@ -139,21 +178,46 @@ class TransferServices {
         reason: transfer.MOTIVO,
         observation: transfer.OBSERVA,
         user: transfer.USUARIO,
-        products: transferProducts
-          .filter(product => product.transferId === transfer.CODIGO)
-          .map(product => {
-            const serialNumbers = prodLojasSeries
-              .filter(serial => (serial.moduleEnteredId === product.transferId && serial.productId === product.id))
-              .map(serial => serial.serialNumber)
-
-            return {
-              ...product,
-              serialNumbers,
-              status: serialNumbers.length < product.quantity ? 'P' : 'B'
-            }
-          })
+        products
       }
     })
+  }
+
+  /**@param {number} id */
+  async findToBeep(id){
+    const scriptProducts = scriptTransferOfProducts.findProductsQuantity(id)
+    /**@type {ITransfersToBeep[]} */
+    const transferProducts = await TransferProductModel._query(1, scriptProducts, QueryTypes.SELECT)
+
+    if (transferProducts.length === 0) {
+      throw {
+        error: 'not found transfer!'
+      }
+    }
+
+    const scriptSerialNumbers = scriptTransferOfProducts.findSerialNumbers(
+      id, transferProducts[0].type
+    )
+    /**@type {IProdLojasSeries[]} */
+    const prodLojasSeries = await TransferProductModel._query(1, scriptSerialNumbers, QueryTypes.SELECT)
+
+    const productsGrouped =  await ProductsService.findGrouped(transferProducts.map(product=> product.id))
+
+    return productsGrouped.map(group => ({
+      group: group.group,
+      products: group.products.map(product => {
+        const transferProduct = transferProducts
+          .find( transferProduct => transferProduct.id === product.id)
+        const quantityBeep = prodLojasSeries.filter(serie => serie.productId === product.id).length
+
+          return {
+          ...product,
+          ...transferProduct,
+          quantityBeep,
+          quantityPedding: (transferProduct?.quantity || 0) - quantityBeep
+        }
+      })
+    }))
   }
 
  /**

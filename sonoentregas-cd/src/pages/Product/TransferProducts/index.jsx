@@ -44,7 +44,7 @@ const Row = ({ transfer, handleOpenCreateUpdate }) => {
 
   return(
     <React.Fragment>
-      <TableRow>
+      <TableRow style={{backgroundColor: `${transfer.type === 'D' ? '#FFa5c033' : '#91c78433'}`}}>
         <TableCell>
           <IconButton aria-label="expand row" size="small" onClick={() => setOpenTableProducts(!openTableProducts)}>
             {openTableProducts ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
@@ -95,7 +95,6 @@ export default function Transfer() {
     try {
       if (search === '') {
         setAlertSnackbar('Digite a pesquisa')
-
         return
       }
 
@@ -105,7 +104,6 @@ export default function Transfer() {
           search
         }
       })
-
       setTransfers(data)
       setOpenBackDrop(false)
     } catch (error) {

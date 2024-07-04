@@ -8,6 +8,6 @@ CREATE TABLE PRODLOJAS_SERIES_MOVIMENTOS (
 	inputUserId INT NOT NULL,
 	outputModule VARCHAR(12),
 	outputModuleId INT,
-	outputBeepDate VARCHAR(12),
+	outputBeepDate DATETIME,
 	outputUserId INT,
 )

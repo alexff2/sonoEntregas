@@ -6,6 +6,7 @@ import PurchaseOrder from './PurchaseOrder'
 import PurchaseNotes from './PurchaseNotes'
 import TransferProducts from './TransferProducts'
 import SearchProducts from './SearchProducts'
+import SearchProductsBeep from './SearchProductsBeep'
 
 import useStyles from './style'
 
@@ -25,6 +26,7 @@ export default function Products() {
           <Tab label="Compras - Pedidos" {...a11yProps(1)}/>
           <Tab label="Compras - Notas" {...a11yProps(2)}/>
           <Tab label="Transferências" {...a11yProps(3)}/>
+          <Tab label="Est. Bip" {...a11yProps(4)}/>
         </Tabs>
       </AppBar>
 
@@ -42,6 +44,10 @@ export default function Products() {
 
       <TabPanel value={value} index={3}>
         <TransferProducts />
+      </TabPanel>
+
+      <TabPanel value={value} index={4}>
+        <SearchProductsBeep />
       </TabPanel>
     </div>
   )
