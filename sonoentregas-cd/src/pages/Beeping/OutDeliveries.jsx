@@ -11,120 +11,14 @@ import { useAlertSnackbar } from '../../context/alertSnackbarContext'
 
 import { BeepReading } from '../../components/BeepReading'
 import { ButtonSuccess } from '../../components/Buttons'
-
-const mokeData = [
-  {
-    group: 'IMPERIAL AUXILIAR MOL/ESPU SOLTEIRAO',
-    product: [
-      {
-        id: 1,
-        mask: '11 X 188 X 93',
-        nameFull: 'PRODUTO: IMPERIAL AUXILIAR MOL/ESPU SOLTEIRAO 11 X 188 X 93',
-        quantify: 2,
-        quantifyBeep: 0,
-        quantifyPedding: 2,
-      },
-      {
-        id: 2,
-        mask: '11 X 100 X 200',
-        nameFull: 'PRODUTO: IMPERIAL AUXILIAR MOL/ESPU SOLTEIRAO 11 X 100 X 200',
-        quantify: 2,
-        quantifyBeep: 2,
-        quantifyPedding: 0,
-      }
-    ]
-  },
-  {
-    group: 'CABECEIRA PISA MARROM',
-    product: [
-      {
-        id: 3,
-        mask: '11 X 188 X 93',
-        nameFull: 'CABECEIRA PISA MARROM 11 X 188 X 93',
-        quantify: 2,
-        quantifyBeep: 1,
-        quantifyPedding: 1,
-      },
-      {
-        id: 4,
-        mask: '140 X 124 X 11',
-        nameFull: 'CABECEIRA PISA MARROM 140 X 124 X 11',
-        quantify: 12,
-        quantifyBeep: 8,
-        quantifyPedding: 4,
-      }
-    ]
-  },
-  {
-    group: 'BASE SUED CHOCOLATE INVERT BORDADA',
-    product: [
-      {
-        id: 7,
-        mask: '26 X 99 X 158',
-        nameFull: 'BASE SUED CHOCOLATE INVERT BORDADA 26 X 99 X 158',
-        quantify: 15,
-        quantifyBeep: 15,
-        quantifyPedding: 0,
-      },
-      {
-        id: 8,
-        mask: '26 X 101,5 X 193',
-        nameFull: 'BASE SUED CHOCOLATE INVERT BORDADA 26 X101,5 X 193',
-        quantify: 2,
-        quantifyBeep: 0,
-        quantifyPedding: 2,
-      }
-    ]
-  },
-  {
-    group: 'BASE SUED CHOCOLATE INVERT BORDADA',
-    product: [
-      {
-        id: 9,
-        mask: '26 X 99 X 158',
-        nameFull: 'BASE SUED CHOCOLATE INVERT BORDADA 26 X 99 X 158',
-        quantify: 15,
-        quantifyBeep: 15,
-        quantifyPedding: 0,
-      },
-      {
-        id: 10,
-        mask: '26 X 101,5 X 193',
-        nameFull: 'BASE SUED CHOCOLATE INVERT BORDADA 26 X101,5 X 193',
-        quantify: 2,
-        quantifyBeep: 0,
-        quantifyPedding: 2,
-      }
-    ]
-  },
-  {
-    group: 'BASE SUED CHOCOLATE INVERT BORDADA',
-    product: [
-      {
-        id: 5,
-        mask: '26 X 99 X 158',
-        nameFull: 'BASE SUED CHOCOLATE INVERT BORDADA 26 X 99 X 158',
-        quantify: 15,
-        quantifyBeep: 15,
-        quantifyPedding: 0,
-      },
-      {
-        id: 6,
-        mask: '26 X 101,5 X 193',
-        nameFull: 'BASE SUED CHOCOLATE INVERT BORDADA 26 X101,5 X 193',
-        quantify: 2,
-        quantifyBeep: 0,
-        quantifyPedding: 2,
-      }
-    ]
-  },
-]
+import api from '../../services/api'
 
 export default function EntryNote({handleRenderBox}) {
   const [openSearch, setOpenSearch] = useState(true)
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(false)
   const [productSelected, setProductSelected] = useState(null)
+  const [products, setProducts] = useState([])
   const { setAlertSnackbar } = useAlertSnackbar()
 
   useEffect(() => {
@@ -147,13 +41,27 @@ export default function EntryNote({handleRenderBox}) {
       }
 
       setLoading(true)
+      const { data } = await api.get(`delivery`,{
+        params: {
+          id: search
+        }
+      })
+      setProducts(data.deliveryProducts)
 
-      setTimeout(() => {
-        setOpenSearch(false)
-        setLoading(false)
-      }, 1000)
+      setOpenSearch(false)
+      setLoading(false)
     } catch (error) {
       console.log(error)
+
+      setSearch('')
+      document.getElementById('searchId').focus()
+      setLoading(false)
+
+      if (error.response.data === 'not found Delivery!') {
+        setAlertSnackbar('Transferência não encontrada!')
+      } else {
+        setAlertSnackbar('Erro interno!')
+      }
     }
   }
 
@@ -163,12 +71,17 @@ export default function EntryNote({handleRenderBox}) {
         !openSearch &&
         <BeepReading.Root>
           <BeepReading.Header
-            title={'BEEP DA ROTA Nº: 123321'}
-            productSelected={productSelected} 
+            title={`BEEP DA ROTA Nº: ${search}`}
+            productSelected={productSelected}
+            module={{
+              name: 'delivery',
+              type: 'D'
+            }}
+            setProducts={setProducts}
           />
 
           <BeepReading.Products
-            data={mokeData}
+            data={products}
             productSelected={productSelected}
             setProductSelected={setProductSelected}
           />

@@ -49,14 +49,14 @@ export function Header({
           serialNumber,
           productId: productSelected.id,
           module: module.name,
-          moduleId: productSelected.transferId
+          moduleId: productSelected.moduleId
         })
       } else {
         await api.put('serial/finished', {
           serialNumber,
           productId: productSelected.id,
           module: module.name,
-          moduleId: productSelected.transferId
+          moduleId: productSelected.moduleId
         })
       }
 

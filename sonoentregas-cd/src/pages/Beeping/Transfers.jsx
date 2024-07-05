@@ -54,19 +54,20 @@ export default function EntryNote({handleRenderBox}) {
 
       setLoading(true)
       const { data } = await api.get(`transfer/${search}/beep`)
-      //console.log(data.products)
       setProducts(data.products)
 
       setOpenSearch(false)
       setLoading(false)
     } catch (error) {
       console.log(error.response)
+      setSearch('')
+      document.getElementById('searchId').focus()
+      setLoading(false)
 
       if (error.response.data === 'not found transfer!') {
         setAlertSnackbar('Transferência não encontrada!')
-        setSearch('')
-        document.getElementById('searchId').focus()
-        setLoading(false)
+      } else {
+        setAlertSnackbar('Erro interno!')
       }
     }
   }
@@ -77,7 +78,7 @@ export default function EntryNote({handleRenderBox}) {
         !openSearch &&
         <BeepReading.Root>
           <BeepReading.Header
-            title={'BEEP DA TRANSFERÊNCIA Nº: 123321'}
+            title={`BEEP DA TRANSFERÊNCIA Nº: ${search}`}
             productSelected={productSelected}
             module={{
               name: 'transfer',

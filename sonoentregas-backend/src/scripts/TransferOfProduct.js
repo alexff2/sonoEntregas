@@ -8,7 +8,7 @@ module.exports = {
   },
   findProductsQuantity(ids){
     return `
-    SELECT A.REGISTRO transferId, A.ITEM item, A.CODPRODUTO id, A.QUANTIDADE quantity, B.TIPODC type
+    SELECT A.REGISTRO moduleId, A.ITEM item, A.CODPRODUTO id, A.QUANTIDADE quantity, B.TIPODC type
     FROM TRANSPRODLOJAI A
     INNER JOIN TRANSPRODLOJA B ON A.REGISTRO = B.CODIGO
     WHERE REGISTRO IN (${ids}) ORDER BY ITEM`

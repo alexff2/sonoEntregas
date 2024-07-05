@@ -56,7 +56,8 @@ module.exports = {
     }
   },
   finishesIfOpened: async(request, response) => {
-    const connection = await ProdLojaSeriesMovimentosModel._query(1)
+    const sce = await ProdLojaSeriesMovimentosModel._query(1)
+    const entrega = await ProdLojaSeriesMovimentosModel._query(0)
 
     try {
       const { productId, serialNumber, module, moduleId } = request.body
@@ -68,7 +69,7 @@ module.exports = {
         }
       }
 
-      await SerieRules.checkModule(module, moduleId, {sce: connection, entrega: {}})
+      await SerieRules.checkModule(module, moduleId, {sce, entrega})
       await SerieRules.finishesIfOpened({ serialNumber, productId })
 
       await SerieService.output({
@@ -76,15 +77,17 @@ module.exports = {
         productId,
         module,
         moduleId: module === 'single' ? 0 : moduleId,
-        connection,
+        connection: sce,
         userId
       })
 
-      await connection.transaction.commit()
+      await sce.transaction.commit()
+      await entrega.transaction.commit()
 
       return response.status(200).json(serialNumber)
     } catch (erro) {
-      await connection.transaction.rollback()
+      await sce.transaction.rollback()
+      await entrega.transaction.rollback()
       errorCath(erro, response)
     }
   }

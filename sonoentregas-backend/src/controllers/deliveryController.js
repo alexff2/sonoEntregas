@@ -13,6 +13,7 @@ const SalesProd = require('../models/SalesProd')
 const Date = require('../class/Date')
 const DeliveriesService = require('../services/DeliveryService')
 const ForecastService = require('../services/ForecastService')
+const errorCath = require('../functions/error')
 
 module.exports = {
   /**
@@ -138,5 +139,18 @@ module.exports = {
     } catch (error) {
       res.status(400).json(error)
     }
-  }
+  },
+  /**
+   * @param {*} request
+   * @param {*} response
+   */
+  async findToBeep(request, response) {
+    try {
+      const {id} = request.query
+      const deliveryProducts = await DeliveriesService.findToBeep(id)
+      return response.json({deliveryProducts})
+    } catch (error) {
+      errorCath(error, response)
+    }
+  },
 }

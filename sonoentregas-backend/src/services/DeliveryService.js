@@ -7,6 +7,16 @@
 * @property {number} QUANTIDADE
 * @property {number} QTD_MOUNTING
 * @property {number} qtdDelivery
+*
+* @typedef {Object} IDeliveryProductsToBeep
+* @property {number} id
+* @property {string} mask
+* @property {string} nameFull
+* @property {number} quantity
+* @property {number} quantityBeep
+* @property {number} quantityPedding
+* @property {number} subGroupId
+* @property {number} moduleId
 * 
 * @typedef {Object} IValueDelivery
 * @property {number} ID_DELIVERY
@@ -267,5 +277,37 @@ module.exports = {
     await DeliveryProd.creatorAny(0, arraySaleProducts, true)
 
     await DeliveryProd._query(1, scriptUpdateSaleProd)
+  },
+  /**@param {number} id  */
+  async findToBeep(id) {
+    const script = `
+    SELECT B.CODIGO id, B.APLICACAO mask, B.NOME [name], SUM(A.QTD_DELIV) quantity,
+    ISNULL(C.quantityBeep, 0) quantityBeep, A.ID_DELIVERY moduleId, B.SUBG subGroupId, 
+    (SUM(A.QTD_DELIV) - ISNULL(C.quantityBeep, 0)) quantityPedding
+    FROM ${process.env.ENTREGAS_BASE}..DELIVERYS_PROD A
+    INNER JOIN PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
+    LEFT JOIN ( SELECT productId, COUNT(id) quantityBeep
+          FROM PRODLOJAS_SERIES_MOVIMENTOS
+          WHERE outputModule = 'delivery'
+          AND outputModuleId = ${id}
+          GROUP BY productId) C ON C.productId = B.CODIGO
+    WHERE A.ID_DELIVERY = ${id}
+    GROUP BY A.ID_DELIVERY, B.CODIGO,  B.APLICACAO, B.NOME, C.quantityBeep, B.SUBG`
+    /**@type {IDeliveryProductsToBeep[]} */
+    const deliveryProduct = await DeliveryProd._query(1, script, QueryTypes.SELECT)
+
+    const scriptGroup = `
+    SELECT CODIGO id, NOME name
+    FROM SUB_GRUPOS WHERE CODIGO IN (${deliveryProduct.map(product => product.subGroupId)})`
+
+    /**@type {import('./ProductsService').IGroup[]} */
+    const groups = await Delivery._query(1, scriptGroup, QueryTypes.SELECT)
+
+    const products = groups.map(group => ({
+      group: group.name,
+      products: deliveryProduct.filter(product => group.id === product.subGroupId)
+    }))
+
+    return products
   }
 }

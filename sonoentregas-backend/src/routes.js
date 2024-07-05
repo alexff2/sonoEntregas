@@ -113,6 +113,7 @@ routes.put('/forecast/:id/finish', ensureAuthenticated, forecastController.finis
 routes.delete('/forecast/sale/:id', ensureAuthenticated, forecastController.rmvSale)
 
 //Deliveries
+routes.get('/delivery', deliveryController.findToBeep)
 routes.get('/delivery/:status', deliveryController.index)
 routes.get('/delivery/:status/:date', deliveryController.index)
 routes.post('/deliveries', ensureAuthenticated, deliveryController.create)

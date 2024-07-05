@@ -38,7 +38,7 @@
  * @property {number} id
  * @property {number} item
  * @property {number} quantity
- * @property {number} transferId
+ * @property {number} moduleId
  * @property {string} type
  * 
  * @typedef {Object} ITransfersSce
