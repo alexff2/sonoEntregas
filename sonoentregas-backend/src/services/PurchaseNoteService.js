@@ -1,3 +1,15 @@
+//@ts-check
+/**
+* @typedef {Object} ProductsToBeep
+* @property {number} id
+* @property {string} mask
+* @property {string} nameFull
+* @property {number} quantity
+* @property {number} quantityBeep
+* @property {number} quantityPedding
+* @property {number} subGroupId
+* @property {number} moduleId
+ */
 const { QueryTypes } = require('sequelize')
 const PurchaseNoteModel = require('../models/tables/PurchaseNote')
 const scriptsPurchaseNoteProducts = require('../scripts/purchaseNote')
@@ -36,6 +48,47 @@ class PurchaseNoteService {
       amount: decimalToCoin(product.amount),
       unitaryValue: decimalToCoin(product.unitaryValue),
     }))
+  }
+
+  async findToBeep(id) {
+    const script = `
+    SELECT B.CODIGO id, B.APLICACAO mask, B.NOME [nameFull], A.QUANTIDADE quantity,
+    ISNULL(C.quantityBeep, 0) quantityBeep, A.NUM_DOC moduleId, B.SUBG subGroupId, 
+    A.QUANTIDADE - ISNULL(C.quantityBeep, 0) quantityPedding
+    FROM (
+      SELECT A.PRODUTO, SUM(A.QUANTIDADE) QUANTIDADE, B.NUM_DOC FROM NFITENS A
+      INNER JOIN NFISCAL B ON A.NNF = B.NF
+      WHERE B.CODFOR = 1 AND B.NUM_DOC = ${id}
+      GROUP BY B.NUM_DOC, A.PRODUTO
+    ) A
+    INNER JOIN PRODUTOS B ON A.PRODUTO = B.CODIGO
+    LEFT JOIN ( SELECT productId, COUNT(id) quantityBeep
+            FROM PRODLOJAS_SERIES_MOVIMENTOS
+            WHERE inputModule = 'purchaseNote'
+            AND inputModuleId = ${id}
+            GROUP BY productId) C ON C.productId = B.CODIGO`
+    /**@type {ProductsToBeep[]} */
+    const purchaseNoteProducts = await PurchaseNoteModel._query(1, script, QueryTypes.SELECT)
+
+    if (purchaseNoteProducts.length === 0) {
+      throw {
+        error: 'not found purchase note!'
+      }
+    }
+
+    const scriptGroup = `
+    SELECT CODIGO id, NOME name
+    FROM SUB_GRUPOS WHERE CODIGO IN (${purchaseNoteProducts.map(product => product.subGroupId)})`
+
+    /**@type {import('./ProductsService').IGroup[]} */
+    const groups = await PurchaseNoteModel._query(1, scriptGroup, QueryTypes.SELECT)
+
+    const products = groups.map(group => ({
+      group: group.name,
+      products: purchaseNoteProducts.filter(product => group.id === product.subGroupId)
+    }))
+
+    return products
   }
 }
 

@@ -1,3 +1,4 @@
+const errorCath = require("../functions/error")
 const PurchaseNoteService = require("../services/PurchaseNoteService")
 
 module.exports = {
@@ -38,6 +39,17 @@ module.exports = {
       let error = e.error ? e.error : e
 
       return response.status(status).json(error)
+    }
+  },
+  async findToBeep(request, response) {
+    try {
+      const {id} = request.params
+
+      const products = await PurchaseNoteService.findToBeep(id)
+
+      return response.json({products})
+    } catch (error) {
+      errorCath(error, response)
     }
   }
 }

@@ -82,7 +82,7 @@ export function Header({
       console.log(error)
 
       if (error.response.data === 'the serial number has already been finalized or has not been entered!') {
-        setAlertSnackbar('o número de série já finalizado ou não foi dado entrada!')
+        setAlertSnackbar('Número de série já finalizado ou não foi dado entrada!')
       } else if (error.response.data === 'This serial number does not belong to this product!') {
         setAlertSnackbar('Este número de série não pertence a esse produto!')
       } else if (error.response.data === 'the serial number already exists and is not finalized!') {
@@ -104,6 +104,7 @@ export function Header({
       <InputBase
         id='beep'
         className={classes.fieldSearch}
+        autoComplete='off'
         onKeyDown={e => e.key === 'Enter' && beepProduct()}
         value={serialNumber}
         disabled={!productSelected}

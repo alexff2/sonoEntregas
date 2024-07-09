@@ -281,7 +281,7 @@ module.exports = {
   /**@param {number} id  */
   async findToBeep(id) {
     const script = `
-    SELECT B.CODIGO id, B.APLICACAO mask, B.NOME [name], SUM(A.QTD_DELIV) quantity,
+    SELECT B.CODIGO id, B.APLICACAO mask, B.NOME [nameFull], SUM(A.QTD_DELIV) quantity,
     ISNULL(C.quantityBeep, 0) quantityBeep, A.ID_DELIVERY moduleId, B.SUBG subGroupId, 
     (SUM(A.QTD_DELIV) - ISNULL(C.quantityBeep, 0)) quantityPedding
     FROM ${process.env.ENTREGAS_BASE}..DELIVERYS_PROD A

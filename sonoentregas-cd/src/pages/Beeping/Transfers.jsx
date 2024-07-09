@@ -59,7 +59,7 @@ export default function EntryNote({handleRenderBox}) {
       setOpenSearch(false)
       setLoading(false)
     } catch (error) {
-      console.log(error.response)
+      console.log(error)
       setSearch('')
       document.getElementById('searchId').focus()
       setLoading(false)

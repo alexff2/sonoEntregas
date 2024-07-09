@@ -61,7 +61,15 @@ class SerieRules {
     }
 
     if(modele === 'purchaseNote') {
-      const purchaseNote = await PurchaseNoteModel.findAny(1, { NF: moduleId }, '*', sce)
+      const purchaseNote = await PurchaseNoteModel.findAny(
+        1,
+        {
+          NUM_DOC: moduleId,
+          CODFOR: 1
+        },
+        '*',
+        sce
+      )
 
       if (purchaseNote.length === 0) {
         throw {

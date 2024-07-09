@@ -179,6 +179,7 @@ export default function BarCode({ handleRenderBox }) {
             <InputBase
               id='searchProduct'
               style={{ width: '100%' }}
+              autoComplete='off'
               placeholder="Pesquisar produto"
               classes={{
                 root: classes.inputRoot,
@@ -233,6 +234,7 @@ export default function BarCode({ handleRenderBox }) {
 
       <Input
         id='serialNumberId'
+        autoComplete='off'
         style={{ width: '85%', marginTop: 20}}
         placeholder='Leitura número de série'
         value={serialNumberSelect}
