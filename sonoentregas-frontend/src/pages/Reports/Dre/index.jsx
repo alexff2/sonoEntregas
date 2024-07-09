@@ -22,10 +22,6 @@ export default function Dre(){
   const [ salesReturns, setSalesReturns ] = useState({
     value: 0,
     percent: 0,
-    cost: {
-      value: 0,
-      percent: 0
-    }
   })
   const [ revenues, setRevenues ] = useState({
     revenues: [],
@@ -178,13 +174,6 @@ export default function Dre(){
                 <td>{toLocString(variableExpenses.total.value)}</td>
                 <td>{toLocString(variableExpenses.total.percent)} %</td>
               </tr> 
-              { salesReturns.cost.value > 0 &&
-                <tr>
-                  <td>(-) 99998 - CDV (Custo de devolução)</td>
-                  <td>{toLocString(salesReturns.cost.value)}</td>
-                  <td>{toLocString(salesReturns.cost.percent)} %</td>
-                </tr>
-              }
               <tr>
                 <td>99999 - CMV (Custo de mercadoria vendida)</td>
                 <td>{toLocString(variableExpenses.cmv.value)}</td>

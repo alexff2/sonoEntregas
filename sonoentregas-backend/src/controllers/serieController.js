@@ -24,6 +24,12 @@ module.exports = {
       const { serialNumber, productId, module, moduleId } = request.body
       const { id: userId } = request.user
 
+      if (isNaN(Number(serialNumber))) {
+        throw {
+          error: 'serial number invalid'
+        }
+      }
+
       if (module !== 'single' && module !== 'purchaseNote' && module !== 'transfer') {
         throw {
           error: 'Module invalid!'
@@ -62,6 +68,12 @@ module.exports = {
     try {
       const { productId, serialNumber, module, moduleId } = request.body
       const { id: userId } = request.user
+
+      if (isNaN(Number(serialNumber))) {
+        throw {
+          error: 'serial number invalid'
+        }
+      }
 
       if (module !== 'transfer' && module !== 'delivery') {
         throw {

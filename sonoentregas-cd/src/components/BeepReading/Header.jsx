@@ -79,6 +79,7 @@ export function Header({
       })
       setSerialNumber('')
     } catch (error) {
+      setSerialNumber('')
       console.log(error)
 
       if (error.response.data === 'the serial number has already been finalized or has not been entered!') {
@@ -87,6 +88,8 @@ export function Header({
         setAlertSnackbar('Este número de série não pertence a esse produto!')
       } else if (error.response.data === 'the serial number already exists and is not finalized!') {
         setAlertSnackbar('Número de série já foi dado entrada em outro produto!')
+      } else if (error.response.data === 'serial number invalid') {
+        setAlertSnackbar('Número de série inválido!')
       } else {
         setAlertSnackbar('Erro interno, entre em contato com ADMs!')
       }
