@@ -295,8 +295,6 @@ module.exports = {
       const financialSummary = await DreService.financialSummary({ shop, dateStart, dateEnd })
       const currentStock = await DreService.currentStock({ shop })
 
-      variableExpenses.total.value = variableExpenses.total.value - revenues.salesReturns.cost.value
-
       const grossContributionMargin = {
         value: revenues.total - variableExpenses.total.value,
         percent: ((revenues.total - variableExpenses.total.value) / revenues.total) * 100

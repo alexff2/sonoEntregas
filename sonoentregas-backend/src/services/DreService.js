@@ -36,19 +36,14 @@ class DreService {
       revenue.percent = (revenue.value / total) * 100
     })
 
-    const percentReturns = (resultReturns[0].value / total) * 100
-    const percentReturnsCost = (resultCost[0].cost / total) * 100
+    const percentReturns = ((resultReturns[0].value - resultCost[0].cost) / total) * 100
 
     return { 
       revenues,
       total,
       salesReturns: {
-        value: resultReturns[0].value,
+        value: resultReturns[0].value - resultCost[0].cost,
         percent: percentReturns,
-        cost: {
-          value: resultCost[0].cost,
-          percent: percentReturnsCost
-        }
       }
     }
   }
