@@ -149,13 +149,7 @@ module.exports = {
       const {id} = request.query
       const delivery = await DeliveriesService.findUnique(id)
 
-      if (delivery.length === 0) {
-        throw {
-          error: 'Delivery not found'
-        }
-      }
-
-      const status = delivery[0].DESCRIPTION === 'Retiradas' ? 'Em lançamento' : delivery[0].STATUS
+      const status = delivery.DESCRIPTION === 'Retiradas' ? 'Em lançamento' : delivery.STATUS
 
       const deliveryProducts = await DeliveriesService.findToBeep(
         id,
