@@ -155,12 +155,14 @@ module.exports = {
         }
       }
 
+      const status = delivery[0].DESCRIPTION === 'Retiradas' ? 'Em lançamento' : delivery[0].STATUS
+
       const deliveryProducts = await DeliveriesService.findToBeep(
         id,
-        delivery.STATUS
+        status
       )
 
-      return response.json({deliveryProducts, status: delivery.STATUS})
+      return response.json({deliveryProducts, status})
     } catch (error) {
       errorCath(error, response)
     }
