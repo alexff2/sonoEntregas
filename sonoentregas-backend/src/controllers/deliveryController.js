@@ -148,10 +148,18 @@ module.exports = {
     try {
       const {id} = request.query
       const delivery = await DeliveriesService.findUnique(id)
+
+      if (delivery.length === 0) {
+        throw {
+          error: 'Delivery not found'
+        }
+      }
+
       const deliveryProducts = await DeliveriesService.findToBeep(
         id,
         delivery.STATUS
       )
+
       return response.json({deliveryProducts, status: delivery.STATUS})
     } catch (error) {
       errorCath(error, response)

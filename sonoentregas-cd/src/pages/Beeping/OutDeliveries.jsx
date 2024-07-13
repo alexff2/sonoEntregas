@@ -59,8 +59,10 @@ export default function EntryNote({handleRenderBox}) {
       document.getElementById('searchId').focus()
       setLoading(false)
 
-      if (error.response.data === 'not found Delivery!') {
-        setAlertSnackbar('Transferência não encontrada!')
+      if (error.response.data === 'Delivery not found') {
+        setAlertSnackbar('Entrega não encontrada!')
+      } else if (error.response.data === 'Delivery already beeped') {
+        setAlertSnackbar('Entrega não tem retorno!')
       } else {
         setAlertSnackbar('Erro interno!')
       }

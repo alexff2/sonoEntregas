@@ -299,6 +299,12 @@ module.exports = {
     /**@type {IDeliveryProductsToBeep[]} */
     const deliveryProduct = await DeliveryProd._query(1, script, QueryTypes.SELECT)
 
+    if (deliveryProduct.length === 0) {
+      throw {
+        error: 'Delivery already beeped'
+      }
+    }
+
     const scriptGroup = `
     SELECT CODIGO id, NOME name
     FROM SUB_GRUPOS WHERE CODIGO IN (${deliveryProduct.map(product => product.subGroupId)})`
