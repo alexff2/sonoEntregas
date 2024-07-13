@@ -32,7 +32,8 @@ export function Header({
   productSelected,
   title,
   module,
-  setProducts
+  setProducts,
+  isReturn
 }) {
   const [serialNumber, setSerialNumber] = useState('')
   const classes = useStyle()
@@ -115,7 +116,9 @@ export function Header({
       />
 
       <Box className={classes.textHeader}>
-        <Typography>{title}</Typography>
+        <Typography>
+          {title}{ isReturn && <> - <strong style={{color: 'red'}}>RETORNO</strong></>}
+        </Typography>
         <Typography>{productSelected ? productSelected.nameFull : 'Selecione um produto...'}</Typography>
       </Box>
     </Box>

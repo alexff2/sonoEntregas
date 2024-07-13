@@ -42,10 +42,22 @@ const ViewDeliveryProd2 = require('../models/ViewDeliveryProd2')
 const Empresas = require('../models/ShopsSce')
 const Sales = require('../models/Sales')
 
+const scripts = require('../scripts/delivery')
 const MainService = require('../services/MainService')
 const Date = require('../class/Date')
 
 module.exports = {
+  async findUnique(/** @type {number} */id){
+    const delivery = await Delivery.findAny(0, { id })
+
+    if (delivery.length === 0) {
+      throw {
+        error: 'delivery not found'
+      }
+    }
+
+    return delivery[0]
+  },
   /**
    * @param {Object[]} deliveries
    */
@@ -278,21 +290,12 @@ module.exports = {
 
     await DeliveryProd._query(1, scriptUpdateSaleProd)
   },
-  /**@param {number} id  */
-  async findToBeep(id) {
-    const script = `
-    SELECT B.CODIGO id, B.APLICACAO mask, B.NOME [nameFull], SUM(A.QTD_DELIV) quantity,
-    ISNULL(C.quantityBeep, 0) quantityBeep, A.ID_DELIVERY moduleId, B.SUBG subGroupId, 
-    (SUM(A.QTD_DELIV) - ISNULL(C.quantityBeep, 0)) quantityPedding
-    FROM ${process.env.ENTREGAS_BASE}..DELIVERYS_PROD A
-    INNER JOIN PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
-    LEFT JOIN ( SELECT productId, COUNT(id) quantityBeep
-          FROM PRODLOJAS_SERIES_MOVIMENTOS
-          WHERE outputModule = 'delivery'
-          AND outputModuleId = ${id}
-          GROUP BY productId) C ON C.productId = B.CODIGO
-    WHERE A.ID_DELIVERY = ${id}
-    GROUP BY A.ID_DELIVERY, B.CODIGO,  B.APLICACAO, B.NOME, C.quantityBeep, B.SUBG`
+  /**
+  *@param {number} id 
+  *@param {string} status
+  */
+  async findToBeep(id, status) {
+    const script = scripts.findToBeep(id, status)
     /**@type {IDeliveryProductsToBeep[]} */
     const deliveryProduct = await DeliveryProd._query(1, script, QueryTypes.SELECT)
 

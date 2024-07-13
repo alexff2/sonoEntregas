@@ -19,6 +19,7 @@ export default function EntryNote({handleRenderBox}) {
   const [loading, setLoading] = useState(false)
   const [productSelected, setProductSelected] = useState(null)
   const [products, setProducts] = useState([])
+  const [status, setStatus] = useState('')
   const { setAlertSnackbar } = useAlertSnackbar()
 
   useEffect(() => {
@@ -47,6 +48,7 @@ export default function EntryNote({handleRenderBox}) {
         }
       })
       setProducts(data.deliveryProducts)
+      setStatus(data.status)
 
       setOpenSearch(false)
       setLoading(false)
@@ -72,10 +74,11 @@ export default function EntryNote({handleRenderBox}) {
         <BeepReading.Root>
           <BeepReading.Header
             title={`BEEP DA ROTA Nº: ${search}`}
+            isReturn={status === 'Finalizada'}
             productSelected={productSelected}
             module={{
               name: 'delivery',
-              type: 'D'
+              type: status === 'Finalizada' ? 'C' : 'D'
             }}
             setProducts={setProducts}
           />

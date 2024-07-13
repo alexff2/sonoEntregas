@@ -30,7 +30,7 @@ module.exports = {
         }
       }
 
-      if (module !== 'single' && module !== 'purchaseNote' && module !== 'transfer') {
+      if (module !== 'single' && module !== 'purchaseNote' && module !== 'transfer' && module !== 'delivery') {
         throw {
           error: 'Module invalid!'
         }

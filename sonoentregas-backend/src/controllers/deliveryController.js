@@ -147,8 +147,12 @@ module.exports = {
   async findToBeep(request, response) {
     try {
       const {id} = request.query
-      const deliveryProducts = await DeliveriesService.findToBeep(id)
-      return response.json({deliveryProducts})
+      const delivery = await DeliveriesService.findUnique(id)
+      const deliveryProducts = await DeliveriesService.findToBeep(
+        id,
+        delivery.STATUS
+      )
+      return response.json({deliveryProducts, status: delivery.STATUS})
     } catch (error) {
       errorCath(error, response)
     }
