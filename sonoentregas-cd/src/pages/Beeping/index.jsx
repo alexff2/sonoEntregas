@@ -10,7 +10,7 @@ import { useAuthenticate } from '../../context/authContext'
 import BarCode from './BarCode'
 import BarCodeEndSingleEntered from './BarCodeEndSingleEntered'
 import EntryNote from './EntryNote'
-import OutDeliveries from './OutDeliveries'
+import Deliveries from './Deliveries'
 import Transfers from './Transfers'
 
 const userAuthToSingleEntered = (userName) => {
@@ -75,7 +75,7 @@ export default function Beeping() {
               && <BarCodeEndSingleEntered handleRenderBox={handleRenderBox} />
             }
             {screenId === 3 && <EntryNote handleRenderBox={handleRenderBox} />}
-            {screenId === 4 && <OutDeliveries handleRenderBox={handleRenderBox} />}
+            {screenId === 4 && <Deliveries handleRenderBox={handleRenderBox} />}
             {screenId === 5 && <Transfers handleRenderBox={handleRenderBox} />}
           </>
       }

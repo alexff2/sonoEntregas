@@ -28,10 +28,13 @@ const useStyles = makeStyles( theme =>({
       borderBottom: 'unset'
     },
     '&:hover': {
-      background: theme.palette.primary.light
+      background: theme.palette.primary.light,
+      '& > td': {
+        color: '#FFF'
+      }
     },
     '& > td' : {
-      padding: 4
+      padding: 4,
     },
     [theme.breakpoints.down('sm')]: {
       '& > td': {
@@ -45,7 +48,8 @@ const useStyles = makeStyles( theme =>({
     },
     background: theme.palette.primary.light,
     '& > td' : {
-      padding: 4
+      padding: 4,
+      color: '#FFF'
     }
   },
   tableProductsCells: {

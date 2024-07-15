@@ -22,7 +22,10 @@ const useStyles = makeStyles(theme => ({
     '& > *': {
       borderBottom: 'unset'
     },
-    background: theme.palette.primary.light
+    background: theme.palette.primary.light,
+    '& > td': {
+      color: '#FFF'
+    }
   }
 }))
 
@@ -31,7 +34,7 @@ const RowSale = ({ sale, type, status, handleInvalidationSale }) => {
   return(
     <React.Fragment>
       <TableRow className={classes.root}>
-        <TableCell component="th" scope="row">
+        <TableCell scope="row">
           {sale.ID_SALES}
         </TableCell>
         <TableCell>{sale.NOMECLI}</TableCell>

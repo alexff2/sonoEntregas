@@ -13,7 +13,7 @@ import { BeepReading } from '../../components/BeepReading'
 import { ButtonSuccess } from '../../components/Buttons'
 import api from '../../services/api'
 
-export default function EntryNote({handleRenderBox}) {
+export default function Deliveries({handleRenderBox}) {
   const [openSearch, setOpenSearch] = useState(true)
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(false)
