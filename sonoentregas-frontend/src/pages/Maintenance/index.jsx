@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 import TabSendMain from './TabSendMain'
-import TabSeachMain from './TabSeachMain'
+import TabSearchMain from './TabSearchMain'
 import Visit from './Visit'
 
 import { useAuthenticate } from '../../context/authContext'
@@ -18,7 +18,7 @@ export default function Vendas(){
   const { OFFICE } =  userAuth
 
   useEffect(() => {
-    setUserMas((OFFICE === 'Dev' || OFFICE === 'Master' || OFFICE === 'Manager'))
+    setUserMas((OFFICE === 'Dev' || OFFICE === 'Master'))
   }, [OFFICE])
 
   const openTab = (tab, e) => {
@@ -66,7 +66,7 @@ export default function Vendas(){
       
       <div className="tab-body body-container">
         {tabs.tab1 &&
-          <TabSeachMain />
+          <TabSearchMain />
         }
 
         {tabs.tab2 &&
