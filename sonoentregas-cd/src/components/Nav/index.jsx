@@ -13,10 +13,12 @@ import {
   LocalShipping,
   People,
   ShoppingCart,
-  KingBed,
-  Build
+  ViewWeek,
+  Build,
+  AirlineSeatIndividualSuite
 } from '@material-ui/icons'
 
+import NavItemSub from './NavItemSub'
 import NavItem from './NavItem'
 import { useAuthenticate } from '../../context/authContext'
 import logo from '../../img/SolftFlex.jpeg';
@@ -27,80 +29,59 @@ const itens = [
   {
     title: 'Home',
     href: '/app/home',
-    icon: Dashboard
+    icon: Dashboard,
+    fullWidth: true
   },
   {
     title: 'Entregas',
     href: '/app/delivery',
-    icon: EmojiTransportationTwoTone
+    icon: EmojiTransportationTwoTone,
+    fullWidth: true
   },
   {
     title: 'Transportes',
     href: '/app/transports',
-    icon: LocalShipping
+    icon: LocalShipping,
+    fullWidth: true
   },
   {
     title: 'Vendas',
-    href: '/app/sales',
-    icon: ShoppingCart
+    icon: ShoppingCart,
+    subs: [
+      {
+        title: 'Consulta',
+        href: '/app/sales/search',
+      },
+      {
+        title: 'Devoluções',
+        href: '/app/sales/returns',
+      },
+    ],
+    fullWidth: true
   },
   {
     title: 'Produtos',
     href: '/app/products',
-    icon: KingBed
+    icon: AirlineSeatIndividualSuite,
+    fullWidth: true
   },
   {
     title: 'Assistências',
     href: '/app/maintenance',
-    icon: Build
-  },
-  {
-    title: 'Usuários',
-    href: '/app/users',
-    icon: People
-  },
-]
-
-const itensMobile = [
-  {
-    title: 'Home',
-    href: '/app/home',
-    icon: Dashboard
-  },
-  {
-    title: 'Entregas',
-    href: '/app/delivery',
-    icon: EmojiTransportationTwoTone
-  },
-  {
-    title: 'Transportes',
-    href: '/app/transports',
-    icon: LocalShipping
-  },
-  {
-    title: 'Vendas',
-    href: '/app/sales',
-    icon: ShoppingCart
-  },
-  {
-    title: 'Produtos',
-    href: '/app/products',
-    icon: KingBed
-  },
-  {
-    title: 'Assistências',
-    href: '/app/maintenance',
-    icon: Build
+    icon: Build,
+    fullWidth: true
   },
   {
     title: 'Bipagens',
     href: '/app/beeping',
-    icon: Build
+    icon: ViewWeek,
+    fullWidth: false
   },
   {
     title: 'Usuários',
     href: '/app/users',
-    icon: People
+    icon: People,
+    fullWidth: true
   },
 ]
 
@@ -144,49 +125,37 @@ function Nav({
       <Divider />
       <Box p={2}>
         <List>
-          {itens.filter(item => (userAuth.OFFICE === 'Dev' || item.title !== 'Usuários')).map(item => (
-            <NavItem
-              key={item.title}
-              title={item.title}
-              href={item.href}
-              icon={item.icon}
-              handleDrawerToggle={handleDrawerToggle}
-              mobileOpen={mobileOpen}
-            />
-          ))}
-        </List>
-      </Box>
-      <Box flexGrow={1} />
-    </Box>
-  )
-
-  const drawerMobile = (
-    <Box
-      height="100%"
-      display="flex"
-      flexDirection="column"
-    >
-      <Box
-        alignItems="center"
-        display="flex"
-        flexDirection="column"
-        p={2}
-      >
-        <img src={logo} alt="Logo" className={classes.logo} />
-      </Box>
-      <Divider />
-      <Box p={2}>
-        <List>
-          {itensMobile.map(item => (
-            <NavItem
-              key={item.title}
-              title={item.title}
-              href={item.href}
-              icon={item.icon}
-              handleDrawerToggle={handleDrawerToggle}
-              mobileOpen={mobileOpen}
-            />
-          ))}
+          {itens
+            .filter(item => 
+              (mobileOpen ? true : item.fullWidth) &&
+              (userAuth.OFFICE === 'Dev' || item.title !== 'Usuários')
+            )
+            .map(item => {
+              if (item.subs) {
+                return (
+                  <NavItemSub
+                    key={item.title}
+                    title={item.title}
+                    subs={item.subs}
+                    icon={item.icon}
+                    handleDrawerToggle={handleDrawerToggle}
+                    mobileOpen={mobileOpen}
+                  />
+                )
+              } else {
+                return (
+                  <NavItem
+                    key={item.title}
+                    title={item.title}
+                    href={item.href}
+                    icon={item.icon}
+                    handleDrawerToggle={handleDrawerToggle}
+                    mobileOpen={mobileOpen}
+                  />
+                )
+              }
+            })
+          }
         </List>
       </Box>
       <Box flexGrow={1} />
@@ -209,7 +178,7 @@ return (
           keepMounted: true,
         }}
       >
-        {drawerMobile}
+        {drawer}
       </Drawer>
     </Hidden>
     <Hidden xsDown implementation="css">

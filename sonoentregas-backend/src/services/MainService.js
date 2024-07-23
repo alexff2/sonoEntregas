@@ -102,7 +102,7 @@ module.exports = {
     const maint = await ViewMaintenance.findSome(0, `STATUS <> 'Finalizada'${codloja}${loc} ORDER BY ID`, '*', connection)
 
     for(var i in maint){
-      maint[i].DATE_PREV = maint[i].DATE_PREV !== null && ObjDate.setDaysInDate(maint[i].DATE_PREV,2)
+      maint[i].DATE_PREV = maint[i].DATE_PREV !== null && ObjDate.setDaysInDate(maint[i].DATE_PREV,0)
       maint[i].DATE_VISIT = maint[i].DATE_VISIT !== null && ObjDate.setDaysInDate(maint[i].DATE_VISIT,2)
     }
     return maint
