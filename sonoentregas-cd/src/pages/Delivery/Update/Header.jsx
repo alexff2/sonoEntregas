@@ -41,9 +41,9 @@ export default function Header({ data, type }) {
   const [disabled, setDisabled] = useState(true)
   const [disabledBtn, setDisabledBtn] = useState(true)
 
-  const { cars } = useCars()
-  const { drivers } = useDrivers()
-  const { assistants } = useAssistants()
+  const { cars, setCars } = useCars()
+  const { drivers, setDrivers } = useDrivers()
+  const { assistants, setAssistants } = useAssistants()
   const { setDelivery } = useDelivery()
 
   useEffect(() => {
@@ -57,6 +57,21 @@ export default function Header({ data, type }) {
       setCodCar(data.ID_CAR)
     }
   }, [data, type])
+
+  useEffect(() => {
+    const searchUsers = async () => {
+      if (assistants.length === 0) {
+        const { data: usersResponse } = await api.get('users/0')
+        const { data: carsResponse } = await api.get('cars')
+
+        setCars(carsResponse)
+        setDrivers(usersResponse.filter(user => user.OFFICE === 'Driver'))
+        setAssistants(usersResponse.filter(user => user.OFFICE === 'Assistant'))
+      }
+    }
+
+    searchUsers()
+  }, [setCars, setDrivers, setAssistants, assistants])
 
   const classes = useStyles()
 

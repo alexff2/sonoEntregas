@@ -1,0 +1,20 @@
+.address-selection {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.address-selection li {
+  padding: 10px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.address-selection li:hover {
+  background-color: var(--texthighlight);
+}
+
+.address-selection li span {
+  font-weight: bold;
+}

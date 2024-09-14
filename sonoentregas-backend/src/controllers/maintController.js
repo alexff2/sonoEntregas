@@ -25,7 +25,7 @@ module.exports = {
     try {
       var { codloja } = req.params
 
-      const maint = await MainService.getViewMaint(codloja)
+      const maint = await MainService.getViewMaint(codloja, 'Shop', null)
 
       return res.json(maint)
     } catch (error) {

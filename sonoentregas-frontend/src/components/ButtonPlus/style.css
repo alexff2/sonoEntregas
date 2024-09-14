@@ -1,0 +1,30 @@
+.btnPlus {
+  position: absolute;
+  bottom: 50px;
+  right: 50px;
+  height: 64px;
+  width: 64px;
+  background-color: var(--blue-logo);
+  font-size: 52px;
+
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  border-radius: 50%;
+  border: none;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btnPlus:hover {
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.8);
+  bottom: 49px;
+  right: 49px;
+}
+
+.btnPlus svg {
+  color: #fff;
+}

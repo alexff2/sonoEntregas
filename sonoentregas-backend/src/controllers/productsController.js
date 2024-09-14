@@ -3,10 +3,10 @@ const errorCath = require('../functions/error')
 
 module.exports = {
   async index(req, res){
-    const { typesearch, search } = req.params
+    const { typeSearch, search } = req.params
 
     const where = {}
-    where[typesearch] = search
+    where[typeSearch] = search
 
     const productsSceCd = await ProductsService.findProductsSceCd(where)
 

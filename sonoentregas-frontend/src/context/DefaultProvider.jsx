@@ -5,17 +5,20 @@ import UserProvider from './userContext'
 import MaintProvider from './maintContext'
 import Alert from './modalAlertContext'
 import AuthProvider from './authContext'
+import BackdropProvider from './backdropContext'
 
 export function DefaultProvider({ children }){
   return (
     <Alert>
-      <AuthProvider>
-        <UserProvider>
-          <MaintProvider>
-            {children}
-          </MaintProvider>
-        </UserProvider>
-      </AuthProvider>
+      <BackdropProvider>
+        <AuthProvider>
+          <UserProvider>
+            <MaintProvider>
+              {children}
+            </MaintProvider>
+          </UserProvider>
+        </AuthProvider>
+      </BackdropProvider>
     </Alert>
   )
 }

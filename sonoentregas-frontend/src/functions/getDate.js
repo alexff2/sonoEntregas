@@ -1,5 +1,5 @@
 export function convertDate(date=false, days = 0){
-  let data, dia, diaF, mes, mesF, anoF
+  let data, day, dayF, month, monthF, yearF
 
   if (date) {
     if(!date.includes('T')){
@@ -8,54 +8,54 @@ export function convertDate(date=false, days = 0){
 
     data = new Date(date)
     //data.setDate(data.getDate()+days)
-    dia  = data.getDate().toString()
-    diaF = (dia.length === 1) ? '0'+dia : dia
-    mes  = (data.getMonth()+1).toString() //+1 pois no getMonth Janeiro começa com zero.
-    mesF = (mes.length === 1) ? '0'+mes : mes
-    anoF = data.getFullYear()
+    day  = data.getDate().toString()
+    dayF = (day.length === 1) ? '0'+day : day
+    month  = (data.getMonth()+1).toString() //+1 pois no getMonth Janeiro começa com zero.
+    monthF = (month.length === 1) ? '0'+month : month
+    yearF = data.getFullYear()
   } else { 
     data = new Date()
     data.setDate(data.getDate()+days)
-    dia  = data.getDate().toString()
-    diaF = (dia.length === 1) ? '0'+dia : dia
-    mes  = (data.getMonth()+1).toString() //+1 pois no getMonth Janeiro começa com zero.
-    mesF = (mes.length === 1) ? '0'+mes : mes
-    anoF = data.getFullYear()
+    day  = data.getDate().toString()
+    dayF = (day.length === 1) ? '0'+day : day
+    month  = (data.getMonth()+1).toString() //+1 pois no getMonth Janeiro começa com zero.
+    monthF = (month.length === 1) ? '0'+month : month
+    yearF = data.getFullYear()
   }
-  return { diaF, mesF, anoF }
+  return { dayF, monthF, yearF }
 }
 
 export function dateSqlToReact(date = false, days = 0) {
-  const { diaF, mesF, anoF } = convertDate(date, days)
-  return `${diaF}/${mesF}/${anoF} `
+  const { dayF, monthF, yearF } = convertDate(date, days)
+  return `${dayF}/${monthF}/${yearF} `
 }
 
 export function getDateToSql(date = false, days = 0) {
-  const { diaF, mesF, anoF } = convertDate(date, days)
-  return `${anoF}-${mesF}-${diaF}`
+  const { dayF, monthF, yearF } = convertDate(date, days)
+  return `${yearF}-${monthF}-${dayF}`
 }
 
-export function dateWarranty(emissao) {
-  if (!emissao) {
+export function dateWarranty(issue) {
+  if (!issue) {
     return
   }
 
-  emissao = emissao.split('/',3)
-  var ano = emissao[2]
-  ano = parseInt(ano) + 1
-  return `${emissao[0]}/${emissao[1]}/${ano}`
+  issue = issue.split('/',3)
+  var year = issue[2]
+  year = parseInt(year) + 1
+  return `${issue[0]}/${issue[1]}/${year}`
 }
 
-export function checkDateWarranty(emissao) {
-  if (!emissao) {
+export function checkDateWarranty(issue) {
+  if (!issue) {
     return
   }
 
-  emissao = emissao.split('/',3)
-  var ano = emissao[2]
-  ano = parseInt(ano) + 1
+  issue = issue.split('/',3)
+  var year = issue[2]
+  year = parseInt(year) + 1
 
-  var warranty = new Date(`${ano}-${emissao[1]}-${emissao[0]}`)
+  var warranty = new Date(`${year}-${issue[1]}-${issue[0]}`)
   warranty.setDate(warranty.getDate()+1)
   warranty = warranty.setHours(0,0,0,0)
 

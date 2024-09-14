@@ -38,6 +38,12 @@ const styleStatus = [
 ]
 export default function Status({ params }) {
   return (
-    <div style={styleStatus[params.type][params.color]}>{params.status}</div>
+    <div 
+      style={{
+        ...styleStatus[params.type][params.color],
+        fontWeight: 'bold',
+        height: '100%',
+      }}
+    >{params.status}</div>
   )
 }

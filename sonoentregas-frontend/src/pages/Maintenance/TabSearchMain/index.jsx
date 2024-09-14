@@ -172,6 +172,7 @@ export default function TabSearchMain() {
                 <th className="cod">Cód. Venda</th>
                 <th>Cliente</th>
                 <th>Produto</th>
+                <th>Agendamento</th>
                 <th className="date">Envio</th>
                 <th>Status</th>
               </tr>
@@ -183,6 +184,12 @@ export default function TabSearchMain() {
                 <td>{main.ID_SALE}</td>
                 <td>{main.NOMECLI}</td>
                 <td>{main.PRODUTO}</td>
+                {!main.DATE_VISIT
+                  ?<td className="dateSched">
+                    {main.DATE_PREV && dateSqlToReact(main.DATE_PREV)} - {main.HOURS_PREV}
+                  </td>
+                  : <td>{dateSqlToReact(main.DATE_VISIT)}</td>
+                }
                 <td>{dateSqlToReact(main.D_ENVIO)}</td>
                 {
                   main.STATUS === 'Aguardando'

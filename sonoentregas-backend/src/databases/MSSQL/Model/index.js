@@ -15,18 +15,30 @@ class Model {
 
     Object.entries(obj).forEach(([key,value], i, vet) => {
       if (key === 'in') {
-        Object.entries(obj.in).forEach(([keyIn,vetValueIn]) => {
+        Object.entries(obj.in).forEach(([keyIn,arrayValueIn], indexIn) => {
           let valueIn
 
-          vetValueIn.forEach((el, ind) => {
-            ind === 0
-              ? valueIn = `'${el}'`
-              : valueIn += `, '${el}'`
-          })
-
-          vet.length === i + 1
-            ? values += `${keyIn} IN (${valueIn.toString()})`
-            : values += `${keyIn} IN (${valueIn.toString()})${separate} `
+          if (indexIn === 0) {
+            arrayValueIn.forEach((el, ind) => {
+              ind === 0
+                ? valueIn = `'${el}'`
+                : valueIn += `, '${el}'`
+            })
+  
+            vet.length === i + 1
+              ? values += `${keyIn} IN (${valueIn.toString()})`
+              : values += `${keyIn} IN (${valueIn.toString()})${separate} `
+          } else {
+            arrayValueIn.forEach((el, ind) => {
+              ind === 0
+                ? valueIn = `'${el}'`
+                : valueIn += `, '${el}'`
+            })
+  
+            vet.length === i + 1
+              ? values += `AND ${keyIn} IN (${valueIn.toString()})`
+              : values += `AND ${keyIn} IN (${valueIn.toString()})${separate} `
+          }
         })
       } else if (key === 'isNull') {
         vet.length === i + 1 

@@ -1,0 +1,4 @@
+.modal-overlaw.backdrop {
+  background-color: transparent;
+  backdrop-filter: blur(5px);
+}

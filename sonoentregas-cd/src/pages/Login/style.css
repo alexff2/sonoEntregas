@@ -125,6 +125,10 @@ form.sign-in-form {
   cursor: progress;
 }
 
+.btn:disabled svg{
+  color: #fff;
+}
+
 .btn:hover {
   background-color: #012c5f;
 }

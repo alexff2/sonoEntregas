@@ -149,6 +149,7 @@ export default function SearchMain({ setVisit }){
               <th className="cod">Loja</th>
               <th>Cliente</th>
               <th>Produto</th>
+              <th>Bairro</th>
               <th>Agendamento</th>
               <th>Visitante</th>
               <th>Status</th>
@@ -166,6 +167,7 @@ export default function SearchMain({ setVisit }){
               <td>{maint.DESC_ABREV}</td>
               <td>{maint.NOMECLI}</td>
               <td>{maint.PRODUTO}</td>
+              <td>{maint.BAIRRO}</td>
               {!maint.DATE_VISIT
                 ?<td className="dateSched">
                   {maint.DATE_PREV && dateSqlToReact(maint.DATE_PREV)} - {maint.HOURS_PREV}
