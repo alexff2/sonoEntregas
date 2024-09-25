@@ -52,6 +52,8 @@ class Model {
         let keyValue
         if (value === 'CURRENT_TIMESTAMP'){
           keyValue = toCompare === '=' ? `${key} = ${value}` : `${key} LIKE ${value}%`
+        } else if (value === 'NULL') {
+          keyValue = `${key} = ${value}`
         } else {
           keyValue = toCompare === '=' ? `${key} = '${value}'` : `${key} LIKE '${value}%'`
         }

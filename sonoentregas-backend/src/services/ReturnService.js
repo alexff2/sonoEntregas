@@ -1,59 +1,9 @@
-//@ts-check
-/**
- * @typedef {Object} InputCreateReturn
- * @property {number} id
- * @property {number} originalReturnId
- * @property {number} shopId
- * @property {number} originalSaleId
- * @property {string} client
- * @property {string} street
- * @property {number} houseNumber
- * @property {string} district
- * @property {string} city
- * @property {string} state
- * @property {string} phone
- * 
- * @typedef {Object} InputCreateReturnProduct
- * @property {number} id
- * @property {number} alternativeCode
- * @property {number} quantity
- * 
- * @typedef {Object} OutputCreateReturn
- * @property {number} id
- * @property {Date} dateSend
- * @property {number} originalReturnId
- * @property {number} shopId
- * @property {number} originalSaleId
- * @property {string} client
- * @property {string} street
- * @property {number} houseNumber
- * @property {string} district
- * @property {string} city
- * @property {string} state
- * @property {string} phone
- * @property {number | null} deliveryId
- * 
- * @typedef {Object} Address
- * @property {number} clientId
- * @property {string} street
- * @property {number} houseNumber
- * @property {string} district
- * @property {string} city
- * @property {string} state
- * @property {string} phone
- * 
- * @typedef {Object} OutputCreateReturnProduct
- * @property {number} id
- * @property {number} returnsSalesId
- * @property {number} alternativeCode
- * @property {number} quantity
-*/
-
 const { QueryTypes } = require('sequelize')
 const DateTime = require('../class/Date')
 const ReturnsModel = require('../models/tables/Returns')
 const ReturnsProductsModel = require('../models/tables/Returns/ReturnsProducts')
 const DeliveryProdModel = require('../models/DeliveryProd')
+const ShopModel = require('../models/tables/Shops')
 const returnsSceScripts = require('../scripts/returnsSce')
 const addressesScripts = require('../scripts/addresses')
 
@@ -74,7 +24,7 @@ class ReturnService {
 
     const products = await ReturnsModel._query(
       shopId,
-      returnsSceScripts.findProducts({id: salesReturns.map(sale => sale.originalReturnId)}),
+      returnsSceScripts.findProductsSce({id: salesReturns.map(sale => sale.originalReturnId)}),
       QueryTypes.SELECT
     )
 
@@ -107,11 +57,27 @@ class ReturnService {
   }
 
   async findOpen(){
-    const returnsPending = await ReturnsModel.findAny(0)
+    const returnsPending = await ReturnsModel.findAny(0, { in: { status: ['Pendente', 'Buscando']} })
+
+    if (returnsPending.length === 0) {
+      return []
+    }
+
+    const products = await ReturnsProductsModel._query(
+      0,
+      returnsSceScripts.products(returnsPending.map(returnPending => returnPending.id)),
+      QueryTypes.SELECT
+    )
+
+    const shops = await ShopModel.findAny(0, { in: { CODLOJA: returnsPending.map(returnPending => returnPending.shopId) } })
 
     returnsPending.forEach(returnPending => {
       returnPending.dateSendToLocale = returnPending.dateSend.toLocaleDateString()
-      returnPending.status = 'Pendente'
+
+      returnPending.products = products.filter(product => product.returnsSalesId === returnPending.id)
+
+      const shop = shops.find(shop => shop.CODLOJA === returnPending.shopId)
+      returnPending.shop = shop.DESC_ABREV
     })
 
     return returnsPending
@@ -120,20 +86,61 @@ class ReturnService {
   async findById({id, connection}){
     const returnsSale = await ReturnsModel.findAny(0, { id }, '*', connection)
 
+    const products = await ReturnsProductsModel._query(
+      0,
+      returnsSceScripts.products(returnsSale[0].id),
+      QueryTypes.SELECT,
+      connection
+    )
+
+    const shop = await ShopModel.findAny(0, { CODLOJA: returnsSale[0].shopId }, '*', connection)
+
     returnsSale.forEach(returnPending => {
       returnPending.dateSendToLocale = returnPending.dateSend.toLocaleDateString()
-      returnPending.status = 'Pendente'
+
+      returnPending.products = products.filter(product => product.returnsSalesId === returnPending.id)
+
+      returnPending.shop = shop[0].DESC_ABREV
     })
 
     return returnsSale[0]
   }
 
-  /**
-   * @param {InputCreateReturn} saleReturnInput 
-   * @param {InputCreateReturnProduct[]} productsInput
-   * @param {Object} connections
-   * @returns 
-   */
+  async findByClientOrDate({typeSearch, search, dateStart, dateFinish}){
+    console.log('Chegou aqui')
+    const returnsSaleScript = await returnsSceScripts.findByClientOrDate({
+      client: typeSearch === 'client' ? search : '',
+      originalSaleId: typeSearch === 'originalSaleId' ? search : '',
+      dateStart: typeSearch === 'dateReturn' ? dateStart : '',
+      dateFinish: typeSearch === 'dateReturn' ? dateFinish : ''
+    })
+
+    const returnsSale = await ReturnsModel._query(0, returnsSaleScript, QueryTypes.SELECT)
+
+    if (returnsSale.length === 0) {
+      return []
+    }
+
+    const products = await ReturnsProductsModel._query(
+      0,
+      returnsSceScripts.products(returnsSale.map(returnSale => returnSale.id)),
+      QueryTypes.SELECT
+    )
+
+    const shops = await ShopModel.findAny(0, { in: { CODLOJA: returnsSale.map(returnSale => returnSale.shopId) } })
+
+    returnsSale.forEach(returnSale => {
+      returnSale.dateSendToLocale = returnSale.dateSend.toLocaleDateString()
+
+      returnSale.products = products.filter(product => product.returnsSalesId === returnSale.id)
+
+      const shop = shops.find(shop => shop.CODLOJA === returnSale.shopId)
+      returnSale.shop = shop.DESC_ABREV
+    })
+
+    return returnsSale
+  }
+
   async create(saleReturnInput, productsInput, connections){
     const scriptUpdateStatusSce = returnsSceScripts.updateStatusSce({
       originalSaleId: saleReturnInput.originalSaleId,
@@ -172,6 +179,7 @@ class ReturnService {
       city: saleReturnInput.city,
       state: saleReturnInput.state,
       phone: saleReturnInput.phone,
+      status: 'Pendente'
     }], false, connections.connectionDelivery)
 
     const productsToCreate = productsInput.map(product => ({
@@ -244,9 +252,40 @@ class ReturnService {
     return addresses
   }
 
-  async linkInDelivery(){}
+  async linkInDelivery(returnId, deliveryId, connectionDelivery){
+    await ReturnsModel.updateAny(
+      0,
+      { 
+        deliveryId,
+        status: 'Buscando'
+      },
+      { id: returnId },
+      connectionDelivery
+    )
+  }
 
-  async unlinkInDelivery(){}
+  async unlinkInDelivery(returnId, connectionDelivery){
+    await ReturnsModel.updateAny(
+      0,
+      { 
+        deliveryId: 'NULL',
+        status: 'Pendente'
+      },
+      { id: returnId },
+      connectionDelivery
+    )
+  }
+
+  async finish(returnId, connectionDelivery){
+    await ReturnsModel.updateAny(
+      0,
+      { 
+        status: 'Devolvido'
+      },
+      { id: returnId },
+      connectionDelivery
+    )
+  }
 }
 
 module.exports = new ReturnService()

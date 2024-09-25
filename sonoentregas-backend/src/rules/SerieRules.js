@@ -3,6 +3,8 @@ const ProdLojaSeriesModel = require('../models/tables/ProdLojaSeriesMovimentos')
 const DeliveryModel = require('../models/Deliverys')
 const TransferOfProductsModel = require('../models/tables/TransferOfProducts')
 const PurchaseNoteModel = require('../models/tables/PurchaseNote')
+const SaleReturnModel = require('../models/tables/Returns/index')
+const MaintenanceModel = require('../models/tables/Maintenance')
 
 class SerieRules {
   async createIfDoesNotExistFinished({serialNumber}, connection){
@@ -39,6 +41,26 @@ class SerieRules {
 
   async checkModule(modele, moduleId, connections) {
     const { sce, entrega } = connections
+
+    if(modele === 'maintenance') {
+      const maintenance = await MaintenanceModel.findAny(0, { id: moduleId }, '*', entrega)
+
+      if (maintenance.length === 0) {
+        throw {
+          error: 'Maintenance not exist!'
+        }
+      }
+    }
+
+    if(modele === 'saleReturn') {
+      const saleReturn = await SaleReturnModel.findAny(0, { id: moduleId }, '*', entrega)
+
+      if (saleReturn.length === 0) {
+        throw {
+          error: 'SaleReturn not exist!'
+        }
+      }
+    }
 
     if(modele === 'delivery') {
       const delivery = await DeliveryModel.findAny(0, { id: moduleId }, '*', entrega)

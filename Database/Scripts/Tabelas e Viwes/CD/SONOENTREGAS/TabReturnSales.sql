@@ -11,7 +11,8 @@ CREATE TABLE RETURNS_SALES (
   city VARCHAR(25) NOT NULL,
   state VARCHAR(25) NOT NULL,
   phone VARCHAR(15) NOT NULL,
-  deliveryId INT
+  status VARCHAR(10) NOT NULL,
+  deliveryId INT,
 )
 
 CREATE UNIQUE INDEX idOriginalReturnIdShopIdOriginalSaleId ON RETURNS_SALES (originalReturnId ASC, shopId ASC, originalSaleId ASC)

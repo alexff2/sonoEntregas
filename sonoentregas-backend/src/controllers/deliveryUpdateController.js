@@ -12,7 +12,6 @@ const DeliveryService = require('../services/DeliveryService')
 const MainService = require('../services/MainService')
 const ForecastsRules = require('../rules/forecastRules')
 const DeliveriesRules = require('../rules/DeliveriesRules')
-const Date = require('../class/Date')
 
 module.exports = {
   /**
@@ -49,25 +48,33 @@ module.exports = {
     const delivery = req.body
     const { id: user_id } = req.user
 
+    const sce = await Deliveries._query(1)
+    const entrega = await Deliveries._query(0)
+
     try {
       const maintenances = await MainService.findMain({
         codloja: 0,
         typeSeach: 'ID_DELIV_MAINT',
         search: id
-      })
+      }, false, entrega)
 
-      await DeliveryService.updateDeliveryProd(delivery, id)
+      await DeliveryService.updateDeliveryProd(delivery, id, { entrega, sce })
 
       await DeliveryService.updateDelivery({
         delivery,
         id,
         user_id,
         maintenances
-      })
+      }, { entrega, sce })
+
+      await sce.transaction.commit()
+      await entrega.transaction.commit()
 
       return res.json(delivery)
     } catch (e) {
       console.log(e)
+      await sce.transaction.rollback()
+      await entrega.transaction.rollback()
       res.status(400).json(e)
     }
   },

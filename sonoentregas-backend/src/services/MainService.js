@@ -17,9 +17,11 @@ module.exports = {
   /**
 
    * @param {Conditions} conditions 
+   * @param {boolean} cd
+   * @param {object} condition
    * @returns {Promise<Object[]>}
    */
-  async findMain(conditions, cd = false) {
+  async findMain(conditions, cd = false, condition) {
     const { codloja, search, typeSeach } = conditions
     var maint
 
@@ -28,7 +30,7 @@ module.exports = {
 
     if (typeSeach === 'close') maint = await ViewMaintenance.findSome(0, `STATUS = 'Finalizada' AND D_FINISH = '${search}'${codLoja}${toCd} ORDER BY ID`)
     else if (typeSeach === 'NOMECLI') maint = await ViewMaintenance.findSome(0, `${typeSeach} LIKE '${search}%'${codLoja}${toCd}`)
-    else maint = await ViewMaintenance.findSome(0, `${typeSeach} = '${search}'${codLoja}${toCd}`)
+    else maint = await ViewMaintenance.findSome(0, `${typeSeach} = '${search}'${codLoja}${toCd}`, '*', condition)
 
     return maint
   },

@@ -128,7 +128,7 @@ module.exports = {
       console.log(error)
     }
   },
-  async updateDelivery({ delivery, id, user_id, maintenances }){
+  async updateDelivery({ delivery, id, user_id, maintenances }, conditions){
     const dateTimeNow = new Date().getISODateTimeBr().dateTime
 
     if (delivery.STATUS === 'Entregando') {
@@ -137,12 +137,12 @@ module.exports = {
         ID_USER_DELIVERING: user_id,
         dateUpdateDelivering: dateTimeNow,
         D_DELIVERING: delivery.date
-      }, { id })
+      }, { id }, conditions.entrega)
 
       for(let i = 0; i < maintenances.length; i++) {
         maintenances[i]["date"] = delivery.date
 
-        await MainService.moveToMaint(maintenances[i].ID_MAINT_DELIV, maintenances[i])
+        await MainService.moveToMaint(maintenances[i].ID_MAINT_DELIV, maintenances[i], conditions)
       }
     } else if (delivery.STATUS === 'Finalizada') {
       await Delivery.updateAny(0, {
@@ -150,14 +150,15 @@ module.exports = {
         ID_USER_DELIVERED: user_id,
         dateUpdateDelivered: dateTimeNow,
         D_DELIVERED: delivery.date
-      }, { id })
+      }, { id }, conditions.entrega)
     }
   },
   /**
    * @param {{ sales: string | any[]; }} delivery
    * @param {number} id
+   * @param {Object} conditions
    */
-  async updateDeliveryProd(delivery, id){
+  async updateDeliveryProd(delivery, id, conditions){
     for (let i = 0; i < delivery.sales.length; i++) {
       for (let j = 0; j < delivery.sales[i].products.length; j++) {
 
@@ -172,20 +173,20 @@ module.exports = {
         let codLoja = delivery.sales[i].CODLOJA
         let idSales = delivery.sales[i].ID_SALES
 
-        upSt && await Delivery._query(0, `UPDATE SALES_PROD SET STATUS = '${status}' WHERE ID_SALES = ${idSales} AND CODLOJA = ${codLoja} AND COD_ORIGINAL = '${cod}'`, QueryTypes.UPDATE)
+        upSt && await Delivery._query(0, `UPDATE SALES_PROD SET STATUS = '${status}' WHERE ID_SALES = ${idSales} AND CODLOJA = ${codLoja} AND COD_ORIGINAL = '${cod}'`, QueryTypes.UPDATE, conditions.entrega)
 
         if (status === 'Entregando') {
-          await Delivery._query(1,`UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL - ${qtd}, EST_LOJA = EST_LOJA - ${qtd} FROM PRODLOJAS A INNER JOIN PRODUTOS B ON A.CODIGO = B.CODIGO WHERE A.CODLOJA = 1 AND B.ALTERNATI = '${cod}'`, QueryTypes.UPDATE)
+          await Delivery._query(1,`UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL - ${qtd}, EST_LOJA = EST_LOJA - ${qtd} FROM PRODLOJAS A INNER JOIN PRODUTOS B ON A.CODIGO = B.CODIGO WHERE A.CODLOJA = 1 AND B.ALTERNATI = '${cod}'`, QueryTypes.UPDATE, conditions.sce)
 
         } else if (DELIVERED) {
 
-          await Delivery._query(0, `UPDATE DELIVERYS_PROD SET DELIVERED = 1, REASON_RETURN = '${reason}' WHERE ID_DELIVERY = ${id} AND ID_SALE = ${idSales} AND CODLOJA = ${codLoja} AND COD_ORIGINAL = '${cod}'`)
+          await Delivery._query(0, `UPDATE DELIVERYS_PROD SET DELIVERED = 1, REASON_RETURN = '${reason}' WHERE ID_DELIVERY = ${id} AND ID_SALE = ${idSales} AND CODLOJA = ${codLoja} AND COD_ORIGINAL = '${cod}'`, QueryTypes.UPDATE, conditions.entrega)
 
-          await Delivery._query(0, `UPDATE SALES_PROD SET STATUS = 'Enviado' WHERE ID_SALES = ${idSales} AND CODLOJA = ${codLoja} AND COD_ORIGINAL = '${cod}'`)
+          await Delivery._query(0, `UPDATE SALES_PROD SET STATUS = 'Enviado' WHERE ID_SALES = ${idSales} AND CODLOJA = ${codLoja} AND COD_ORIGINAL = '${cod}'`, QueryTypes.UPDATE, conditions.entrega)
 
-          await Delivery._query(1,`UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL + ${qtd}, EST_LOJA = EST_LOJA + ${qtd} FROM PRODLOJAS A INNER JOIN PRODUTOS B ON A.CODIGO = B.CODIGO WHERE A.CODLOJA = 1 AND B.ALTERNATI = '${cod}'`)
+          await Delivery._query(1,`UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL + ${qtd}, EST_LOJA = EST_LOJA + ${qtd} FROM PRODLOJAS A INNER JOIN PRODUTOS B ON A.CODIGO = B.CODIGO WHERE A.CODLOJA = 1 AND B.ALTERNATI = '${cod}'`, QueryTypes.UPDATE, conditions.sce)
           
-          await Delivery._query(0, `UPDATE SALES SET STATUS = 'Aberta' WHERE ID_SALES = ${idSales} AND CODLOJA = ${codLoja}`)
+          await Delivery._query(0, `UPDATE SALES SET STATUS = 'Aberta' WHERE ID_SALES = ${idSales} AND CODLOJA = ${codLoja}`, QueryTypes.UPDATE, conditions.entrega)
         }
       }
     }
@@ -295,7 +296,9 @@ module.exports = {
   *@param {string} status
   */
   async findToBeep(id, status) {
-    const script = scripts.findToBeep(id, status)
+    const script = status === 'Finalizada'
+      ? scripts.findToBeepDeliveryReturn(id)
+      : scripts.findToBeepDelivery(id)
     /**@type {IDeliveryProductsToBeep[]} */
     const deliveryProduct = await DeliveryProd._query(1, script, QueryTypes.SELECT)
 

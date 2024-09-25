@@ -30,7 +30,7 @@ module.exports = {
         }
       }
 
-      if (module !== 'single' && module !== 'purchaseNote' && module !== 'transfer' && module !== 'delivery') {
+      if (module !== 'single' && module !== 'purchaseNote' && module !== 'transfer' && module !== 'delivery' && module !== 'saleReturn') {
         throw {
           error: 'Module invalid!'
         }
@@ -75,7 +75,7 @@ module.exports = {
         }
       }
 
-      if (module !== 'transfer' && module !== 'delivery') {
+      if (module !== 'transfer' && module !== 'delivery' && module !== 'maintenance') {
         throw {
           error: 'Module invalid!'
         }

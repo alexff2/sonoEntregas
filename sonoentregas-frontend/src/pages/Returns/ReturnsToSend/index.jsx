@@ -44,7 +44,6 @@ export default function ReturnsToSend({setOpen, setReturns}) {
         saleReturnInput: { ...selectSaleReturn, shopId: shopAuth.cod, ...address},
         productsInput: selectSaleReturn.products
       })
-      console.log(data)
 
       setReturns(prev => [...prev, data.returnCreated])
 

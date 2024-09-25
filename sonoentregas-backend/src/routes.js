@@ -98,7 +98,11 @@ routes.get('/sales/:idSale/loja/:idLoja/product/:idProduct', salesController.fin
 routes.post('/sales/updateDate/:idSale', salesController.updateDateDelivery)
 // Returns Sales
 routes.post('/returns', ensureAuthenticated, returnsController.create)
+routes.put('/returns/delivery/link', ensureAuthenticated, returnsController.linkSaleReturnInDelivery)
+routes.put('/returns/delivery/unlink', ensureAuthenticated, returnsController.unlinkSaleReturnInDelivery)
+routes.put('/returns/delivery/finish', ensureAuthenticated, returnsController.finish)
 routes.delete('/returns/:id', ensureAuthenticated, returnsController.cancel)
+routes.get('/returns', ensureAuthenticated, returnsController.findByClientOrDate)
 routes.get('/returns/open', ensureAuthenticated, returnsController.findOpen)
 routes.get('/returns/sce', ensureAuthenticated, returnsController.findSce)
 routes.get('/returns/address', ensureAuthenticated, returnsController.findAddress)

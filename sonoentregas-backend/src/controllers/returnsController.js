@@ -1,5 +1,6 @@
 const ReturnsModel = require('../models/tables/Returns')
 const ReturnService = require('../services/ReturnService')
+const ReturnRules = require('../rules/SaleReturn')
 const errorCath = require('../functions/error')
 
 module.exports = {
@@ -7,6 +8,20 @@ module.exports = {
     try {
       const returns = await ReturnService.findOpen()
       return response.json({ returns })
+    } catch (error) {
+      return errorCath(error, response)
+    }
+  },
+  async findByClientOrDate(request, response) {
+    try {
+      const { typeSearch, search, dateStart, dateFinish } = request.query
+      const salesReturns = await ReturnService.findByClientOrDate({
+        typeSearch,
+        search,
+        dateStart,
+        dateFinish
+      })
+      return response.json({salesReturns})
     } catch (error) {
       return errorCath(error, response)
     }
@@ -84,5 +99,53 @@ module.exports = {
       connectionSce.transaction.rollback()
       return errorCath(error, response)
     }
-  }
+  },
+  async linkSaleReturnInDelivery(request, response) {
+    const { returnId, deliveryId } = request.body
+    const connection = await ReturnsModel._query(0)
+
+    try {
+      await ReturnService.linkInDelivery(returnId, deliveryId, connection)
+      const linkedReturn = await ReturnService.findById({id: returnId, connection})
+      connection.transaction.commit()
+      return response.status(200).json({ linkedReturn })
+    } catch (error) {
+      connection.transaction.rollback()
+      return errorCath(error, response)
+    }
+  },
+  async unlinkSaleReturnInDelivery(request, response) {
+    const { returnId } = request.body
+    const connection = await ReturnsModel._query(0)
+
+    try {
+      if (await ReturnRules.checkIfReturnedSaleStartedBeeping(returnId)) {
+        throw {
+          status: 409,
+          message: 'saleReturnStartedBeeping'
+        }
+      }
+      await ReturnService.unlinkInDelivery(returnId, connection)
+      const linkedReturn = await ReturnService.findById({id: returnId, connection})
+      connection.transaction.commit()
+      return response.status(200).json({ linkedReturn })
+    } catch (error) {
+      connection.transaction.rollback()
+      return errorCath(error, response)
+    }
+  },     
+  async finish(request, response) {
+    const { returnId } = request.body
+    const connection = await ReturnsModel._query(0)
+
+    try {
+      await ReturnService.finish(returnId, connection)
+      const saleReturn = await ReturnService.findById({id: returnId, connection})
+      connection.transaction.commit()
+      return response.status(200).json({ saleReturn })
+    } catch (error) {
+      connection.transaction.rollback()
+      return errorCath(error, response)
+    }
+  },     
 }

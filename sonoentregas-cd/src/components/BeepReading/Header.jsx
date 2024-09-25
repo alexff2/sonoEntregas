@@ -49,14 +49,14 @@ export function Header({
         await api.post('serial/first', {
           serialNumber,
           productId: productSelected.id,
-          module: module.name,
+          module: module.name === 'delivery' ? productSelected.module : module.name,
           moduleId: productSelected.moduleId
         })
       } else {
         await api.put('serial/finished', {
           serialNumber,
           productId: productSelected.id,
-          module: module.name,
+          module: module.name === 'delivery' ? productSelected.module : module.name,
           moduleId: productSelected.moduleId
         })
       }
@@ -66,11 +66,20 @@ export function Header({
           return {
             ...productGroup,
             products: productGroup.products.map(product => {
-              if (product.id === productSelected.id) {
-                productSelected.quantityPedding -= 1
-                productSelected.quantityBeep += 1
-
-                return productSelected
+              if(product.module) {
+                if (product.id === productSelected.id && product.module === productSelected.module) {
+                  productSelected.quantityPedding -= 1
+                  productSelected.quantityBeep += 1
+  
+                  return productSelected
+                }
+              } else {
+                if (product.id === productSelected.id) {
+                  productSelected.quantityPedding -= 1
+                  productSelected.quantityBeep += 1
+  
+                  return productSelected
+                }
               }
     
               return product
@@ -117,7 +126,7 @@ export function Header({
 
       <Box className={classes.textHeader}>
         <Typography>
-          {title}{ isReturn && <> - <strong style={{color: 'red'}}>RETORNO</strong></>}
+          {title}{ isReturn && <> - <strong style={{color: 'red'}}>RETORNO / DEVOLUÇÕES</strong></>}
         </Typography>
         <Typography>{productSelected ? productSelected.nameFull : 'Selecione um produto...'}</Typography>
       </Box>

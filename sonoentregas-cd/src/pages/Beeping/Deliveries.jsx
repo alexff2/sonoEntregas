@@ -53,13 +53,13 @@ export default function Deliveries({handleRenderBox}) {
       setOpenSearch(false)
       setLoading(false)
     } catch (error) {
-      console.log(error)
+      console.log(error.response)
 
       setSearch('')
       document.getElementById('searchId').focus()
       setLoading(false)
 
-      if (error.response.data === 'Delivery not found') {
+      if (error.response.data === 'delivery not found') {
         setAlertSnackbar('Entrega não encontrada!')
       } else if (error.response.data === 'Delivery already beeped') {
         setAlertSnackbar('Entrega não tem retorno!')
