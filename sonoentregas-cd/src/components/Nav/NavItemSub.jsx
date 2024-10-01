@@ -1,7 +1,11 @@
 import React, { useState } from 'react'
 import { NavLink } from "react-router-dom"
 import { Button, Collapse, ListItem, makeStyles } from "@material-ui/core"
-import PropTypes from 'prop-types';
+import {
+  KeyboardArrowDown,
+  KeyboardArrowUp
+} from '@material-ui/icons'
+import PropTypes from 'prop-types'
 
 const useStyle = makeStyles((theme)=>({
   item: {
@@ -21,6 +25,10 @@ const useStyle = makeStyles((theme)=>({
   },
   icon: {
     marginRight: theme.spacing(1)
+  },
+  titleButton: {
+    fontSize: theme.typography.h6.fontSize,
+    paddingLeft: 2
   },
   title: {
     fontSize: theme.typography.h6.fontSize,
@@ -43,11 +51,15 @@ function Navbar({
       <Button
         className={classes.button}
         onClick={() => setOpen(!open)}
+        style={{justifyContent: 'space-between'}}
       >
-        {Icon && (
-          <Icon className={classes.icon}/>
-        )}
-        <span className={classes.title}>{title}</span>
+        <div style={{display: 'flex', alignItems: 'center'}}>
+          {Icon && (
+            <Icon className={classes.icon}/>
+          )}
+          <span className={classes.titleButton}>{title}</span>
+        </div>
+        {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
       </Button>
 
       <Collapse component="div" in={open} timeout="auto" unmountOnExit>

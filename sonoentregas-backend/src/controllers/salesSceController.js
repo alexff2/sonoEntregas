@@ -113,9 +113,11 @@ module.exports = {
    * @returns 
    */
   async sendSale( req, res ){
+    const { loja } = req.params
+    const entrega = await Sales._query(0)
+    const sce = await Sales._query(loja)
+
     try {
-      const { loja } = req.params
-      
       const { CODIGOVENDA, CODCLIENTE, NOMECLI, VALORPROD, DESCONTO, TOTALVENDA, EMISSAO, ENDERECO, NUMERO, BAIRRO, CIDADE, ESTADO, PONTOREF, OBS, products, USER_ID, VENDEDOR, FONE, CGC_CPF, INS_RG, FAX, FONE2, orcParc, O_V , OBS2, HAVE_OBS2, isWithdrawal } = req.body
 
       const fone_2 = FAX ? FAX : FONE2
@@ -127,38 +129,43 @@ module.exports = {
       const D_ENTREGA1 = ObjDate.setDaysInDate(EMISSAO.split('T')[0], days) //Objetivo do sistema
       const DOWN_EST = O_V == 0 ? 1 : 'NULL'
 
-      const saleFind = await Sales.findSome(0, `ID_SALES = ${CODIGOVENDA} AND CODLOJA = ${loja}`)
+      const saleFind = await Sales.findSome(
+        0,
+        `ID_SALES = ${CODIGOVENDA} AND CODLOJA = ${loja}`,
+        '*',
+        entrega
+      )
 
       if (saleFind.length === 0) {
 
         const valuesSales = `${CODIGOVENDA}, ${loja}, ${CODCLIENTE}, '${NOMECLI}', ${VALORPROD}, ${DESCONTO}, ${TOTALVENDA}, '${EMISSAO}', 'Aberta', '${ENDERECO}', '${NUMERO}', '${BAIRRO}', '${CIDADE}', '${ESTADO}', '${PONTOREF}', '${OBS}', ${USER_ID}, '${D_ENTREGA1}', '${D_ENVIO}', '${VENDEDOR}', '${FONE}', '${CGC_CPF}', '${INS_RG}', '${fone_2}', '${O_V}', '${OBS2}', '${HAVE_OBS2 ? 1 : 0}', 0, NULL, ${isWithdrawal ? 1 : 0}, NULL`
 
-        await Sales.creator(0, valuesSales)
+        await Sales.creator(0, valuesSales, false, entrega)
 
         for (let i = 0; i < orcParc.length; i++) {
           const { TITULO, PARCELA, VENCIMENTO, VALOR, FORMPAGTO } = orcParc[i]
   
           let valuesOrcParc = `${TITULO}, ${loja}, ${PARCELA}, '${VENCIMENTO}', ${VALOR}, '${FORMPAGTO}'`
   
-          await OrcParc.creator(0, valuesOrcParc, true)
+          await OrcParc.creator(0, valuesOrcParc, true, entrega)
         }
       } else if (saleFind[0].STATUS === 'Cancelada') {
         const valuesSales = `TOTAL_PROD = ${VALORPROD}, DESCONTO = ${DESCONTO}, TOTAL = ${TOTALVENDA}, ENDERECO = '${ENDERECO}', STATUS = 'Aberta', NUMERO = '${NUMERO}', BAIRRO = '${BAIRRO}', CIDADE = '${CIDADE}', ESTADO = '${ESTADO}', PONTOREF = '${PONTOREF}', OBS = '${OBS}', D_ENTREGA1 = '${D_ENTREGA1}', D_ENVIO = '${D_ENVIO}', VENDEDOR = '${VENDEDOR}', FONE = '${FONE}', CGC_CPF = '${CGC_CPF}', INS_RG = '${INS_RG}', FAX = '${fone_2}', O_V = '${O_V}', OBS2 = '${OBS2}', HAVE_OBS2 = '${HAVE_OBS2 ? 1 : 0}', isWithdrawal = ${isWithdrawal ? 1 : 0}`
 
-        await Sales._query(0, `UPDATE SALES SET ${valuesSales} WHERE ID_SALES = ${CODIGOVENDA} AND CODLOJA = ${loja}`)
+        await Sales._query(0, `UPDATE SALES SET ${valuesSales} WHERE ID_SALES = ${CODIGOVENDA} AND CODLOJA = ${loja}`, QueryTypes.UPDATE, entrega)
 
-        await OrcParc._query(0, `DELETE ORCPARC WHERE ID_SALES = ${CODIGOVENDA} AND CODLOJA = ${loja}`)
+        await OrcParc._query(0, `DELETE ORCPARC WHERE ID_SALES = ${CODIGOVENDA} AND CODLOJA = ${loja}`, QueryTypes.DELETE, entrega)
 
         for (let i = 0; i < orcParc.length; i++) {
           const { TITULO, PARCELA, VENCIMENTO, VALOR, FORMPAGTO } = orcParc[i]
   
           let valuesOrcParc = `${TITULO}, ${loja}, ${PARCELA}, '${VENCIMENTO}', ${VALOR}, '${FORMPAGTO}'`
   
-          await OrcParc.creator(0, valuesOrcParc, true)
+          await OrcParc.creator(0, valuesOrcParc, true, entrega)
         }
       }
 
-      const currentSale = saleFind.length === 0 ? await Sales._query(0, 'SELECT MAX(ID) ID FROM SALES', QueryTypes.SELECT) : saleFind
+      const currentSale = saleFind.length === 0 ? await Sales._query(0, 'SELECT MAX(ID) ID FROM SALES', QueryTypes.SELECT, entrega) : saleFind
 
       for (let i = 0; i < products.length; i++) {
         const { NUMVENDA, CODPRODUTO, ALTERNATI, DESCRICAO, QUANTIDADE, UNITARIO1,NPDESC, NVTOTAL, GIFT  } = products[i]
@@ -167,17 +174,24 @@ module.exports = {
 
         let valueProd = `${NUMVENDA}, ${loja}, ${CODPRODUTO}, '${ALTERNATI}', '${DESCRICAO}', ${QUANTIDADE}, ${UNITARIO1}, ${NPDESC}, ${NVTOTAL}, 'Enviado', ${DOWN_EST}, ${_GIFT}, ${currentSale[0].ID}`
 
-        await SalesProd.creator(0, valueProd, true)
+        await SalesProd.creator(0, valueProd, true, entrega)
 
         if (O_V === '2') {
-          await Sales._query(loja, `UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL + ${QUANTIDADE}, EST_LOJA = EST_LOJA + ${QUANTIDADE} WHERE CODIGO = ${CODPRODUTO} AND CODLOJA = 1`)
+          await Sales._query(loja, `UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL + ${QUANTIDADE}, EST_LOJA = EST_LOJA + ${QUANTIDADE} WHERE CODIGO = ${CODPRODUTO} AND CODLOJA = 1`, QueryTypes.UPDATE, sce)
         }
 
-        await Sales._query(loja, `UPDATE NVENDI2 SET STATUS = 'Enviado', GIFT = ${_GIFT} WHERE NUMVENDA = ${CODIGOVENDA} AND CODPRODUTO = ${CODPRODUTO}`)
+        const scriptInsertNvendi2Status = `INSERT INTO NVENDI2_STATUS (CODIGOVENDA, CODPRODUTO, STATUS, GIFT) VALUES (${CODIGOVENDA}, ${CODPRODUTO}, 'Enviado', ${_GIFT})`
+
+        await Sales._query(loja, scriptInsertNvendi2Status, QueryTypes.UPDATE, sce)
       }
+
+      await sce.transaction.commit()
+      await entrega.transaction.commit()
 
       return res.json({create: true})
     } catch (error) {
+      await sce.transaction.rollback()
+      await entrega.transaction.rollback()
       console.log(error)
       return res.status(400).json(error)
     }
@@ -188,35 +202,48 @@ module.exports = {
    * @returns 
    */
   async cancelSubmitSales( req, res ){
-    try {
-      const { ID_SALES, CODLOJA, CODPRODUTO, QUANTIDADE, DOWN_EST } = req.body
+    const { ID_SALES, CODLOJA, CODPRODUTO, QUANTIDADE, DOWN_EST } = req.body
+    const entrega = await Sales._query(0)
+    const sce = await Sales._query(CODLOJA)
 
-      await SalesProd._query(0, `DELETE SALES_PROD WHERE ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA} AND CODPRODUTO = '${CODPRODUTO}'`)
+    try {
+      await SalesProd._query(0, `DELETE SALES_PROD WHERE ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA} AND CODPRODUTO = '${CODPRODUTO}'`, QueryTypes.DELETE, entrega)
 
       if (DOWN_EST == null){
-        await Sales._query(CODLOJA, `UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL - ${QUANTIDADE}, EST_LOJA = EST_LOJA - ${QUANTIDADE} WHERE CODIGO = ${CODPRODUTO} AND CODLOJA = 1`)
+        await Sales._query(CODLOJA, `UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL - ${QUANTIDADE}, EST_LOJA = EST_LOJA - ${QUANTIDADE} WHERE CODIGO = ${CODPRODUTO} AND CODLOJA = 1`, QueryTypes.UPDATE, sce)
       }
-      await Sales._query(CODLOJA, `UPDATE NVENDI2 SET STATUS = NULL WHERE NUMVENDA = ${ID_SALES} AND CODPRODUTO = ${CODPRODUTO}`)
 
-      const ProdSales = await SalesProd.findSome(0, `ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`)
+      await Sales._query(CODLOJA, `DELETE NVENDI2_STATUS WHERE CODIGOVENDA = ${ID_SALES} AND CODPRODUTO = ${CODPRODUTO}`, QueryTypes.UPDATE, sce)
 
-      const forecastSale = await Sales._query(0, `SELECT * FROM SALES A INNER JOIN FORECAST_SALES B ON A.ID = B.idSale WHERE A.ID_SALES = ${ID_SALES} AND A.CODLOJA = ${CODLOJA}`, QueryTypes.SELECT)
+      const ProdSales = await SalesProd.findSome(0, `ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`, '*', entrega)
+
+      const forecastSale = await Sales._query(0, `SELECT * FROM SALES A INNER JOIN FORECAST_SALES B ON A.ID = B.idSale WHERE A.ID_SALES = ${ID_SALES} AND A.CODLOJA = ${CODLOJA}`, QueryTypes.SELECT, entrega)
 
       if (ProdSales.length === 0) {
         if (forecastSale.length === 0) {
-          await SalesProd._query(0, `DELETE SALES WHERE ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`)        
-          await SalesProd._query(0, `DELETE ORCPARC WHERE ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`)
-          await Sales._query(CODLOJA, `UPDATE NVENDA2 SET STATUS = NULL WHERE CODIGOVENDA = ${ID_SALES}`)
+          await SalesProd._query(0, `DELETE SALES WHERE ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`, QueryTypes.DELETE, entrega)
+          await SalesProd._query(0, `DELETE ORCPARC WHERE ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`, QueryTypes.DELETE, entrega)
+
+          await sce.transaction.commit()
+          await entrega.transaction.commit()
 
           return res.json({msg: 'Venda também excluída!', venda: true})
         } else {
-          await Sales.updateAny(0, { STATUS: 'Cancelada' }, { ID_SALES, CODLOJA })
+          await Sales.updateAny(0, { STATUS: 'Cancelada' }, { ID_SALES, CODLOJA }, entrega)
 
+          await sce.transaction.commit()
+          await entrega.transaction.commit()
           return res.json({msg: 'Venda cancelada!', venda: false})
         }
       }
+
+      await sce.transaction.commit()
+      await entrega.transaction.commit()
+
       return res.json({msg: 'Produto excluído com sucesso!', venda: false})
     } catch (error) {
+      await sce.transaction.rollback()
+      await entrega.transaction.rollback()
       console.log(error)
       return res.status(400).json(error)
     }

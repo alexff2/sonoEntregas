@@ -33,11 +33,11 @@ module.exports = {
   },
   updateStatusSce({originalSaleId, alternativesCodes, status}) {
     const script = `
-    UPDATE NVENDI2
+    UPDATE NVENDI2_STATUS
     SET STATUS = '${status}'
-    FROM NVENDI2 A
+    FROM NVENDI2_STATUS A
     INNER JOIN PRODUTOS B ON A.CODPRODUTO = B.CODIGO
-    WHERE A.NUMVENDA = ${originalSaleId}
+    WHERE A.CODIGOVENDA = ${originalSaleId}
     AND B.ALTERNATI IN (${alternativesCodes})`
 
     return script
