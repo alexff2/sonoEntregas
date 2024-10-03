@@ -59,5 +59,13 @@ module.exports = {
     INNER JOIN SONO..PRODUTOS E ON E.ALTERNATI = A.alternativeCode
     WHERE A.returnsSalesId IN (${returnsSalesIds})
     GROUP BY A.id, A.returnsSalesId, A.alternativeCode, E.NOME, a.quantity`
+  },
+  decreaseStock(returnId){
+    return `
+    UPDATE ${process.env.CD_BASE}..PRODLOJAS SET EST_ATUAL = EST_ATUAL + C.quantity, EST_LOJA = EST_LOJA + C.quantity
+    FROM ${process.env.CD_BASE}..PRODLOJAS A
+    INNER JOIN ${process.env.CD_BASE}..PRODUTOS B ON A.CODIGO = B.CODIGO
+    INNER JOIN RETURNS_SALES_PRODUCTS C ON C.alternativeCode = B.ALTERNATI
+    WHERE A.CODLOJA = 1 AND C.returnsSalesId = ${returnId}`
   }
 }

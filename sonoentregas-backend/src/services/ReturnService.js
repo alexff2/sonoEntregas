@@ -285,6 +285,15 @@ class ReturnService {
       { id: returnId },
       connectionDelivery
     )
+
+    const scriptRmvStock = returnsSceScripts.decreaseStock(returnId)
+
+    await ReturnsModel._query(
+      0,
+      scriptRmvStock,
+      QueryTypes.UPDATE,
+      connectionDelivery
+    )
   }
 }
 

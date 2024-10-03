@@ -161,7 +161,10 @@ const Row = ({item, clickStatus, printProof}) => {
                   <TableCell>Alternativo</TableCell>
                   <TableCell>Produto</TableCell>
                   <TableCell align='right'>Qtd</TableCell>
-                  <TableCell align='right'>Qtd Bip</TableCell>
+                  {
+                    process.env.REACT_APP_STOCK_BEEP === '1' &&
+                    <TableCell align='right'>Qtd Bip</TableCell>
+                  }
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -171,7 +174,10 @@ const Row = ({item, clickStatus, printProof}) => {
                       <TableCell>{product.alternativeCode}</TableCell>
                       <TableCell>{product.name}</TableCell>
                       <TableCell align='right'>{product.quantity}</TableCell>
-                      <TableCell align='right'>{product.quantityBeep}</TableCell>
+                      {
+                        process.env.REACT_APP_STOCK_BEEP === '1' &&
+                        <TableCell align='right'>{product.quantityBeep}</TableCell>
+                      }
                     </TableRow>
                   ))
                 }
@@ -260,7 +266,7 @@ export default function Returns(){
       const { data } = await api.get('delivery/open')
       setDeliveries(data)
     } else if (returnSale.status === 'Buscando') {
-      if (!returnSale.products.some(product => product.quantity !== product.quantityBeep)) {
+      if (process.env.REACT_APP_STOCK_BEEP === '0' || !returnSale.products.some(product => product.quantity !== product.quantityBeep)) {
         returnSale.statusLocal = 'Finalizar'
       } else if (returnSale.products.some(product => product.quantityBeep > 0)) {
         returnSale.statusLocal = 'Bipando'
