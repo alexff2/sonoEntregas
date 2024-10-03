@@ -22,6 +22,7 @@ export default function AuthProvider({ children }){
   const [userAuth, setUserAuth] = useState({})
   const [shopAuth, setShopAuth] = useState({})
   const [isAuthenticated, setIsAuthenticated] = useState(true)
+  const [noConnection, setNoConnection] = useState(false)
   const { setAlert } = useModalAlert()
 
   useEffect(() => {
@@ -46,7 +47,7 @@ export default function AuthProvider({ children }){
       } catch (e) {
         if (!e.response){
           console.log(e)
-          setAlert('Rede')
+          setNoConnection(true)
         } else if (e.response.status === 401){
           console.log(e.response.data)
           setAlert('Sua sessão expirou, entre novamente na aplicação!')
@@ -114,7 +115,8 @@ export default function AuthProvider({ children }){
       shopAuth,
       login,
       logout,
-      getToken
+      getToken,
+      noConnection
     }}>
       { children }
     </AuthContext.Provider>
@@ -128,7 +130,8 @@ export function useAuthenticate(){
     shopAuth,
     login,
     logout,
-    getToken
+    getToken,
+    noConnection
   } = useContext(AuthContext)
 
   return {
@@ -137,6 +140,7 @@ export function useAuthenticate(){
     shopAuth,
     login,
     logout,
-    getToken
+    getToken,
+    noConnection
   }
 }

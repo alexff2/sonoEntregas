@@ -4,13 +4,22 @@ import { useAuthenticate } from '../context/authContext'
 
 import PrivateRoutes from './private.routes'
 import PublicRoutes from './public.routes'
+import NoConnectionRoutes from './noConnection.routes'
 
 export default function Routes(){
-  const { isAuthenticated } = useAuthenticate()
+  const { isAuthenticated, noConnection } = useAuthenticate()
 
   return(
     <BrowserRouter>
-      { isAuthenticated ? <PrivateRoutes /> : <PublicRoutes /> }
+      { isAuthenticated
+        ? <>
+            { noConnection
+              ? <NoConnectionRoutes />
+              : <PrivateRoutes />
+            }
+          </>
+        : <PublicRoutes />
+      }
     </BrowserRouter>
   )
 }

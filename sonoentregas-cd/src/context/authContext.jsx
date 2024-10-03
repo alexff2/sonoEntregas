@@ -17,6 +17,7 @@ const getUser = () => JSON.parse(localStorage.getItem(SONO_USER))
 
 export default function AuthProvider({ children }){
   const [userAuth, setUserAuth] = useState({})
+  const [noConnection, setNoConnection] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(true)
   const { setAlert } = useAlert()
 
@@ -40,7 +41,7 @@ export default function AuthProvider({ children }){
       } catch (e) {
         if (!e.response){
           console.log(e)
-          setAlert('Rede')
+          setNoConnection(true)
         } else if (e.response.status === 401){
           console.log(e.response.data)
           setAlert('Sua sessão expirou, entre novamente na aplicação!')
@@ -135,6 +136,7 @@ export default function AuthProvider({ children }){
       login,
       signUp,
       logout,
+      noConnection
     }}>
       { children }
     </AuthContext.Provider>
@@ -147,7 +149,8 @@ export function useAuthenticate(){
     userAuth,
     login,
     signUp,
-    logout
+    logout,
+    noConnection
   } = useContext(AuthContext)
 
   return {
@@ -155,6 +158,7 @@ export function useAuthenticate(){
     userAuth,
     login,
     signUp,
-    logout
+    logout,
+    noConnection
   }
 }
