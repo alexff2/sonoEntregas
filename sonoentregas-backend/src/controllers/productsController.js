@@ -3,7 +3,7 @@ const errorCath = require('../functions/error')
 
 module.exports = {
   async index(req, res){
-    const { typeSearch, search } = req.params
+    const { typeSearch, search } = req.query
 
     const where = {}
     where[typeSearch] = search

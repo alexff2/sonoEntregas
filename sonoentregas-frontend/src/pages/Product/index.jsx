@@ -8,14 +8,20 @@ export default function Product(){
   const [ loading, setLoading ] = useState(false)
   const [ products, setProducts ] = useState([])
   const [ search, setSearch ] = useState()
-  const [ typeSeach, setTypeSeach ] = useState('NOME')
+  const [ typeSearch, setTypeSearch ] = useState('NOME')
   const [ childrenAlertModal, setChildrenAlertModal ] = useState('Vazio')
 
   const searchProduct = async () => {
     setLoading(true)
     try {
       if (search !== '') {
-        const { data } = await api.get(`products/${typeSeach}/${search}`)
+        const { data } = await api.get('products', {
+          params: {
+            search,
+            typeSearch
+          }
+        }
+        )
         setProducts(data)
       } else {
         setProducts([])
@@ -33,7 +39,7 @@ export default function Product(){
       <div className="header-container">
         <h2>Pesquisa de Produtos</h2>
         <div>
-          <select onChange={e => setTypeSeach(e.target.value)} name="typeProd" id="typeProd">
+          <select onChange={e => setTypeSearch(e.target.value)} name="typeProd" id="typeProd">
             <option value="NOME">Nome</option>
             <option value="COD_ORIGINAL">Código</option>
           </select>

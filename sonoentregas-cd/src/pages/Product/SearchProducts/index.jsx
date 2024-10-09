@@ -33,7 +33,12 @@ export default function SearchProducts() {
   const searchProduct = async () => {
     try {
       if (search !== '') {
-        const { data } = await api.get(`products/${typeSearch}/${search}`)
+        const { data } = await api.get('products', {
+          params: {
+            search,
+            typeSearch
+          }
+        })
         setProducts(data)
       } else {
         setProducts([])

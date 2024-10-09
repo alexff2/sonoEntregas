@@ -51,7 +51,7 @@ routes.put('/users/:userId', usersController.update)
   //Employees
   routes.get('/employee', ensureAuthenticated, employeeController.index)
   //Products SCE CD
-  routes.get('/products/:typeSearch/:search', productsController.index)
+  routes.get('/products', productsController.index)
   routes.get('/product', ensureAuthenticated, productsController.findProduct)
   routes.get('/products/stock', ensureAuthenticated, productsController.findStock)
   routes.put('/product/barcode', ensureAuthenticated, productsController.updateBarCode)
