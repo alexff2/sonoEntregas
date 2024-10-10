@@ -74,14 +74,6 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
     }
   }
 
-  const selectRow = indexRow => {
-    (indexSelect !== indexRow) 
-      ? setIndexSelect(indexRow) 
-      : setIndexSelect(-1)
-
-    document.getElementById('quantifyId').focus()
-  }
-
   const keyPres = (key) => {
     if (key === 'ArrowUp' ) {
       if (indexSelect === 0) {
@@ -141,6 +133,7 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
     setSearch('')
 
     document.getElementById('searchId').focus()
+    setIndexSelect(0)
   }
 
   const handleSendTransfer = async e => {
@@ -398,7 +391,10 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
                     hover
                     role='check-box'
                     key={i}
-                    onClick={() => selectRow(i)}
+                    onClick={() => {
+                      document.getElementById('quantifyId').focus()
+                      setIndexSelect(i)
+                    }}
                     selected={i===indexSelect}
                   >
                     <TableCell>{product.generalCode}</TableCell>
