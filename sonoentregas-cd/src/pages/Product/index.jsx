@@ -7,6 +7,7 @@ import PurchaseNotes from './PurchaseNotes'
 import TransferProducts from './TransferProducts'
 import SearchProducts from './SearchProducts'
 import SearchProductsBeep from './SearchProductsBeep'
+import ChangeSerialNumber from './ChangeSerialNumber'
 
 import useStyles from './style'
 
@@ -23,10 +24,11 @@ export default function Products() {
           variant="fullWidth"
         >
           <Tab label="Consulta" {...a11yProps(0)}/>
-          <Tab label="Compras - Pedidos" {...a11yProps(1)}/>
-          <Tab label="Compras - Notas" {...a11yProps(2)}/>
+          <Tab label="Pedidos" {...a11yProps(1)}/>
+          <Tab label="Notas" {...a11yProps(2)}/>
           <Tab label="Transferências" {...a11yProps(3)}/>
           <Tab label="Est. Bip" {...a11yProps(4)}/>
+          <Tab label="Alt. Bip" {...a11yProps(5)}/>
         </Tabs>
       </AppBar>
 
@@ -48,6 +50,10 @@ export default function Products() {
 
       <TabPanel value={value} index={4}>
         <SearchProductsBeep />
+      </TabPanel>
+
+      <TabPanel value={value} index={5}>
+        <ChangeSerialNumber />
       </TabPanel>
     </div>
   )

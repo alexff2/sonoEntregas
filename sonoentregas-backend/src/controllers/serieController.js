@@ -5,6 +5,17 @@ const SerieRules = require('../rules/SerieRules')
 const errorCath = require('../functions/error')
 
 module.exports = {
+  findSerialNumberOfProduct: async (request, response) => {
+    try {
+      const { serialNumber } = request.query
+
+      const product = await SerieService.findSerialNumberOfProduct(serialNumber)
+
+      return response.status(200).json({ product })
+    } catch (error) {
+      errorCath(error, response)
+    }
+  },
   findOpenSeriesByProduct: async (request, response) => {
     try {
       const { code } = request.query
@@ -99,6 +110,26 @@ module.exports = {
       return response.status(200).json(serialNumber)
     } catch (erro) {
       await sce.transaction.rollback()
+      await entrega.transaction.rollback()
+      errorCath(erro, response)
+    }
+  },
+  changeSerialNumberOfProduct: async(request, response) => {
+    const entrega = await ProdLojaSeriesMovimentosModel._query(1)
+
+    try {
+      const { serialNumber, newProductId } = request.body
+
+      await SerieService.changeSerialNumberOfProduct({
+        serialNumber,
+        newProductId,
+        transaction: entrega
+      })
+
+      await entrega.transaction.commit()
+
+      return response.status(200).json({ serialNumber })
+    } catch (erro) {
       await entrega.transaction.rollback()
       errorCath(erro, response)
     }

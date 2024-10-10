@@ -25,7 +25,9 @@
  * @property {number} inputUserId
  */
 
+const { QueryTypes } = require('sequelize')
 const ProdLojaSeriesMovimentosModel = require('../models/tables/ProdLojaSeriesMovimentos')
+const ProductService = require('../services/ProductsService')
 
 class SerieService {
   /**@param {InputProps} props */
@@ -76,6 +78,51 @@ class SerieService {
 
       return products.map(product => product.serialNumber)
   }
+
+  async findSerialNumberOfProduct(serialNumber){
+    const serialNumberOfProduct = await ProdLojaSeriesMovimentosModel.findAny(1, {
+      serialNumber,
+      isNull: 'outputBeepDate'
+    })
+
+    if (serialNumberOfProduct.length === 0) {
+      return []  
+    }
+
+    const product = await ProductService.findProductsSceCd({ CODIGO: serialNumberOfProduct[0].productId })
+
+    return {
+      id: product[0].CODIGO,
+      name: product[0].NOME,
+      generalCode: product[0].ALTERNATI,
+      serialNumber
+    }
+  }
+
+  async changeSerialNumberOfProduct({ serialNumber, newProductId, transaction }) {
+    const serialNumberOfProduct = await ProdLojaSeriesMovimentosModel.findAny(1, {
+      serialNumber,
+      isNull: 'outputBeepDate'
+    }, 'productId', transaction)
+
+    if (serialNumberOfProduct.length !== 1) {
+      throw {
+        error: 'Change not allowed'
+      }
+    }
+
+    await ProdLojaSeriesMovimentosModel.updateAny(
+      1,
+      {
+        productId: newProductId
+      },
+      {
+        serialNumber,
+        isNull: 'outputBeepDate'
+      },
+      transaction
+    )
+  } 
 }
 
 module.exports = new SerieService()

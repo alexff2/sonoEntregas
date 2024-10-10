@@ -57,8 +57,10 @@ routes.put('/users/:userId', usersController.update)
   routes.put('/product/barcode', ensureAuthenticated, productsController.updateBarCode)
   // Beep
   routes.get('/serial/product', serieController.findOpenSeriesByProduct)
+  routes.get('/serial/product/open', serieController.findSerialNumberOfProduct)
   routes.post('/serial/first', ensureAuthenticated, serieController.createFirst)
   routes.put('/serial/finished', ensureAuthenticated, serieController.finishesIfOpened)
+  routes.put('/serial/change/product', ensureAuthenticated, serieController.changeSerialNumberOfProduct)
   // Purchase Order
   routes.get('/purchase/order', purchaseOrderController.find)
   routes.get('/purchase/order/open', purchaseOrderController.findOpen)
