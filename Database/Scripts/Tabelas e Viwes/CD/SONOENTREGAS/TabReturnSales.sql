@@ -4,7 +4,7 @@ CREATE TABLE RETURNS_SALES (
   originalReturnId INT NOT NULL,
   shopId INT NOT NULL,
   originalSaleId INT NOT NULL,
-  client VARCHAR(60) NOT NULL,
+  client VARCHAR(60) COLLATE SQL_Latin1_General_CP850_CI_AI NOT NULL,
   street VARCHAR(60) NOT NULL,
   houseNumber CHAR(15) NOT NULL,
   district VARCHAR(30) NOT NULL,
