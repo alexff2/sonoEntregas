@@ -80,35 +80,57 @@ const Item = ({classes, title, icon: Icon, value, searchHome}) => {
   </Grid>
 )}
 
-export default function Home(){
+export default function Cards(){
   const [ itens, setItens ] = useState([])
   const classes = useStyles()
   const { setOpenBackDrop } = useBackdrop()
+  const { setSales }  = useSale()
 
   useEffect(()=>{
-    setItens([
-      {
-        icon: ShoppingCart,
-        value: '',
-        title: 'Vendas Pendentes',
-      },
-      {
-        icon: ShoppingCart,
-        value: '',
-        title: 'Vendas em processo',
-      },
-      {
-        icon: LocalShipping,
-        value: '',
-        title: 'Rotas em lançamento',
-      },
-      {
-        icon: LocalShipping,
-        value: '',
-        title: 'Rotas em deslocamento',
+    setOpenBackDrop(true)
+    api.get('sales/', {
+      params: {
+        status: 'open'
       }
-    ])
-  },[])
+    }).then(resp => {
+      setSales(resp.data)
+      setOpenBackDrop(false)
+    }).catch(e => {
+      console.log(e)
+      setOpenBackDrop(false)
+    })
+    api
+      .get('/home')
+      .then(resp => {
+        setItens([
+          {
+            icon: ShoppingCart,
+            value: `${resp.data.salesPending} / ${resp.data.salesUnscheduled}`,
+            title: 'Vendas Pendentes',
+          },
+          {
+            icon: ShoppingCart,
+            value: (resp.data.salesOnRelease + resp.data.salesOnDelivering),
+            title: 'Vendas em processo',
+          },
+          {
+            icon: LocalShipping,
+            value: resp.data.devOnRelease,
+            title: 'Rotas em lançamento',
+          },
+          {
+            icon: LocalShipping,
+            value: resp.data.delivering,
+            title: 'Rotas em deslocamento',
+          }
+        ])
+        setOpenBackDrop(false)
+      })
+      .catch(e => {
+        console.log(e)
+        setOpenBackDrop(false)
+      })
+  },[setOpenBackDrop, setSales])
 
   const searchHome = () => {
     setOpenBackDrop(true)
@@ -118,7 +140,7 @@ export default function Home(){
         setItens([
           {
             icon: ShoppingCart,
-            value: resp.data.salesPending,
+            value: `${resp.data.salesPending} / ${resp.data.salesUnscheduled}`,
             title: 'Vendas Pendentes',
           },
           {

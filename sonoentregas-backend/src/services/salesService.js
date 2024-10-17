@@ -28,6 +28,7 @@
  */
 const { QueryTypes } = require('sequelize')
 const Sales = require('../models/Sales')
+const SalesProd = require('../models/SalesProd')
 const ViewVendas = require('../models/ViewVendas')
 const ViewSalesProd = require('../models/ViewSalesProd')
 const Empresas = require('../models/ShopsSce')
@@ -320,5 +321,28 @@ module.exports = {
       PONTOREF: saleSce[0].PONTOREF,
       OBS: saleSce[0].OBS
     }, { ID: idSale })
-  }
+  },
+  /**
+   * @param {object} params
+   * @param {object} connection
+   */
+  async updateDateDelivery({id, dateDeliv, OBS_SCHEDULE}, connection) {
+    await Sales.updateAny(0, {
+      D_ENTREGA1: dateDeliv,
+      SCHEDULED: 1,
+      OBS_SCHEDULED: OBS_SCHEDULE
+    }, { ID: id }, connection)
+  },
+  /**
+   * @param {object} params
+   */
+  async unschedule({id, connection}){
+    await Sales.updateAny(0, {
+      D_ENTREGA1: 'NULL',
+    }, { ID: id }, connection)
+
+    await SalesProd.updateAny(0, {
+      STATUS: 'Sem Agendamento',
+    }, { ID_SALE_ID: id, STATUS: 'Enviado' }, connection)
+  },
 }

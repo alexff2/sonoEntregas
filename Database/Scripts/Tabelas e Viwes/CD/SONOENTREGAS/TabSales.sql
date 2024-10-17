@@ -1,6 +1,5 @@
 USE [SONOENTREGAS]
 GO
-
 /****** Object:  Table [dbo].[SALES]    Script Date: 20/01/2022 16:20:22 ******/
 SET ANSI_NULLS ON
 GO
@@ -29,9 +28,7 @@ CREATE TABLE [dbo].[SALES](
 	[ESTADO] [char](2) NULL,
 	[PONTOREF] [varchar](250) NULL,
 	[OBS] [varchar](250) NULL,
-	[D_ENTREGA2] [datetime] NULL,
 	[USER_ID] [float] NOT NULL,
-	[D_ENTREGA1] [datetime] NOT NULL,
 	[D_ENVIO] [datetime] NOT NULL,
 	[VENDEDOR] [varchar](30) NOT NULL,
 	[FONE] [varchar](15) NULL,
@@ -43,6 +40,7 @@ CREATE TABLE [dbo].[SALES](
 	[HAVE_OBS2] [bit] NULL,
 	[SCHEDULED] [bit] NOT NULL DEFAULT ((0)),
 	[OBS_SCHEDULED] [varchar](250) NULL,
+	[D_ENTREGA1] [datetime],
  CONSTRAINT [PK_SALES] PRIMARY KEY CLUSTERED 
 (
 	[CODLOJA] ASC,

@@ -24,6 +24,7 @@ import SearchIcon from '@material-ui/icons/Search'
 import { KeyboardArrowDown, KeyboardArrowUp} from '@material-ui/icons'
 
 import { useAddress } from '../../../context/addressContext'
+import { useAlertSnackbar } from '../../../context/alertSnackbarContext'
 
 import api from '../../../services/api'
 import { getDateBr } from '../../../functions/getDates'
@@ -31,7 +32,6 @@ import { getComparator, stableSort } from '../../../functions/orderTable'
 
 import EnhancedTableHead from '../../../components/EnhancedTableHead'
 import Modal from '../../../components/Modal'
-import ModalAlert from '../../../components/ModalAlert'
 import ModalSales from './ModalSales'
 import ModalUpdateDateDeliv from './ModalUpdateDateDeliv'
 import BoxInfo from "../../../components/BoxInfo"
@@ -132,23 +132,14 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-function Row({ sale, modalDetailProduct, setOpenModalBoxInfo }) {
+function Row({
+  sale,
+  handleOpenModalDetailProduct,
+  handleOpenModalBoxInfo,
+  handleOpenModalUpdateDate
+}) {
   const [open, setOpen] = useState(false)
-  const [openModalUpdateDate, setOpenModalUpdateDate] = useState(false)
   const classes = useStyles()
-  const { setAddress } = useAddress()
-
-  const setInfoInBox = () => {
-    setOpenModalBoxInfo(true)
-    setAddress({
-      OBS2: sale.OBS2,
-      ENDERECO: sale.ENDERECO,
-      PONTOREF: sale.PONTOREF,
-      OBS: sale.OBS,
-      SCHEDULED: sale.SCHEDULED,
-      OBS_SCHEDULED: sale.OBS_SCHEDULED
-    })
-  }
 
   return (
     <React.Fragment>
@@ -159,13 +150,21 @@ function Row({ sale, modalDetailProduct, setOpenModalBoxInfo }) {
           </IconButton>
         </TableCell>
         <TableCell
-          style={sale.HAVE_OBS2 ? {color: 'Red', fontWeight: 700, cursor: 'pointer'}: {cursor: 'pointer'}}
-          onClick={setInfoInBox}
+          style={ sale.HAVE_OBS2
+                  ? {color: 'Red', fontWeight: 700, cursor: 'pointer'}
+                  : {cursor: 'pointer'}}
+          onClick={() => handleOpenModalBoxInfo(sale)}
           >{sale.ID_SALES}</TableCell>
         <TableCell>{sale.NOMECLI}</TableCell>
         <TableCell align="right">{getDateBr(sale.EMISSAO)}</TableCell>
-        <TableCell align="right" onClick={()=>setOpenModalUpdateDate(true)} className={classes.updateDateDeliv}>
-          {getDateBr(sale.D_ENTREGA1)}
+        <TableCell
+          align="right"
+          onClick={()=> handleOpenModalUpdateDate(sale)}
+          className={classes.updateDateDeliv}
+        >
+          {sale.D_ENTREGA1 !== null
+            ? getDateBr(sale.D_ENTREGA1)
+            : 'Sem Agendamento'}
         </TableCell>
         <TableCell align="right">{sale.SHOP}</TableCell>
       </TableRow>
@@ -188,7 +187,10 @@ function Row({ sale, modalDetailProduct, setOpenModalBoxInfo }) {
                 </TableHead>
                 <TableBody>
                   {sale.products.map((produto) => (
-                    <TableRow key={produto.CODPRODUTO} onClick={() => modalDetailProduct(sale, produto)}>
+                    <TableRow
+                      key={produto.CODPRODUTO}
+                      onClick={() => handleOpenModalDetailProduct(sale, produto)}
+                    >
                       <TableCell component="th" scope="row">
                         {produto.COD_ORIGINAL}
                       </TableCell>
@@ -207,29 +209,23 @@ function Row({ sale, modalDetailProduct, setOpenModalBoxInfo }) {
           </Collapse>
         </TableCell>
       </TableRow>
-
-      <ModalUpdateDateDeliv 
-        open={openModalUpdateDate}
-        setOpen={setOpenModalUpdateDate}
-        saleCurrent={sale}
-      />
     </React.Fragment>
   );
 }
 
 export default function Sales() {
-  const [ openModalProduct, setOpenModalProduct ] = useState(false)
-  const [ openModalBoxInfo, setOpenModalBoxInfo ] = useState(false)
-  const [ openModalAlert, setOpenModalAlert ] = useState(false)
-  const [ childrenAlert, setChildrenAlert ] = useState(false)
-  const [ order, setOrder ] = useState('asc')
-  const [ orderBy, setOrderBy ] = useState('idSales')
-  const [ sales, setSales ] = useState([])
-  const [ search, setSearch ] = useState('')
-  const [ typeSearch, setTypeSearch ] = useState('ID_SALES')
-  const [ saleCurrent, setSaleCurrent ] = useState([])
-  const [ productCurrent, setProductCurrent ] = useState([])
-
+  const [openModalProduct, setOpenModalProduct] = useState(false)
+  const [openModalBoxInfo, setOpenModalBoxInfo] = useState(false)
+  const [openModalUpdateDate, setOpenModalUpdateDate] = useState(false)
+  const [order, setOrder] = useState('asc')
+  const [orderBy, setOrderBy] = useState('idSales')
+  const [sales, setSales] = useState([])
+  const [search, setSearch] = useState('')
+  const [typeSearch, setTypeSearch] = useState('ID_SALES')
+  const [saleCurrent, setSaleCurrent] = useState()
+  const [productCurrent, setProductCurrent] = useState([])
+  const { setAlertSnackbar } = useAlertSnackbar()
+  const { setAddress } = useAddress()
   const classes = useStyles()
   
   const searchSales = async () => {
@@ -244,25 +240,25 @@ export default function Sales() {
 
         if (response.data === ''){
           console.log(response)
-          setChildrenAlert('Venda(s) não encontrada(s)!') 
-          setOpenModalAlert(true)
+          setAlertSnackbar('Venda(s) não encontrada(s)!') 
+          setAlertSnackbar(true)
         } else {
           setSales(response.data)
         }
       } else {
-        setChildrenAlert('Preencha o campo de pesquisa!') 
-        setOpenModalAlert(true)
+        setAlertSnackbar('Preencha o campo de pesquisa!') 
+        setAlertSnackbar(true)
         setSales([])
       }
     } catch (e) {
       console.log(e.response)
       if (e.response.status === 400) {
-        setChildrenAlert("Requisição Incorreta (Verifique valor digitado)!")
-        setOpenModalAlert(true)
+        setAlertSnackbar("Requisição Incorreta (Verifique valor digitado)!")
+        setAlertSnackbar(true)
         setSales([])
       } else {
-        setChildrenAlert("Erro ao comunicar com o Servidor")
-        setOpenModalAlert(true)
+        setAlertSnackbar("Erro ao comunicar com o Servidor")
+        setAlertSnackbar(true)
         setSales([])
       }
     }
@@ -274,10 +270,27 @@ export default function Sales() {
     setOrderBy(property)
   }
 
-  const modalDetailProduct = (sale, product) => {
+  const handleOpenModalDetailProduct = (sale, product) => {
     setOpenModalProduct(true)
     setSaleCurrent(sale)
     setProductCurrent(product)
+  }
+
+  const handleOpenModalBoxInfo = (sale) => {
+    setOpenModalBoxInfo(true)
+    setAddress({
+      OBS2: sale.OBS2,
+      ENDERECO: sale.ENDERECO,
+      PONTOREF: sale.PONTOREF,
+      OBS: sale.OBS,
+      SCHEDULED: sale.SCHEDULED,
+      OBS_SCHEDULED: sale.OBS_SCHEDULED
+    })
+  }
+
+  const handleOpenModalUpdateDate = (sale) => {
+    setOpenModalUpdateDate(true)
+    setSaleCurrent(sale)
   }
 
   const headCell = [
@@ -343,9 +356,10 @@ export default function Sales() {
                 .map( sale => (
                 <Row 
                   key={sale.ID} 
-                  modalDetailProduct={modalDetailProduct}
                   sale={sale}
-                  setOpenModalBoxInfo={setOpenModalBoxInfo}
+                  handleOpenModalDetailProduct={handleOpenModalDetailProduct}
+                  handleOpenModalBoxInfo={handleOpenModalBoxInfo}
+                  handleOpenModalUpdateDate={handleOpenModalUpdateDate}
                 />
               ))}
             </TableBody>
@@ -366,16 +380,25 @@ export default function Sales() {
       </Modal>
 
       {/*Modal update date delivery*/}
+      <Modal 
+        open={openModalUpdateDate}
+        setOpen={setOpenModalUpdateDate}
+        title={'Atualizar Data de Entrega'}
+        >
+        <ModalUpdateDateDeliv
+          open={openModalUpdateDate}
+          setOpen={setOpenModalUpdateDate}
+          saleCurrent={saleCurrent}
+        />
+      </Modal>
+
+      {/*Modal info sale*/}
       <Modal
         open={openModalBoxInfo}
         setOpen={setOpenModalBoxInfo}
         >
         <BoxInfo loc="Modal"/>
       </Modal>
-
-      <ModalAlert open={openModalAlert} setOpen={setOpenModalAlert}>
-        {childrenAlert}
-      </ModalAlert>
     </Box>
   )
 }

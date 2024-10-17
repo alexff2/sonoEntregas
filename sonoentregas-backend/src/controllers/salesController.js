@@ -1,4 +1,5 @@
 //@ts-check
+const { DatabaseError } = require('sequelize')
 const Sales = require('../models/Sales')
 const ViewDeliveryProd = require('../models/ViewDeliveryProd2')
 const ViewDeliveries = require('../models/ViewDeliverys')
@@ -141,19 +142,44 @@ module.exports = {
     }
   },
   /**
+   * @param {*} req
+   * @param {*} res
+   */
+  async updateDateDelivery( req, res ){
+    const connection = await Sales._query(0)
+    try {
+      const { id } = req.params
+      const { dateDeliv, OBS_SCHEDULE } = req.body
+  
+      await SalesService.updateDateDelivery({id, dateDeliv, OBS_SCHEDULE}, connection)
+
+      await connection.transaction.commit()
+
+      return res.json(dateDeliv)
+    } catch (error) {
+      console.log(error)
+      !(error instanceof DatabaseError) && await connection.transaction.rollback()
+      return res.status(400).json(error)
+    }
+  },
+  /**
    * @param {*} req 
    * @param {*} res 
    */
-  async updateDateDelivery( req, res ){
+  async unschedule(req, res){
+    const connection = await Sales._query(0)
     try {
-      const { idSale } = req.params
-      const { dateDeliv, CODLOJA, OBS_SCHED } = req.body
-  
-      await Sales._query(0, `UPDATE SALES SET D_ENTREGA1 = '${dateDeliv}', SCHEDULED = 1, OBS_SCHEDULED = '${OBS_SCHED}' WHERE ID_SALES = ${idSale} AND CODLOJA = ${CODLOJA}`)
+      const { id } = req.params
 
-      res.json(dateDeliv)
+      await SalesService.unschedule({id, connection})
+
+      await connection.transaction.commit()
+
+      return res.status(200).json('Unscheduled')
     } catch (error) {
-      res.status(400).json(error)
+      console.log(error)
+      !(error instanceof DatabaseError) && await connection.transaction.rollback()
+      return res.status(400).json(error)
     }
   }
 }

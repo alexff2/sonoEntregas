@@ -35,7 +35,7 @@ module.exports = {
       const { serialNumber, productId, module, moduleId } = request.body
       const { id: userId } = request.user
 
-      if (isNaN(Number(serialNumber))) {
+      if(serialNumber.length > 10 || isNaN(Number(serialNumber)) || Number(serialNumber) <= 0) {
         throw {
           error: 'serial number invalid'
         }

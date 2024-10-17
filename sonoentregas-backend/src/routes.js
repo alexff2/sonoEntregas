@@ -97,7 +97,8 @@ routes.get('/sales/:idSale/forecast/create', salesController.findSalesToCreatedF
 routes.get('/sales/forecast/create/product/:idProduct', salesController.findSalesToCreatedForecastByProduct)
 routes.get('/sales/:idSale/routes/create', salesController.findSalesToCreatedDelivery)
 routes.get('/sales/:idSale/loja/:idLoja/product/:idProduct', salesController.findProductDetails)
-routes.post('/sales/updateDate/:idSale', salesController.updateDateDelivery)
+routes.put('/sales/:id/reschedule', salesController.updateDateDelivery)
+routes.put('/sales/:id/unschedule', salesController.unschedule)
 // Returns Sales
 routes.post('/returns', ensureAuthenticated, returnsController.create)
 routes.put('/returns/delivery/link', ensureAuthenticated, returnsController.linkSaleReturnInDelivery)

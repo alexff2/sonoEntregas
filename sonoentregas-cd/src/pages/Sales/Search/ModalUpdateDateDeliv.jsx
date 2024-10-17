@@ -1,8 +1,7 @@
 import React from 'react'
-import { Box, InputBase, makeStyles } from '@material-ui/core'
+import { Box, Checkbox, InputBase, makeStyles } from '@material-ui/core'
 
 import { useSale } from '../../../context/saleContext'
-import Modal from '../../../components/Modal'
 import { ButtonSuccess, ButtonCancel } from '../../../components/Buttons'
 
 import api from '../../../services/api'
@@ -30,9 +29,11 @@ const useStyles = makeStyles( theme => ({
     textAlign: 'end'
   }
 }))
-export default function ModalUpdateDateDev({open, setOpen, saleCurrent}){
+
+export default function ModalUpdateDateDev({setOpen, saleCurrent}){
+  const [ unschedule, setUnschedule ] = React.useState(saleCurrent.D_ENTREGA1 ? false : true)
   const [ dateDeliv, setDateDeliv ] = React.useState('')
-  const [ obsSched, setObsSched ] = React.useState('')
+  const [ obsSchedule, setObsSchedule ] = React.useState('')
   const [ error, setError ] = React.useState(false)
   const [ childrenError, setChildrenError ] = React.useState(false)
 
@@ -58,13 +59,12 @@ export default function ModalUpdateDateDev({open, setOpen, saleCurrent}){
     }
   }
 
-  const updateDateDeliv = async () => {
+  const handleUpdateDateDeliv = async () => {
     try {
       if (dateDeliv !== '') {
-        const { data } = await api.post(`sales/updateDate/${saleCurrent.ID_SALES}`, { 
+        const { data } = await api.put(`sales/${saleCurrent.ID}/reschedule`, { 
           dateDeliv,
-          CODLOJA: saleCurrent.CODLOJA,
-          OBS_SCHED: obsSched
+          OBS_SCHEDULE: obsSchedule
         })
 
         saleCurrent.D_ENTREGA1 = data
@@ -80,21 +80,46 @@ export default function ModalUpdateDateDev({open, setOpen, saleCurrent}){
     }
   }
 
+  const handleUnschedule = async () => {
+    try {
+      await api.put(`sales/${saleCurrent.ID}/unschedule`)
+
+      saleCurrent.D_ENTREGA1 = null
+
+      sales.find( sale => sale.ID === saleCurrent.ID && (sale.D_ENTREGA1 = null))
+
+      setOpen(false)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleSave = () => {
+    if (unschedule) {
+      handleUnschedule()
+    } else {
+      handleUpdateDateDeliv()
+    }
+  }
+
   return(
-    <Modal open={open} setOpen={setOpen} title="Agenda nova data de entrega" >
-      <Box className={classes.box}>
-        <InputBase placeholder="Observação" onChange={e => setObsSched(e.target.value)} className={classes.inputBase}/>
+    <Box width={'500px'} height={'130px'}>
+      <Checkbox checked={unschedule} onChange={e => setUnschedule(e.target.checked)} />
+      <span>Sem Agendamento</span>
+
+      {!unschedule && <Box className={classes.box}>
+        <InputBase placeholder="Observação" onChange={e => setObsSchedule(e.target.value)} className={classes.inputBase}/>
         <input type="date" onChange={changeDateDeliv} className={classes.inputDate}/>
-      </Box>
+      </Box>}
 
       {error && <div><span style={{color: 'red'}}>{childrenError}</span></div>}
 
       <hr />
 
       <Box className={classes.boxButton}>
-        <ButtonSuccess children="Salvar" onClick={updateDateDeliv}/>
+        <ButtonSuccess children="Salvar" onClick={handleSave}/>
         <ButtonCancel children="Cancelar" onClick={() => setOpen(false)}/>
       </Box>
-    </Modal>
+    </Box>
   )
 }

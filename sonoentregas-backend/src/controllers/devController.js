@@ -7,39 +7,24 @@ module.exports = {
     const sonoEntregas = new Sequelize(Connections[0])
     const sono = new Sequelize(Connections[1])
 
+    const scripUpdate = `
+    BEGIN TRANSACTION
+    ALTER TABLE SALES ADD D_ENTREGA DATETIME
+    UPDATE SALES SET D_ENTREGA = D_ENTREGA1
+    ALTER TABLE SALES DROP COLUMN D_ENTREGA1
+    ALTER TABLE SALES ADD D_ENTREGA1 DATETIME
+    UPDATE SALES SET D_ENTREGA1 = D_ENTREGA
+    ALTER TABLE SALES DROP COLUMN D_ENTREGA
+    COMMIT TRANSACTION`
+
     const tSonoEntregas = await sonoEntregas.transaction()
     const tSono = await sono.transaction()
 
     try {
-      const cars = await sonoEntregas.query(
-        `SELECT * FROM CARS`,
+      await sonoEntregas.query(
+        scripUpdate,
         { transaction: tSonoEntregas, type: QueryTypes.SELECT }
       )
-
-      const empresas = await sono.query(
-        'SELECT * FROM EMPRESA',
-        { transaction: tSono, type: QueryTypes.SELECT }
-      )
-
-      const shops = await sonoEntregas.query(
-        'SELECT * FROM LOJAS',
-        { transaction: tSonoEntregas, type: QueryTypes.SELECT }
-      )
-
-      const clientes = await sono.query(
-        'SELECT * FROM CLIENTES',
-        { transaction: tSono, type: QueryTypes.SELECT }
-      )
-
-      await tSonoEntregas.commit()
-      await tSono.commit()
-
-      return res.status(200).json({
-        shops,
-        empresas,
-        cars,
-        clientes
-      })
     } catch (error) {
       console.log(error)
 

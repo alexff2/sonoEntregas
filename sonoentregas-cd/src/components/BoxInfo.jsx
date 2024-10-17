@@ -55,7 +55,7 @@ export default function BoxInfo(){
           {address.SCHEDULED && <div style={{color: 'red'}}>Obs. Agendamento: <span>{address.OBS_SCHEDULED}</span></div>}
         </Box> 
         :<Box className={classes.bodyBox} textAlign="center">
-          <div style={{marginTop: 100}}>Clique em uma venda para mostrar infomações</div>
+          <div style={{marginTop: 100}}>Clique em uma venda para mostrar informações</div>
         </Box>
       }
     </Box>

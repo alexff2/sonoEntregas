@@ -113,7 +113,9 @@ function Row({ sale, type, setSales, availableStocks }) {
     dateAlert.setDate(dateAlert.getDate()+2)
     dateAlert.setHours(0,0,0,0)
 
-    if (dateDelivery < dateNow) {
+    if (sale.D_ENTREGA1 === null) {
+      return { color: 'blue' }
+    } else if (dateDelivery < dateNow) {
       return { color: 'red' }
     } else if (dateDelivery >= dateNow && dateDelivery <= dateAlert){
       return { color: 'yellow' }
@@ -144,7 +146,14 @@ function Row({ sale, type, setSales, availableStocks }) {
         <TableCell onClick={setInformation}>{sale.ID_SALES}</TableCell>
         <TableCell onClick={setInformation}>{sale.NOMECLI}</TableCell>
         <TableCell onClick={setInformation}>{sale.BAIRRO}</TableCell>
-        <TableCell onClick={setInformation} style={styleDateDelivery()}>{getDateBr(sale.D_ENTREGA1)}</TableCell>
+        <TableCell
+          onClick={setInformation}
+          style={styleDateDelivery()}
+        >
+          {sale.D_ENTREGA1 !== null
+            ? getDateBr(sale.D_ENTREGA1)
+            : 'Sem Agendamento'}
+        </TableCell>
         <TableCell onClick={setInformation}>{sale.SHOP}</TableCell>
         { (type === 'delivery' || type === 'forecast') && 
           <TableCell
