@@ -332,6 +332,10 @@ module.exports = {
       SCHEDULED: 1,
       OBS_SCHEDULED: OBS_SCHEDULE
     }, { ID: id }, connection)
+
+    await SalesProd.updateAny(0, {
+      STATUS: 'Enviado',
+    }, { ID_SALE_ID: id, STATUS: 'Sem Agendamento' }, connection)
   },
   /**
    * @param {object} params
