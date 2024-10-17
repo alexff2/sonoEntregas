@@ -35,7 +35,17 @@ export default function Home(){
       
       <Box className={classes.sales}>
         <Sales
-          sales={sales}
+          sales={sales.filter(sale => sale.D_ENTREGA1 !== null)}
+          type={'home'}
+        />
+        <Box className={classes.boxAddress}>
+          <BoxInfo />
+        </Box>
+      </Box>
+
+      <Box className={classes.sales}>
+        <Sales
+          sales={sales.filter(sale => sale.D_ENTREGA1 === null)}
           type={'home'}
         />
         <Box className={classes.boxAddress}>
