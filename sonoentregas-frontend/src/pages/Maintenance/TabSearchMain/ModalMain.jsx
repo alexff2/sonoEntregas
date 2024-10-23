@@ -50,12 +50,16 @@ const CheckFinishStatus = ({ maintDeliv, datePrevMain }) => {
 
 export default function ModalMain({ maint, clickReport }) {
   const [maintDelivs, setMaintDelivs] = useState([])
+  const [maintVisit, setMaintVisit] = useState([])
   const { setChildrenError, setOpen, setType } = useModalAlert()
 
   useEffect(()=>{
     maint &&
     api.get(`maintenancedeliv/${maint.ID}`)
-      .then(resp => setMaintDelivs(resp.data))
+      .then(resp => {
+        setMaintDelivs(resp.data.mainDeliv)
+        setMaintVisit(resp.data.maintVisit)
+      })
       .catch(error => {
         console.log(error)
         setChildrenError('Erro ao comunicar com servidor, entre em contato com ADM!')
@@ -113,6 +117,9 @@ export default function ModalMain({ maint, clickReport }) {
             {maint.ENDERECO+', '+maint.BAIRRO+', '+maint.CIDADE+'-'+maint.ESTADO}
           </div>
           <div className="info"><label>Obs: </label>{maint.OBS}</div>
+          {maintVisit.length > 0 && <div className="info"><label>Obs Técnico: </label>
+            {maintVisit[0].OBS !== '1' ? maintVisit[0].OBS : ''}
+          </div>}
           <div className="info">
             <label>Defeito reclamado: </label>{maint.CAT_DEFECT}
           </div>

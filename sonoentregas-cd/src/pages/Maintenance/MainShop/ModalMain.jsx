@@ -52,7 +52,7 @@ export default function ModalMain({ maint, clickReport }) {
 
   useEffect(()=>{
     api.get(`maintenancedeliv/${maint.ID}`)
-      .then(resp => setMaintDelivs(resp.data))
+      .then(resp => setMaintDelivs(resp.data.mainDeliv))
       .catch(error => {
         console.log(error)
         setOpen(true)

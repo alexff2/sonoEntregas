@@ -14,7 +14,7 @@ module.exports = {
     try {
       const { ID_MAIN, DATE, HOURS, ID_USER } = req.body
 
-      const scrip = `${ID_MAIN}, '${DATE}', '${HOURS}', ${ID_USER}`
+      const scrip = `${ID_MAIN}, '${DATE}', '${HOURS}', '', ${ID_USER}`
 
       await MaintenanceVisit.creatorNotReturn(0, scrip, true)
 

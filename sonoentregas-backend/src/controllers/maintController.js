@@ -44,7 +44,7 @@ module.exports = {
 
       params.codloja = params.codloja !== 'null' ? params.codloja : 0
 
-      const maint = await MainService.findMain(params)
+      const maint = await MainService.findMain(params, false,  null)
 
       return res.json(maint)
     } catch (error) {

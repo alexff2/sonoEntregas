@@ -1,5 +1,6 @@
 // @ts-check
 const MaintenanceDeliv = require('../models/tables/MaintenanceDeliv')
+const MaintenanceVisit = require('../models/tables/MaintenanceVisit')
 const Maintenance = require('../models/tables/Maintenance')
 const ViewMaintenance = require('../models/views/ViewMaintenance')
 
@@ -93,7 +94,7 @@ module.exports = {
   },
   /**
    * @param {string} codloja
-   * @param {string} loc
+   * @param {string| null} loc
    * @param {Object | null} connection
    * @returns 
    */
@@ -109,4 +110,11 @@ module.exports = {
     }
     return maint
   },
+  async findMaintenanceVisit(idMaintenance){
+    const maintenanceVisit = await MaintenanceVisit.findAny(0, {
+      ID_MAIN: idMaintenance
+    })
+
+    return maintenanceVisit
+  }
 }
