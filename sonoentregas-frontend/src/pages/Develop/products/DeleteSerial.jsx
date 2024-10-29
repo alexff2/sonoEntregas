@@ -51,7 +51,7 @@ const DeleteSerial = () => {
       <h1>Delete Serial</h1>
 
       <p>
-        Código do Produto: 
+        Código do Produto : 
         <input
           id='productId'
           type="text"

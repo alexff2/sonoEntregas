@@ -8,7 +8,7 @@ import NoConnectionRoutes from './noConnection.routes'
 import PublicRoutes from './public.routes'
 
 export default function Routes(){
-  const { isAuthenticated, noConnection } = useAuthenticate()
+  const { isAuthenticated, noConnection, userAuth } = useAuthenticate()
 
   return(
     <BrowserRouter>
@@ -18,7 +18,7 @@ export default function Routes(){
               ? <NoConnectionRoutes />
               : <>
                   {
-                    process.env.REACT_APP_PASSWORD_DEVELOPER === 'dev'
+                    (process.env.REACT_APP_PASSWORD_DEVELOPER === 'dev' || userAuth.OFFICE === 'Dev')
                     ? <DevelopRoutes />
                     : <PrivateRoutes />
                   }
