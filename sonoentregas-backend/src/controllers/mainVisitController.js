@@ -1,9 +1,9 @@
 // @ts-check
 const MaintenanceVisit = require('../models/tables/MaintenanceVisit')
 const Maintenance = require('../models/tables/Maintenance')
-const { getViewMaint } = require('../services/MainService')
 
 const ObjDate = require('../functions/getDate')
+const MainService = require('../services/MainService')
 
 module.exports = {
   /**
@@ -20,7 +20,7 @@ module.exports = {
 
       await Maintenance.updateAny(0, { STATUS: 'Agendada' }, { ID: ID_MAIN })
 
-      const ViewMain = await getViewMaint('null')
+      const ViewMain = await MainService.getViewMaint('null', undefined, undefined)
 
       return res.json(ViewMain)
     } catch (error) {
@@ -39,7 +39,7 @@ module.exports = {
 
       await Maintenance.updateAny(0, { STATUS: 'Visitando' }, { ID: id })
 
-      return res.json(await getViewMaint('null'))
+      return res.json(await MainService.getViewMaint('null', undefined, undefined))
     } catch (error) {
       console.log(error)
       return res.status(400).json(error)
@@ -79,7 +79,30 @@ module.exports = {
         msg = 'Assistência enviada ao CD!'
       }
 
-      return res.json({ main: await getViewMaint('null'), msg })
+      return res.json({ main: await MainService.getViewMaint('null', undefined, undefined), msg })
+    } catch (error) {
+      console.log(error)
+      return res.status(400).json(error)
+    }
+  },
+  /**
+   * @param {*} req
+   * @param {*} res
+   */
+  async reschedule(req, res){
+    const { id } = req.params
+    const { dateVisit, hoursVisit } = req.body
+
+    try {
+      await MainService.reschedule({
+        dateVisit,
+        hoursVisit,
+        idMaintenance: id
+      })
+
+      const maintenanceVisit = await MainService.getViewMaint('null', undefined, undefined)
+
+      return res.json(maintenanceVisit)
     } catch (error) {
       console.log(error)
       return res.status(400).json(error)

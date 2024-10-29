@@ -116,5 +116,14 @@ module.exports = {
     })
 
     return maintenanceVisit
-  }
+  },
+  /**
+   * @param {Object} maintenanceVisit
+   */
+  async reschedule({dateVisit, hoursVisit, idMaintenance}){
+    await MaintenanceVisit.updateAny(0, {
+      DATE_PREV: dateVisit,
+      HOURS_PREV: hoursVisit
+    }, { ID_MAIN: idMaintenance })
+  },
 }

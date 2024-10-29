@@ -8,31 +8,54 @@ import { useAuthenticate } from '../../../context/authContext'
 
 export default function ModalSchedule({ maintSelect, setOpenModalSch }){
   const [disabled, setDisabled] = useState(false)
-  const [dateVist, setDateVisit] = useState('')
-  const [hoursVist, setHoursVisit] = useState('')
+  const [dateVisit, setDateVisit] = useState('')
+  const [hoursVisit, setHoursVisit] = useState('')
   const { setMaintenance } = useMaintenance()
   const { setAlert } = useModalAlert()
   const { userAuth } = useAuthenticate()
   const { ID: idUser } = userAuth
 
+  const scheduleVisit = async () => {
+    const { data } = await api.post('maintenance/visit', {
+      ID_MAIN: maintSelect.ID,
+      DATE: dateVisit,
+      HOURS: hoursVisit,
+      ID_USER: idUser
+    })
+    setMaintenance(data)
+    setAlert('Visita agendada com sucesso!', 'sucess')
+  }
+
+  const rescheduleVisit = async () => {
+    try {
+      const { data } = await api.put(`maintenance/visit/reschedule/${maintSelect.ID}`, {
+        dateVisit,
+        hoursVisit
+      })
+      setMaintenance(data)
+      setAlert('Visita reagendada com sucesso!', 'sucess')
+    } catch (error) {
+      console.log(error)
+      !error.response
+        ? setAlert('Rede')
+        : setAlert('Servidor')
+    }
+  }
+
   const submitScheduleVisit = async e => {
     setDisabled(true)
     e.preventDefault()
     try {
-      const { data } = await api.post('maintvisit', {
-        ID_MAIN: maintSelect.ID,
-        DATE: dateVist,
-        HOURS: hoursVist,
-        ID_USER: idUser
-      })
-      setMaintenance(data)
-      setAlert('Visita agendada com sucesso!', 'sucess')
-      setOpenModalSch(false)
+      maintSelect.STATUS === 'Agendada'
+        ? await rescheduleVisit()
+        : await scheduleVisit()
+
+        setOpenModalSch(false)
     } catch (error) {
       console.log(error)
       !error.response
-          ? setAlert('Rede')
-          : setAlert('Servidor')
+        ? setAlert('Rede')
+        : setAlert('Servidor')
     }
   }
 

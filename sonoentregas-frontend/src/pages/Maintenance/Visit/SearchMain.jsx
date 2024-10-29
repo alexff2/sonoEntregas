@@ -68,7 +68,7 @@ export default function SearchMain({ setVisit }){
   }
 
   const clickRowMaint = (e, maint) => {
-    if(e.target.className !== 'btnActionVisit'){
+    if(e.target.className !== 'btnActionVisit' && e.target.className !== 'dateSchedule'){
       setOpenModalReport(true)
       setMaintSelect(maint)
     }
@@ -169,7 +169,16 @@ export default function SearchMain({ setVisit }){
               <td>{maint.PRODUTO}</td>
               <td>{maint.BAIRRO}</td>
               {!maint.DATE_VISIT
-                ?<td className="dateSched">
+                ?<td
+                  className="dateSchedule"
+                  style={{ cursor: maint.STATUS === 'Agendada' ? 'pointer' : 'auto' }}
+                  onClick={() => {
+                    if (maint.STATUS === 'Agendada') {
+                      setOpenModalSch(true)
+                      setMaintSelect(maint)
+                    }
+                  }}
+                >
                   {maint.DATE_PREV && dateSqlToReact(maint.DATE_PREV)} - {maint.HOURS_PREV}
                 </td>
                 : <td>{dateSqlToReact(maint.DATE_VISIT)}</td>

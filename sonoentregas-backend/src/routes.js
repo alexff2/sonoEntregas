@@ -158,7 +158,8 @@ routes.get('/maintenancedeliv/:typeSeach/:search', maintenanceDelivController.fi
 routes.post('/maintenancedeliv', maintenanceDelivController.create)
 routes.put('/maintenancedeliv/:id', maintenanceDelivController.update)
 //Maintenance Visit
-routes.post('/maintvisit', mainVisitController.create)
+routes.post('/maintenance/visit', mainVisitController.create)
+routes.put('/maintenance/visit/reschedule/:id', mainVisitController.reschedule)
 routes.put('/maintvisit/start/:id', mainVisitController.startVisit)
 routes.put('/maintvisit/finish/:id', mainVisitController.finishVisit)
 // Category Def
