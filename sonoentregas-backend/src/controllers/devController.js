@@ -33,5 +33,54 @@ module.exports = {
 
       throw new Error('Internal server error')
     }
+  },
+  async findProductsWithSerials(req, res) {
+    const {productId} = req.query
+    const sonoCd = new Sequelize(Connections[1])
+
+    const scriptProducts = `
+    SELECT CODIGO id, NOME name, ALTERNATI alternativeCode FROM PRODUTOS WHERE CODIGO = ${productId}`
+
+    const scriptSerials = `
+    SELECT id, serialNumber FROM PRODLOJAS_SERIES_MOVIMENTOS A
+    WHERE outputBeepDate IS NULL AND productId = ${productId}`
+
+    try {
+      const product = await sonoCd.query(
+        scriptProducts,
+        { type: QueryTypes.SELECT }
+      )
+
+      const serials = await sonoCd.query(
+        scriptSerials,
+        { type: QueryTypes.SELECT }
+      )
+
+      return res.json({product: product[0], serials})
+    } catch (error) {
+      console.log(error)
+
+      throw new Error('Internal server error')
+    }
+  },
+  async deleteSerial(req, res) {
+    const {serialId} = req.query
+    const sonoCd = new Sequelize(Connections[1])
+
+    const scriptDelete = `
+    DELETE FROM PRODLOJAS_SERIES_MOVIMENTOS WHERE id = ${serialId}`
+
+    try {
+      await sonoCd.query(
+        scriptDelete,
+        { type: QueryTypes.SELECT }
+      )
+
+      return res.json({message: 'Serial deleted'})
+    } catch (error) {
+      console.log(error)
+
+      throw new Error('Internal server error')
+    }
   }
 }

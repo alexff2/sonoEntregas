@@ -3,6 +3,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { useAuthenticate } from '../context/authContext' 
 
 import PrivateRoutes from './private.routes'
+import DevelopRoutes from './develop.routes'
 import NoConnectionRoutes from './noConnection.routes'
 import PublicRoutes from './public.routes'
 
@@ -15,7 +16,13 @@ export default function Routes(){
         ? <>
             { noConnection
               ? <NoConnectionRoutes />
-              : <PrivateRoutes />
+              : <>
+                  {
+                    process.env.REACT_APP_PASSWORD_DEVELOPER === 'dev'
+                    ? <DevelopRoutes />
+                    : <PrivateRoutes />
+                  }
+                </>
             }
           </>
         : <PublicRoutes />
