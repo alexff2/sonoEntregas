@@ -63,8 +63,24 @@ export default function Filter({
           color='secondary'
           variant='contained'
           disabled={disabledButton}
+          style={{
+            position: 'relative',
+          }}
         >
-          Ok { disabledButton && <CircularProgress size={25}/> }
+          Ok 
+          { 
+            disabledButton &&
+            <CircularProgress
+              size={25}
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                marginTop: -12,
+                marginLeft: -12,
+              }}
+            /> 
+          }
         </Button>
       </DialogActions>
     </Dialog>

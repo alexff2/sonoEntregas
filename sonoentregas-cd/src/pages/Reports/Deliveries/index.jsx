@@ -7,6 +7,7 @@ import {
 import { useNavigate } from 'react-router-dom'
 
 import { getDateBr } from '../../../functions/getDates'
+import { useAlertSnackbar } from '../../../context/alertSnackbarContext'
 
 import api from '../../../services/api'
 
@@ -25,11 +26,17 @@ export default function Deliveries(){
     deliveriesByStore: [],
     deliveryCd: ''
   })
+  const { setAlertSnackbar } = useAlertSnackbar()
 
   const navigate = useNavigate()
 
   const handleFilterReport = async ({ dateStart, dateEnd }) => {
     try {
+      if (dateStart === '' || dateEnd === '') {
+        setAlertSnackbar('Data inicial e final são obrigatórias')
+        return
+      }
+
       const { data } = await api.get('reports/deliveries', {
         params: {
           dateStart,
