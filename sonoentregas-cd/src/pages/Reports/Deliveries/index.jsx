@@ -39,7 +39,6 @@ export default function Deliveries(){
 
       setDateSelect(getDateBr(dateStart) + ' à ' + getDateBr(dateEnd))
       setDeliveries(data)
-      console.log(data)
       setIsOpenFilter(false)
     } catch (e) {
       console.log(e)

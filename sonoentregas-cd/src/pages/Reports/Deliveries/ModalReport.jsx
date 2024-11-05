@@ -19,7 +19,7 @@ export default function ModalReport({
     <ReportContainer
       openModal={openReport}
       setOpenModal={setOpenReport}
-      save={`Relatório de Entregas por data - ${date}`}
+      save={`Relatório de Entregas por data - ${date} - ${deliveries.deliveryCd}`}
     >
       <Box className="report">
         <Box display='flex' justifyContent='space-between' mb={1}>
