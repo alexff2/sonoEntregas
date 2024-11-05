@@ -51,5 +51,76 @@ module.exports = {
           WHERE inputModule = 'saleReturn'
           GROUP BY productId, inputModuleId) D ON D.productId = C.CODIGO AND A.id = D.inputModuleId
       WHERE A.deliveryId = ${id}`
+  },
+  deliveriesByDriver(dateStart, dateEnd) {
+    return `
+    select *, (a.qtd_realized + a.qtd_return) total from (
+      SELECT DESCRIPTION,
+        (SELECT COUNT(ID_SALE) FROM (SELECT ID_SALE
+        FROM DELIVERYS_PROD DP
+        INNER JOIN DELIVERYS D ON DP.ID_DELIVERY = D.ID
+        WHERE D.D_DELIVERED BETWEEN '${dateStart}' AND '${dateEnd}'
+        AND D.ID_DRIVER = USERS.ID AND DP.DELIVERED = 0
+        GROUP BY DP.ID_DELIVERY, DP.ID_SALE, D.ID_DRIVER,
+        DP.CODLOJA) COUNT_D) qtd_realized,
+        (SELECT COUNT(ID_SALE) FROM (SELECT ID_SALE
+        FROM DELIVERYS_PROD DP
+        INNER JOIN DELIVERYS D ON DP.ID_DELIVERY = D.ID
+        WHERE D.D_DELIVERED BETWEEN '${dateStart}' AND '${dateEnd}'
+        AND D.ID_DRIVER = USERS.ID AND DP.DELIVERED = 1
+        GROUP BY DP.ID_DELIVERY, DP.ID_SALE, D.ID_DRIVER,
+        DP.CODLOJA) COUNT_D) qtd_return
+      FROM USERS
+      WHERE OFFICE = 'Driver'
+    ) a
+    where a.qtd_realized + a.qtd_return > 0
+    order by a.DESCRIPTION`
+  },
+  deliveriesByAssistants(dateStart, dateEnd) {
+    return `
+    select *, (a.qtd_realized + a.qtd_return) total from (
+      SELECT DESCRIPTION,
+        (SELECT COUNT(ID_SALE) FROM (SELECT ID_SALE
+        FROM DELIVERYS_PROD DP
+        INNER JOIN DELIVERYS D ON DP.ID_DELIVERY = D.ID
+        WHERE D.D_DELIVERED BETWEEN '${dateStart}' AND '${dateEnd}'
+        AND D.ID_ASSISTANT = USERS.ID AND DP.DELIVERED = 0
+        GROUP BY DP.ID_DELIVERY, DP.ID_SALE, D.ID_ASSISTANT,
+        DP.CODLOJA) COUNT_D) qtd_realized,
+        (SELECT COUNT(ID_SALE) FROM (SELECT ID_SALE
+        FROM DELIVERYS_PROD DP
+        INNER JOIN DELIVERYS D ON DP.ID_DELIVERY = D.ID
+        WHERE D.D_DELIVERED BETWEEN '${dateStart}' AND '${dateEnd}'
+        AND D.ID_ASSISTANT = USERS.ID AND DP.DELIVERED = 1
+        GROUP BY DP.ID_DELIVERY, DP.ID_SALE, D.ID_ASSISTANT,
+        DP.CODLOJA) COUNT_D) qtd_return
+      FROM USERS
+      WHERE OFFICE = 'Assistant'
+    ) a
+    where a.qtd_realized + a.qtd_return > 0
+    order by a.DESCRIPTION`
+  },
+  deliveriesByStore(dateStart, dateEnd) {
+    return `
+    select *, (a.qtd_realized + a.qtd_return) total from (
+      SELECT DESCRICAO DESCRIPTION,
+        (SELECT COUNT(ID_SALE) FROM (SELECT ID_SALE
+        FROM DELIVERYS_PROD DP
+        INNER JOIN DELIVERYS D ON DP.ID_DELIVERY = D.ID
+        WHERE D.D_DELIVERED BETWEEN '${dateStart}' AND '${dateEnd}'
+        AND DP.CODLOJA = LOJAS.CODLOJA AND DP.DELIVERED = 0
+        GROUP BY DP.ID_DELIVERY, DP.ID_SALE, DP.CODLOJA) COUNT_D
+      ) qtd_realized,
+      (SELECT COUNT(ID_SALE) FROM (SELECT ID_SALE
+        FROM DELIVERYS_PROD DP
+        INNER JOIN DELIVERYS D ON DP.ID_DELIVERY = D.ID
+        WHERE D.D_DELIVERED BETWEEN '${dateStart}' AND '${dateEnd}'
+        AND DP.CODLOJA = LOJAS.CODLOJA AND DP.DELIVERED = 1
+        GROUP BY DP.ID_DELIVERY, DP.ID_SALE, DP.CODLOJA) COUNT_D
+      ) qtd_return
+      FROM LOJAS
+    ) a
+    where a.qtd_realized + a.qtd_return > 0
+    order by a.DESCRIPTION`
   }
 }

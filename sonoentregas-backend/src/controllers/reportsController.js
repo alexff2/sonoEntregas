@@ -27,6 +27,7 @@ const Products = require('../models/Produtos')
 const SalesService = require('../services/salesService')
 const PurchaseOrderService = require('../services/PurchaseOrderService')
 const DreService = require('../services/DreService')
+const DeliveryService = require('../services/DeliveryService')
 const ShopSceService = require('../services/ShopSceService')
 const connections = require('../databases/MSSQL/connections')
 
@@ -329,6 +330,38 @@ module.exports = {
 
       return res.status(status).json(error)
     }
+  },
+  /**
+   * @param {any} req
+   * @param {any} res
+   */
+  async deliveries(req, res) {
+    const { dateStart, dateEnd } = req.query
+
+    try {
+      const deliveriesByAssistants = await DeliveryService.deliveriesByAssistants(dateStart, dateEnd)
+      const deliveriesByDriver = await DeliveryService.deliveriesByDriver(dateStart, dateEnd)
+      const deliveriesByStore = await DeliveryService.deliveriesByStore(dateStart, dateEnd)
+
+      const deliveryCd = {
+        'SONO' :'CD São Luís',
+        'SONO_CD_PIAUI' :'CD Piauí',
+        'SONO_CD_PARA' :'CD Para',
+      }
+
+      return res.json({
+        deliveriesByAssistants,
+        deliveriesByDriver,
+        deliveriesByStore,
+        deliveryCd: deliveryCd[connections[1].database]
+      })
+    } catch (e) {
+      console.log(e)
+
+      let status = e.status ? e.status : 400
+      let error = e.error ? e.error : e
+
+      return res.status(status).json(error)
+    }
   }
 }
-

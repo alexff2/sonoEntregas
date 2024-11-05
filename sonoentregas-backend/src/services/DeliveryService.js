@@ -321,5 +321,38 @@ module.exports = {
     }))
 
     return products
+  },
+  /**
+   * @param {string} dateStart
+   * @param {string} dateEnd
+   */
+  async deliveriesByAssistants(dateStart, dateEnd){
+    const script = scripts.deliveriesByAssistants(dateStart, dateEnd)
+
+    const deliveries = await Delivery._query(0, script, QueryTypes.SELECT)
+
+    return deliveries
+  },
+  /**
+   * @param {string} dateStart
+   * @param {string} dateEnd
+   */
+  async deliveriesByDriver(dateStart, dateEnd){
+    const script = scripts.deliveriesByDriver(dateStart, dateEnd)
+
+    const deliveries = await Delivery._query(0, script, QueryTypes.SELECT)
+
+    return deliveries
+  },
+  /**
+   * @param {string} dateStart
+   * @param {string} dateEnd
+   */
+  async deliveriesByStore(dateStart, dateEnd){
+    const script = scripts.deliveriesByStore(dateStart, dateEnd)
+
+    const deliveries = await Delivery._query(0, script, QueryTypes.SELECT)
+
+    return deliveries
   }
 }

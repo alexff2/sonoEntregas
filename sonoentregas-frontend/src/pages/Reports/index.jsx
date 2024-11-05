@@ -17,6 +17,14 @@ export default function Reports() {
         userAuth.OFFICE === 'Dev' &&
         <input
           type="password"
+          style={{
+            position: 'absolute',
+            top: 0,
+            backgroundColor: 'transparent',
+            color: 'transparent',
+            border: 'transparent',
+            outline: 'none',
+          }}
           value={passwordDev}
           onChange={e => setPasswordDev(e.target.value)}
         />
