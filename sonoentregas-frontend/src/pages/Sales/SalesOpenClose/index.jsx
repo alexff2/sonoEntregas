@@ -44,6 +44,29 @@ function Row({ sale, cancelSubmitSales, reverseStock, saleDetail, updateAddress 
     else saleDetail(sale, prod)
   }
 
+  const styleDateDelivery = () => {
+    // VERIFICAR
+    var dateDelivery, dateNow, dateAlert
+    dateDelivery = new Date(sale.D_ENTREGA1)
+    dateDelivery.setHours(0,0,0,0)
+
+    dateNow = new Date().setHours(0,0,0,0)
+
+    dateAlert = new Date()
+    dateAlert.setDate(dateAlert.getDate()+2)
+    dateAlert.setHours(0,0,0,0)
+
+    if (sale.D_ENTREGA1 === null) {
+      return { color: 'blue' }
+    } else if (dateDelivery < dateNow) {
+      return { color: 'red' }
+    } else if (dateDelivery >= dateNow && dateDelivery <= dateAlert){
+      return { color: 'yellow' }
+    } else {
+      return { color: 'black' }
+    }
+  }
+
   return (
     <>
       <tr>
@@ -53,7 +76,12 @@ function Row({ sale, cancelSubmitSales, reverseStock, saleDetail, updateAddress 
         <td>{sale.ID_SALES}</td>
         <td style={{cursor: 'pointer'}} onClick={() => updateAddress(sale)}>{sale.NOMECLI}</td>
         <td>{dateSqlToReact(sale.EMISSAO)}</td>
-        <td>{dateSqlToReact(sale.D_ENTREGA1)}</td>
+        <td style={styleDateDelivery()}>
+          {sale.D_ENTREGA1 !== null
+            ? dateSqlToReact(sale.D_ENTREGA1)
+            : 'Sem agendamento'
+          }
+        </td>
       </tr>
 
       <tr id="trProdId">

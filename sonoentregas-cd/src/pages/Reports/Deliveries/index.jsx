@@ -15,7 +15,6 @@ import Filter from './Filter'
 import TableDeliveries from './TableDeliveries'
 import ModalReport from './ModalReport'
 
-
 export default function Deliveries(){
   const [ isOpenFilter, setIsOpenFilter ] = useState(true)
   const [ isOpenReport, setIsOpenReport ] = useState(false)

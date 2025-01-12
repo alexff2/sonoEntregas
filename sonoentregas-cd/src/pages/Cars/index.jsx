@@ -1,61 +1,54 @@
-import React, { useState } from 'react'
-import useStyles from './style'
-import { AppBar, Tabs, Tab } from '@material-ui/core'
+import React, {useEffect} from 'react'
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@material-ui/core"
+import { Edit } from "@material-ui/icons"
+import { useCars } from '../../context/carsContext'
+import api from '../../services/api'
 
-import { TabPanel, a11yProps } from '../../components/TabPanel'
-import TableCars from './tableCars'
-import RegisterCars from './registerCars'
+export default function TableCars({
+  setValue, setIsDisableFind, setIsDisableRegister, setIsDisableUpdate, setCar
+}) {
+  const { cars, setCars } = useCars()
 
-export default function SimpleTabs() {
-  const classes = useStyles();
-  const [value, setValue] = useState(0);
-  const [car, setCar] = useState({});
-  const [ isDisableFind, setIsDisableFind ] = useState(false)
-  const [ isDisableRegister, setIsDisableRegister ] = useState(false)
-  const [ isDisableUpdate, setIsDisableUpdate ] = useState(true)
+  useEffect(() => {
+    api.get('cars')
+      .then(({data}) => {
+        setCars(data)
+      })
+  }, [setCars])
 
-  return (
-    <div className={classes.root}>
-      <AppBar position="static">
-        <Tabs 
-          value={value}
-          onChange={(event, newValue) => setValue(newValue)}
-          aria-label="simple tabs example"
-          variant="fullWidth"
-        >
-          <Tab label="Consulta" {...a11yProps(0)} disabled={isDisableFind}/>
-          <Tab label="Cadastrar" {...a11yProps(1)} disabled={isDisableRegister}/>
-          <Tab label="Alterar" {...a11yProps(2)} disabled={isDisableUpdate}/>
-        </Tabs>
-      </AppBar>
-
-      <TabPanel value={value} index={0}>
-        <TableCars 
-          setValue={setValue}
-          setIsDisableFind={setIsDisableFind}
-          setIsDisableRegister={setIsDisableRegister}
-          setIsDisableUpdate={setIsDisableUpdate}
-          setCar={setCar}
-        />
-      </TabPanel>
-
-      <TabPanel value={value} index={1}>
-        <RegisterCars 
-          selectCar={false}
-          setValue={setValue}
-          />
-      </TabPanel>
-
-      <TabPanel value={value} index={2}>
-        <RegisterCars 
-          setValue={setValue}
-          selectCar={car}
-          setSelectCar={setCar}
-          setIsDisableFind={setIsDisableFind}
-          setIsDisableRegister={setIsDisableRegister}
-          setIsDisableUpdate={setIsDisableUpdate}
-        />
-      </TabPanel>
-    </div>
-  );
+  const updateCar = car => {
+    setIsDisableFind(true)
+    setIsDisableRegister(true)
+    setIsDisableUpdate(false)
+    setValue(2)
+    setCar(car)
+  }
+  return(
+    <TableContainer component={Paper}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Código</TableCell>
+            <TableCell>Descrição</TableCell>
+            <TableCell>Placa</TableCell>
+            <TableCell>Modelo</TableCell>
+            <TableCell></TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {cars.map( car => (
+            <TableRow key={car.ID}>
+              <TableCell>{car.ID}</TableCell>
+              <TableCell>{car.DESCRIPTION}</TableCell>
+              <TableCell>{car.PLATE}</TableCell>
+              <TableCell>{car.MODEL}</TableCell>
+              <TableCell>
+                <Edit onClick={() => updateCar(car)}/>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  )
 }
