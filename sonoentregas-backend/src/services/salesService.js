@@ -349,9 +349,5 @@ module.exports = {
     await Sales.updateAny(0, {
       D_ENTREGA1: 'NULL',
     }, { ID: id }, connection)
-
-    await SalesProd.updateAny(0, {
-      STATUS: 'Sem Agendamento',
-    }, { ID_SALE_ID: id, STATUS: 'Enviado' }, connection)
   },
 }

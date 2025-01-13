@@ -425,12 +425,12 @@ export default function CreateUpdatePurchaseOrder({
               <FormControlLabel
                 value='normal'
                 control={<Radio id='type1' style={{padding: 2}}/>}
-                label='Normal'
+                label='Rel-Sim'
               />
               <FormControlLabel
                 value='bonus'
                 control={<Radio id='type1' style={{padding: 2}}/>}
-                label='Bonificado'
+                label='Rel-Não'
               />
             </RadioGroup>
           </FormControl>
