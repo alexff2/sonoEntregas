@@ -92,13 +92,18 @@ module.exports = {
    * @returns 
    */
   async findSales(where) {
-    const sales = await Sales.findSome(0, where)
+    const script = `SELECT * FROM sales WHERE ${where} ORDER BY D_ENTREGA1`
+
+    const sales = await Sales._query(0, script, QueryTypes.SELECT)
 
     if (sales.length === 0) {
       return []
     }
 
-    return setUpSalesProduct(sales)
+    return setUpSalesProduct([
+      ...sales.filter(sale => sale.D_ENTREGA1 !== null),
+      ...sales.filter(sale => sale.D_ENTREGA1 === null)
+    ])
   },
   /**
    * @param {*} where 
