@@ -3,7 +3,6 @@ const { QueryTypes } = require('sequelize')
 const Produtos = require("../models/Produtos")
 const DB = require("../models/Produtos")
 const scriptPurchaseOrder = require('../scripts/purchaseOrder')
-const { difDate } = require('../functions/getDate')
 const DateTime = require('../class/Date')
 
 class PurchaseOrderService {
@@ -77,7 +76,13 @@ class PurchaseOrderService {
     }
 
     if (field === 'type') {
+      value === 'normal'
+        ? await DB._query(1, scriptPurchaseOrder.setProductValues(id), QueryTypes.UPDATE, connection)
+        : await DB._query(1, scriptPurchaseOrder.resetProductValues(id), QueryTypes.UPDATE, connection)
+
       value = value === 'normal' ? 'CIF' : 'FOB'
+
+      await DB._query(1, scriptPurchaseOrder.updateTotalValues(id), QueryTypes.UPDATE, connection)
     }
 
     if (field === 'type1') {
@@ -118,8 +123,8 @@ class PurchaseOrderService {
     return item
   }
 
-  async updateValues(id, connection) {
-    const script = scriptPurchaseOrder.updateValues(id)
+  async updateTotalValues(id, connection) {
+    const script = scriptPurchaseOrder.updateTotalValues(id)
 
     await DB._query(1, script, QueryTypes.UPDATE, connection)
   }

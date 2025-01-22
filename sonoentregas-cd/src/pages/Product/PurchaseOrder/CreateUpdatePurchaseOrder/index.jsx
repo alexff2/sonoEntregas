@@ -148,12 +148,17 @@ export default function CreateUpdatePurchaseOrder({
     try {
       setPurChaseOrder(state => ({...state, [e.target.id]: e.target.value}))
 
+      setOpenBackDrop(true)
       debounce(async () => {
-        setOpenBackDrop(true)
         await api.put(`purchase/order/${purchaseOrder.id}`, {
           fieldToUpdate: e.target.id,
           value: e.target.value
         })
+
+        if (e.target.id === 'type') {
+          const { data } = await api.post('purchase/order')
+          setProductsPurchaseOrder(data.purchaseOrder.products)
+        }
 
         setOpenBackDrop(false)
       }, 1300)

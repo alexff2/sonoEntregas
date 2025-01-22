@@ -104,7 +104,7 @@ module.exports = {
     AND ROUND(A.VALORBRUTO - D.VALOR_CHEGADA, 2) <> 0
     GROUP BY A.CODIGOPEDIDO, A.EMISSAO, A.VALORBRUTO, A.FACTORY_DATA, A.OBSERVACAO, C.NOME, D.VALOR_CHEGADA`
   },
-  updateValues(id) {
+  updateTotalValues(id) {
     return `
     UPDATE PEDFOR SET VALORPED = B.TOTAL, VALORBRUTO = B.TOTAL
     FROM PEDFOR A
@@ -114,5 +114,23 @@ module.exports = {
       GROUP BY NUMPEDIDO) B
       ON A.CODIGOPEDIDO = B.NUMPEDIDO
     WHERE A.CODIGOPEDIDO = ${id}`
+  },
+  setProductValues(id) {
+    return `
+    UPDATE PEDFORI SET VLUNITARIO = B.PCO_COMPRA, VLTOTAL = A.QUANTIDADE * B.PCO_COMPRA,
+    VALOR_UNIT_LIQ = B.PCO_COMPRA, VALOR_TOTAL_LIQ = A.QUANTIDADE * B.PCO_COMPRA
+    FROM PEDFORI A
+    INNER JOIN PRODLOJAS B ON A.CODPRODUTO = B.CODIGO
+    WHERE B.CODLOJA = 1
+    AND A.NUMPEDIDO =  ${id}`
+  },
+  resetProductValues(id) {
+    return `UPDATE PEDFORI SET VLUNITARIO = 0, VLTOTAL = 0, VALOR_UNIT_LIQ = 0, VALOR_TOTAL_LIQ = 0 WHERE NUMPEDIDO = ${id}`
+  },
+  setValueSingleProduct(id, item, value) {
+    return `
+    UPDATE PEDFORI SET VLUNITARIO = ${value}, VLTOTAL = QUANTIDADE * ${value},
+    VALOR_UNIT_LIQ = ${value}, VALOR_TOTAL_LIQ = QUANTIDADE * ${value}
+    WHERE NUMPEDIDO = ${id} AND ITEM = ${item}`
   }
 }

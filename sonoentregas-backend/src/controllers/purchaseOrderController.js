@@ -143,7 +143,7 @@ module.exports = {
         connection: { sequelize, transaction }
       })
 
-      await PurchaseOrderService.updateValues(id, { sequelize, transaction })
+      await PurchaseOrderService.updateTotalValues(id, { sequelize, transaction })
 
       await transaction.commit()
       return response.status(201).json({ itemId })
@@ -164,7 +164,7 @@ module.exports = {
 
       await PurchaseOrderService.rmvProduct({ id, item }, { sequelize, transaction })
 
-      await PurchaseOrderService.updateValues(id, { sequelize, transaction })
+      await PurchaseOrderService.updateTotalValues(id, { sequelize, transaction })
 
       await transaction.commit()
       return response.status(200).json('')
@@ -190,7 +190,7 @@ module.exports = {
         quantity
       }, { sequelize, transaction })
 
-      await PurchaseOrderService.updateValues(id, { sequelize, transaction })
+      await PurchaseOrderService.updateTotalValues(id, { sequelize, transaction })
 
       await transaction.commit()
       return response.status(200).json('')
