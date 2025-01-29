@@ -1,0 +1,25 @@
+{
+  "devDependencies": {
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "^19.6.0",
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0",
+    "husky": "^8.0.0"
+  },
+  "scripts": {
+    "prepare": "husky install",
+    "test": "echo 'No tests yet' && exit 0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "name": "sonoentregas",
+  "description": "Projeto de backend com express e dois frontend usando react e electron",
+  "version": "1.0.0",
+  "main": "commitlint.config.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
