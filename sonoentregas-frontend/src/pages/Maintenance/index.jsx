@@ -4,22 +4,12 @@ import TabSendMain from './TabSendMain'
 import TabSearchMain from './TabSearchMain'
 import Visit from './Visit'
 
-import { useAuthenticate } from '../../context/authContext'
-
 export default function Vendas(){
-  const [ userMaster, setUserMas ] = useState(false)
   const [ tabs, setTabs ] = useState({
     tab1: true,
     tab2: false,
     tab3: false,
   })
-  const { userAuth } = useAuthenticate()
-
-  const { OFFICE } =  userAuth
-
-  useEffect(() => {
-    setUserMas((OFFICE === 'Dev' || OFFICE === 'Master'))
-  }, [OFFICE])
 
   const openTab = (tab, e) => {
     // Change style buttons
@@ -56,12 +46,11 @@ export default function Vendas(){
           type="button"
           onClick={e => openTab('tab2', e)} />
 
-        { userMaster &&
-          <input
-            className="tablinks"
-            value="VISITA"
-            type="button"
-            onClick={e => openTab('tab3', e)} /> }
+        <input
+          className="tablinks"
+          value="VISITA"
+          type="button"
+          onClick={e => openTab('tab3', e)} />
       </div>
       
       <div className="tab-body body-container">
