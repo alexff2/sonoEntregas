@@ -78,7 +78,7 @@ class PurchaseOrderService {
     if (field === 'type') {
       value === 'normal'
         ? await DB._query(1, scriptPurchaseOrder.setProductValues(id), QueryTypes.UPDATE, connection)
-        : await DB._query(1, scriptPurchaseOrder.resetProductValues(id), QueryTypes.UPDATE, connection)
+        : await DB._query(1, scriptPurchaseOrder.setProductMaintenanceValues(id), QueryTypes.UPDATE, connection)
 
       value = value === 'normal' ? 'CIF' : 'FOB'
 

@@ -124,8 +124,14 @@ module.exports = {
     WHERE B.CODLOJA = 1
     AND A.NUMPEDIDO =  ${id}`
   },
-  resetProductValues(id) {
-    return `UPDATE PEDFORI SET VLUNITARIO = 0, VLTOTAL = 0, VALOR_UNIT_LIQ = 0, VALOR_TOTAL_LIQ = 0 WHERE NUMPEDIDO = ${id}`
+  setProductMaintenanceValues(id) {
+    return `
+    UPDATE PEDFORI SET VLUNITARIO = B.PCO_AREMAR, VLTOTAL = A.QUANTIDADE * B.PCO_AREMAR,
+    VALOR_UNIT_LIQ = B.PCO_AREMAR, VALOR_TOTAL_LIQ = A.QUANTIDADE * B.PCO_AREMAR
+    FROM PEDFORI A
+    INNER JOIN PRODLOJAS B ON A.CODPRODUTO = B.CODIGO
+    WHERE B.CODLOJA = 1
+    AND A.NUMPEDIDO =  ${id}`
   },
   setValueSingleProduct(id, item, value) {
     return `
