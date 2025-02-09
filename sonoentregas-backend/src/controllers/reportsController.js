@@ -291,24 +291,34 @@ module.exports = {
 
       const shopSelected = await ShopSceService.findByShop(shop)
       const revenues = await DreService.revenues({ shop, dateStart, dateEnd })
-      const variableExpenses = await DreService.variableExpenses({ shop, dateStart, dateEnd, totRevenues: revenues.total })
-      const fixedExpenses = await DreService.FixedExpenses({ shop, dateStart, dateEnd, totRevenues: revenues.total })
+      const variableExpenses = await DreService.variableExpenses({
+        shop,
+        dateStart,
+        dateEnd,
+        totRevenues: revenues.grossRevenue.value,
+      })
+      const fixedExpenses = await DreService.FixedExpenses({
+        shop,
+        dateStart,
+        dateEnd,
+        totRevenues: revenues.grossRevenue.value
+      })
       const financialSummary = await DreService.financialSummary({ shop, dateStart, dateEnd })
       const currentStock = await DreService.currentStock({ shop })
 
       const grossContributionMargin = {
-        value: revenues.total - variableExpenses.total.value,
-        percent: ((revenues.total - variableExpenses.total.value) / revenues.total) * 100
+        value: revenues.grossRevenue.value - variableExpenses.total.value,
+        percent: ((revenues.grossRevenue.value - variableExpenses.total.value) / revenues.grossRevenue.value) * 100
       }
 
       const netResult = {
         value: grossContributionMargin.value - fixedExpenses.total.value - revenues.salesReturns.value,
-        percent: ((grossContributionMargin.value - fixedExpenses.total.value - revenues.salesReturns.value) / revenues.total) * 100
+        percent: ((grossContributionMargin.value - fixedExpenses.total.value - revenues.salesReturns.value) / revenues.grossRevenue.value) * 100
       }
 
       const balancePoint = {
         value: (fixedExpenses.total.value / grossContributionMargin.percent) * 100,
-        percent: (((fixedExpenses.total.value / grossContributionMargin.percent) * 100) / revenues.total) * 100
+        percent: (((fixedExpenses.total.value / grossContributionMargin.percent) * 100) / revenues.grossRevenue.value) * 100
       }
 
       return res.json({

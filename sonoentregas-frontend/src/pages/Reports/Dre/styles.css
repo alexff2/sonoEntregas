@@ -67,6 +67,14 @@
   background-color: rgb(230, 231, 233);
 }
 
+.tablesInDre .trHeader.titleDre td {
+  color: #12aa52;
+}
+
+.tablesInDre .trFoot th {
+  color: #12aa52;
+}
+
 .tablesInDre .trFoot th:first-child {
   border-radius:  0 0 0 0.5rem;
 }

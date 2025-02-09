@@ -3,7 +3,7 @@ const ViewVenda = require('../models/ViewVendas')
 
 class DreService {
   async revenues({ shop, dateStart, dateEnd }) {
-    const script = `
+    const scriptGrossRevenues = `
     SELECT SUM(N.VALOR) value, N.SITUACAO id, N.NOMEPAGTO name FROM VIEW_OS_VENDA_FATURADA N 
     WHERE N.EMISSAO BETWEEN '${dateStart}' AND '${dateEnd}'
     GROUP BY N.SITUACAO, N.NOMEPAGTO
@@ -15,36 +15,44 @@ class DreService {
     WHERE DATA BETWEEN '${dateStart}' AND '${dateEnd}'
     `
 
-    const scriptCost = `
+    const scriptCostReturns = `
     SELECT SUM(A.QUANTIDADE_DEVOLVIDA * C.PCO_COMPRA) cost
     FROM ITENS_DEVOLUCAO A
     INNER JOIN DEVOLUCAO B ON A.CODDEVOLUCAO = B.CODIGO
     INNER JOIN NVENDI2 C ON C.NUMVENDA = A.CODVENDA AND C.CODPRODUTO = A.CODPRODUTO
     WHERE A.QUANTIDADE_DEVOLVIDA > 0
-    AND B.DATA BETWEEN '${dateStart}' AND '${dateEnd}'
-    `
+    AND B.DATA BETWEEN '${dateStart}' AND '${dateEnd}'`
 
-    const resultReturns = await ViewVenda._query(shop, scriptReturns, QueryTypes.SELECT)
+    const totalReturns = await ViewVenda._query(shop, scriptReturns, QueryTypes.SELECT)
 
-    const resultCost = await ViewVenda._query(shop, scriptCost, QueryTypes.SELECT)
+    const costReturns = await ViewVenda._query(shop, scriptCostReturns, QueryTypes.SELECT)
 
-    const revenues = await ViewVenda._query(shop, script, QueryTypes.SELECT)
+    const grossRevenues = await ViewVenda._query(shop, scriptGrossRevenues, QueryTypes.SELECT)
 
-    const total = revenues.reduce((acc, cur) => acc + cur.value, 0)
+    const grossRevenue = {
+      value: grossRevenues.reduce((acc, cur) => acc + cur.value, 0),
+      percent: 100
+    }
 
-    revenues.forEach(revenue => {
-      revenue.percent = (revenue.value / total) * 100
+    const salesReturns = {
+      value: totalReturns[0].value - costReturns[0].cost,
+      percent: ((totalReturns[0].value - costReturns[0].cost) / grossRevenue.value) * 100,
+    }
+
+    const netRevenue = {
+      value: grossRevenue.value - salesReturns.value,
+      percent: (grossRevenue.value - salesReturns.value) / grossRevenue.value * 100
+    }
+
+    grossRevenues.forEach(revenue => {
+      revenue.percent = (revenue.value / grossRevenue.value) * 100
     })
 
-    const percentReturns = ((resultReturns[0].value - resultCost[0].cost) / total) * 100
-
     return { 
-      revenues,
-      total,
-      salesReturns: {
-        value: resultReturns[0].value - resultCost[0].cost,
-        percent: percentReturns,
-      }
+      grossRevenues,
+      grossRevenue,
+      salesReturns,
+      netRevenue
     }
   }
   async variableExpenses({ shop, dateStart, dateEnd, totRevenues }) {
