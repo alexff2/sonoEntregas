@@ -52,7 +52,7 @@ class PurchaseNoteService {
 
   async findToBeep(id) {
     const script = `
-    SELECT B.CODIGO id, B.APLICACAO mask, B.NOME [nameFull], A.QUANTIDADE quantity,
+    SELECT B.CODIGO id, B.ORIGINAL originalId, B.APLICACAO mask, B.NOME [nameFull], A.QUANTIDADE quantity,
     ISNULL(C.quantityBeep, 0) quantityBeep, A.NUM_DOC moduleId, B.SUBG subGroupId, 
     A.QUANTIDADE - ISNULL(C.quantityBeep, 0) quantityPedding
     FROM (

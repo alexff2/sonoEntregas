@@ -43,6 +43,7 @@ export function Header({
 
   useEffect(() => {
     document.getElementById('beep').focus()
+    console.log(products)
   }, [])
 
   const beepProduct = async () => {
@@ -67,7 +68,7 @@ export function Header({
 
       products.forEach(group => {
         group.products.forEach(product => {
-          if (product.id === Number(id)) {
+          if (product.originalId === id) {
             productSelectedToSend = product
             setProductSelected(product)
           }
