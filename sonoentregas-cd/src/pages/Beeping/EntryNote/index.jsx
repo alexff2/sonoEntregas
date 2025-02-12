@@ -4,6 +4,10 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
   TextField
 } from '@material-ui/core'
 
@@ -17,6 +21,7 @@ export default function EntryNote({handleRenderBox}) {
   const [openSearch, setOpenSearch] = useState(true)
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(false)
+  const [beepId, setBeepId] = useState(true)
   const [productSelected, setProductSelected] = useState(null)
   const [products, setProducts] = useState([])
   const { setAlertSnackbar } = useAlertSnackbar()
@@ -60,6 +65,10 @@ export default function EntryNote({handleRenderBox}) {
     }
   }
 
+  const handleChangeRadioTypeBeep = e => {
+    setBeepId(e.target.value === '1' ? true : false)
+  }
+
   return (
     <React.Fragment>
       {
@@ -68,17 +77,21 @@ export default function EntryNote({handleRenderBox}) {
           <BeepReading.Header
             title={`BEEP DA NOTA DE ENTRADA Nº: ${search}`}
             productSelected={productSelected}
+            setProductSelected={setProductSelected}
             module={{
               name: 'purchaseNote',
-              type: 'C'
+              type: 'C',
+              beepId
             }}
             setProducts={setProducts}
+            products={products}
           />
 
           <BeepReading.Products
             data={products}
             productSelected={productSelected}
             setProductSelected={setProductSelected}
+            beepId={beepId}
           />
 
           <BeepReading.Footer handleRenderBox={handleRenderBox} />
@@ -88,12 +101,45 @@ export default function EntryNote({handleRenderBox}) {
       <Dialog open={openSearch} onClose={handleCloseSearch}>
         <DialogTitle>Digite o número da nota</DialogTitle>
         <DialogContent>
+          <FormControl component='fieldset' fullWidth>
+            <RadioGroup
+              style={{
+                flexDirection: 'row',
+                width: '100%',
+                justifyContent: 'space-between',
+                marginBottom: 20,
+                border: 'solid 1px var(--gray-bold)',
+                borderRadius: 5,
+                padding: 10
+              }}
+              value={beepId ? '1' : '0'}
+              onChange={handleChangeRadioTypeBeep}
+            >
+              <FormControlLabel
+                value='1'
+                control={<Radio id='type1'/>}
+                label='Novo'
+                style={{
+                  marginLeft: 0
+                }}
+              />
+              <FormControlLabel
+                value='0'
+                control={<Radio id='type1'/>}
+                label='Antigo'
+                style={{
+                  marginLeft: 0
+                }}
+              />
+            </RadioGroup>
+          </FormControl>
           <TextField
             id='searchId'
             placeholder='Digite aqui...'
             autoComplete='off'
             onChange={e => setSearch(e.target.value)}
             onKeyDown={e =>  e.key === 'Enter' && handleSearch()}
+            fullWidth
           />
         </DialogContent>
         <DialogActions>

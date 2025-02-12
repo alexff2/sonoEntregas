@@ -31,12 +31,13 @@ const useStyle = makeStyles(theme =>({
 export function Products({
   data,
   productSelected,
-  setProductSelected
+  setProductSelected,
+  beepId
 }) {
   const classes = useStyle()
 
   const handleClickProduct = prod => {
-    if (prod.quantityPedding > 0) {
+    if (prod.quantityPedding > 0 && !beepId) {
       setProductSelected(prod)
       setTimeout(() => {
         document.getElementById('beep').focus()
@@ -69,7 +70,7 @@ export function Products({
                     onClick={() => handleClickProduct(prod)}
                   >
                     {
-                      prod.quantityPedding > 0 ?
+                      (prod.quantityPedding > 0 && !beepId) ?
                         <Checkbox
                           inputProps={{ 'aria-label': 'primary checkbox' }}
                           checked={(!!productSelected && productSelected.id === prod.id)}

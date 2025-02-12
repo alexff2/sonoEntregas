@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Box,
   InputBase,
@@ -21,7 +21,7 @@ const useStyle = makeStyles(theme =>({
     background: 'white',
     borderRadius: 4,
     marginBottom: 8,
-    paddingLeft: 8
+    paddingLeft: 8,
   },
   textHeader: {
     color: 'white',
@@ -30,8 +30,10 @@ const useStyle = makeStyles(theme =>({
 
 export function Header({
   productSelected,
+  setProductSelected,
   title,
   module,
+  products,
   setProducts,
   isReturn
 }) {
@@ -39,25 +41,61 @@ export function Header({
   const classes = useStyle()
   const { setAlertSnackbar } = useAlertSnackbar()
 
+  useEffect(() => {
+    document.getElementById('beep').focus()
+  }, [])
+
   const beepProduct = async () => {
-    if (productSelected.quantityPedding === 0) {
+    if (productSelected?.quantityPedding === 0) {
       return
+    }
+
+    let productSelectedToSend, serie
+
+    if (!!module.beepId) {
+      const beep = serialNumber
+
+      const [id, serieString] = beep.split(' ')
+
+      if (serieString === '' || beep.split(' ').length === 1) {
+        setAlertSnackbar('Número inválido!')
+
+        return
+      }
+
+      serie = serieString
+
+      products.forEach(group => {
+        group.products.forEach(product => {
+          if (product.id === Number(id)) {
+            productSelectedToSend = product
+            setProductSelected(product)
+          }
+        })
+      })
+
+      if (!productSelectedToSend) {
+        setAlertSnackbar('Produto não encontrado! Verifique ID vinculado no cadastro do produto!')
+        return
+      }
+    } else {
+      productSelectedToSend = productSelected
     }
 
     try {
       if (module.type === 'C') {
         await api.post('serial/first', {
-          serialNumber,
-          productId: productSelected.id,
-          module: module.name === 'delivery' ? productSelected.module : module.name,
-          moduleId: productSelected.moduleId
+          serialNumber: !!module.beepId ? serie : serialNumber,
+          productId: productSelectedToSend.id,
+          module: module.name === 'delivery' ? productSelectedToSend.module : module.name,
+          moduleId: productSelectedToSend.moduleId
         })
       } else {
         await api.put('serial/finished', {
-          serialNumber,
-          productId: productSelected.id,
-          module: module.name === 'delivery' ? productSelected.module : module.name,
-          moduleId: productSelected.moduleId
+          serialNumber: !!module.beepId ? serie : serialNumber,
+          productId: productSelectedToSend.id,
+          module: module.name === 'delivery' ? productSelectedToSend.module : module.name,
+          moduleId: productSelectedToSend.moduleId
         })
       }
 
@@ -67,18 +105,18 @@ export function Header({
             ...productGroup,
             products: productGroup.products.map(product => {
               if(product.module) {
-                if (product.id === productSelected.id && product.module === productSelected.module) {
-                  productSelected.quantityPedding -= 1
-                  productSelected.quantityBeep += 1
+                if (product.id === productSelectedToSend.id && product.module === productSelectedToSend.module) {
+                  productSelectedToSend.quantityPedding -= 1
+                  productSelectedToSend.quantityBeep += 1
   
-                  return productSelected
+                  return productSelectedToSend
                 }
               } else {
-                if (product.id === productSelected.id) {
-                  productSelected.quantityPedding -= 1
-                  productSelected.quantityBeep += 1
+                if (product.id === productSelectedToSend.id) {
+                  productSelectedToSend.quantityPedding -= 1
+                  productSelectedToSend.quantityBeep += 1
   
-                  return productSelected
+                  return productSelectedToSend
                 }
               }
     
@@ -88,6 +126,8 @@ export function Header({
         })
       })
       setSerialNumber('')
+
+      module.beepId && document.getElementById('beep').focus()
     } catch (error) {
       setSerialNumber('')
       console.log(error)
@@ -107,7 +147,7 @@ export function Header({
   }
 
   const changeSerialInputSerialNumber = e => {
-    if (productSelected.quantityPedding > 0) {
+    if (productSelected?.quantityPedding > 0 || !!module.beepId) {
       setSerialNumber(e.target.value)
     }
   }
@@ -120,7 +160,7 @@ export function Header({
         autoComplete='off'
         onKeyDown={e => e.key === 'Enter' && beepProduct()}
         value={serialNumber}
-        disabled={!productSelected}
+        disabled={!productSelected && !module.beepId}
         onChange={changeSerialInputSerialNumber}
       />
 

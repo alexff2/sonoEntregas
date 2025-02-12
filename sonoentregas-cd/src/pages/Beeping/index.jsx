@@ -29,7 +29,10 @@ const BoxBeep = ({ children, ...props }) => {
     component={Paper}
     style={{
       padding: 40,
-      boxShadow: '0px 3.21306px 5.3551px rgba(0, 0, 0, 0.2), 0px 1.07102px 19.2783px rgba(0, 0, 0, 0.12), 0px 6.42612px 10.7102px rgba(0, 0, 0, 0.14)',
+      boxShadow: `
+        0px 3.21306px 5.3551px rgba(0, 0, 0, 0.2),
+        0px 1.07102px 19.2783px rgba(0, 0, 0, 0.12),
+        0px 6.42612px 10.7102px rgba(0, 0, 0, 0.14)`,
       marginBottom: 10
     }}
   >
