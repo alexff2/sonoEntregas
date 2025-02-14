@@ -1,4 +1,5 @@
 const errorCath = require("../functions/error")
+const PurchaseNoteModel = require("../models/tables/PurchaseNote")
 const PurchaseNoteService = require("../services/PurchaseNoteService")
 
 module.exports = {
@@ -49,6 +50,26 @@ module.exports = {
 
       return response.json({products})
     } catch (error) {
+      errorCath(error, response)
+    }
+  },
+  async updateId(request, response) {
+    const { sequelize, transaction } = await PurchaseNoteModel._query(1)
+    try {
+      const { id } = request.params
+      const { newId } = request.body
+
+      await PurchaseNoteService.updateId({
+        newId,
+        oldId: id,
+        t: { sequelize, transaction }
+      })
+
+      await transaction.commit()
+      return response.json('updated')
+    } catch (error) {
+      await transaction.rollback()
+
       errorCath(error, response)
     }
   }

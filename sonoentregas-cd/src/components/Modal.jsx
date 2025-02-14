@@ -10,6 +10,9 @@ const useStyles = makeStyles( theme => ({
       '& *': {
         fontSize: '10px',
         padding: 4
+      },
+      '& h2': {
+        textAlign: 'center'
       }
     }
   },
@@ -57,7 +60,8 @@ export default function TransitionsModal({ open, setOpen, title, children }) {
     >
       <Fade in={open}>
         <div className={title ? classes.paper1 : classes.paper2}>
-          {title ? <h2 id="transition-modal-title">{title}</h2>:null}
+          { title && <h2 id="transition-modal-title">{title}</h2> }
+
           <div id="transition-modal-description" className={classes.modalContent}>
             {children}
           </div>

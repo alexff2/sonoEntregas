@@ -90,6 +90,23 @@ class PurchaseNoteService {
 
     return products
   }
+
+  async updateId({ newId, oldId, t }) {
+    const note = await PurchaseNoteModel.find({
+      loja: 1,
+      where: { NUM_DOC: newId }
+    })
+
+    if(note.length > 0) throw {
+      error: 'It already exists'
+    }
+
+    await PurchaseNoteModel.updateAny(1, {
+      NUM_DOC: newId
+    }, {
+      NUM_DOC: oldId
+    }, t)
+  }
 }
 
 module.exports = new PurchaseNoteService()

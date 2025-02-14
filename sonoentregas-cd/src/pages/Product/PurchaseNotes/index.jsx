@@ -14,17 +14,22 @@ import { Box,
   TableHead,
   TableRow
 } from '@material-ui/core'
-import { Search as SearchIcon } from '@material-ui/icons'
+import {
+  Search as SearchIcon,
+  Create
+} from '@material-ui/icons'
 
-import useStyles from '../style'
 import Modal from '../../../components/Modal'
+import ModalNotesProducts from './ModalNotesProducts'
+import UpdateId from './UpdateId'
+import useStyles from '../style'
 import { useAlertSnackbar } from '../../../context/alertSnackbarContext'
 import { useBackdrop } from '../../../context/backdropContext'
-import ModalNotesProducts from './ModalNotesProducts'
 import api from '../../../services/api'
 
 export default function PurchaseNotes() {
   const [ openModalNotesProducts, setOpenModalNotesProducts ] = useState(false)
+  const [ openModalUpdateId, setOpenModalUpdateId ] = useState(false)
   const [ noteSelected, setNoteSelected ] = useState()
   const [ search, setSearch ] = useState('')
   const [ typeSearch, setTypeSearch ] = useState('docNumber')
@@ -33,6 +38,14 @@ export default function PurchaseNotes() {
   const { setAlertSnackbar } = useAlertSnackbar()
   const { setOpenBackDrop } = useBackdrop()
   const classes = useStyles()
+
+  const changeId = e => {
+    if(typeSearch !== 'issue') {
+      if(isNaN(Number(e.target.value))) return
+    }
+
+    setSearch(e.target.value)
+  }
 
   const searchNoteEntry = async () => {
     setOpenBackDrop(true)
@@ -57,6 +70,11 @@ export default function PurchaseNotes() {
   const handleSelectNote = note => {
     setNoteSelected(note)
     setOpenModalNotesProducts(true)
+  }
+
+  const handleClickUpdateId = note => {
+    setNoteSelected(note)
+    setOpenModalUpdateId(true)
   }
 
   return (
@@ -88,7 +106,9 @@ export default function PurchaseNotes() {
               input: classes.inputInput,
             }}
             inputProps={{ 'aria-label': 'search' }}
-            onChange={e => setSearch(e.target.value)}
+            value={search}
+            onChange={changeId}
+            onKeyDown={e => e.key === 'Enter' && searchNoteEntry()}
           />
         </div>
 
@@ -105,6 +125,7 @@ export default function PurchaseNotes() {
               <TableCell align="right">Lançamento</TableCell>
               <TableCell align="right">Hora lançamento</TableCell>
               <TableCell align="right">R$ Total Nota</TableCell>
+              <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -119,6 +140,9 @@ export default function PurchaseNotes() {
                 <TableCell align="right">{note.release}</TableCell>
                 <TableCell align="right">{note.releaseTime}</TableCell>
                 <TableCell align="right">{note.value}</TableCell>
+                <TableCell>
+                  <Create onClick={() => handleClickUpdateId(note)}/>
+                </TableCell>
               </TableRow>
             ))
             }
@@ -135,6 +159,18 @@ export default function PurchaseNotes() {
           setOpen={setOpenModalNotesProducts}
           note={noteSelected}
           type={'view'}
+        />
+      </Modal>
+
+      <Modal
+        title='ATUALIZAR NÚMERO DA NOTA'
+        open={openModalUpdateId}
+        setOpen={setOpenModalUpdateId}
+      >
+        <UpdateId
+          setOpen={setOpenModalUpdateId}
+          noteSelected={noteSelected}
+          setPurchaseNotes={setPurchaseNotes}
         />
       </Modal>
     </Box>

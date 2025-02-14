@@ -22,12 +22,15 @@ const useStyle = makeStyles( theme => ({
   }
 }))
 
-export function ButtonSuccess({children, loading=false, ...other}) {
+export function ButtonSuccess({children, loading=false, stylesInComponent, ...other}) {
   const classes = useStyle()
   return(
     <Button
       className={classes.btnSuccess}
-      style={ loading ? {cursor: 'progress'}: {cursor: 'pointer'}}
+      style={{
+        cursor: loading ? 'progress' : 'pointer',
+        ...stylesInComponent
+      }}
       disabled={loading ? true : false}
       {...other}
     >

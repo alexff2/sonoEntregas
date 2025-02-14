@@ -76,6 +76,7 @@ routes.put('/users/:userId', usersController.update)
   routes.get('/purchase/notes', purchaseNoteController.find)
   routes.get('/purchase/note/:id/products', purchaseNoteController.findProducts)
   routes.get('/purchase/note/:id/beep', purchaseNoteController.findToBeep)
+  routes.put('/purchase/notes/:id', purchaseNoteController.updateId)
   // Transfer
   routes.get('/transfer', transferController.find)
   routes.get('/transfer/:id/beep', transferController.findToBeep)
