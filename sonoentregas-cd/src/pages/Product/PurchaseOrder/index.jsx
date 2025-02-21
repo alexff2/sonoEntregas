@@ -17,9 +17,10 @@ import { Box,
   TableHead,
   TableRow
 } from '@material-ui/core'
-import { Search as SearchIcon, Add } from '@material-ui/icons'
+import { Search as SearchIcon, Add, Print } from '@material-ui/icons'
 
 import Modal from '../../../components/Modal'
+import Reports from '../../../components/Reports'
 import CreateUpdatePurchaseOrder from './CreateUpdatePurchaseOrder'
 import PurchaseOderProducts from './PurchaseOrderProducts'
 import { useAlertSnackbar } from '../../../context/alertSnackbarContext'
@@ -27,6 +28,7 @@ import { useBackdrop } from '../../../context/backdropContext'
 import { debounce } from '../../../functions/debounce'
 import api from '../../../services/api'
 import useStyles from '../style'
+import PurchaseOrderReport from './PurchaseOrderReport'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />
@@ -35,6 +37,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export default function PurchaseOrder() {
   const [openPurchaseOrderProducts, setOpenPurchaseOrderProducts] = useState(false)
   const [openPurchaseCreateUpdate, setOpenPurchaseCreateUpdate] = useState(false)
+  const [openPurchaseReport, setOpenPurchaseReport] = useState(false)
   const [openChangeFactoryData, setOpenChangeFactoryData] = useState(false)
   const [purchaseOrderSelected, setPurchaseOrderSelected] = useState()
   const [search, setSearch] = useState('')
@@ -177,6 +180,7 @@ export default function PurchaseOrder() {
               <TableCell align="right">Dados Fab.</TableCell>
               <TableCell align="right">R$ Total</TableCell>
               <TableCell align="right">Nº da nota</TableCell>
+              <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -224,6 +228,12 @@ export default function PurchaseOrder() {
                 </TableCell>
                 <TableCell align="right">{purchaseOrder.value}</TableCell>
                 <TableCell align="right">{purchaseOrder.noteNumber}</TableCell>
+                <TableCell align="right">
+                  <Print onClick={() => {
+                    setOpenPurchaseReport(true)
+                    setPurchaseOrderSelected(purchaseOrder)
+                  }}/>
+                </TableCell>
               </TableRow>
             ))
             }
@@ -286,6 +296,14 @@ export default function PurchaseOrder() {
           />
         </Dialog>
       }
+
+      <Reports
+        openModal={openPurchaseReport}
+        setOpenModal={setOpenPurchaseReport}
+        save={'Pedido Nº: '+purchaseOrderSelected?.id}
+      >
+        <PurchaseOrderReport purchaseOrder={purchaseOrderSelected}/>
+      </Reports>
     </Box>
   )
 }
