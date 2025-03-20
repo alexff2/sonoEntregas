@@ -37,6 +37,7 @@ class ReturnService {
     })
 
     const isSendReturn = await ReturnsModel.findAny(0, {
+      shopId,
       in: {
         originalReturnId: salesReturns.map(sale => sale.originalReturnId)
       }

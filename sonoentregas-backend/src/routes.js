@@ -184,6 +184,7 @@ routes.post('/promotion', ensureAuthenticated, promotionController.create)
 routes.post('/synchronize', ensureAuthenticated, syncController.synchronize)
 //Developer 
 routes.get('/dev', devController.getTable)
+routes.get('/teste', devController.teste)
 routes.get('/dev/product/find/serials', devController.findProductsWithSerials)
 routes.delete('/dev/product/delete/serial', devController.deleteSerial)
 

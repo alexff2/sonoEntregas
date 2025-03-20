@@ -1,5 +1,6 @@
 const { QueryTypes } = require('sequelize')
 const Sequelize  = require('sequelize')
+const xlsx = require('xlsx');
 const Connections = require('../databases/MSSQL/connections/index')
 
 module.exports = {
@@ -77,6 +78,21 @@ module.exports = {
       )
 
       return res.json({message: 'Serial deleted'})
+    } catch (error) {
+      console.log(error)
+
+      throw new Error('Internal server error')
+    }
+  },
+  async teste(req, res) {
+    try {
+      const workbook = xlsx.readFile('C:\\Users\\USER-01\\Desktop\\notas_fab.xlsx');
+      const sheet_name = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheet_name];
+
+      const data = xlsx.utils.sheet_to_json(worksheet);
+
+      return res.json({data})
     } catch (error) {
       console.log(error)
 

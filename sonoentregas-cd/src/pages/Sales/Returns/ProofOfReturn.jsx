@@ -9,7 +9,7 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(3),
   },
   title: {
-    marginBottom: theme.spacing(2),
+    marginBottom: theme.spacing(0),
   },
   signature: {
     marginTop: theme.spacing(2),
@@ -42,16 +42,24 @@ const ProofOfReturn = ({ saleReturn }) => {
             <strong>Telefone</strong>: {saleReturn.phone}
           </Typography>
           <Divider />
-          <List style={{ height: '220px', overflow: 'auto' }}>
+          <div style={{padding: '8px 0'}}>
             {saleReturn.products.map((product, index) => (
-              <ListItem key={index}>
-                <ListItemText
-                  primary={product.name}
-                  secondary={`Quantidade: ${product.quantity}`}
-                />
-              </ListItem>
+              <div
+                key={index}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: 4
+                }}
+              >
+                <div style={{
+                  fontWeight: 'bold'
+                }}>{product.name}</div>
+                <div>{`Quantidade: ${product.quantity}`}</div>
+              </div>
             ))}
-          </List>
+          </div>
           <Divider />
           <div className={classes.signature}>
             <Typography variant="body1">
@@ -96,16 +104,24 @@ const ProofOfReturn = ({ saleReturn }) => {
             <strong>Telefone</strong>: {saleReturn.phone}
           </Typography>
           <Divider />
-          <List style={{ height: '220px', overflow: 'auto' }}>
+          <div style={{padding: '8px 0'}}>
             {saleReturn.products.map((product, index) => (
-              <ListItem key={index}>
-                <ListItemText
-                  primary={product.name}
-                  secondary={`Quantidade: ${product.quantity}`}
-                />
-              </ListItem>
+              <div
+                key={index}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: 4
+                }}
+              >
+                <div style={{
+                  fontWeight: 'bold'
+                }}>{product.name}</div>
+                <div>{`Quantidade: ${product.quantity}`}</div>
+              </div>
             ))}
-          </List>
+          </div>
           <Divider />
           <div className={classes.signature}>
             <Typography variant="body1">

@@ -73,7 +73,7 @@ module.exports = {
       if (month1 === -1) {
         month1 = 11
         script_month1 = `
-          SELECT A.COD_ORIGINAL, B.NOME, SUM(A.QTD_DELIV) QTD_MES1
+          SELECT A.COD_ORIGINAL, B.NOME, SUM(A.QUANTIDADE) QTD_MES1
           FROM SALES_PROD A
           INNER JOIN ${process.env.CD_BASE}..PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
           INNER JOIN SALES C ON A.CODLOJA = C.CODLOJA AND A.ID_SALES = C.ID_SALES

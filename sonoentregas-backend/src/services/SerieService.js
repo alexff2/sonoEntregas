@@ -122,7 +122,28 @@ class SerieService {
       },
       transaction
     )
-  } 
+  }
+
+  async changeInputModuleId({ oldModuleId, newModuleId, transaction }) {
+    const serialNumbers = await ProdLojaSeriesMovimentosModel.findAny(1, {
+      inputModuleId: oldModuleId,
+    }, 'serialNumber', transaction)
+
+    if (serialNumbers.length === 0) {
+      return
+    }
+
+    await ProdLojaSeriesMovimentosModel.updateAny(
+      1,
+      {
+        inputModuleId: newModuleId
+      },
+      {
+        inputModuleId: oldModuleId,
+      },
+      transaction
+    )
+  }
 }
 
 module.exports = new SerieService()

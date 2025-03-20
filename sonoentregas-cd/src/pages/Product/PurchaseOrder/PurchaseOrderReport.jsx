@@ -163,7 +163,7 @@ const PurchaseOrderReport = ({ purchaseOrder }) => {
         <div className={classes.footer}>
           <div className={classes.signLine}></div>
           <Typography className={classes.smallText}>CD SONO ARTE</Typography>
-          <Typography className={classes.smallText}>ELEN FRASAO</Typography>
+          <Typography className={classes.smallText}>{purchaseOrder.employeeName}</Typography>
         </div>
       </div>
     </div>

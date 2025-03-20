@@ -1,8 +1,8 @@
 
 const { QueryTypes } = require('sequelize')
-const Sequelize  = require('sequelize')
 
 const connections = require('../connections')
+const connectWithRetry = require('./connectWithRetry')
 
 class Model {
   constructor(tab, columns){
@@ -296,8 +296,20 @@ class Model {
 
   async _query(loja, script, type, t, log){
     log && console.log(script)
-    const connection = connections[loja]
-    const sequelize = new Sequelize(connection)
+    const connectionConfig = connections[loja]
+
+    if (!connectionConfig) {
+      throw new Error(`Configuração de conexão para ${loja} não encontrada.`);
+    }
+
+    let sequelize;
+
+    try {
+      sequelize = await connectWithRetry(connectionConfig)
+    } catch (error) {
+      console.error(`Erro crítico ao conectar ao banco ${loja}:`, error.message);
+      return null
+    }
 
     let results
 

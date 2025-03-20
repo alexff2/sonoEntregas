@@ -13,6 +13,7 @@
 const { QueryTypes } = require('sequelize')
 const PurchaseNoteModel = require('../models/tables/PurchaseNote')
 const scriptsPurchaseNoteProducts = require('../scripts/purchaseNote')
+const SerieService = require('../services/SerieService')
 const DateTime = require('../class/Date')
 const { decimalToCoin } = require('../functions/TransformCoin')
 
@@ -106,6 +107,12 @@ class PurchaseNoteService {
     }, {
       NUM_DOC: oldId
     }, t)
+
+    await SerieService.changeInputModuleId({
+      oldModuleId: oldId,
+      newModuleId: newId,
+      transaction: t
+    })
   }
 }
 

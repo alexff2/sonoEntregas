@@ -18,7 +18,7 @@ module.exports = {
     const ModelDefault = new Model('', '')
 
     const scriptReturn = findByIdDateName({
-      id: typeSearch === 'returnShopId' ? search : '',
+      originalSaleId: typeSearch === 'returnShopId' ? search : '',
       name: typeSearch === 'client' ? search : '',
       dateStart: typeSearch === 'dateStart' ? search.dateStart : '',
       dateFinish: typeSearch === 'dateFinish' ? search.dateFinish : '',
