@@ -1,5 +1,5 @@
 import React from 'react'
-import { Container, Typography, Paper, List, ListItem, ListItemText, Divider, Box } from '@material-ui/core'
+import { Container, Typography, Paper, Divider, Box } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn'
 import logo from '../../../img/SolftFlex.jpeg';
