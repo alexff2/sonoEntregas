@@ -162,6 +162,11 @@ export default function PurchaseOrder() {
             }}
             inputProps={{ 'aria-label': 'search' }}
             onChange={e => setSearch(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                searchPurchaseOrder()
+              }
+            }}
           />
         </div>
 

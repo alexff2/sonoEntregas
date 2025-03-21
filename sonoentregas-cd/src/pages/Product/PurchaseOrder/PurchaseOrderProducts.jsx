@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@material-ui/core'
 import api from '../../../services/api'
 
 const useStyles = makeStyles({
@@ -35,8 +35,9 @@ export default function PurchaseOrderProducts({
     <Paper className={classes.root}>
       <div className={classes.header}>
         <h3>Fornecedor: Maranhão Colhões</h3>
-        <p>Nº do pedido: {purchaseOrder.id}</p>
-        <p>Valor: {purchaseOrder.value}</p>
+        <Typography>Nº do pedido: {purchaseOrder.id}</Typography>
+        <Typography>Valor: {purchaseOrder.value}</Typography>
+        <Typography>Observação: {purchaseOrder.observation}</Typography>
       </div>
 
       <TableContainer className={classes.container}>

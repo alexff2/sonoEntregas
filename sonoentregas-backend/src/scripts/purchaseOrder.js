@@ -24,7 +24,7 @@ module.exports = {
 
     return script
   },
-  purchaseOrder({code, issue, open}){
+  purchaseOrder({code, issue}){
     return `
     SELECT CODIGOPEDIDO id, FORMAT(VALORPED, 'C', 'pt-br') value, COMPRADOR employeeId, CFOP [open],
     CASE WHEN B.NOME IS NULL THEN '' ELSE B.NOME END AS employeeName,
@@ -34,12 +34,14 @@ module.exports = {
     CONVERT(VARCHAR, EMISSAO, 23) issueToInput,
     CONVERT(VARCHAR, CREATE_AT, 103) release,
     CASE WHEN TIPO_PEDIDO = '1' THEN 'normal' ELSE 'bonus' END AS [type1],
-    CASE WHEN TIPOFRETE = 'CIF' THEN 'normal' ELSE 'maintenance' END AS [type]
+    CASE WHEN TIPOFRETE = 'CIF' THEN 'normal' ELSE 'maintenance' END AS [type],
+    C.NOME companyName, C.CGC companyCnpj, C.INSC companyIe, OBSERVACAO observation
     FROM PEDFOR A
     LEFT JOIN FUNCIONARIO B ON A.COMPRADOR = B.CODIGO
+    INNER JOIN EMPRESA C ON A.CODLOJA = C.CODIGO
     WHERE CODIGOPEDIDO = '${code}'
     OR EMISSAO = '${issue}'
-    OR CFOP = ${open ? 1 : 0}
+    OR CFOP = 1
     `
   },
   purchaseOrderProduct(idsPurchase, order){

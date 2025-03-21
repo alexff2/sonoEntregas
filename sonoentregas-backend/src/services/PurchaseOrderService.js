@@ -19,8 +19,8 @@ class PurchaseOrderService {
     return purchases
   }
 
-  async findByCodeOrIssueOrOpen({code = '', issue ='', open = true}, connection) {
-    const script = scriptPurchaseOrder.purchaseOrder({code, issue, open})
+  async findByCodeOrIssueOrOpen({code = '', issue =''}, connection) {
+    const script = scriptPurchaseOrder.purchaseOrder({code, issue})
 
     const purchaseOrder = await Produtos._query(1, script, QueryTypes.SELECT, connection)
 
