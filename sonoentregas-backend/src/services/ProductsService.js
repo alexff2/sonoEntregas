@@ -79,7 +79,7 @@ module.exports = {
   async findStock(typeSearch, search){
     const where = {
       maior: 'B.ESTOQUE > 0',
-      igual: 'B.ESTOQUE = 0',
+      igual: 'ISNULL(B.ESTOQUE, 0) = 0',
       generalCode: `A.ALTERNATI LIKE '${search}'`,
       name: `A.NOME LIKE '${search}%'`
     }

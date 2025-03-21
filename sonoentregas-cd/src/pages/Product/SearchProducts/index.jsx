@@ -91,9 +91,10 @@ export default function SearchProducts() {
             <TableRow className={classes.rowHeader}>
               <TableCell>Código</TableCell>
               <TableCell>Descrição</TableCell>
-              <TableCell align="right">Qtd. Total</TableCell>
-              <TableCell align="right">Qtd. Reservado</TableCell>
-              <TableCell align="right">Qtd. Disponível</TableCell>
+              <TableCell align="right">Qtd Kardex</TableCell>
+              <TableCell align="right">Qtd Bipada</TableCell>
+              <TableCell align="right">Qtd Reservado</TableCell>
+              <TableCell align="right">Qtd Disp. Loja</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -101,7 +102,8 @@ export default function SearchProducts() {
             <TableRow key={product.COD_ORIGINAL}>
               <TableCell>{product.COD_ORIGINAL}</TableCell>
               <TableCell>{product.NOME}</TableCell>
-              <TableCell align="right">{product.EST_LOJA}</TableCell>
+              <TableCell align="right">{product.EST_KARDEX}</TableCell>
+              <TableCell align="right">{product.EST_BEEP}</TableCell>
               <TableCell align="right">{product.EST_RESERVA}</TableCell>
               <TableCell align="right">{product.EST_DISPONIVEL}</TableCell>
             </TableRow>
