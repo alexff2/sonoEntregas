@@ -114,7 +114,7 @@ const useStyle = makeStyles(theme => ({
 }))
 
 export default function TableMain() {
-  const [search, setSearch] = useState()
+  const [search, setSearch] = useState('')
   const [typeSeach, setTypeSeach] = useState('STATUS')
   const [typesStatus, setTypesStatus] = useState('open')
   const [openModalMain, setOpenModalMain] = useState(false)
@@ -123,7 +123,7 @@ export default function TableMain() {
   const [openModalStart, setOpenModalStart] = useState(false)
   const [selectMain, setSelectMain] = useState({})
   const { maintenance, setMaintenance } = useMaintenance()
-  const { setChildrenModal, setOpen: setOpenAlert } = useAlert()
+  const { setAlert } = useAlert()
   const classes = useStyle()
 
   useEffect(() => {
@@ -152,26 +152,29 @@ export default function TableMain() {
         resp = await api.get(`maintenancedeliv`)
       } else  if (typeSeach === 'STATUS' && typesStatus === 'close'){
         resp = await api.get(`maintenancedeliv/${typesStatus}/${search}`)
-      }else {
+      } else {
         if (search !== '') {
+          if (typeSeach === 'ID_SALE') {
+            if (isNaN(parseInt(search))) {
+              setAlert('Digite apenas números!') 
+              return
+            }
+          }
           resp = await api.get(`maintenancedeliv/${typeSeach}/${search}`)
         } else {
-          setOpenAlert(true)
-          setChildrenModal('Preencha o campo de pesquisa!') 
+          setAlert('Preencha o campo de pesquisa!') 
           return
         }
       }
 
       if (resp.data.length === 0){
-        setOpenAlert(true)
-        setChildrenModal('Assistência(s) não encontrada(s)!') 
+        setAlert('Assistência(s) não encontrada(s)!') 
       } else {
         setMaintenance(resp.data)
       }
     } catch (e) {
       console.log(e)
-      setOpenAlert(true)
-      setChildrenModal("Erro ao comunicar com o Servidor")
+      setAlert("Erro ao comunicar com o Servidor")
       setMaintenance([])
     }
   }
@@ -189,7 +192,7 @@ export default function TableMain() {
             value={typeSeach}
           >
             <MenuItem value={'STATUS'}>STATUS</MenuItem>
-            <MenuItem value={'ID_SALE'}>Código</MenuItem>
+            <MenuItem value={'ID_SALE'}>DAV</MenuItem>
             <MenuItem value={'NOMECLI'}>Cliente</MenuItem>
           </Select>
         </FormControl>
