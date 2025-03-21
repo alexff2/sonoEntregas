@@ -20,7 +20,12 @@ function SetEstoque({ product }) {
   <>
     {product.CD
       ? <>  
-          <td>{product.CD.EST_BEEP}</td>
+          <td>
+            { process.env.REACT_APP_STOCK_BEEP === '1'
+                ? product.CD.EST_BEEP
+                : product.CD.EST_KARDEX
+            }
+          </td>
           <td>{product.CD.EST_DISPONIVEL}</td>
           <td>
             { !product.STATUS
