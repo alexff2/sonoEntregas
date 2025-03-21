@@ -21,13 +21,11 @@ const useStyles = makeStyles((theme) => ({
     position: 'relative',
     height: '100%',
   },
-  header: {
-    marginBottom: theme.spacing(2),
-  },
   companyInfo: {
-    marginBottom: theme.spacing(2),
+    marginBottom: theme.spacing(1),
   },
   infoBlock: {
+    marginTop: theme.spacing(0),
     marginBottom: theme.spacing(0),
   },
   table: {
@@ -73,21 +71,33 @@ const PurchaseOrderReport = ({ purchaseOrder }) => {
 
   const paginatedProducts = splitReportTable(purchaseOrderProducts, 34, 34)
 
+  const currentDateTime = new Date().toLocaleString('pt-BR', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  })
+
   return (
     <> 
       {paginatedProducts.map((products, index) => (
         <div key={index} className="report">
           <div className={classes.root}>
             {/* Company Header */}
-            <div className={classes.header}>
+            <div>
               <Box display="flex" alignItems="center" justifyContent="space-between">
                 <Typography variant="h6">{purchaseOrder.companyName}</Typography>
-                <Typography>Pag. {index+1}</Typography>
+                <Typography className={classes.smallText}>
+                  Pagina {index+1} de {paginatedProducts.length}
+                </Typography>
               </Box>
               <div className={classes.companyInfo}>
-                <Typography className={classes.smallText}>
-                  CNPJ: {purchaseOrder.companyCnpj} &nbsp; IE: {purchaseOrder.companyIe}
-                </Typography>
+                <Box display="flex" alignItems="center" justifyContent="space-between">
+                  <Typography className={classes.smallText}>
+                    CNPJ: {purchaseOrder.companyCnpj} &nbsp; IE: {purchaseOrder.companyIe}
+                  </Typography>
+                  <Typography className={classes.smallText}>
+                    {currentDateTime}
+                  </Typography>
+                </Box>
                 <Typography className={classes.smallText}>
                   AV 4, QD D, LOTE 3, SN DIST. INDUST, SAO LUIS - MA
                 </Typography>
@@ -166,7 +176,7 @@ const PurchaseOrderReport = ({ purchaseOrder }) => {
             </Table>
 
             <Box className={classes.footer}>
-              Pag. {index+1}
+              Pagina {index+1} de {paginatedProducts.length}
             </Box>
           </div>
         </div>
