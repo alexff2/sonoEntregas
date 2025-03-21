@@ -358,6 +358,7 @@ module.exports = {
 
       const deliveryCd = {
         'SONO' :'CD São Luís',
+        'SONO_CD_CO' :'CD Cidade Operária',
         'SONO_CD_PIAUI' :'CD Piauí',
         'SONO_CD_PARA' :'CD Para',
       }

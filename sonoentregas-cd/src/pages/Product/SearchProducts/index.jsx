@@ -22,6 +22,7 @@ import { useAlertSnackbar } from '../../../context/alertSnackbarContext'
 import useStyles from '../style'
 
 import api from '../../../services/api'
+import { useBackdrop } from "../../../context/backdropContext"
 
 export default function SearchProducts() {
   const [ products, setProducts ] = useState([])
@@ -29,23 +30,30 @@ export default function SearchProducts() {
   const [ typeSearch, setTypeSearch ] = useState('NOME')
   const classes = useStyles()
   const { setAlertSnackbar } = useAlertSnackbar()
+  const { setOpenBackDrop } = useBackdrop()
   
   const searchProduct = async () => {
     try {
-      if (search !== '') {
-        const { data } = await api.get('products', {
-          params: {
-            search,
-            typeSearch
-          }
-        })
-        setProducts(data)
-      } else {
-        setProducts([])
+      if (search === '' || search === undefined) {
+        setAlertSnackbar('Campo de pesquisa vazio')
+        return
       }
+
+      setOpenBackDrop(true)
+
+      const { data } = await api.get('products', {
+        params: {
+          search,
+          typeSearch
+        }
+      })
+
+      setOpenBackDrop(false)
+      setProducts(data)
     } catch (e) {
       setAlertSnackbar(e)
       setProducts([])
+      setOpenBackDrop(false)
     }
   }
 
