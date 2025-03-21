@@ -55,7 +55,7 @@ const PageReport = ({ products, lastPage, result, classe, pageNumber, months }) 
               'M.TRI',
               'M.SEM',
               'PEND.',
-              'EST/ASS',
+              'ESTOQUE',
               'PED',
               'COMP'
             ].map((th, i) => (
@@ -75,7 +75,7 @@ const PageReport = ({ products, lastPage, result, classe, pageNumber, months }) 
               <TableCell>{product.MedMen}</TableCell>
               <TableCell>{product.MedSem}</TableCell>
               <TableCell>{product.PENDENTE}</TableCell>
-              <TableCell>{product.EST_LOJA} / {product.EST_DEPOSITO}</TableCell>
+              <TableCell>{product.EST_LOJA}</TableCell>
               <TableCell>{product.PEDIDO}</TableCell>
               <TableCell>
                 {product.Result}
@@ -199,7 +199,6 @@ export default function OrderSuggestion() {
     result.valueMonth3 += productsFilter[i].QTD_MES3
     result.valuePend += productsFilter[i].PENDENTE
     result.valueEstLoja += productsFilter[i].EST_LOJA
-    result.valueEstDep += productsFilter[i].EST_DEPOSITO
     result.valuePed += productsFilter[i].PEDIDO
     productsFilter[i]['Tot'] = productsFilter[i].QTD_MES1 + productsFilter[i].QTD_MES2 + productsFilter[i].QTD_MES3
     productsFilter[i]['MedMen'] = Math.floor((productsFilter[i].QTD_MES1 + productsFilter[i].QTD_MES2 + productsFilter[i].QTD_MES3) / 3)
@@ -257,7 +256,7 @@ export default function OrderSuggestion() {
                 'MEDIA TRI',
                 'MEDIA SEM',
                 'PENDENTE',
-                'EST/ASS',
+                'ESTOQUE',
                 'PEDIDO',
                 'COMPRA'
               ].map((th, i) => (
@@ -277,7 +276,7 @@ export default function OrderSuggestion() {
                 <TableCell>{product.MedMen}</TableCell>
                 <TableCell>{product.MedSem}</TableCell>
                 <TableCell>{product.PENDENTE}</TableCell>
-                <TableCell>{product.EST_LOJA} / {product.EST_DEPOSITO}</TableCell>
+                <TableCell>{product.EST_LOJA}</TableCell>
                 <TableCell>{product.PEDIDO}</TableCell>
                 <TableCell style={ product.Result < 0 ? {color: 'green'} : {color: 'red'}}>
                   {product.Result}
@@ -338,7 +337,7 @@ export default function OrderSuggestion() {
                     'M.TRI',
                     'M.SEM',
                     'PEND.',
-                    'EST/ASS',
+                    'ESTOQUE',
                     'PED',
                     'COMP'
                   ].map((th, i) => (
@@ -358,7 +357,7 @@ export default function OrderSuggestion() {
                     <TableCell>{product.MedMen}</TableCell>
                     <TableCell>{product.MedSem}</TableCell>
                     <TableCell>{product.PENDENTE}</TableCell>
-                    <TableCell>{product.EST_LOJA} / {product.EST_DEPOSITO}</TableCell>
+                    <TableCell>{product.EST_LOJA}</TableCell>
                     <TableCell>{product.PEDIDO}</TableCell>
                     <TableCell>
                       {product.Result}
