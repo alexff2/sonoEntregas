@@ -20,7 +20,7 @@ function SetEstoque({ product }) {
   <>
     {product.CD
       ? <>  
-          <td>{product.CD.EST_ATUAL}</td>
+          <td>{product.CD.EST_BEEP}</td>
           <td>{product.CD.EST_DISPONIVEL}</td>
           <td>
             { !product.STATUS
