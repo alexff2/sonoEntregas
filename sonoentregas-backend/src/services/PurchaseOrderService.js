@@ -10,6 +10,10 @@ class PurchaseOrderService {
     const script = scriptPurchaseOrder.findPurchaseOrderToReport()
 
     const purchases = await Produtos._query(1, script, QueryTypes.SELECT)
+    if (purchases.length === 0) {
+      return []
+    }
+
     const purchasesProducts = await this.findProducts(purchases.map( purchase => purchase.CODIGOPEDIDO))
 
     purchases.forEach(purchase => {0
@@ -31,6 +35,10 @@ class PurchaseOrderService {
     const script = scriptPurchaseOrder.purchaseOrderProduct(idsPurchase, order)
 
     const productsPurchaseOrder = await Produtos._query(1, script, QueryTypes.SELECT, connection)
+
+    if (productsPurchaseOrder.length === 0) {
+      return []
+    }
 
     return productsPurchaseOrder
       .map(prod => ({
