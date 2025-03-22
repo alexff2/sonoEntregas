@@ -80,7 +80,12 @@ export default function Product(){
                   }
                 </td>
                 <td>{item.EST_RESERVA}</td>
-                <td>{item.EST_DISPONIVEL}</td>
+                <td>
+                  { process.env.REACT_APP_STOCK_BEEP === '1'
+                      ? (item.EST_BEEP - item.EST_RESERVA)
+                      : (item.EST_KARDEX - item.EST_RESERVA)
+                  }
+                </td>
               </tr>
             ))}
           </tbody>

@@ -26,7 +26,12 @@ function SetEstoque({ product }) {
                 : product.CD.EST_KARDEX
             }
           </td>
-          <td>{product.CD.EST_DISPONIVEL}</td>
+          <td>
+            { process.env.REACT_APP_STOCK_BEEP === '1'
+                ? (item.EST_BEEP - item.EST_RESERVA)
+                : (item.EST_KARDEX - item.EST_RESERVA)
+            }
+          </td>
           <td>
             { !product.STATUS
                 ?<input 

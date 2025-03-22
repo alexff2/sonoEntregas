@@ -37,7 +37,7 @@ export default function Products() {
           <Tab label="Pedidos" {...a11yProps(1)}/>
           <Tab label="Notas" {...a11yProps(2)}/>
           <Tab label="Transferências" {...a11yProps(3)}/>
-          {userAuthToSingleEntered(userAuth.DESCRIPTION) && <Tab label="Alt. Bip" {...a11yProps(5)}/>}
+          {userAuthToSingleEntered(userAuth.DESCRIPTION) && <Tab label="Alt. Bip" {...a11yProps(4)}/>}
         </Tabs>
       </AppBar>
 
@@ -58,7 +58,7 @@ export default function Products() {
       </TabPanel>
 
       { userAuthToSingleEntered(userAuth.DESCRIPTION) &&
-        <TabPanel value={value} index={5}>
+        <TabPanel value={value} index={4}>
           <ChangeSerialNumber />
         </TabPanel>
       }
