@@ -98,6 +98,11 @@ const useStyles = makeStyles(theme => ({
   tableProduct: {
     height: 400,
   },
+  boxSerialNumber: {
+    display: 'flex',
+    gap: 10,
+    flexWrap: 'wrap',
+  },
 }))
 
 export default useStyles
