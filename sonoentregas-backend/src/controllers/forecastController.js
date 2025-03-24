@@ -8,7 +8,7 @@ module.exports = {
    * @param {any} req
    * @param {any} res
    */
-  async findForecast(req, res){
+  async findSalesOfForecast(req, res){
     try {
       const { id } = req.params
 
@@ -19,6 +19,24 @@ module.exports = {
       const forecast = await ForecastService.findForecast({ id })
 
       return res.status(200).json(forecast[0])
+    } catch (e) {
+      console.log(e)
+
+      let status = e.status ? e.status : 400
+      let error = e.error ? e.error : e
+
+      return res.status(status).json(error)
+    }
+  },
+  /**
+   * @param {any} req
+   * @param {any} res
+   */
+  async findOpenForecast(req, res){
+    try {
+      const forecast = await ForecastService.findForecastOpen()
+
+      return res.status(200).json(forecast)
     } catch (e) {
       console.log(e)
 

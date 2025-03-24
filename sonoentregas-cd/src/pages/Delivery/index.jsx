@@ -109,7 +109,7 @@ export default function Delivery() {
       try {
         const { data: dataDeliveries } = await api.get('delivery/open')
         const { data: dataDeliveriesFinished } = await api.get(`delivery/close/${getDateSql()}`)
-        const { data: dataForecasts } = await api.get('forecast')
+        const { data: dataForecasts } = await api.get('forecast/open')
   
         setDelivery(dataDeliveries)
         setDeliveryFinish(dataDeliveriesFinished)
@@ -222,7 +222,7 @@ export default function Delivery() {
 
   const searchForecastFinished = async e => {
     try {
-      const { data } = await api.get(`forecast/closed`, {
+      const { data } = await api.get(`forecast/finished`, {
         params: {
           typeSearch: 'date',
           search: e.target.value,

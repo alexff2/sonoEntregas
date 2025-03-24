@@ -62,12 +62,47 @@ const Users = require('../models/Users')
 const ObjDate = require('../functions/getDate')
 
 class ForecastService {
+  async findForecastOpen(){
+    /** @type {IForecast[]} */
+    const forecasts = await Forecast._query(0, 'select * from Forecast where [status] IS NULL OR [status] = 1', QueryTypes.SELECT)
+
+    if (forecasts.length === 0) {
+      return []
+    }
+
+    const scriptSales = 
+    `SELECT A.*, C.DESC_ABREV SHOP, B.NOMECLI, B.BAIRRO, B.ID_SALES, B.D_ENTREGA1, B.FONE, B.FAX, B.VENDEDOR, B.TOTAL,
+    Convert(varchar, A.dateValidation, 103) + ' as ' +Convert(varchar, A.dateValidation, 8) dateValidationFormat
+    FROM FORECAST_SALES A
+    INNER JOIN SALES B ON A.idSale = B.ID
+    INNER JOIN LOJAS C ON B.CODLOJA = C.CODLOJA
+    WHERE A.idForecast IN (${forecasts.map(forecast => forecast.id)})
+    `
+
+    /** @type {IForecastSales[]} */
+    const forecastSales = await Forecast._query(0, scriptSales, QueryTypes.SELECT)
+
+    if (forecastSales.length === 0) {
+      return []
+    }
+
+    const users = await Users.findAny(0, { in: {ID: forecasts.map(forecast => forecast.idUserCreated)} })
+
+    forecasts.forEach(forecast => {
+      const userCreate = users.find( user => user.ID === forecast.idUserCreated)
+
+      forecast['userCreated'] = userCreate.DESCRIPTION
+    })
+
+    return forecasts
+  }
+
   /**
    * @param {Object | string} where
    * @param {string | boolean} codLoja
    * @returns 
    */
-  async findForecast(where, codLoja = false){//CALCULAR STATUS VENCIDO
+  async findForecast(where, codLoja = false){
     /** @type {IForecast[]} */
     const forecasts = where === 'created' 
       ? await Forecast._query(0, 'select * from Forecast where [status] IS NULL OR [status] = 1', QueryTypes.SELECT)
@@ -94,13 +129,11 @@ class ForecastService {
       return []
     }
 
-    const scriptProduct = 
-    `SELECT B.*, A.quantityForecast, A.idForecastSale 
-    FROM VIEW_SALES_PROD B
-    INNER JOIN (SELECT A.*, B.idSale
-                FROM FORECAST_PRODUCT A
-                INNER JOIN FORECAST_SALES B ON A.idForecastSale = B.id) A
-    ON A.idSale = B.ID_SALE_ID AND A.COD_ORIGINAL = B.COD_ORIGINAL
+    const scriptProduct = `
+    SELECT A.*, B.idForecast, C.NOME, D.NVTOTAL FROM FORECAST_PRODUCT A
+    INNER JOIN FORECAST_SALES B ON A.idForecastSale = B.id
+    INNER JOIN ${process.env.CD_BASE}..PRODUTOS C ON A.COD_ORIGINAL = C.ALTERNATI
+    INNER JOIN SALES_PROD D ON D.COD_ORIGINAL = A.COD_ORIGINAL AND D.ID_SALE_ID = B.idSale
     WHERE A.idForecastSale in (${forecastSales.map(sale => sale.id)})`
 
     /**@type {IForecastProduct[]} */
