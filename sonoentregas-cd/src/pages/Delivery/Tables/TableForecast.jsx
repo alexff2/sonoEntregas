@@ -92,21 +92,15 @@ export default function TabForecast({ forecastsFinish }) {
 
       await api.put(`/forecast/${forecastToSendFinished.id}/started`)
 
-      const newForecasts = forecasts.map(forecast => {
-        forecast.status = true
+      setForecasts(state => 
+        state.map(forecast => {
+          if (forecast.id === forecastToSendFinished.id) {
+            forecast.status = true
+          }
 
-        const newSales = forecast.sales.map(sale => {
-          sale.canRemove = false
-
-          return sale
+          return forecast
         })
-
-        forecast.sales = newSales
-
-        return forecast
-      })
-
-      setForecasts(newForecasts)
+      )
 
       setForecastToSendFinished({})
 
