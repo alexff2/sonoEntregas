@@ -116,7 +116,7 @@ routes.post('/cars', carsController.create)
 routes.put('/cars/:id', carsController.update)
 // Forecasts
 routes.get('/forecast', forecastController.findCreatedForecast)
-routes.get('/forecast/open', forecastController.findCreatedForecast)
+routes.get('/forecast/open', forecastController.findOpenForecast)
 routes.get('/forecast/finished', forecastController.findFinishedForecast)
 routes.get('/forecast/:id/view', forecastController.findSalesOfForecast)
 routes.post('/forecast', ensureAuthenticated, forecastController.create)

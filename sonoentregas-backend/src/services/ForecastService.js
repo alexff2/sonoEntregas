@@ -70,22 +70,6 @@ class ForecastService {
       return []
     }
 
-    const scriptSales = 
-    `SELECT A.*, C.DESC_ABREV SHOP, B.NOMECLI, B.BAIRRO, B.ID_SALES, B.D_ENTREGA1, B.FONE, B.FAX, B.VENDEDOR, B.TOTAL,
-    Convert(varchar, A.dateValidation, 103) + ' as ' +Convert(varchar, A.dateValidation, 8) dateValidationFormat
-    FROM FORECAST_SALES A
-    INNER JOIN SALES B ON A.idSale = B.ID
-    INNER JOIN LOJAS C ON B.CODLOJA = C.CODLOJA
-    WHERE A.idForecast IN (${forecasts.map(forecast => forecast.id)})
-    `
-
-    /** @type {IForecastSales[]} */
-    const forecastSales = await Forecast._query(0, scriptSales, QueryTypes.SELECT)
-
-    if (forecastSales.length === 0) {
-      return []
-    }
-
     const users = await Users.findAny(0, { in: {ID: forecasts.map(forecast => forecast.idUserCreated)} })
 
     forecasts.forEach(forecast => {
