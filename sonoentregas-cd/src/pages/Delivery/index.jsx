@@ -368,9 +368,9 @@ export default function Delivery() {
         setOpen={setOpenFinish}
         title={"Finalizar Entrega"}
       >
-        <ModalView 
+        <ModalView
+          id={selectDelivery.ID} 
           setOpen={setOpenFinish}
-          selectDelivery={selectDelivery}
           type={'open'}
         />
       </Modal>
@@ -380,9 +380,9 @@ export default function Delivery() {
         setOpen={setOpenView}
         title={"Visualização"}
       >
-        <ModalView 
+        <ModalView
+          id={selectDelivery.ID} 
           setOpen={setOpenView}
-          selectDelivery={selectDelivery}
           type={'close'}
         />
       </Modal>

@@ -133,6 +133,7 @@ routes.delete('/forecast/sale/:id', ensureAuthenticated, forecastController.rmvS
 routes.get('/delivery', deliveryController.findToBeep)
 routes.get('/delivery/:status', deliveryController.index)
 routes.get('/delivery/:status/:date', deliveryController.index)
+routes.get('/delivery/:id/sales/view', deliveryController.findDelivery)
 routes.post('/deliveries', ensureAuthenticated, deliveryController.create)
 routes.post('/delivery/:id/sales/add', ensureAuthenticated, deliveryController.addSale)
 routes.post('/delivery/sale/rmv', ensureAuthenticated, deliveryController.rmvSale)

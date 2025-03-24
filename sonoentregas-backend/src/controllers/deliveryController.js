@@ -31,10 +31,31 @@ module.exports = {
         : "STATUS <> 'Finalizada'"
 
       const deliveries = await ViewDeliveries.findSome(0, where)
-      
-      const dataDeliveries = await DeliveriesService.findSalesOfDelivery(deliveries)
 
-      return res.json(dataDeliveries)
+      deliveries.forEach((delivery) => {
+        delivery.D_MOUNTING = new Date(delivery.D_MOUNTING+'T00:00:00')
+          .getBRDateTime()
+          .date
+      })
+
+      return res.json(deliveries)
+    } catch (error) {
+      console.log(error)
+      return res.status(400).json(error)
+    }
+  },
+  /**
+   * @param {*} req 
+   * @param {*} res 
+   * @returns 
+   */
+  async findDelivery( req, res ){
+    try {
+      const { id } = req.params
+      
+      const delivery =  await DeliveriesService.findDelivery(id)
+
+      return res.json(delivery)
     } catch (error) {
       console.log(error)
       return res.status(400).json(error)

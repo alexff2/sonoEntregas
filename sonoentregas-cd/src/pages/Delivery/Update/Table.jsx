@@ -27,7 +27,6 @@ import ModalAddSale from './ModalAddSale'
 
 import { useForecasts } from '../../../context/forecastsContext'
 import { useDelivery } from '../../../context/deliveryContext'
-import { useSale } from '../../../context/saleContext'
 
 import { getComparator, stableSort } from '../../../functions/orderTable'
 import { getDateBr } from '../../../functions/getDates'
@@ -128,7 +127,6 @@ export default function TableSalesUpdate({ sales }) {
   const { type, id: idData } = useParams()
   const { setForecasts, forecasts: forecastsContext } = useForecasts()
   const { setDelivery, delivery } = useDelivery()
-  const { setSales } = useSale()
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -187,14 +185,6 @@ export default function TableSalesUpdate({ sales }) {
 
       setDelivery([...deliveries])
 
-      const { data: dataSales } = await api.get('sales/', {
-        params: {
-          status: 'open'
-        }
-      })
-
-      setSales(dataSales)
-
       setSelected([])
     } catch (e) {
       console.log(e)
@@ -223,14 +213,6 @@ export default function TableSalesUpdate({ sales }) {
       }
 
       setForecasts([...forecasts])
-
-      const { data: dataSales } = await api.get('sales/', {
-        params: {
-          status: 'open'
-        }
-      })
-
-      setSales(dataSales)
 
       setSelected([])
     } catch (e) {

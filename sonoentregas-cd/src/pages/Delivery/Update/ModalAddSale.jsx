@@ -17,7 +17,6 @@ import { ButtonCancel, ButtonSuccess } from '../../../components/Buttons'
 
 import { useAlert } from '../../../context/alertContext'
 import { useForecasts } from '../../../context/forecastsContext'
-import { useSale } from '../../../context/saleContext'
 import { useDelivery } from '../../../context/deliveryContext'
 import api from '../../../services/api'
 import { getDateBr } from '../../../functions/getDates'
@@ -91,7 +90,6 @@ export default function ModalAddSale({ setOpen, typeModal }){
   const { setAlert } = useAlert()
   const { setForecasts } = useForecasts()
   const { setDelivery } = useDelivery()
-  const { setSales } = useSale()
   const { type, id } = useParams()
   const classes = useStyles()
 
@@ -273,14 +271,6 @@ export default function ModalAddSale({ setOpen, typeModal }){
         setDelivery(data)
       }
 
-      const { data: dataSales } = await api.get('sales/', {
-        params: {
-          status: 'open'
-        }
-      })
-
-      setSales(dataSales)
-
       setOpen(false)
     } catch (e) {
       if (!e.response){
@@ -328,14 +318,6 @@ export default function ModalAddSale({ setOpen, typeModal }){
 
       const { data: dataDelivery } = await api.get('delivery/status') 
       setDelivery(dataDelivery)
-
-      const { data: dataSales } = await api.get('sales/', {
-        params: {
-          status: 'open'
-        }
-      })
-
-      setSales(dataSales)
 
       setOpen(false)
     } catch (e) {

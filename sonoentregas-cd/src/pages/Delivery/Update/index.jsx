@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
   Box,
@@ -13,6 +13,7 @@ import Header from './Header'
 
 import { useForecasts } from '../../../context/forecastsContext'
 import { useDelivery } from '../../../context/deliveryContext'
+import api from '../../../services/api'
 
 function AppBarTitle({ type }) {
   return (
@@ -22,16 +23,8 @@ function AppBarTitle({ type }) {
   );
 }
 
-function SalesTable({ sales }) {
-  return (
-    <Box padding={4}>
-      <Table sales={sales} />
-    </Box>
-  );
-}
-
-
 export default function Update(){
+  const [ sales, setSales ] = useState([])
   const { forecasts } = useForecasts()
   const { delivery: deliveries } = useDelivery()
   const { type, id } = useParams()
@@ -42,10 +35,34 @@ export default function Update(){
     : deliveries.find(delivery => delivery.ID === parseInt(id))
 
   useEffect(() => {
+    const getForecast = async () => {
+      try {
+        const { data: forecast } = await api.get(`/forecast/${id}/view`)
+
+        setSales(forecast.sales)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    const getDelivery = async () => {
+      try {
+        const { data: delivery } = await api.get(`/delivery/${id}/sales/view`)
+
+        setSales(delivery.sales)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
     if (!forecasts.length) {
       navigate('/app/delivery');
     }
-  }, [forecasts, navigate])
+
+    type === 'forecast'
+      ? getForecast()
+      : getDelivery()
+  }, [forecasts, navigate, id, type])
 
   return (
     <Box component={Paper}>
@@ -57,7 +74,9 @@ export default function Update(){
 
       <Divider />
 
-      <SalesTable sales={data?.sales ?? []} />
+      <Box padding={4}>
+        <Table sales={sales} />
+      </Box>
     </Box>
   )
 }

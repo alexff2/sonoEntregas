@@ -17,7 +17,6 @@ import TableHeadSale from './TableHeadSale'
 //context
 import { useDelivery } from '../../../../context/deliveryContext'
 import { useDeliveryFinish } from '../../../../context/deliveryFinishContext'
-import { useSale } from '../../../../context/saleContext'
 
 import api from '../../../../services/api'
 
@@ -68,27 +67,31 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-export default function ModalView({ setOpen, selectDelivery, type }){
+export default function ModalView({ setOpen, type, id }){
   //States
   const [ openModalAlert, setOpenModalAlert ] = useState(false)
   const [ childrenModalAlert, setChildrenOpenModalAlert ] = useState('')
   const [ date, setDate ] = useState(false)
   const [ disabledBtnSave, setDisabledBtnSave ] = useState(false)
+  const [ selectDelivery, setSelectDelivery ] = useState()
 
   const { setDelivery } = useDelivery()
   const { deliveryFinish, setDeliveryFinish } = useDeliveryFinish()
-  const stateSales = useSale()
 
   const classes = useStyles()
 
   useEffect(() => {
-    type === 'open' && selectDelivery.sales.forEach(sale =>{
-      sale.products.forEach(produto => {
-        produto.DELIVERED = true
-        produto.STATUS = 'Enviado'
+    api.get(`delivery/${id}/sales/view`)
+      .then(({ data }) => {
+        type === 'open' && data.sales.forEach(sale =>{
+          sale.products.forEach(produto => {
+            produto.DELIVERED = true
+            produto.STATUS = 'Enviado'
+          })
+        })
+        setSelectDelivery(data)
       })
-    })
-  }, [type, selectDelivery])
+  }, [type, id])
 
   //Functions
 
@@ -106,19 +109,10 @@ export default function ModalView({ setOpen, selectDelivery, type }){
           })
         })
   
-        const { data } = await api.put(`delivery/status/${selectDelivery.ID}`, selectDelivery)
+        await api.put(`delivery/status/${selectDelivery.ID}`, selectDelivery)
   
-        if(data.ID){
-          const resp = await api.get('sales/', {
-            params: {
-              status: 'open'
-            }
-          })
-          stateSales.setSales(resp.data)
-        }
-
-        const { data: dataDelivery } = await api.get('delivery/status/') 
-        setDelivery(dataDelivery)
+        const { data: deliveriesOpen } = await api.get('delivery/open') 
+        setDelivery(deliveriesOpen)
         setDeliveryFinish([...deliveryFinish, selectDelivery])
         setOpen(false)
       } else {
@@ -136,17 +130,17 @@ export default function ModalView({ setOpen, selectDelivery, type }){
   return(
     <form>
       <h3 className={classes.titleModalFinish}>
-        { selectDelivery.DESCRIPTION } - { selectDelivery.sales.length } Venda(s)
+        { selectDelivery?.DESCRIPTION } - { selectDelivery?.sales.length } Venda(s)
       </h3>
 
       <div className={classes.divHeader}>    
         <div>
-          <p><span>Motorista: </span>{selectDelivery.DRIVER}</p>
-          <p><span>Auxiliar: </span> {selectDelivery.ASSISTANT}</p>
+          <p><span>Motorista: </span>{selectDelivery?.DRIVER}</p>
+          <p><span>Auxiliar: </span> {selectDelivery?.ASSISTANT}</p>
         </div>
 
         <div>
-          <p><span>Veículo: </span> {selectDelivery.CAR}</p>
+          <p><span>Veículo: </span> {selectDelivery?.CAR}</p>
           <p><span>Cubagem: </span> </p>
         </div>
 
@@ -154,12 +148,12 @@ export default function ModalView({ setOpen, selectDelivery, type }){
           <p><span>Custo: </span> {
             Intl
               .NumberFormat('pt-br',{style: 'currency', currency: 'BRL'})
-              .format(selectDelivery.COST)
+              .format(selectDelivery?.COST)
           }</p>
           <p><span>Valor: </span>{
             Intl
             .NumberFormat('pt-br',{style: 'currency', currency: 'BRL'})
-            .format(selectDelivery.PRICE)
+            .format(selectDelivery?.PRICE)
           }</p>
         </div>
       </div>
@@ -188,13 +182,13 @@ export default function ModalView({ setOpen, selectDelivery, type }){
           <TableHeadSale />
 
           <TableBody>
-            {selectDelivery.sales.map((sale, index) => (
+            {selectDelivery?.sales.map((sale, index) => (
               <RowSale
                 key={index}
                 sale={sale}
                 classes={classes}
                 type={type}
-                status={selectDelivery.STATUS}
+                status={selectDelivery?.STATUS}
               />
             ))}
           </TableBody>

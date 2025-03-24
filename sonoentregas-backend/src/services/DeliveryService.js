@@ -35,6 +35,7 @@
 const { QueryTypes } = require('sequelize')
 
 const Delivery = require('../models/Deliverys')
+const ViewDeliveries = require('../models/ViewDeliverys')
 const DeliveryProd = require('../models/DeliveryProd')
 const SalesProd = require('../models/SalesProd')
 const ViewDeliverySales = require('../models/ViewDeliverySales')
@@ -48,82 +49,106 @@ const Date = require('../class/Date')
 
 module.exports = {
   async findUnique(/** @type {number} */id){
-    const delivery = await Delivery.findAny(0, { id })
+    const deliveries = await Delivery.findAny(0, { id })
 
-    if (delivery.length === 0) {
+    if (deliveries.length === 0) {
       throw {
         error: 'delivery not found'
       }
     }
 
-    return delivery[0]
+    const delivery = deliveries[0]
+
+    delivery.D_MOUNTING = new Date(delivery.D_MOUNTING+'T00:00:00')
+      .getBRDateTime()
+      .date
+
+    delivery.D_DELIVERING = new Date(delivery.D_DELIVERING+'T00:00:00')
+      .getBRDateTime()
+      .date
+
+    delivery.D_DELIVERED = new Date(delivery.D_DELIVERED+'T00:00:00')
+      .getBRDateTime()
+      .date
+
+    return delivery
   },
   /**
-   * @param {Object[]} deliveries
+   * @param {number} id
    */
-  async findSalesOfDelivery(deliveries){
+  async findDelivery(id){
     try {
-      if (deliveries.length > 0) {
-        var idDeliveries = deliveries.map(delivery => delivery.ID)
+      const deliveries = await ViewDeliveries.findAny(0, { id })
 
-        const sales = await ViewDeliverySales.findSome(0, `ID_DELIVERY IN (${idDeliveries})`)
+      if (deliveries.length === 0) {
+        throw {
+          error: 'delivery not found'
+        }
+      }
 
-        const vDeliveryProd2 = await ViewDeliveryProd2.findSome(0, `ID_DELIVERY IN (${idDeliveries})`)
+      const delivery = deliveries[0]
 
-        const shops = await Empresas._query(0, 'SELECT * FROM LOJAS', QueryTypes.SELECT)
+      delivery.D_MOUNTING = new Date(delivery.D_MOUNTING+'T00:00:00')
+        .getBRDateTime()
+        .date
 
-        const scriptValuesByDelivery =`
-        SELECT C.ID_DELIVERY, SUM(C.QTD_DELIV * B.PCO_COMPRA) COST, SUM(C.QTD_DELIV * D.UNITARIO1) PRICE FROM SONO..PRODUTOS A
-        INNER JOIN ${process.env.CD_BASE}..PRODLOJAS B ON A.CODIGO = B.CODIGO
-        INNER JOIN DELIVERYS_PROD C ON C.COD_ORIGINAL = A.ALTERNATI
-        INNER JOIN SALES_PROD D ON C.ID_SALE = D.ID_SALES AND C.CODLOJA = D.CODLOJA AND C.COD_ORIGINAL = D.COD_ORIGINAL
-        WHERE B.CODLOJA = 1
-        AND C.ID_DELIVERY IN (${idDeliveries})
-        GROUP BY C.ID_DELIVERY`
+      delivery.D_DELIVERING = new Date(delivery.D_DELIVERING+'T00:00:00')
+        .getBRDateTime()
+        .date
 
-        /**@type {IValueDelivery[]} */
-        const valuesByDelivery = await ViewDeliverySales._query(0, scriptValuesByDelivery, QueryTypes.SELECT)
+      delivery.D_DELIVERED = new Date(delivery.D_DELIVERED+'T00:00:00')
+        .getBRDateTime()
+        .date
 
-        deliveries.forEach( delivery => {
-          delivery['sales'] = []
+      const scriptValuesByDelivery =`
+      SELECT C.ID_DELIVERY, SUM(C.QTD_DELIV * B.PCO_COMPRA) COST, SUM(C.QTD_DELIV * D.UNITARIO1) PRICE FROM SONO..PRODUTOS A
+      INNER JOIN ${process.env.CD_BASE}..PRODLOJAS B ON A.CODIGO = B.CODIGO
+      INNER JOIN DELIVERYS_PROD C ON C.COD_ORIGINAL = A.ALTERNATI
+      INNER JOIN SALES_PROD D ON C.ID_SALE = D.ID_SALES AND C.CODLOJA = D.CODLOJA AND C.COD_ORIGINAL = D.COD_ORIGINAL
+      WHERE B.CODLOJA = 1
+      AND C.ID_DELIVERY = ${id}
+      GROUP BY C.ID_DELIVERY`
 
-          delivery.D_MOUNTING = new Date(delivery.D_MOUNTING+'T00:00:00').getBRDateTime().date
-          delivery.D_DELIVERING = new Date(delivery.D_DELIVERING+'T00:00:00').getBRDateTime().date
-          delivery.D_DELIVERED = new Date(delivery.D_DELIVERED+'T00:00:00').getBRDateTime().date
+      /**@type {IValueDelivery[]} */
+      const valuesByDelivery = await ViewDeliverySales._query(0, scriptValuesByDelivery, QueryTypes.SELECT)
 
-          const valuesDelivery = valuesByDelivery.find(value => value.ID_DELIVERY === delivery.ID)
+      delivery['sales'] = []
 
-          if (valuesDelivery) {
-            delivery.COST = valuesDelivery.COST
-            delivery.PRICE = valuesDelivery.PRICE
+      const valuesDelivery = valuesByDelivery.find(value => value.ID_DELIVERY === delivery.ID)
+
+      if (valuesDelivery) {
+        delivery.COST = valuesDelivery.COST
+        delivery.PRICE = valuesDelivery.PRICE
+      }
+
+      const sales = await ViewDeliverySales.findSome(0, `ID_DELIVERY = ${id}`)
+
+      const vDeliveryProd2 = await ViewDeliveryProd2.findSome(0, `ID_DELIVERY = ${id}`)
+
+      const shops = await Empresas._query(0, 'SELECT * FROM LOJAS', QueryTypes.SELECT)
+
+      sales.forEach(sale => {
+
+        sale["products"] = []
+
+        vDeliveryProd2.forEach(saleProd => {
+          if (sale.ID_SALES === saleProd.ID_SALES && sale.CODLOJA === saleProd.CODLOJA && saleProd.ID_DELIVERY === sale.ID_DELIVERY) {
+            sale.products.push(saleProd)
           }
-
-          sales.forEach(sale => {
-
-            sale["products"] = []
-
-            vDeliveryProd2.forEach(saleProd => {
-              if (sale.ID_SALES === saleProd.ID_SALES && sale.CODLOJA === saleProd.CODLOJA && saleProd.ID_DELIVERY === sale.ID_DELIVERY) {
-                sale.products.push(saleProd)
-              }
-            })
-
-            if (sale.ID_DELIVERY === delivery.ID) {
-              delivery.sales.push(sale)
-            }
-
-            shops.forEach( shops => {
-              if (shops.CODLOJA === sale.CODLOJA) {
-                sale['SHOP'] = shops.DESC_ABREV
-              }
-            })
-          })
         })
 
-        return deliveries
-      } else {
-        return []
-      }
+        if (sale.ID_DELIVERY === delivery.ID) {
+          delivery.sales.push(sale)
+        }
+
+        shops.forEach( shops => {
+          if (shops.CODLOJA === sale.CODLOJA) {
+            sale['SHOP'] = shops.DESC_ABREV
+          }
+        })
+      })
+
+      return delivery
     } catch (error) {
       console.log(error)
     }

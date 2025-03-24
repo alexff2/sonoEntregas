@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { ButtonSuccess } from "../../../components/Buttons"
 import {
   makeStyles,
@@ -9,6 +9,7 @@ import {
 
 import { useDelivery } from "../../../context/deliveryContext"
 import { useAlert } from '../../../context/alertContext'
+import { useBackdrop } from '../../../context/backdropContext'
 
 import api from "../../../services/api"
 
@@ -33,6 +34,7 @@ const useStyle = makeStyles(theme => ({
 
 export default function ModalDelivering({ setOpen, selectDelivery }){
   const [ date, setDate ] = useState('')
+  const [ sales, setSales ] = useState([])
   const [ error, setError ] = useState(false)
   const [ childrenError, setChildrenError ] = useState('')
   const [ disabledBtnSave, setDisabledBtnSave ] = useState(false)
@@ -40,6 +42,24 @@ export default function ModalDelivering({ setOpen, selectDelivery }){
   const classes = useStyle()
   const { setDelivery } = useDelivery()
   const { setAlert } = useAlert()
+  const { setOpenBackDrop } = useBackdrop()
+
+  useEffect(() => {
+    setOpenBackDrop(true)
+    const getDelivery = async () => {
+      try {
+        const { data: delivery } = await api.get(`/delivery/${selectDelivery.ID}/sales/view`)
+
+        setSales(delivery.sales)
+        setOpenBackDrop(false)
+      } catch (error) {
+        console.log(error)
+        setOpenBackDrop(false)
+      }
+    }
+
+    getDelivery()
+  }, [selectDelivery, setOpenBackDrop])
 
   const delivering = async () => {
     try {
@@ -53,6 +73,7 @@ export default function ModalDelivering({ setOpen, selectDelivery }){
 
       setDisabledBtnSave(true)
 
+      selectDelivery["sales"] = sales
       selectDelivery.STATUS = 'Entregando'
       selectDelivery['date'] = date
   
