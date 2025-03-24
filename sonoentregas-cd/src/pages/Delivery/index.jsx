@@ -90,6 +90,7 @@ export default function Delivery() {
   const [ openFinish, setOpenFinish ] = useState(false)
   const [ openView, setOpenView ] = useState(false)
   const [ openLoading, setOpenLoading ] = useState(false)
+  const [ forecastsFinish, setForecastsFinish ] = useState([])
 
   //States
   const [ selectDelivery, setSelectDelivery ] = useState({})
@@ -224,12 +225,11 @@ export default function Delivery() {
     try {
       const { data } = await api.get(`forecast/finished`, {
         params: {
-          typeSearch: 'date',
-          search: e.target.value,
+          date: e.target.value,
         }
       })
 
-      setDeliveryFinish(data)
+      setForecastsFinish(data)
     } catch (e) {
       if (!e.response){
         console.log(e)
@@ -264,7 +264,7 @@ export default function Delivery() {
           </div>
         </div>
 
-        <TableForecast />
+        <TableForecast forecastsFinish={forecastsFinish}/>
 
         <div className={classes.boxTabHeader} style={{paddingTop: '1rem'}}>
           <span>Rotas em processo</span>

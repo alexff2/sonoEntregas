@@ -69,7 +69,7 @@ const Status = ({date, status}) => {
   }
 }
 
-export default function TabForecast() {
+export default function TabForecast({ forecastsFinish }) {
   const [ openConfirm, setOpenConfirm ] = useState(false)
   const [ progress, setProgress ] = useState(false)
   const [ openModalForecasView, setOpenModalForecastView ] = useState(false)
@@ -221,7 +221,40 @@ export default function TabForecast() {
         </TableHead>
 
         <TableBody>
-          {forecasts?.map( forecast => (
+          {forecastsFinish.map( forecast => (
+            <TableRow key={forecast.id} className={classes.body}>
+              <TableCell>{forecast.id}</TableCell>
+              <TableCell width={'50%'}>
+                {`Previsão do dia ${getDateBr(forecast.date)}`}
+              </TableCell>
+              <TableCell onClick={() => {
+                setForecastSelect(forecast)
+                setOpenModalForecastView(true)
+              }}>
+                <Status date={forecast.date} status={forecast.status} />
+              </TableCell>
+
+              {(forecast.status || forecast.status === null) &&
+                <TableCell>
+                  <Tooltip title='Atualizar previsão'>
+                    <IconButton onClick={() => navigate(`update/forecast/${forecast.id}`)}>
+                      <EditSharp/>
+                    </IconButton>
+                  </Tooltip>
+                  {(forecast.status === null || forecast.status) &&
+                    <Tooltip title={forecast.status ? 'Finalizar Previsão' : 'Enviar previsão para as lojas'}>
+                      <IconButton onClick={() => handleClickSendFinishedForecast(forecast)}>
+                        { forecast.status
+                          ? <CheckCircle />
+                          : <Send/>
+                        }
+                      </IconButton>
+                    </Tooltip>}
+                </TableCell>
+              }
+            </TableRow>
+          ))}
+          {forecasts.map( forecast => (
             <TableRow key={forecast.id} className={classes.body}>
               <TableCell>{forecast.id}</TableCell>
               <TableCell width={'50%'}>
@@ -265,7 +298,6 @@ export default function TabForecast() {
       <Modal
         open={openModalForecasView}
         setOpen={setOpenModalForecastView}
-        title={`Visualização - ${forecastSelect.sales.length } venda(s) lançada(s)`}
       >
         <ForecastView 
           forecastId={forecastSelect.id}

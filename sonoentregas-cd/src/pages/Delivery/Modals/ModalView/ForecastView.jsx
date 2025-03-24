@@ -7,7 +7,8 @@ import {
   Paper,
   AppBar,
   Tabs,
-  Tab
+  Tab,
+  Typography
 } from "@material-ui/core"
 
 import { TabPanel, a11yProps } from '../../../../components/TabPanel'
@@ -17,43 +18,11 @@ import TableHeadSale from './TableHeadSale'
 import api from "../../../../services/api"
 
 const useStyles = makeStyles(theme => ({
-  //Style form select\
   titleModalFinish: {
     width: '100%',
     textAlign: 'Center',
-    marginTop: -30
-  },
-  divHeader:{
-    width: '100%',
-    display: 'flex',
-    marginTop: -20,
-    marginBottom: 15,
-    '& span' : {
-      fontWeight: 700
-    },
-    '& > div': {
-      width: '50%',
-      '& > p' : {
-        marginBottom: 2,
-        marginTop: 2,
-      },
-      '& > div' : {
-        marginBottom: 2,
-      }
-    }
-  },
-  //Style buttons
-  btnActions: {
-    width: '100%',
-    padding: theme.spacing(2, 0),
-    display: 'flex',
-    justifyContent: 'flex-end'
-  },
-  root: {
-    '& > *': {
-      borderBottom: 'unset'
-    },
-    background: theme.palette.primary.light
+    fontSize: 20,
+    fontWeight: 600,
   },
   headerTab: {
     [theme.breakpoints.down('sm')]: {
@@ -78,7 +47,7 @@ const useStyles = makeStyles(theme => ({
 }))
 
 export default function ForecastView({ forecastId, handleInvalidationSale }){
-  const [ forecast, setForecast ] = useState()
+  const [ sales, setSales ] = useState([])
   const [value, setValue] = useState(0)
   const classes = useStyles()
 
@@ -87,7 +56,7 @@ export default function ForecastView({ forecastId, handleInvalidationSale }){
       try {
         const { data } = await api.get(`/forecast/${forecastId}/view`)
 
-        setForecast(data)
+        setSales(data.sales)
       } catch (error) {
         console.log(error)
       }
@@ -96,107 +65,107 @@ export default function ForecastView({ forecastId, handleInvalidationSale }){
     getForecast()
   }, [forecastId])
 
-  const forecastNotValidated = forecast ? forecast.sales.filter(sale => sale.validationStatus === null) : []
-  const forecastAccepted = forecast ? forecast.sales.filter(sale => sale.validationStatus && sale.idDelivery === null) : []
-  const forecastRefused = forecast ? forecast.sales.filter(sale => sale.validationStatus === false) : []
-  const forecastInRoute = forecast ? forecast.sales.filter(sale => sale.validationStatus && sale.idDelivery !== null) : []
+  const salesNotValidated = sales.filter(sale => sale.validationStatus === null)
+  const salesAccepted = sales.filter(sale => sale.validationStatus && sale.idDelivery === null)
+  const salesRefused = sales.filter(sale => sale.validationStatus === false)
+  const salesInRoute = sales.filter(sale => sale.validationStatus && sale.idDelivery !== null)
 
   return (
-    <>{ forecast
-      ?<>
-        <AppBar position="static">
-          <Tabs
-            className={classes.headerTab}
-            value={value}
-            onChange={(event, newValue) => setValue(newValue)}
-            aria-label="simple tabs example"
-            variant="fullWidth"
-          >
-            <Tab label={`${forecastNotValidated.length} Não validada(s)`} {...a11yProps(0)}/>
-            <Tab label={`${forecastAccepted.length} Confirmada(s)`} {...a11yProps(1)}/>
-            <Tab label={`${forecastRefused.length} Negada(s)`} {...a11yProps(2)}/>
-            <Tab label={`${forecastInRoute.length} Em Rota`} {...a11yProps(3)}/>
-          </Tabs>
-        </AppBar>
-
-        <TabPanel
-          className={classes.bodyTab} value={value} index={0}
+    <>
+      <Typography variant="h3" className={classes.titleModalFinish}>
+        {`Visualização - ${sales.length } venda(s) lançada(s)`}
+      </Typography>
+      <AppBar position="static">
+        <Tabs
+          className={classes.headerTab}
+          value={value}
+          onChange={(event, newValue) => setValue(newValue)}
+          aria-label="simple tabs example"
+          variant="fullWidth"
         >
-          <TableContainer component={Paper}>
-            <Table className={classes.table}>
-              <TableHeadSale/>
-              <TableBody>
-                {forecastNotValidated.map((sale, index) => (
-                  <RowSale
-                    key={index}
-                    sale={sale}
-                    type={'close'}
-                  />
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </TabPanel>
+          <Tab label={`${salesNotValidated.length} Não validada(s)`} {...a11yProps(0)}/>
+          <Tab label={`${salesAccepted.length} Confirmada(s)`} {...a11yProps(1)}/>
+          <Tab label={`${salesRefused.length} Negada(s)`} {...a11yProps(2)}/>
+          <Tab label={`${salesInRoute.length} Em Rota`} {...a11yProps(3)}/>
+        </Tabs>
+      </AppBar>
 
-        <TabPanel
-          className={classes.bodyTab} value={value} index={1}
-        >
-          <TableContainer component={Paper}>
-            <Table className={classes.table}>
-              <TableHeadSale type='forecastView'/>
-              <TableBody>
-                {forecastAccepted.map((sale, index) => (
-                  <RowSale
-                    key={index}
-                    sale={sale}
-                    type={'forecastView'}
-                    handleInvalidationSale={handleInvalidationSale}
-                  />
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </TabPanel>
+      <TabPanel
+        className={classes.bodyTab} value={value} index={0}
+      >
+        <TableContainer component={Paper}>
+          <Table className={classes.table}>
+            <TableHeadSale/>
+            <TableBody>
+              {salesNotValidated.map((sale, index) => (
+                <RowSale
+                  key={index}
+                  sale={sale}
+                  type={'close'}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </TabPanel>
 
-        <TabPanel
-          className={classes.bodyTab} value={value} index={2}
-        >
-          <TableContainer component={Paper}>
-            <Table className={classes.table}>
-              <TableHeadSale />
-              <TableBody>
-                {forecastRefused.map((sale, index) => (
-                  <RowSale
-                    key={index}
-                    sale={sale}
-                    type={'close'}
-                  />
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </TabPanel>
+      <TabPanel
+        className={classes.bodyTab} value={value} index={1}
+      >
+        <TableContainer component={Paper}>
+          <Table className={classes.table}>
+            <TableHeadSale type='forecastView'/>
+            <TableBody>
+              {salesAccepted.map((sale, index) => (
+                <RowSale
+                  key={index}
+                  sale={sale}
+                  type={'forecastView'}
+                  handleInvalidationSale={handleInvalidationSale}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </TabPanel>
 
-        <TabPanel
-          className={classes.bodyTab} value={value} index={3}
-        >
-          <TableContainer component={Paper}>
-            <Table className={classes.table}>
-              <TableHeadSale/>
-              <TableBody>
-                {forecastInRoute.map((sale, index) => (
-                  <RowSale
-                    key={index}
-                    sale={sale}
-                    type={'close'}
-                  />
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </TabPanel>
-      </>
-      : <></>}
+      <TabPanel
+        className={classes.bodyTab} value={value} index={2}
+      >
+        <TableContainer component={Paper}>
+          <Table className={classes.table}>
+            <TableHeadSale />
+            <TableBody>
+              {salesRefused.map((sale, index) => (
+                <RowSale
+                  key={index}
+                  sale={sale}
+                  type={'close'}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </TabPanel>
+
+      <TabPanel
+        className={classes.bodyTab} value={value} index={3}
+      >
+        <TableContainer component={Paper}>
+          <Table className={classes.table}>
+            <TableHeadSale/>
+            <TableBody>
+              {salesInRoute.map((sale, index) => (
+                <RowSale
+                  key={index}
+                  sale={sale}
+                  type={'close'}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </TabPanel>
     </>
   )
 }

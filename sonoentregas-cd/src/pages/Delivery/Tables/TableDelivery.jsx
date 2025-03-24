@@ -67,7 +67,7 @@ export default function TableDelivery({ type, deleteDelivery, openModals }){
         </TableHead>
         
         <TableBody>
-        {delivery.filter(item => item.DRIVER).map( item => (
+        {delivery.map( item => (
           <TableRow key={item.ID} className={classes.body}>
             <TableCell width={'5%'}>{item.ID}</TableCell>
             <TableCell width={'25%'}>{item.DESCRIPTION+' - '+item.D_MOUNTING}</TableCell>
@@ -80,24 +80,22 @@ export default function TableDelivery({ type, deleteDelivery, openModals }){
                 onClick={() => openModals(item, 'view')}
               >{item.STATUS}</div>
             </TableCell>
-            <TableCell width={'10%'} align="right">
-              {item.STATUS === 'Em lançamento' &&
-                <>
-                  <NavLink to={`update/delivery/${item.ID}`} className={classes.link}>
-                    <Edit />
-                  </NavLink>
-                  <Delete onClick={()=> deleteDelivery(item.ID)}/>
-                </>
-              }
-            </TableCell>
-            <TableCell width={'7%'}>
-              {item.STATUS !== 'Finalizada' &&
-              <Button
-                onClick={() => openModals(item, 'status')}
-                children={item.STATUS === 'Em lançamento' ? 'Entregar' : 'Finalizar'}
-              />
-              }
-            </TableCell>
+            {item.STATUS === 'Em lançamento' &&
+              <TableCell width={'10%'} align="right">
+                <NavLink to={`update/delivery/${item.ID}`} className={classes.link}>
+                  <Edit />
+                </NavLink>
+                <Delete onClick={()=> deleteDelivery(item.ID)}/>
+              </TableCell>
+            }
+            {item.STATUS !== 'Finalizada' &&
+              <TableCell width={'7%'}>
+                <Button
+                  onClick={() => openModals(item, 'status')}
+                  children={item.STATUS === 'Em lançamento' ? 'Entregar' : 'Finalizar'}
+                />
+              </TableCell>
+            }
           </TableRow>
         ))}
         </TableBody>

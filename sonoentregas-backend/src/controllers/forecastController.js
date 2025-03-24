@@ -76,14 +76,12 @@ module.exports = {
    */
   async findFinishedForecast(req, res){
     try {
-      const { typeSearch, search } = req.query
+      const { date } = req.query
 
-      const where = {}
-
-      where[typeSearch] = search
-      where['status'] = 0
-
-      const forecast = await ForecastService.findForecast( where, false)
+      const forecast = await ForecastService.findForecastClose({
+        date,
+        status: '0'
+      })
 
       return res.status(200).json(forecast)
     } catch (e) {
