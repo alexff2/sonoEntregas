@@ -75,7 +75,6 @@ const setUpSalesProduct = async (/** @type {ISales[]} */ sales, where = '') => {
 
   /**@type {IProduct[]} */
   const viewSalesProd = await ViewSalesProd.findSome(0, where)
-  console.log('Passou')
 
   return addProductInSale({ sales, products: viewSalesProd })
 }
