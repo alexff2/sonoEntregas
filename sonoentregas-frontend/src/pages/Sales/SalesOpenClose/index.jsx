@@ -156,6 +156,7 @@ export default function TabSaleWaiting({ type }) {
   },[codLoja, type])
 
   const searchSales = async () => {
+    setLoading(true)
     try {
       if (typeSearch !== 'All' && search === '') {
         console.log(typeSearch, search)
@@ -177,7 +178,10 @@ export default function TabSaleWaiting({ type }) {
       } else {
         setSales(data)
       }
+
+      setLoading(false)
     } catch (e) {
+      setLoading(false)
       console.log(e)
       setAlert("Erro ao comunicar com o Servidor")
     }
