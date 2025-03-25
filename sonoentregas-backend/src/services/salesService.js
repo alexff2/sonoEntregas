@@ -70,7 +70,7 @@ const setUpSalesProduct = async (/** @type {ISales[]} */ sales, where = '') => {
   if (where === '') {
     const idSales = sales.map(sale => sale.ID_SALES)
 
-    where = `ID_SALES IN (${idSales})`
+    where = `ID_SALES IN (${idSales}) AND CODLOJA IN (${sales.map(sale => sale.CODLOJA)})`
   }
 
   /**@type {IProduct[]} */
