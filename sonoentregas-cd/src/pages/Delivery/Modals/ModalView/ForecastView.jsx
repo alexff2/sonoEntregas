@@ -23,6 +23,8 @@ const useStyles = makeStyles(theme => ({
     textAlign: 'Center',
     fontSize: 20,
     fontWeight: 600,
+    color: theme.palette.common.black,
+    padding: theme.spacing(2, 0),
   },
   headerTab: {
     [theme.breakpoints.down('sm')]: {
