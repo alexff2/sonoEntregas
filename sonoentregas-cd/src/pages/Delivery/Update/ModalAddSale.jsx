@@ -120,6 +120,12 @@ export default function ModalAddSale({ setOpen, typeModal }){
 
       let { data }  = await api.get(`sales/${idSale}/${router}/create`)
 
+      if (data === '') {
+        setErrorMsg('Venda não enviada a base do CD!')
+
+        return
+      }
+
       if (typeModal === 'withdrawal') {
         if (!data[0].isWithdrawal) {
           setErrorMsg('Venda sem solicitação de retirada!')
@@ -134,11 +140,7 @@ export default function ModalAddSale({ setOpen, typeModal }){
         }
       }
 
-      if (data === '') {
-        setErrorMsg('Venda não enviada a base do CD!')
-
-        return
-      } else if (data.notFound) {
+      if (data.notFound) {
         setErrorMsg(data.notFound.message)
         
         return

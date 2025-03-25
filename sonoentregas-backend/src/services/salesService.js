@@ -68,20 +68,14 @@ const addProductInSale = async ({ sales , products }) => {
 
 const setUpSalesProduct = async (/** @type {ISales[]} */ sales, where = '') => {
   if (where === '') {
-    let idSales = ''
-    for (let i = 0; i < sales.length; i++){
-      if ( i === 0 ){
-        idSales+= sales[i].ID_SALES
-      } else {
-        idSales+= `, ${sales[i].ID_SALES}`
-      }
-    }
+    const idSales = sales.map(sale => sale.ID_SALES)
 
     where = `ID_SALES IN (${idSales})`
   }
 
   /**@type {IProduct[]} */
   const viewSalesProd = await ViewSalesProd.findSome(0, where)
+  console.log('Passou')
 
   return addProductInSale({ sales, products: viewSalesProd })
 }
