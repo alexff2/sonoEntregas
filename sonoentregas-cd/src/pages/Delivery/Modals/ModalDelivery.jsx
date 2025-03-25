@@ -8,7 +8,8 @@ import {
   MenuItem,
   Box,
   Typography,
-  Paper
+  Paper,
+  CircularProgress
 } from "@material-ui/core"
 
 //Components
@@ -131,7 +132,7 @@ export default function ModalDelivery({ setOpen, type }){
   const [ deliverySales, setDeliverySales ] = useState([])
   const [ availableStocks, setAvailableStocks ] = useState([])
   const [ errorMsg, setErrorMsg ] = useState('')
-  const [ disabledBtnSave, setDisabledBtnSave ] = useState(false)
+  const [ isLoading, setIsLoading ] = useState(false)
 
   const { cars, setCars } = useCars()
   const { drivers, setDrivers } = useDrivers()
@@ -167,11 +168,11 @@ export default function ModalDelivery({ setOpen, type }){
 
       if(date === '') {
         setErrorMsg('Selecione a data de carregamento!')
-        setDisabledBtnSave(false)
+        setIsLoading(false)
         return
       }
 
-      setDisabledBtnSave(true)
+      setIsLoading(true)
 
       let salesProd = []
 
@@ -201,7 +202,7 @@ export default function ModalDelivery({ setOpen, type }){
 
       setOpen(false)
     } catch (e) {
-      setDisabledBtnSave(false)
+      setIsLoading(false)
       if (!e.response){
         console.log(e)
         setAlert('Rede')
@@ -216,11 +217,11 @@ export default function ModalDelivery({ setOpen, type }){
 
   const createForecast = async () => {
     try {
-      setDisabledBtnSave(true)
+      setIsLoading(true)
 
       if(date === '') {
         setErrorMsg('Selecione a data de previsão!')
-        setDisabledBtnSave(false)
+        setIsLoading(false)
         return
       }
 
@@ -236,7 +237,7 @@ export default function ModalDelivery({ setOpen, type }){
 
       if(sales.length === 0) {
         setErrorMsg('Selecione ao menos um produto das vendas inseridas!')
-        setDisabledBtnSave(false)
+        setIsLoading(false)
         return
       }
 
@@ -261,7 +262,7 @@ export default function ModalDelivery({ setOpen, type }){
 
       setOpen(false)
     } catch (e) {
-      setDisabledBtnSave(false)
+      setIsLoading(false)
       if (!e.response){
         console.log(e)
         setAlert('Rede')
@@ -336,6 +337,7 @@ export default function ModalDelivery({ setOpen, type }){
 
   const handleSearchSales = async e => {
     e.preventDefault()
+    setIsLoading(true)
 
     if (search === ''){
       setErrorMsg(`Preencha o campo Código ${ typeSearch === 'codProduct' ? 'do Produto' : 'da DAV'}`)
@@ -395,7 +397,9 @@ export default function ModalDelivery({ setOpen, type }){
         ? validationsSearchById(filteredSales)
         : setStateSales(filteredSales)
 
-      } catch (e) {
+      setIsLoading(false)
+    } catch (e) {
+      setIsLoading(false)
       if (!e.response){
         console.log(e)
         setAlert('Rede')
@@ -582,7 +586,9 @@ export default function ModalDelivery({ setOpen, type }){
           onChange={onChangeInputSearch}
         />
 
-        <button onClick={e => handleSearchSales(e)}>Inserir</button>
+        <button onClick={e => handleSearchSales(e)} disabled={isLoading}>
+          { isLoading ?  <CircularProgress size={24} style={{ color: 'white'}}/> : 'Inserir' }
+        </button>
       </div>
 
       {errorMsg !== '' && <div className={classes.error}>{errorMsg}</div> }
@@ -604,7 +610,7 @@ export default function ModalDelivery({ setOpen, type }){
         <ButtonSuccess 
           children={"Lançar"}
           onClick={type === 'forecast' ? createForecast : createDelivery }
-          disabled={disabledBtnSave}
+          disabled={isLoading}
         />
         <ButtonCancel 
           children="Cancelar"

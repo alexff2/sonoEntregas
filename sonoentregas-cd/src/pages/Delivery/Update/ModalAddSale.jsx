@@ -7,7 +7,8 @@ import {
   TextField,
   Typography,
   Button,
-  makeStyles
+  makeStyles,
+  CircularProgress
 } from '@material-ui/core/'
 
 import Modal from '../../../components/Modal'
@@ -79,7 +80,7 @@ export default function ModalAddSale({ setOpen, typeModal }){
   const [ slideInputs, setSlideInputs ] = useState(true)
   const [ slideTable, setSlideTable ] = useState(false)
   const [ errorMsg, setErrorMsg ] = useState('')
-  const [ disabledBtnSave, setDisabledBtnSave ] = useState(false)
+  const [ isLoading, setIsLoading ] = useState(false)
   const [ idSale, setIdSale ] = useState('')
   const [ whoWithdrew, setWhoWithdrew ] = useState('')
   const [ date, setDate ] = useState('')
@@ -105,6 +106,7 @@ export default function ModalAddSale({ setOpen, typeModal }){
 
   const handleSearchSales = async () => {
     try {
+      setIsLoading(true)
       if (idSale === ''){
         setErrorMsg('Preencha o campo Código da Venda')
         return
@@ -187,7 +189,10 @@ export default function ModalAddSale({ setOpen, typeModal }){
         setSlideInputs(false)
         setSlideTable(true)
       }
+
+      setIsLoading(false)
     } catch (e) {
+      setIsLoading(false)
       if (!e.response) {
         console.log(e)
         setAlert('Rede')
@@ -229,7 +234,7 @@ export default function ModalAddSale({ setOpen, typeModal }){
 
   const addSalesInData = async () => {
     try {
-      setDisabledBtnSave(true)
+      setIsLoading(true)
 
       let saleFiltered
 
@@ -249,7 +254,7 @@ export default function ModalAddSale({ setOpen, typeModal }){
 
       if(saleFiltered.length === 0) {
         setErrorMsg('Selecione ao menos um produto das vendas inseridas!')
-        setDisabledBtnSave(false)
+        setIsLoading(false)
         return
       }
 
@@ -297,7 +302,7 @@ export default function ModalAddSale({ setOpen, typeModal }){
         return
       }
 
-      setDisabledBtnSave(true)
+      setIsLoading(true)
 
       let validation = true
 
@@ -368,7 +373,10 @@ export default function ModalAddSale({ setOpen, typeModal }){
             <Button
               className={classes.btnAdd}
               onClick={handleSearchSales}
-            >Inserir</Button>
+              disabled={isLoading}
+            >
+              { isLoading ?  <CircularProgress size={24} style={{ color: 'white'}}/> : 'Inserir' }
+            </Button>
           </Box>
 
           { errorMsg !== '' && <Box 
@@ -470,8 +478,8 @@ export default function ModalAddSale({ setOpen, typeModal }){
             <ButtonSuccess 
               children={"Lançar"}
               onClick={typeModal === 'withdrawal' ? handleWithdrawal : addSalesInData}
-              disabled={disabledBtnSave}
-              loading={disabledBtnSave}
+              disabled={isLoading}
+              loading={isLoading}
             />
             <ButtonCancel 
               children="Cancelar"
