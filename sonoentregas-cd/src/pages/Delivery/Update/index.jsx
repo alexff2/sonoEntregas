@@ -57,11 +57,10 @@ export default function Update(){
 
     if (!forecasts.length) {
       navigate('/app/delivery');
+      return
     }
 
-    type === 'forecast'
-      ? getForecast()
-      : getDelivery()
+    type === 'forecast' ? getForecast() : getDelivery()
   }, [forecasts, navigate, id, type])
 
   return (
@@ -75,7 +74,7 @@ export default function Update(){
       <Divider />
 
       <Box padding={4}>
-        <Table sales={sales} />
+        <Table sales={sales} setSales={setSales} />
       </Box>
     </Box>
   )

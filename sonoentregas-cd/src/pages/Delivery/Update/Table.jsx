@@ -26,7 +26,6 @@ import Modal from '../../../components/Modal'
 import ModalAddSale from './ModalAddSale'
 
 import { useForecasts } from '../../../context/forecastsContext'
-import { useDelivery } from '../../../context/deliveryContext'
 
 import { getComparator, stableSort } from '../../../functions/orderTable'
 import { getDateBr } from '../../../functions/getDates'
@@ -118,7 +117,7 @@ const TableToolbar = (props) => {
   );
 }
 
-export default function TableSalesUpdate({ sales }) {
+export default function TableSalesUpdate({ sales, setSales }) {
   const [order, setOrder] = React.useState('asc')
   const [orderBy, setOrderBy] = React.useState('ID_SALES')
   const [selected, setSelected] = React.useState([])
@@ -126,7 +125,6 @@ export default function TableSalesUpdate({ sales }) {
   const classes = useStyles()
   const { type, id: idData } = useParams()
   const { setForecasts, forecasts: forecastsContext } = useForecasts()
-  const { setDelivery, delivery } = useDelivery()
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -166,32 +164,17 @@ export default function TableSalesUpdate({ sales }) {
 
   const removeDeliverySales = async () => {
     try {
-      const deliveries = delivery
+      setSales(sales.filter( sale => !selected.includes(type === 'forecast' ? sale.id : sale.ID)))
+      /* const salesFind = sales.filter( sale => selected.includes(type === 'forecast' ? sale.id : sale.ID)) */
+      for(let index = 0; index < selected.length; index++) {
+        const saleFind = sales.find( sale => sale.ID === selected[index])
 
-      for (let indexDelivery = 0; indexDelivery < deliveries.length; indexDelivery++){
-        if (deliveries[indexDelivery].ID === parseInt(idData)) {
-          for(let index = 0; index < selected.length; index++) {
-            const saleFind = deliveries[indexDelivery].sales.find( sale => sale.ID === selected[index])
-
-            await api.post(`delivery/sale/rmv`, { salesProd: saleFind.products })
-
-            const saleFilter = deliveries[indexDelivery].sales.filter( sale => sale.ID !== selected[index])
-
-
-            deliveries[indexDelivery].sales = saleFilter
-          }
-        }
+        await api.post(`delivery/sale/rmv`, { salesProd: saleFind.products })
       }
-
-      setDelivery([...deliveries])
 
       setSelected([])
     } catch (e) {
       console.log(e)
-      const { data } = await api.get('delivery/open')
-      
-      setDelivery(data)
-      setSelected([])
     }
   }
 

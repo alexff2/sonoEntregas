@@ -139,16 +139,23 @@ module.exports = {
    * @param {*} res 
    */
   async rmvSale( req, res ) {
+    const connectionEntrega = await Deliveries._query(0)
+
     try {
       const { id: user_id } = req.user
       const { salesProd } = req.body
 
-      await DeliveriesService.rmvSale({ salesProd })
+      await DeliveriesService.rmvSale({ salesProd }, connectionEntrega)
 
-      await ForecastService.setIdDeliveryNullInForecastSales({ idDelivery: salesProd[0].ID_DELIVERY, idSale: salesProd[0].ID_SALE_ID })
+      await ForecastService.setIdDeliveryNullInForecastSales(
+        { idDelivery: salesProd[0].ID_DELIVERY, idSale: salesProd[0].ID_SALE_ID },
+        connectionEntrega
+      )
 
+      await connectionEntrega.transaction.commit()
       return res.json({ message: `Update by${user_id}` })
     } catch (e) {
+      await connectionEntrega.transaction.rollback()
       console.log(e)
 
       return res.status(400).json(e)

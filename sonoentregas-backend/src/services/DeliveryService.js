@@ -182,7 +182,10 @@ module.exports = {
 
       sales.forEach(sale => {
         if (sale.ID_DELIVERY === delivery.ID) {
-          sale["products"] = products.filter(product => sale.ID_SALES === product.ID_SALES && sale.CODLOJA === product.CODLOJA && product.ID_DELIVERY === sale.ID_DELIVERY)
+          sale["products"] =
+            products.filter(
+              product => sale.ID_SALES === product.ID_SALES && sale.CODLOJA === product.CODLOJA && product.ID_DELIVERY === sale.ID_DELIVERY
+            )
           delivery.sales.push(sale)
         }
       })
@@ -284,20 +287,16 @@ module.exports = {
       })
     }
   },
-  async rmvSale({ salesProd }){
+  async rmvSale({ salesProd }, connectionEntrega){
     const script = `DELETE DELIVERYS_PROD WHERE ID_DELIVERY = ${salesProd[0].ID_DELIVERY} AND ID_SALE = ${salesProd[0].ID_SALES} AND CODLOJA = ${salesProd[0].CODLOJA}`
 
-    await DeliveryProd._query(0, script, QueryTypes.DELETE)
+    await DeliveryProd._query(0, script, QueryTypes.DELETE, connectionEntrega)
 
-    for(let i = 0; i < salesProd.length; i++) {
-      var { ID_SALES, CODLOJA, COD_ORIGINAL } = salesProd[i]
-
-      await SalesProd.updateAny(0, { STATUS: 'Em Previsão' }, {
-        CODLOJA,
-        ID_SALES,
-        COD_ORIGINAL
-      })
-    }
+    await SalesProd.updateAny(0, { STATUS: 'Em Previsão' }, {
+      ID_SALES: salesProd[0].ID_SALES,
+      CODLOJA: salesProd[0].CODLOJA,
+      in: { COD_ORIGINAL: salesProd.map(product => product.COD_ORIGINAL) }
+    }, connectionEntrega)
   },
   /**
    * @param {ISale} sale
