@@ -39,7 +39,7 @@ export default function Update(){
       try {
         const { data: forecast } = await api.get(`/forecast/${id}/view`)
 
-        setSales(forecast.sales)
+        setSales(forecast === '' ? [] : forecast.sales)
       } catch (error) {
         console.log(error)
       }
