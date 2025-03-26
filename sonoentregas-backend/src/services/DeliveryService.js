@@ -153,6 +153,43 @@ module.exports = {
       console.log(error)
     }
   },
+  /**
+   * @param {number} idShop
+   */
+  async findDeliveriesByShop(idShop){
+    const deliveriesId = await Delivery.findAny(0, {
+      in: {
+        status: ['Em lançamento', 'Entregando']
+      }
+    }, 'ID')
+
+    const sales = await ViewDeliverySales.findAny(0, {
+      CODLOJA: idShop,
+      in: { ID_DELIVERY: deliveriesId.map(delivery => delivery.ID)}
+    })
+
+    const products = await ViewDeliveryProd2.findAny(0, {
+      CODLOJA: idShop,
+      in: { ID_DELIVERY: deliveriesId.map(delivery => delivery.ID)}
+    })
+
+    const deliveries = await ViewDeliveries.findAny(0, {
+      in: { ID: sales.map(sale => sale.ID_DELIVERY) }
+    })
+
+    deliveries.forEach(delivery => {
+      delivery["sales"] = []
+
+      sales.forEach(sale => {
+        if (sale.ID_DELIVERY === delivery.ID) {
+          sale["products"] = products.filter(product => sale.ID_SALES === product.ID_SALES && sale.CODLOJA === product.CODLOJA && product.ID_DELIVERY === sale.ID_DELIVERY)
+          delivery.sales.push(sale)
+        }
+      })
+    })
+
+    return deliveries
+  },
   async updateDelivery({ delivery, id, user_id, maintenances }, conditions){
     const dateTimeNow = new Date().getISODateTimeBr().dateTime
 

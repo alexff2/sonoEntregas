@@ -49,6 +49,24 @@ module.exports = {
    * @param {*} res 
    * @returns 
    */
+  async findDeliveryByShop( req, res ){
+    try {
+      const { idShop } = req.params
+      console.log('PASSOU')
+      
+      const deliveries =  await DeliveriesService.findDeliveriesByShop(idShop)
+
+      return res.json(deliveries)
+    } catch (error) {
+      console.log(error)
+      return res.status(400).json(error)
+    }
+  },
+  /**
+   * @param {*} req 
+   * @param {*} res 
+   * @returns 
+   */
   async findDelivery( req, res ){
     try {
       const { id } = req.params

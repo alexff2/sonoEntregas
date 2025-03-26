@@ -22,34 +22,10 @@ export function TabSalesProcess() {
 
   useEffect(() => {
     setLoading(true)
-    api.get(`/delivery/open`)
-      .then( resp => {
-        let salesMountingOfThisStore = []
-        let salesDeliveringOfThisStore = []
-        resp.data.forEach(delivery => {
-          if (delivery.ASSISTANT) {
-            let salesFiltered = delivery.sales.filter(sale => sale.CODLOJA === codLoja)
-
-            if (salesFiltered.length > 0) {
-              delivery.sales = salesFiltered
-
-              if (delivery.STATUS === 'Em lançamento') {
-                salesMountingOfThisStore = [
-                  ...salesMountingOfThisStore,
-                  delivery
-                ]
-              } else {
-                salesDeliveringOfThisStore = [
-                  ...salesDeliveringOfThisStore,
-                  delivery
-                ]
-              }
-            }
-          }
-        })
-
-        setSalesMounting(salesMountingOfThisStore)
-        setSalesDelivering(salesDeliveringOfThisStore)
+    api.get(`/delivery/${codLoja}/sales/shops`)
+      .then(({ data }) => {
+        setSalesMounting(data.filter(delivery => delivery.STATUS === 'Em lançamento'))
+        setSalesDelivering(data.filter(delivery => delivery.STATUS === 'Entregando'))
         setLoading(false)
       })
       .catch( err => {
