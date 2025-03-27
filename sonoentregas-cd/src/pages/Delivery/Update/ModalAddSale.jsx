@@ -261,7 +261,7 @@ export default function ModalAddSale({ setOpen, typeModal }){
       if (type === 'forecast') {
         await api.post(`/forecast/${id}/sales/add`, { sales: saleFiltered })
 
-        const { data } = await api.get('forecast')
+        const { data } = await api.get('forecast/open')
 
         setForecasts(data)
       } else {

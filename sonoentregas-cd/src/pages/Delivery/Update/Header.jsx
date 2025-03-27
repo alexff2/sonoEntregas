@@ -47,18 +47,6 @@ export default function Header({ data, type }) {
   const { setDelivery } = useDelivery()
 
   useEffect(() => {
-    if (data && type === 'delivery') {
-      const dateArray = data.D_MOUNTING.split('/')
-
-      setDescription(data.DESCRIPTION)
-      setDate(`${dateArray[2]}-${dateArray[1]}-${dateArray[0]}`)
-      setCodDriver(data.ID_DRIVER)
-      setCodAssistant(data.ID_ASSISTANT)
-      setCodCar(data.ID_CAR)
-    }
-  }, [data, type])
-
-  useEffect(() => {
     const searchUsers = async () => {
       if (assistants.length === 0) {
         const { data: usersResponse } = await api.get('users/0')
@@ -68,10 +56,20 @@ export default function Header({ data, type }) {
         setDrivers(usersResponse.filter(user => user.OFFICE === 'Driver'))
         setAssistants(usersResponse.filter(user => user.OFFICE === 'Assistant'))
       }
+
+      if (data && type === 'delivery') {
+        const dateArray = data.D_MOUNTING.split('/')
+  
+        setDescription(data.DESCRIPTION)
+        setDate(`${dateArray[2]}-${dateArray[1]}-${dateArray[0]}`)
+        setCodDriver(data.ID_DRIVER)
+        setCodAssistant(data.ID_ASSISTANT)
+        setCodCar(data.ID_CAR)
+      }
     }
 
     searchUsers()
-  }, [setCars, setDrivers, setAssistants, assistants])
+  }, [setCars, setDrivers, setAssistants, assistants, data, type])
 
   const classes = useStyles()
 
@@ -141,7 +139,6 @@ export default function Header({ data, type }) {
                 labelId="driverLabel"
                 label="Motorista"
                 id="driver"
-                defaultValue={0}
                 value={codDriver}
                 onChange={(e) => setCodDriver(e.target.value)}
                 disabled={disabled}

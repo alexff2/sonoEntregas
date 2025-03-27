@@ -61,7 +61,7 @@ export default function Update(){
     }
 
     type === 'forecast' ? getForecast() : getDelivery()
-  }, [forecasts, navigate, id, type])
+  }, [forecasts, deliveries, navigate, id, type])
 
   return (
     <Box component={Paper}>
