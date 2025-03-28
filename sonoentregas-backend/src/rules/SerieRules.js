@@ -4,7 +4,7 @@ const DeliveryModel = require('../models/Deliverys')
 const TransferOfProductsModel = require('../models/tables/TransferOfProducts')
 const PurchaseNoteModel = require('../models/tables/PurchaseNote')
 const SaleReturnModel = require('../models/tables/Returns/index')
-const MaintenanceModel = require('../models/tables/Maintenance')
+const MaintenanceDelivModel = require('../models/tables/MaintenanceDeliv')
 
 class SerieRules {
   async createIfDoesNotExistFinished({serialNumber}, connection){
@@ -43,7 +43,7 @@ class SerieRules {
     const { sce, entrega } = connections
 
     if(modele === 'maintenance') {
-      const maintenance = await MaintenanceModel.findAny(0, { id: moduleId }, '*', entrega)
+      const maintenance = await MaintenanceDelivModel.findAny(0, { id: moduleId }, '*', entrega)
 
       if (maintenance.length === 0) {
         throw {
@@ -99,6 +99,20 @@ class SerieRules {
         }
       }
     }
+  }
+
+  async serialNumberMayReturn({serialNumber, moduleId, module }, connection) {
+    const serialNumberExists = await ProdLojaSeriesModel.findAny(1, {
+      serialNumber,
+      outputModuleId: moduleId,
+      outputModule: module,
+    }, '*', connection);
+
+    if (serialNumberExists.length > 0) {
+      return true;
+    }
+
+    return false;
   }
 }
 

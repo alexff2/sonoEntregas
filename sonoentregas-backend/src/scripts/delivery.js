@@ -24,7 +24,7 @@ module.exports = {
           FROM PRODLOJAS_SERIES_MOVIMENTOS
           WHERE outputModule = 'maintenance'
           GROUP BY productId, outputModuleId) D ON D.productId = C.CODIGO AND D.outputModuleId = A.ID
-      WHERE AND B.ID_DELIV_MAIN = ${id}`
+      WHERE B.ID_DELIV_MAIN = ${id}`
   },
   findToBeepDeliveryReturn(id) {
     return `

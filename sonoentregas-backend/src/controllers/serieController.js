@@ -41,16 +41,20 @@ module.exports = {
         }
       }
 
-      if (module !== 'single' && module !== 'purchaseNote' && module !== 'transfer' && module !== 'delivery' && module !== 'saleReturn') {
-        throw {
-          error: 'Module invalid!'
-        }
-      }
-
       if (module !== 'single') await SerieRules.checkModule(module, moduleId, {
         sce: connection,
         entrega: connectionEntrega
       })
+
+      if (module === 'delivery' || module === 'maintenance') {
+        const mayReturn = await SerieRules.serialNumberMayReturn({ serialNumber, moduleId, module }, connection)
+        if (!mayReturn) {
+          throw {
+            error: 'Serial number not linked to this module on output!'
+          }
+        }
+      }
+
       await SerieRules.createIfDoesNotExistFinished({ serialNumber }, connection)
 
       const serialNumberResponse = await SerieService.create({

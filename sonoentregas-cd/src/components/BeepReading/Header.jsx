@@ -136,6 +136,8 @@ export function Header({
         setAlertSnackbar('Número de série já finalizado ou não foi dado entrada!')
       } else if (error.response.data === 'This serial number does not belong to this product!') {
         setAlertSnackbar('Este número de série não pertence a esse produto!')
+      } else if (error.response.data === 'Serial number not linked to this module on output!') {
+        setAlertSnackbar('Número de série não vinculado a esse modulo na saída!')
       } else if (error.response.data === 'the serial number already exists and is not finalized!') {
         setAlertSnackbar('Número de série já foi dado entrada em outro produto!')
       } else if (error.response.data === 'serial number invalid') {
