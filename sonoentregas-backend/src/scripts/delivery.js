@@ -23,7 +23,7 @@ module.exports = {
       LEFT JOIN ( SELECT productId, COUNT(id) quantityBeep, outputModuleId
           FROM PRODLOJAS_SERIES_MOVIMENTOS
           WHERE outputModule = 'maintenance'
-          GROUP BY productId, outputModuleId) D ON D.productId = C.CODIGO AND D.outputModuleId = A.ID
+          GROUP BY productId, outputModuleId) D ON D.productId = C.CODIGO AND D.outputModuleId = B.ID
       WHERE B.ID_DELIV_MAIN = ${id}`
   },
   findToBeepDeliveryReturn(id) {
@@ -50,7 +50,7 @@ module.exports = {
       LEFT JOIN ( SELECT productId, COUNT(id) quantityBeep, inputModuleId
           FROM PRODLOJAS_SERIES_MOVIMENTOS
           WHERE inputModule = 'maintenance'
-          GROUP BY productId, inputModuleId) D ON D.productId = C.CODIGO AND D.inputModuleId = A.ID
+          GROUP BY productId, inputModuleId) D ON D.productId = C.CODIGO AND D.inputModuleId = B.ID
       WHERE B.DONE = 0 AND B.ID_DELIV_MAIN = ${id}
       UNION
       SELECT C.CODIGO id, C.APLICACAO mask, C.NOME nameFull, B.quantity,
