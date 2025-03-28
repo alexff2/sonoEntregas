@@ -101,9 +101,10 @@ class SerieRules {
     }
   }
 
-  async serialNumberMayReturn({serialNumber, moduleId, module }, connection) {
+  async serialNumberMayReturn({serialNumber, moduleId, module, productId }, connection) {
     const serialNumberExists = await ProdLojaSeriesModel.findAny(1, {
       serialNumber,
+      productId,
       outputModuleId: moduleId,
       outputModule: module,
     }, '*', connection);

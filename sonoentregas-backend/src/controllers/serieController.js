@@ -47,7 +47,12 @@ module.exports = {
       })
 
       if (module === 'delivery' || module === 'maintenance') {
-        const mayReturn = await SerieRules.serialNumberMayReturn({ serialNumber, moduleId, module }, connection)
+        const mayReturn = await SerieRules.serialNumberMayReturn({
+          serialNumber,
+          moduleId,
+          module,
+          productId
+        }, connection)
         if (!mayReturn) {
           throw {
             error: 'Serial number not linked to this module on output!'
