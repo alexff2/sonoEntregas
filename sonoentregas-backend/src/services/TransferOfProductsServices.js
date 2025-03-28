@@ -357,11 +357,13 @@ class TransferServices {
    * @param {any} connection
    */
   async rmvProduct(id, productId, type, connection){
-    scriptTransferOfProducts.moveStock(
-      type === 'D' ? 'S' : 'E',
+    const scriptMoveStock = scriptTransferOfProducts.moveStock(
+      type === 'D' ? 'E' : 'S',
       id,
       productId
     )
+
+    await TransferProductModel._query(1, scriptMoveStock, QueryTypes.UPDATE, connection)
 
     await TransferProductModel.deleteAny(
       1,

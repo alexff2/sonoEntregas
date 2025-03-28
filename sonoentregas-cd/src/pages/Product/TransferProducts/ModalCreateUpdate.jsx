@@ -209,8 +209,14 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
       .then(({ data }) => {
         setShopSce(data)
     
-        transferUpdate ? setOriginId(transferUpdate.originId) : setOriginId(1)
-        transferUpdate ? setDestinyId(transferUpdate.destinyId) : setDestinyId(2)
+        if (transferUpdate) {
+          setOriginId(transferUpdate.originId)
+          setDestinyId(transferUpdate.destinyId)
+        } else {
+          setOriginId(1)
+          setDestinyId(2)
+        }
+          
       })
   }, [transferUpdate])
 
