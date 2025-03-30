@@ -52,7 +52,6 @@ module.exports = {
   async findDeliveryByShop( req, res ){
     try {
       const { idShop } = req.params
-      console.log('PASSOU')
       
       const deliveries =  await DeliveriesService.findDeliveriesByShop(idShop)
 
