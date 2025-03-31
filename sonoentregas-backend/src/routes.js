@@ -56,7 +56,7 @@ routes.put('/users/:userId', usersController.update)
   routes.get('/products/stock', ensureAuthenticated, productsController.findStock)
   routes.put('/product/barcode', ensureAuthenticated, productsController.updateBarCode)
   // Beep
-  routes.get('/beep-pendant', serieController.findBeepPendantModules)
+  routes.get('/beep-pendant-modules', serieController.findBeepPendantModules)
   routes.get('/serial/product', serieController.findOpenSeriesByProduct)
   routes.get('/serial/product/open', serieController.findSerialNumberOfProduct)
   routes.post('/serial/first', ensureAuthenticated, serieController.createFirst)

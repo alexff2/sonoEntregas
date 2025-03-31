@@ -150,6 +150,7 @@ class SerieService {
     const script = scriptsBeepPendantModule(where)
 
     const data = await ProdLojaSeriesMovimentosModel._query(0, script, QueryTypes.SELECT)
+    console.log('data', data)
 
     const modules = []
 
@@ -159,7 +160,7 @@ class SerieService {
           description: item.MODULE,
           data: [{
             id: item.ID,
-            data: item.DATA,
+            date: item.DATA.toLocaleDateString(),
             obs: item.OBS,
             qtd: item.QTD,
             qtd_beep: item.QTD_BEEP
@@ -170,7 +171,7 @@ class SerieService {
 
         moduleFind?.data.push({
           id: item.ID,
-          data: item.DATA,
+          date: item.DATA.toLocaleDateString(),
           obs: item.OBS,
           qtd: item.QTD,
           qtd_beep: item.QTD_BEEP
