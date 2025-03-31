@@ -146,8 +146,8 @@ class SerieService {
     )
   }
 
-  async beepPendantModules() {
-    const script = scriptsBeepPendantModule()
+  async beepPendantModules(where) {
+    const script = scriptsBeepPendantModule(where)
 
     const data = await ProdLojaSeriesMovimentosModel._query(0, script, QueryTypes.SELECT)
 

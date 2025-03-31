@@ -144,9 +144,20 @@ module.exports = {
     }
   },
   findBeepPendantModules: async(request, response) => {
-    const where = request.query.where
+    const where = request.query
 
-    const result = await SerieService.beepPendantModules()
+    if (typeof where !== 'object' || where === null || Array.isArray(where)) {
+      return response.status(400).json({ error: 'Invalid "where" parameter. It must be an object.' })
+    }
+
+    const allowedKeys = ['data', 'module', 'id']
+    const invalidKeys = Object.keys(where).filter(key => !allowedKeys.includes(key))
+
+    if (invalidKeys.length > 0) {
+      return response.status(400).json({ error: `Invalid keys in "where" parameter: ${invalidKeys.join(', ')}` })
+    }
+
+    const result = await SerieService.beepPendantModules(where)
 
     return response.json(result)
   }
