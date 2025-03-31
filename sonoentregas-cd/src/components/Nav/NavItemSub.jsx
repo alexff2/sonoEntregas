@@ -6,6 +6,7 @@ import {
   KeyboardArrowUp
 } from '@material-ui/icons'
 import PropTypes from 'prop-types'
+import { useAuthenticate } from '../../context/authContext'
 
 const useStyle = makeStyles((theme)=>({
   item: {
@@ -46,6 +47,7 @@ function Navbar({
 }) {
   const [open, setOpen] = useState(false)
   const classes = useStyle()
+  const { userAuth } = useAuthenticate()
   return(
     <>
       <Button
@@ -64,7 +66,7 @@ function Navbar({
 
       <Collapse component="div" in={open} timeout="auto" unmountOnExit>
         {
-          subs.map((sub, i) => (
+          subs.filter(sub => (userAuth.OFFICE === 'Dev' || sub.title !== 'Movimentações')).map((sub, i) => (
             <ListItem
               key={i}
               className={classes.item}

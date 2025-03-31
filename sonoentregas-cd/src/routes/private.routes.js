@@ -10,10 +10,16 @@ import DeliveryUpdate from '../pages/Delivery/Update'
 
 import Cars from '../pages/Cars'
 import Users from '../pages/Users'
-import Products from '../pages/Product'
 
-import SalesReturns from '../pages/Sales/Returns'
+import ProductsSearch from '../pages/Product/SearchProducts'
+import ProductsPurchaseNotes from '../pages/Product/PurchaseNotes'
+import ProductsPurchaseOrder from '../pages/Product/PurchaseOrder'
+import ProductsTransfer from '../pages/Product/TransferProducts'
+import ProductsChangeBeep from '../pages/Product/ChangeSerialNumber'
+import ProductsBeepPendantModules from '../pages/Product/BeepPendantModules'
+
 import SalesSearch from '../pages/Sales/Search'
+import SalesReturns from '../pages/Sales/Returns'
 
 import Reports from '../pages/Reports'
 import OrderSuggestion from '../pages/Reports/OrderSuggestion'
@@ -39,7 +45,13 @@ export default function PrivateRoutes(){
         <Route path="/app/sales/returns" element={<SalesReturns />} />
         <Route path="/app/sales/search" element={<SalesSearch />} />
 
-        <Route path="/app/products" element={<Products />} />
+        <Route path="/app/products/search" element={<ProductsSearch />} />
+        <Route path="/app/products/purchase-order" element={<ProductsPurchaseOrder />} />
+        <Route path="/app/products/purchase-notes" element={<ProductsPurchaseNotes />} />
+        <Route path="/app/products/transfer" element={<ProductsTransfer />} />
+        <Route path="/app/products/change-beep" element={<ProductsChangeBeep />} />
+        <Route path="/app/products/modules-pending-beep" element={<ProductsBeepPendantModules />} />
+
         <Route path="/app/maintenance" element={<Maintenance />} />
         <Route path="/app/beeping" element={<Beeping />} />
         <Route path="/app/users" element={<Users />} />

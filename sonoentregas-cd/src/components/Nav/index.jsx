@@ -61,8 +61,33 @@ const itens = [
   },
   {
     title: 'Produtos',
-    href: '/app/products',
     icon: AirlineSeatIndividualSuite,
+    subs: [
+      {
+        title: 'Consulta',
+        href: '/app/products/search',
+      },
+      {
+        title: 'Notas de Compra',
+        href: '/app/products/purchase-notes',
+      },
+      {
+        title: 'Ordens de Compra',
+        href: '/app/products/purchase-order',
+      },
+      {
+        title: 'Transferências',
+        href: '/app/products/transfer',
+      },
+      {
+        title: 'Atualizar Bip',
+        href: '/app/products/change-beep',
+      },
+      {
+        title: 'Módulos Pendentes de Bipagem',
+        href: '/app/products/modules-pending-beep',
+      },
+    ],
     fullWidth: true
   },
   {
