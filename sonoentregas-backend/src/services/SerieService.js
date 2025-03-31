@@ -151,7 +151,34 @@ class SerieService {
 
     const data = await ProdLojaSeriesMovimentosModel._query(0, script, QueryTypes.SELECT)
 
-    return data
+    const modules = []
+
+    for (const item of data) {
+      if (!modules.some(module => module.description === item.MODULE)) {
+        modules.push({
+          description: item.MODULE,
+          data: [{
+            id: item.ID,
+            data: item.DATA,
+            obs: item.OBS,
+            qtd: item.QTD,
+            qtd_beep: item.QTD_BEEP
+          }]
+        })
+      } else {
+        const moduleFind = modules.find(module => module.description === item.MODULE)
+
+        moduleFind?.data.push({
+          id: item.ID,
+          data: item.DATA,
+          obs: item.OBS,
+          qtd: item.QTD,
+          qtd_beep: item.QTD_BEEP
+        })
+      }
+    }
+
+    return modules
   }
 }
 
