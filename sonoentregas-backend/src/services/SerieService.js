@@ -28,6 +28,7 @@
 const { QueryTypes } = require('sequelize')
 const ProdLojaSeriesMovimentosModel = require('../models/tables/ProdLojaSeriesMovimentos')
 const ProductService = require('../services/ProductsService')
+const scriptsBeepPendantModule = require('../scripts/beepPendantModule')
 
 class SerieService {
   /**@param {InputProps} props */
@@ -143,6 +144,14 @@ class SerieService {
       },
       transaction
     )
+  }
+
+  async beepPendantModules() {
+    const script = scriptsBeepPendantModule()
+
+    const data = await ProdLojaSeriesMovimentosModel._query(0, script, QueryTypes.SELECT)
+
+    return data
   }
 }
 

@@ -142,5 +142,12 @@ module.exports = {
       await entrega.transaction.rollback()
       errorCath(erro, response)
     }
+  },
+  findBeepPendantModules: async(request, response) => {
+    const where = request.query.where
+
+    const result = await SerieService.beepPendantModules()
+
+    return response.json(result)
   }
 }

@@ -3,68 +3,12 @@ const { QueryTypes } = require('sequelize')
 
 const connections = require('../connections')
 const connectWithRetry = require('./connectWithRetry')
+const getObj = require('../../../functions/getObj')
 
 class Model {
   constructor(tab, columns){
     this.tab = tab,
     this.columns = columns
-  }
-
-  getObj(obj, separate=', ', toCompare = '='){
-    let values = ''
-
-    Object.entries(obj).forEach(([key,value], i, vet) => {
-      if (key === 'in') {
-        Object.entries(obj.in).forEach(([keyIn,arrayValueIn], indexIn) => {
-          let valueIn
-
-          if (indexIn === 0) {
-            arrayValueIn.forEach((el, ind) => {
-              ind === 0
-                ? valueIn = `'${el}'`
-                : valueIn += `, '${el}'`
-            })
-  
-            vet.length === i + 1
-              ? values += `${keyIn} IN (${valueIn.toString()})`
-              : values += `${keyIn} IN (${valueIn.toString()})${separate} `
-          } else {
-            arrayValueIn.forEach((el, ind) => {
-              ind === 0
-                ? valueIn = `'${el}'`
-                : valueIn += `, '${el}'`
-            })
-  
-            vet.length === i + 1
-              ? values += `AND ${keyIn} IN (${valueIn.toString()})`
-              : values += `AND ${keyIn} IN (${valueIn.toString()})${separate} `
-          }
-        })
-      } else if (key === 'isNull') {
-        vet.length === i + 1 
-          ? values += `${value} is null` 
-          : values += `${value} is null${separate} `
-      } else if (key === 'isNotNull') {
-        vet.length === i + 1 
-          ? values += `${value} is not null` 
-          : values += `${value} is not null${separate} `
-      } else {
-        let keyValue
-        if (value === 'CURRENT_TIMESTAMP'){
-          keyValue = toCompare === '=' ? `${key} = ${value}` : `${key} LIKE ${value}%`
-        } else if (value === 'NULL') {
-          keyValue = `${key} = ${value}`
-        } else {
-          keyValue = toCompare === '=' ? `${key} = '${value}'` : `${key} LIKE '${value}%'`
-        }
-  
-        vet.length === i + 1 
-          ? values += keyValue 
-          : values += `${keyValue}${separate} `
-      }
-    })
-
-    return values
   }
 
   async findAll(loja, columns = this.columns, t, log=false){
@@ -83,7 +27,7 @@ class Model {
   async find({loja, where = {}, columns = this.columns, toCompare = '='}, t, log=false){
     where = Object.keys(where).length === 0 
       ? '' 
-      : `WHERE ${this.getObj(where, ' AND ', toCompare)}`
+      : `WHERE ${getObj(where, ' AND ', toCompare)}`
 
     const script = `SELECT ${columns} FROM ${this.tab} ${where}`
 
@@ -94,7 +38,7 @@ class Model {
   async findAny(loja, where = {}, columns = this.columns, t, log=false){
     where = Object.keys(where).length === 0 
       ? '' 
-      : `WHERE ${this.getObj(where, ' AND ')}`
+      : `WHERE ${getObj(where, ' AND ')}`
 
     const script = `SELECT ${columns} FROM ${this.tab} ${where}`
 
@@ -240,7 +184,7 @@ class Model {
   }
   async updateAny(loja, obJValues, where, t, log=false) {
     
-    const script = `UPDATE ${this.tab} SET ${this.getObj(obJValues)} WHERE ${this.getObj(where, ' AND ')}`
+    const script = `UPDATE ${this.tab} SET ${getObj(obJValues)} WHERE ${getObj(where, ' AND ')}`
     
     await this._query(loja, script, QueryTypes.UPDATE, t, log)
   }
@@ -280,7 +224,7 @@ class Model {
   }
   async deleteAny(loja, where, t, log=false) {
 
-    const script = `DELETE ${this.tab} WHERE ${this.getObj(where, ' AND ')}`
+    const script = `DELETE ${this.tab} WHERE ${getObj(where, ' AND ')}`
 
     await this._query(loja, script, QueryTypes.DELETE, t, log)
   }
