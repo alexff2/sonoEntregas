@@ -150,7 +150,6 @@ class SerieService {
     const script = scriptsBeepPendantModule(where)
 
     const data = await ProdLojaSeriesMovimentosModel._query(0, script, QueryTypes.SELECT)
-    console.log('data', data)
 
     const modules = []
 

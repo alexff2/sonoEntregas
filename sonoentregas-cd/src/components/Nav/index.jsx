@@ -68,12 +68,12 @@ const itens = [
         href: '/app/products/search',
       },
       {
-        title: 'Notas de Compra',
-        href: '/app/products/purchase-notes',
+        title: 'Pedidos',
+        href: '/app/products/purchase-order',
       },
       {
-        title: 'Ordens de Compra',
-        href: '/app/products/purchase-order',
+        title: 'Notas',
+        href: '/app/products/purchase-notes',
       },
       {
         title: 'Transferências',
@@ -84,7 +84,7 @@ const itens = [
         href: '/app/products/change-beep',
       },
       {
-        title: 'Módulos Pendentes de Bipagem',
+        title: 'Bips Pendentes',
         href: '/app/products/modules-pending-beep',
       },
     ],

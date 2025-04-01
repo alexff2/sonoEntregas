@@ -37,16 +37,16 @@ const BeepPendantModules = () => {
         <Box key={index} marginTop={4}>
           <TableContainer component={Paper} variant='elevation'>
             <Box bgcolor="primary.main" color="#FFF" p={1}>
-              <Typography variant='h5'>{module.description}</Typography>
+              <Typography variant='h6'>{module.description}</Typography>
             </Box>
             <Table size='small'>
               <TableHead>
                 <TableRow>
                   <TableCell>ID</TableCell>
                   <TableCell>Data</TableCell>
-                  <TableCell>Obs</TableCell>
                   <TableCell>Qtd</TableCell>
                   <TableCell>Qtd Beep</TableCell>
+                  <TableCell>Obs</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -54,9 +54,9 @@ const BeepPendantModules = () => {
                 <TableRow key={index}>
                   <TableCell>{item.id}</TableCell>
                   <TableCell>{item.date}</TableCell>
-                  <TableCell>{item.obs}</TableCell>
                   <TableCell>{item.qtd}</TableCell>
                   <TableCell>{item.qtd_beep}</TableCell>
+                  <TableCell>{item.obs}</TableCell>
                 </TableRow>
               ))}
               </TableBody>

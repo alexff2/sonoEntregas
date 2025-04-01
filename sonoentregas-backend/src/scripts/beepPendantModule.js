@@ -134,8 +134,8 @@ SELECT * FROM (
  */
 function beepPendantModule(whereObj = {}) {
   const where = Object.keys(whereObj).length === 0 
-    ? '' 
-    : `WHERE ${getObj(whereObj, ' AND ')}`
+    ? 'ORDER BY MODULE, DATA, ID' 
+    : `WHERE ${getObj(whereObj, ' AND ')} ORDER BY MODULE, DATA, ID`
 
   const script = `${scriptDefault} ${where}`
 
