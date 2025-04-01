@@ -55,24 +55,26 @@ export default function ModalDelivering({ setOpen, selectDelivery }){
     const getDelivery = async () => {
       try {
         const { data: delivery } = await api.get(`/delivery/${selectDelivery.ID}/sales/view`)
-        const { data: productsBeep } = await api.get('delivery', {
-          params: {
-            id: selectDelivery.ID,
-          }
-        })
-
-        const pendantProducts = []
-
-        productsBeep.deliveryProducts.forEach(group => {
-          group.products.forEach(product => {
-            if (product.quantityPedding > 0) {
-              pendantProducts.push(product)
+        if(process.env.REACT_APP_STOCK_BEEP === '1'){
+          const { data: productsBeep } = await api.get('delivery', {
+            params: {
+              id: selectDelivery.ID,
             }
           })
-        })
-
+  
+          const pendantProducts = []
+  
+          productsBeep.deliveryProducts.forEach(group => {
+            group.products.forEach(product => {
+              if (product.quantityPedding > 0) {
+                pendantProducts.push(product)
+              }
+            })
+          })
+  
+          setBeepPendantProducts(pendantProducts)
+        }
         setSales(delivery.sales)
-        setBeepPendantProducts(pendantProducts)
         setOpenBackDrop(false)
       } catch (error) {
         console.log(error)
