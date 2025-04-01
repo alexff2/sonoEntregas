@@ -4,7 +4,12 @@ import {
   makeStyles,
   TextField,
   Divider,
-  Box
+  Box,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody
 } from '@material-ui/core'
 
 import { useDelivery } from "../../../context/deliveryContext"
@@ -35,6 +40,7 @@ const useStyle = makeStyles(theme => ({
 export default function ModalDelivering({ setOpen, selectDelivery }){
   const [ date, setDate ] = useState('')
   const [ sales, setSales ] = useState([])
+  const [ beepPendantProducts, setBeepPendantProducts ] = useState([])
   const [ error, setError ] = useState(false)
   const [ childrenError, setChildrenError ] = useState('')
   const [ disabledBtnSave, setDisabledBtnSave ] = useState(false)
@@ -49,8 +55,24 @@ export default function ModalDelivering({ setOpen, selectDelivery }){
     const getDelivery = async () => {
       try {
         const { data: delivery } = await api.get(`/delivery/${selectDelivery.ID}/sales/view`)
+        const { data: productsBeep } = await api.get('delivery', {
+          params: {
+            id: selectDelivery.ID,
+          }
+        })
+
+        const pendantProducts = []
+
+        productsBeep.deliveryProducts.forEach(group => {
+          group.products.forEach(product => {
+            if (product.quantityPedding > 0) {
+              pendantProducts.push(product)
+            }
+          })
+        })
 
         setSales(delivery.sales)
+        setBeepPendantProducts(pendantProducts)
         setOpenBackDrop(false)
       } catch (error) {
         console.log(error)
@@ -106,26 +128,57 @@ export default function ModalDelivering({ setOpen, selectDelivery }){
   }
 
   return(
-    <div>
-      <Divider />
-      <Box className={classes.boxContainer}>
-        <span>Selecione a data de saída:</span>
-        <TextField
-          type="date"
-          onChange={e => setDate(e.target.value)}
-          InputLabelProps={{
-            shrink: true
-          }}
-        />
+    <>
+      {beepPendantProducts.length > 0
+        ?<Box>
+          <div className={classes.errorDiv}>
+            <span>Produtos abaixo pendentes de bipar!</span>
+          </div>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>Código</TableCell>
+                <TableCell>Produto</TableCell>
+                <TableCell>Qtd</TableCell>
+                <TableCell>Qtd Bip</TableCell>
+                <TableCell>Qtd Pen</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {beepPendantProducts.map((product, index) => (
+                <TableRow key={index}>
+                  <TableCell>{product.id}</TableCell>
+                  <TableCell>{product.nameFull}</TableCell>
+                  <TableCell>{product.quantity}</TableCell>
+                  <TableCell>{product.quantityBeep}</TableCell>
+                  <TableCell>{product.quantityPedding}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Box>
+        :<div>
+          <Divider />
+          <Box className={classes.boxContainer}>
+            <span>Selecione a data de saída:</span>
+            <TextField
+              type="date"
+              onChange={e => setDate(e.target.value)}
+              InputLabelProps={{
+                shrink: true
+              }}
+            />
 
-        <ButtonSuccess
-          children={'SALVAR'}
-          onClick={delivering}
-          disabled={disabledBtnSave}
-          loading={disabledBtnSave}
-        />
-      </Box>
-      {error && <div className={classes.errorDiv}><span>{childrenError}</span></div>}
-    </div>
+            <ButtonSuccess
+              children={'SALVAR'}
+              onClick={delivering}
+              disabled={disabledBtnSave || beepPendantProducts.length > 0}
+              loading={disabledBtnSave}
+            />
+          </Box>
+          {error && <div className={classes.errorDiv}><span>{childrenError}</span></div>}
+        </div>
+      }
+    </>
   )
 }
