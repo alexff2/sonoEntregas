@@ -144,6 +144,10 @@ module.exports = {
     }
   },
   findBeepPendantModules: async(request, response) => {
+    if(process.env.CD_BASE !== 'SONO') {
+      return response.json([])
+    }
+
     const where = request.query
 
     if (typeof where !== 'object' || where === null || Array.isArray(where)) {
