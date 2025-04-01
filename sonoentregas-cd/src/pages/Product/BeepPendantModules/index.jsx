@@ -46,6 +46,7 @@ const BeepPendantModules = () => {
                   <TableCell>Data</TableCell>
                   <TableCell>Qtd</TableCell>
                   <TableCell>Qtd Beep</TableCell>
+                  <TableCell>Qtd Pen.</TableCell>
                   <TableCell>Obs</TableCell>
                 </TableRow>
               </TableHead>
@@ -56,6 +57,7 @@ const BeepPendantModules = () => {
                   <TableCell>{item.date}</TableCell>
                   <TableCell>{item.qtd}</TableCell>
                   <TableCell>{item.qtd_beep}</TableCell>
+                  <TableCell>{item.qtd - item.qtd_beep}</TableCell>
                   <TableCell>{item.obs}</TableCell>
                 </TableRow>
               ))}
