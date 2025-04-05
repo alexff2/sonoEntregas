@@ -21,7 +21,7 @@ export default function EntryNote({handleRenderBox}) {
   const [openSearch, setOpenSearch] = useState(true)
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(false)
-  const [beepId, setBeepId] = useState(true)
+  const [beepById, setBeepById] = useState(true)
   const [productSelected, setProductSelected] = useState(null)
   const [products, setProducts] = useState([])
   const { setAlertSnackbar } = useAlertSnackbar()
@@ -66,7 +66,7 @@ export default function EntryNote({handleRenderBox}) {
   }
 
   const handleChangeRadioTypeBeep = e => {
-    setBeepId(e.target.value === '1' ? true : false)
+    setBeepById(e.target.value === '1' ? true : false)
   }
 
   return (
@@ -81,7 +81,7 @@ export default function EntryNote({handleRenderBox}) {
             module={{
               name: 'purchaseNote',
               type: 'C',
-              beepId
+              beepById
             }}
             setProducts={setProducts}
             products={products}
@@ -91,7 +91,7 @@ export default function EntryNote({handleRenderBox}) {
             data={products}
             productSelected={productSelected}
             setProductSelected={setProductSelected}
-            beepId={beepId}
+            beepById={beepById}
           />
 
           <BeepReading.Footer handleRenderBox={handleRenderBox} />
@@ -112,7 +112,7 @@ export default function EntryNote({handleRenderBox}) {
                 borderRadius: 5,
                 padding: 10
               }}
-              value={beepId ? '1' : '0'}
+              value={beepById ? '1' : '0'}
               onChange={handleChangeRadioTypeBeep}
             >
               <FormControlLabel

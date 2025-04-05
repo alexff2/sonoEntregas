@@ -52,7 +52,7 @@ export function Header({
 
     let productSelectedToSend, serie
 
-    if (!!module.beepId) {
+    if (!!module.beepById) {
       const beep = serialNumber
 
       const [id, serieString] = beep.split(' ')
@@ -85,14 +85,14 @@ export function Header({
     try {
       if (module.type === 'C') {
         await api.post('serial/first', {
-          serialNumber: !!module.beepId ? serie : serialNumber,
+          serialNumber: !!module.beepById ? serie : serialNumber,
           productId: productSelectedToSend.id,
           module: module.name === 'delivery' ? productSelectedToSend.module : module.name,
           moduleId: productSelectedToSend.moduleId
         })
       } else {
         await api.put('serial/finished', {
-          serialNumber: !!module.beepId ? serie : serialNumber,
+          serialNumber: !!module.beepById ? serie : serialNumber,
           productId: productSelectedToSend.id,
           module: module.name === 'delivery' ? productSelectedToSend.module : module.name,
           moduleId: productSelectedToSend.moduleId
@@ -127,7 +127,7 @@ export function Header({
       })
       setSerialNumber('')
 
-      module.beepId && document.getElementById('beep').focus()
+      module.beepById && document.getElementById('beep').focus()
     } catch (error) {
       setSerialNumber('')
       console.log(error)
@@ -149,7 +149,7 @@ export function Header({
   }
 
   const changeSerialInputSerialNumber = e => {
-    if (productSelected?.quantityPedding > 0 || !!module.beepId) {
+    if (productSelected?.quantityPedding > 0 || !!module.beepById) {
       setSerialNumber(e.target.value)
     }
   }
@@ -162,7 +162,7 @@ export function Header({
         autoComplete='off'
         onKeyDown={e => e.key === 'Enter' && beepProduct()}
         value={serialNumber}
-        disabled={!productSelected && !module.beepId}
+        disabled={!productSelected && !module.beepById}
         onChange={changeSerialInputSerialNumber}
       />
 

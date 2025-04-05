@@ -39,6 +39,18 @@ module.exports = {
       return response.status(400).json('Error')
     }
   },
+  async findProductToBeepById(request, response) {
+    try {
+      const { originalId } = request.query
+
+      const products = await ProductsService.findProductToBeepById(originalId)
+
+      return response.status(200).json(products)
+    } catch (error) {
+      console.log(error)
+      return response.status(400).json(error)
+    }
+  },
   async findStock(request, response) {
     try {
       const { typeSearch, search } = request.query

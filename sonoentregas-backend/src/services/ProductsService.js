@@ -97,5 +97,30 @@ module.exports = {
     `
 
     return await ProductModel._query(1, script, QueryTypes.SELECT)
+  },
+  async findProductToBeepById(originalId) {
+    const script = `SELECT CODIGO code, NOME name, ORIGINAL originalId FROM PRODUTOS
+    WHERE ORIGINAL = ${originalId} AND ATIVO = 'S'
+    `
+
+    const product = await ProductModel._query(1, script, QueryTypes.SELECT)
+
+    if (product.length === 0) {
+      throw {
+        error: 'Product not found'
+      }
+    }
+
+    if (product.length > 1) {
+      throw {
+        error: 'More than one product found'
+      }
+    }
+
+    const serialNumbers = await ProductModel._query(1, `SELECT serialNumber FROM PRODLOJAS_SERIES_MOVIMENTOS WHERE productId = ${product[0].code} AND outputModule IS NULL`, QueryTypes.SELECT)
+
+    product[0].serialNumbers = serialNumbers.map( serial => serial.serialNumber)
+
+    return product[0]
   }
 }

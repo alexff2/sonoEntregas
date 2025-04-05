@@ -9,6 +9,7 @@ import { useAuthenticate } from '../../context/authContext'
 
 import BarCode from './BarCode'
 import BarCodeEndSingleEntered from './BarCodeEndSingleEntered'
+import SingleEnteredById from './SingleEnteredById'
 import EntryNote from './EntryNote'
 import Deliveries from './Deliveries'
 import Transfers from './Transfers'
@@ -69,6 +70,10 @@ export default function Beeping() {
             <BoxBeep onClick={() => {handleRenderBox(3)}}>Nota de entrada</BoxBeep>
             <BoxBeep onClick={() => {handleRenderBox(4)}}>Rotas de entregas</BoxBeep>
             <BoxBeep onClick={() => {handleRenderBox(5)}}>Transferências</BoxBeep>
+            {
+              userAuthToSingleEntered(userAuth.DESCRIPTION) &&
+              <BoxBeep onClick={() => {handleRenderBox(6)}}>Entrada por código de barra com ID</BoxBeep>
+            }
           </>
         : 
           <>
@@ -80,6 +85,10 @@ export default function Beeping() {
             {screenId === 3 && <EntryNote handleRenderBox={handleRenderBox} />}
             {screenId === 4 && <Deliveries handleRenderBox={handleRenderBox} />}
             {screenId === 5 && <Transfers handleRenderBox={handleRenderBox} />}
+            {
+              (screenId === 6 && userAuthToSingleEntered(userAuth.DESCRIPTION))
+              && <SingleEnteredById handleRenderBox={handleRenderBox} />
+            }
           </>
       }
 

@@ -52,8 +52,9 @@ routes.put('/users/:userId', usersController.update)
   routes.get('/employee', ensureAuthenticated, employeeController.index)
   //Products SCE CD
   routes.get('/products', productsController.index)
-  routes.get('/product', ensureAuthenticated, productsController.findProduct)
   routes.get('/products/stock', ensureAuthenticated, productsController.findStock)
+  routes.get('/product', ensureAuthenticated, productsController.findProduct)
+  routes.get('/product/to-beep', ensureAuthenticated, productsController.findProductToBeepById)
   routes.put('/product/barcode', ensureAuthenticated, productsController.updateBarCode)
   // Beep
   routes.get('/beep-pendant-modules', serieController.findBeepPendantModules)
