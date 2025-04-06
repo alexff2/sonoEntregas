@@ -17,6 +17,7 @@ import api from '../../services/api'
 
 export default function BarCode({ handleRenderBox }) {
   const [ productSelect, setProductSelect ] = useState('')
+  const [ qtdBeep, setQtdBeep ] = useState('')
   const [ serialNumberSelect, setSerialNumberSelect ] = useState('')
   const [ serialsNumber, setSerialsNumber ] = useState([])
   const classes = useStyles()
@@ -52,6 +53,7 @@ export default function BarCode({ handleRenderBox }) {
         module: 'single'
       })
 
+      setQtdBeep(product.serialNumbers.length + 1)
       setSerialsNumber([...product.serialNumbers, data.serialNumberResponse])
       setSerialNumberSelect('')
     } catch (error) {
@@ -74,7 +76,12 @@ export default function BarCode({ handleRenderBox }) {
   return (
     <Box>
       <Box className={classes.barHeader}>
-        <p style={{color: '#FFF'}}>{productSelect}</p>
+        <p style={{color: '#FFF'}}>
+          {productSelect}
+          {(qtdBeep !== '') && (
+            <p>Qtd: {qtdBeep}</p>
+          )}
+        </p>
       </Box>
 
       <Input

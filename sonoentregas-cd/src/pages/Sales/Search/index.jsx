@@ -166,6 +166,7 @@ function Row({
             ? getDateBr(sale.D_ENTREGA1)
             : 'Sem Agendamento'}
         </TableCell>
+        <TableCell align="right">{sale.FONE}</TableCell>
         <TableCell align="right">{sale.SHOP}</TableCell>
       </TableRow>
 
@@ -299,6 +300,7 @@ export default function Sales() {
     { id: 'NOMECLI', numeric: false, disablePadding: false, label: 'Nome do Cliente', class: classes.tableHeadCellStart },
     { id: 'EMISSAO', numeric: true, disablePadding: false, label: 'Emissão', class: classes.tableHeadCell },
     { id: 'D_ENTREGA1', numeric: true, disablePadding: false, label: 'Previsão', class: classes.tableHeadCell },
+    { id: 'FONE', numeric: true, disablePadding: false, label: 'Fone', class: classes.tableHeadCell },
     { id: 'CODLOJA', numeric: true, disablePadding: false, label: 'Loja', class: classes.tableHeadCell },
   ]
 

@@ -242,6 +242,14 @@ export default function BarCode({ handleRenderBox }) {
         onKeyPress={e => e.key === 'Enter' && handleCreateSerial()}
       />
 
+      <Box
+        style={{
+          padding: 4,
+          fontWeight: 'bold',
+          display: 'flex',
+          alignItems: 'start'
+        }}
+      >Qtd: {serialsNumber.length}</Box>
       <Box component={Paper} style={{ marginTop: 20}}>
         <TableContainer>
           <Table size='small'>
