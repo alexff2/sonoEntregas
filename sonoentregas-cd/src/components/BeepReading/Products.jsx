@@ -32,17 +32,18 @@ export function Products({
   data,
   productSelected,
   setProductSelected,
-  beepId
+  beepById
 }) {
   const classes = useStyle()
 
   const handleClickProduct = prod => {
-    if (prod.quantityPedding > 0 && !beepId) {
+    if (prod.quantityPedding > 0 && !beepById) {
       setProductSelected(prod)
-      setTimeout(() => {
-        document.getElementById('beep').focus()
-      }, 100)
     }
+
+    setTimeout(() => {
+      document.getElementById('beep').focus()
+    }, 100)
   }
 
   const moduleNames = {
@@ -65,12 +66,13 @@ export function Products({
                       display: 'flex',
                       background: `${(index % 2) === 0 ? 'white' : 'transparent'}`,
                       padding: '4px 0',
-                      cursor: 'pointer'
+                      cursor: `${beepById ? 'default' : 'pointer'}`,
+                      userSelect: `${beepById ? 'none' : 'auto'}`,
                     }}
                     onClick={() => handleClickProduct(prod)}
                   >
                     {
-                      (prod.quantityPedding > 0 && !beepId) ?
+                      (prod.quantityPedding > 0 && !beepById) ?
                         <Checkbox
                           inputProps={{ 'aria-label': 'primary checkbox' }}
                           checked={(!!productSelected && productSelected.id === prod.id)}
