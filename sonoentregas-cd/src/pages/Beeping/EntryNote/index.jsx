@@ -67,6 +67,7 @@ export default function EntryNote({handleRenderBox}) {
 
   const handleChangeRadioTypeBeep = e => {
     setBeepById(e.target.value === '1' ? true : false)
+    document.getElementById('searchId').focus()
   }
 
   return (
