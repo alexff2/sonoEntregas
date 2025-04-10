@@ -46,7 +46,7 @@ export function Header({
   }, [])
 
   const beepProduct = async () => {
-    if (productSelected?.quantityPedding === 0) {
+    if (productSelected?.quantityPedding === 0 && !module.beepById) {
       return
     }
 

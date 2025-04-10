@@ -75,7 +75,7 @@ export default function EntryNote({handleRenderBox}) {
         !openSearch &&
         <BeepReading.Root>
           <BeepReading.Header
-            title={`BEEP DA NOTA DE ENTRADA Nº: ${search}`}
+            title={`BIP DA NOTA DE ENTRADA Nº: ${search}`}
             productSelected={productSelected}
             setProductSelected={setProductSelected}
             module={{
