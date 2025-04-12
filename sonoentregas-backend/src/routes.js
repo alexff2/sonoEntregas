@@ -66,6 +66,7 @@ routes.put('/users/:userId', usersController.update)
   routes.put('/serial/change/product', ensureAuthenticated, serieController.changeSerialNumberOfProduct)
   // Balance by beep
   routes.get('/balance-by-beep/open', ensureAuthenticated, balanceByBeepController.open)
+  routes.get('/balance-by-beep/:id', ensureAuthenticated, balanceByBeepController.findById)
   routes.post('/balance-by-beep', ensureAuthenticated, balanceByBeepController.create)
   routes.post('/balance-by-beep/beep', ensureAuthenticated, balanceByBeepController.createBeep)
   routes.post('/balance-by-beep/beep-not-found', ensureAuthenticated, balanceByBeepController.createBeepNotFound)

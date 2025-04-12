@@ -1,5 +1,4 @@
 const errorCath = (err, response) => {
-  console.log('PASSOU')
   console.log(err)
 
   let status = err.status ? err.status : 400

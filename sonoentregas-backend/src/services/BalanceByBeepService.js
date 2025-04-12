@@ -5,7 +5,7 @@ const DateSys = require('../class/Date')
 const { QueryTypes } = require('sequelize')
 
 class BalanceByBeepService {
-  async open(data, t) {
+  async open() {
     const balanceOpen = await BalanceByBeepModel.findAny(1, {
       isNull: 'dtFinish'
     })
@@ -19,18 +19,23 @@ class BalanceByBeepService {
     }))
   }
 
-  async create({description, userId}, t) {
-    const existingBalanceOpen = await BalanceByBeepModel.findAny(1, {
-      isNull: 'dtFinish'
+  async findById(id) {
+    const balance = await BalanceByBeepModel.findAny(1, {
+      id
     })
 
-    if (existingBalanceOpen.length > 0) {
-      throw {
-        status: 400,
-        message: 'There is already an open balance.'
-      }
+    return {
+      id: balance[0].id,
+      description: balance[0].description,
+      userId: balance[0].userId,
+      dtBalance: new DateSys(balance[0].dtBalance).getBRDateTime().date,
+      dtFinish: balance[0].dtFinish
+        ? new DateSys(balance[0].dtFinish).getBRDateTime().date
+        : null,
     }
+  }
 
+  async create({description, userId}, t) {
     const data = {
       description,
       userId,
@@ -40,34 +45,28 @@ class BalanceByBeepService {
     await BalanceByBeepModel.create(1, [data], true, t)
   }
 
-  async createBeep(serialNumber, userId, t) {
+  async createBeep(t, { serialNumber, userId, balanceId }) {
     const balance = await BalanceByBeepModel.findAny(1, {
-      isNull: 'dtFinish'
+      isNull: 'dtFinish',
+      id: balanceId
     }, 'id', t)
 
     if (balance.length === 0) {
       throw {
         status: 400,
-        message: 'Não existe balanço aberto'
-      }
-    }
-
-    if (balance.length > 1) {
-      throw {
-        status: 400,
-        message: 'Existe mais de um balanço aberto, entre em contato com o suporte'
+        message: 'Número inválido ou não existe'
       }
     }
 
     const existingBeep = await BalanceBySerieBeepModel.findAny(1, {
-      serialNumber
+      serialNumber,
+      balanceId: balance[0].id
     }, 'serialNumber', t)
-    
 
     if (existingBeep.length > 0) {
       throw {
         status: 400,
-        message: 'Serial já cadastrado'
+        message: 'Número de série já bipado nesse balanço'
       }
     }
 
@@ -101,34 +100,28 @@ class BalanceByBeepService {
     }
   }
 
-  async createBeepNotFound(serialNumber, productId, userId, t) {
+  async createBeepNotFound(t, {serialNumber, productId, userId, balanceId}) {
     const balance = await BalanceByBeepModel.findAny(1, {
-      isNull: 'dtFinish'
+      isNull: 'dtFinish',
+      id: balanceId
     }, 'id', t)
 
     if (balance.length === 0) {
       throw {
         status: 400,
-        message: 'Não existe balanço aberto'
-      }
-    }
-
-    if (balance.length > 1) {
-      throw {
-        status: 400,
-        message: 'Existe mais de um balanço aberto, entre em contato com o suporte'
+        message: 'Número inválido ou não existe'
       }
     }
 
     const existingBeep = await BalanceBySerieBeepModel.findAny(1, {
-      serialNumber
+      serialNumber,
+      balanceId: balance[0].id
     }, 'serialNumber', t)
-    
 
     if (existingBeep.length > 0) {
       throw {
         status: 400,
-        message: 'Serial já cadastrado'
+        message: 'Número de série já bipado nesse balanço'
       }
     }
 

@@ -2,6 +2,7 @@ import React from 'react'
 import {
   Box,
   Dialog,
+  DialogTitle,
   FormControl,
   Input,
   InputBase,
@@ -13,6 +14,7 @@ import {
   TableCell,
   TableContainer,
   TableRow,
+  TextField,
   Typography
 } from '@material-ui/core'
 import SearchIcon from '@material-ui/icons/Search'
@@ -24,6 +26,9 @@ import api from '../../services/api'
 
 const BalanceByBeep = ({handleRenderBox}) => {
   const [ search, setSearch ] = React.useState('')
+  const [ searchBalanceId, setSearchBalanceId ] = React.useState('')
+  const [ openModalSearch, setOpenModalSearch ] = React.useState(true)
+  const [ loading, setLoading ] = React.useState(false)
   const [ typeSearch, setTypeSearch ] = React.useState('NOME')
   const [ productsSearch, setProductsSearch ] = React.useState([])
   const [ productSelect, setProductSelect ] = React.useState('')
@@ -59,7 +64,8 @@ const BalanceByBeep = ({handleRenderBox}) => {
     try {
       setOpenBackDrop(true)
       const { data } = await api.post('balance-by-beep/beep', {
-        serialNumber: serialNumberSelect
+        serialNumber: serialNumberSelect,
+        balanceId: searchBalanceId
       })
       if (data.notFoundSerialNumber) {
         setOpenModalSelectProduct(true)
@@ -87,7 +93,8 @@ const BalanceByBeep = ({handleRenderBox}) => {
       setOpenBackDrop(true)
       await api.post('balance-by-beep/beep-not-found', {
         serialNumber: serialNumberSelect,
-        productId: product.code
+        productId: product.code,
+        balanceId: searchBalanceId
       })
       setProductSelect(product.name)
     } catch (error) {
@@ -105,30 +112,83 @@ const BalanceByBeep = ({handleRenderBox}) => {
     }
   }
 
-  React.useEffect(() => {
-    const balanceOpen = async () => {
-      try {
-        setOpenBackDrop(true)
-        const { data } = await api.get('/balance-by-beep/open')
-        if (data.balanceOpen.length === 0) {
-          setAlertSnackbar('Não existe balanço aberto para bipagem!')
-          handleRenderBox()
-          return
-        }
-        document.getElementById('serialNumberId').focus()
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      } finally {
-        setOpenBackDrop(false)
+  const handleSearchBalance = async () => {
+    try {
+      if (searchBalanceId === '') {
+        setAlertSnackbar('Pesquisa vazia!')
+        document.getElementById('searchBalanceId').focus()
+        return
+      }
+
+      setLoading(true)
+
+      const { data } = await api.get(`balance-by-beep/${searchBalanceId}`)
+
+      if (data.balance.dtFinish) {
+        setAlertSnackbar('Número de balanço já finalizado!')
+        setSearchBalanceId('')
+        document.getElementById('searchBalanceId').focus()
+        setLoading(false)
+        return
+      }
+
+      localStorage.setItem('balanceId', searchBalanceId)
+      setOpenModalSearch(false)
+      setLoading(false)
+      document.getElementById('serialNumberId').focus()
+    } catch (error) {
+      console.log(error)
+      setSearchBalanceId('')
+      document.getElementById('searchBalanceId').focus()
+      setLoading(false)
+
+      if (error.response.data.message) {
+        setAlertSnackbar(error.response.data.message)
+      } else {
+        setAlertSnackbar('Erro interno!')
       }
     }
+  }
 
-    balanceOpen()
-  }, [handleRenderBox, setOpenBackDrop, setAlertSnackbar])
+  const handleCloseSearch = () => {
+    setOpenModalSearch(false)
+    handleRenderBox()
+  }
+
+  const handleClearLocalStorage = () => {
+    localStorage.removeItem('balanceId')
+    setOpenModalSearch(true)
+    setSearchBalanceId('')
+    setTimeout(() => {
+      document.getElementById('searchBalanceId').focus()
+    }, 100)
+  }
+
+  React.useEffect(() => {
+    const balanceLocalStage = async () => {
+      const balanceId = localStorage.getItem('balanceId')
+      console.log('balanceId', balanceId)
+      if (balanceId) {
+        setOpenModalSearch(false)
+        setSearchBalanceId(balanceId)
+        return
+      }
+
+      setOpenModalSearch(true)
+      setTimeout(() => {
+        document.getElementById('searchBalanceId').focus()
+      }, 100)
+    }
+
+    balanceLocalStage()
+  }, [])
 
   return (
     <Box>
-      <Box className={classes.barHeader}>
+      <Box className={classes.barHeader} style={{ padding: 8 }}>
+        <p style={{color: '#FFF'}}>
+          Balanço Nº {searchBalanceId}
+        </p>
         <p style={{color: '#FFF'}}>
           {productSelect}
         </p>
@@ -144,7 +204,22 @@ const BalanceByBeep = ({handleRenderBox}) => {
         onKeyPress={e => e.key === 'Enter' && handleCreateSerial()}
       />
 
-      <ButtonSuccess onClick={handleRenderBox} className={classes.btnAdd}>Voltar</ButtonSuccess>
+      <ButtonSuccess
+        onClick={handleRenderBox}
+        style={{
+          position: 'fixed',
+          bottom: '1.5rem',
+          right: '1.5rem'
+        }}
+      >Voltar</ButtonSuccess>
+      <ButtonSuccess
+        onClick={handleClearLocalStorage}
+        style={{
+          position: 'fixed',
+          bottom: '1.5rem',
+          left: '1.5rem'
+        }}
+      >Recarregar</ButtonSuccess>
 
       <Dialog open={openModalSelectProduct} onClose={() => setOpenModalSelectProduct(false)} fullWidth>
         <Box p={2}>
@@ -212,6 +287,27 @@ const BalanceByBeep = ({handleRenderBox}) => {
           }
           </Box>
         </Box>
+      </Dialog>
+      
+      <Dialog open={openModalSearch} onClose={handleCloseSearch}>
+        <DialogTitle>Digite o número do balanço</DialogTitle>
+        <TextField
+          id='searchBalanceId'
+          placeholder='Digite aqui...'
+          autoComplete='off'
+          style={{
+            padding: 4,
+            margin: 4
+          }}
+          value={searchBalanceId}
+          onChange={e => setSearchBalanceId(e.target.value)}
+          onKeyDown={e =>  e.key === 'Enter' && handleSearchBalance()}
+        />
+        <ButtonSuccess
+          className={classes.btn}
+          onClick={handleSearchBalance}
+          loading={loading}
+        >Pesquisar</ButtonSuccess>
       </Dialog>
     </Box>
   )

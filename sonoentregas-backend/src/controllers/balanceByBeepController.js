@@ -14,6 +14,19 @@ module.exports = {
       errorCath(error, response)
     }
   },
+  async findById(request, response) {
+    try {
+      const { id } = request.params
+
+      const balance = await BalanceByBeepService.findById(id)
+
+      return response.status(200).json({
+        balance
+      })
+    } catch (error) {
+      errorCath(error, response)
+    }
+  },
   async create(request, response) {
     const connections = await BalanceByBeepModel._query(1)
 
@@ -35,10 +48,14 @@ module.exports = {
   async createBeep(request, response) {
     const connections = await BalanceByBeepModel._query(1)
     try {
-      const { serialNumber } = request.body
+      const { serialNumber, balanceId } = request.body
       const userId = request.user.id
 
-      const result = await BalanceByBeepService.createBeep(serialNumber, userId, connections)
+      const result = await BalanceByBeepService.createBeep(connections, {
+        serialNumber,
+        userId,
+        balanceId
+      })
 
       await connections.transaction.commit()
       return response.status(201).json(result)
@@ -50,10 +67,15 @@ module.exports = {
   async createBeepNotFound(request, response) {
     const connections = await BalanceByBeepModel._query(1)
     try {
-      const { serialNumber, productId } = request.body
+      const { serialNumber, productId, balanceId } = request.body
       const userId = request.user.id
 
-      await BalanceByBeepService.createBeepNotFound(serialNumber, productId, userId, connections)
+      await BalanceByBeepService.createBeepNotFound(connections, {
+        serialNumber,
+        userId,
+        productId,
+        balanceId
+      })
 
       await connections.transaction.commit()
       return response.status(201).json({message: 'Beep created successfully'})
