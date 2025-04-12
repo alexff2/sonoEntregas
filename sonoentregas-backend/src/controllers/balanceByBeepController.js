@@ -33,10 +33,33 @@ module.exports = {
     }
   },
   async createBeep(request, response) {
+    const connections = await BalanceByBeepModel._query(1)
     try {
-      
+      const { serialNumber } = request.body
+      const userId = request.user.id
+
+      const result = await BalanceByBeepService.createBeep(serialNumber, userId, connections)
+
+      await connections.transaction.commit()
+      return response.status(201).json(result)
+    } catch (error) {
+      await connections.transaction.rollback()
+      errorCath(error, response)
+    }
+  },
+  async createBeepNotFound(request, response) {
+    const connections = await BalanceByBeepModel._query(1)
+    try {
+      const { serialNumber, productId } = request.body
+      const userId = request.user.id
+
+      await BalanceByBeepService.createBeepNotFound(serialNumber, productId, userId, connections)
+
+      await connections.transaction.commit()
+      return response.status(201).json({message: 'Beep created successfully'})
     } catch (error) {
       errorCath(error, response)
+      await connections.transaction.rollback()
     }
   },
   async reportBalance(request, response){

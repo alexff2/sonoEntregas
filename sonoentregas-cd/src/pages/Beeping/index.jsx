@@ -13,6 +13,7 @@ import SingleEnteredById from './SingleEnteredById'
 import EntryNote from './EntryNote'
 import Deliveries from './Deliveries'
 import Transfers from './Transfers'
+import BalanceByBeep from './BalanceByBeep'
 
 const userAuthToSingleEntered = (userName) => {
   const users = [
@@ -74,6 +75,7 @@ export default function Beeping() {
               userAuthToSingleEntered(userAuth.DESCRIPTION) &&
               <BoxBeep onClick={() => {handleRenderBox(6)}}>Entrada por código de barra com ID</BoxBeep>
             }
+            <BoxBeep onClick={() => {handleRenderBox(7)}}>Balanço por bip</BoxBeep>
           </>
         : 
           <>
@@ -89,6 +91,7 @@ export default function Beeping() {
               (screenId === 6 && userAuthToSingleEntered(userAuth.DESCRIPTION))
               && <SingleEnteredById handleRenderBox={handleRenderBox} />
             }
+            {screenId === 7 && <BalanceByBeep handleRenderBox={handleRenderBox} />}
           </>
       }
 
