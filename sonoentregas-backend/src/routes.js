@@ -32,6 +32,7 @@ const catDefController = require('./controllers/catDefController')
 const goalsController = require('./controllers/goalsController')
 const promotionController = require('./controllers/promotionController')
 const serieController = require('./controllers/serieController')
+const balanceByBeepController = require('./controllers/balanceByBeepController')
 const syncController = require('./controllers/syncController')
 
 //Routes
@@ -63,6 +64,9 @@ routes.put('/users/:userId', usersController.update)
   routes.post('/serial/first', ensureAuthenticated, serieController.createFirst)
   routes.put('/serial/finished', ensureAuthenticated, serieController.finishesIfOpened)
   routes.put('/serial/change/product', ensureAuthenticated, serieController.changeSerialNumberOfProduct)
+  // Balance by beep
+  routes.get('/balance-by-beep/open', ensureAuthenticated, balanceByBeepController.open)
+  routes.post('/balance-by-beep', ensureAuthenticated, balanceByBeepController.create)
   // Purchase Order
   routes.get('/purchase/order', purchaseOrderController.find)
   routes.get('/purchase/order/open', purchaseOrderController.findOpen)

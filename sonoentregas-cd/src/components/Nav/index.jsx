@@ -84,6 +84,10 @@ const itens = [
         href: '/app/products/change-beep',
       },
       {
+        title: 'Balanço/Bip',
+        href: '/app/products/balance-by-beep',
+      },
+      {
         title: 'Bips Pendentes',
         href: '/app/products/modules-pending-beep',
       },

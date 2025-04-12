@@ -16,6 +16,7 @@ import ProductsPurchaseNotes from '../pages/Product/PurchaseNotes'
 import ProductsPurchaseOrder from '../pages/Product/PurchaseOrder'
 import ProductsTransfer from '../pages/Product/TransferProducts'
 import ProductsChangeBeep from '../pages/Product/ChangeSerialNumber'
+import ProductsBalanceByBeep from '../pages/Product/BalanceByBeep'
 import ProductsBeepPendantModules from '../pages/Product/BeepPendantModules'
 
 import SalesSearch from '../pages/Sales/Search'
@@ -50,6 +51,7 @@ export default function PrivateRoutes(){
         <Route path="/app/products/purchase-notes" element={<ProductsPurchaseNotes />} />
         <Route path="/app/products/transfer" element={<ProductsTransfer />} />
         <Route path="/app/products/change-beep" element={<ProductsChangeBeep />} />
+        <Route path="/app/products/balance-by-beep" element={<ProductsBalanceByBeep />} />
         <Route path="/app/products/modules-pending-beep" element={<ProductsBeepPendantModules />} />
 
         <Route path="/app/maintenance" element={<Maintenance />} />
