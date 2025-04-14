@@ -71,6 +71,7 @@ routes.put('/users/:userId', usersController.update)
   routes.post('/balance-by-beep', ensureAuthenticated, balanceByBeepController.create)
   routes.post('/balance-by-beep/beep', ensureAuthenticated, balanceByBeepController.createBeep)
   routes.post('/balance-by-beep/beep-not-found', ensureAuthenticated, balanceByBeepController.createBeepNotFound)
+  routes.put('/balance-by-beep/:id/close', ensureAuthenticated, balanceByBeepController.close)
   // Purchase Order
   routes.get('/purchase/order', purchaseOrderController.find)
   routes.get('/purchase/order/open', purchaseOrderController.findOpen)

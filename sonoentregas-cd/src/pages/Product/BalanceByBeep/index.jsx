@@ -25,12 +25,14 @@ import api from '../../../services/api'
 import useStyles from '../style'
 import DialogCreate from './DialogCreate'
 import Report from './report'
+import DialogClose from './DialogClose'
 
 const BalanceByBeep = () => {
   const [ balances, setBalances ] = React.useState([])
   const [ dataReport, setDataReport ] = React.useState(false)
   const [ typeSearch, setTypeSearch ] = React.useState('id')
   const [ openDialogCreate, setOpenDialogCreate ] = React.useState(false)
+  const [ balanceIdClose, setBalanceIdClose ] = React.useState(false)
   const documentReport = React.useRef(null)
   const classes = useStyles()
 
@@ -125,7 +127,6 @@ const BalanceByBeep = () => {
               <TableCell>Descrição</TableCell>
               <TableCell>Data</TableCell>
               <TableCell>Dt Fim</TableCell>
-              <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -138,10 +139,14 @@ const BalanceByBeep = () => {
                 <TableCell>{balance.id}</TableCell>
                 <TableCell>{balance.description}</TableCell>
                 <TableCell>{balance.dtBalance}</TableCell>
-                <TableCell>{balance.dtFinish}</TableCell>
-                <TableCell align="right">
-                  <Print onClick={() => loadDataReport(balance)}/>
-                </TableCell>
+                <TableCell>
+                  {balance.dtFinish
+                    ? <Print onClick={() => loadDataReport(balance)}/>
+                    : <Button
+                        variant='contained'
+                        onClick={() => setBalanceIdClose(balance.id)}
+                      >Finalizar</Button>}
+                  </TableCell>
               </TableRow>
             </React.Fragment>
           ))}
@@ -176,6 +181,11 @@ const BalanceByBeep = () => {
         </Box>
         )
       }
+
+      <DialogClose
+        balanceIdClose={balanceIdClose}
+        onClose={() => setBalanceIdClose(false)}
+      />
     </Box>
   )
 }

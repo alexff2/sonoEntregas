@@ -162,6 +162,21 @@ class BalanceByBeepService {
       divergencePercentage,
     }
   }
+
+  async close(t, { id, userId }) {
+    const data = {
+      dtFinish: new Date().toISOString(),
+      userId,
+    }
+
+    const createMirrorAvailableProducts = balanceScripts.createMirrorAvailableProducts(id)
+
+    await BalanceByBeepModel._query(1, createMirrorAvailableProducts, QueryTypes.INSERT, t)
+
+    await BalanceByBeepModel.updateAny(1, data, {
+      id
+    }, t)
+  }
 }
 
 module.exports = new BalanceByBeepService()

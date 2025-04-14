@@ -102,5 +102,20 @@ module.exports = {
     } catch (error) {
       errorCath(error, response)
     }
-  }
+  },
+  async close(request, response) {
+    const connections = await BalanceByBeepModel._query(1)
+    try {
+      const { id } = request.params
+      const userId = request.user.id
+
+      await BalanceByBeepService.close(connections, {id, userId })
+
+      await connections.transaction.commit()
+      return response.status(200).json({message: 'Balance closed successfully'})
+    } catch (error) {
+      await connections.transaction.rollback()
+      errorCath(error, response)
+    }
+  },
 }
