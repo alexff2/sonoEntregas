@@ -28,7 +28,7 @@ import Report from './report'
 
 const BalanceByBeep = () => {
   const [ balances, setBalances ] = React.useState([])
-  const [ selectBalanceId, setSelectBalanceId ] = React.useState(false)
+  const [ dataReport, setDataReport ] = React.useState(false)
   const [ typeSearch, setTypeSearch ] = React.useState('id')
   const [ openDialogCreate, setOpenDialogCreate ] = React.useState(false)
   const documentReport = React.useRef(null)
@@ -36,8 +36,8 @@ const BalanceByBeep = () => {
 
   const handlePrint = useReactToPrint({
     content: () => documentReport.current,
-    documentTitle: 'Relatório do Balanço ' + selectBalanceId,
-    onAfterPrint: () => setSelectBalanceId(false),
+    documentTitle: 'Relatório do Balanço ' + (dataReport ? dataReport.balance.id : '1'),
+    onAfterPrint: () => setDataReport(false),
   })
 
   const loadData = React.useCallback(async () => {
@@ -48,6 +48,18 @@ const BalanceByBeep = () => {
       console.error('Error fetching data:', error)
     }
   }, [])
+
+  const loadDataReport = async balance => {
+    try {
+      const {data} = await api.get(`/balance-by-beep/${balance.id}/report`)
+      setDataReport(data)
+      setTimeout(() => {
+        handlePrint()
+      }, 500)
+    } catch (error) {
+      console.error('Error fetching data:', error)
+    }
+  }
   
   React.useEffect(() => {
     loadData()
@@ -128,12 +140,7 @@ const BalanceByBeep = () => {
                 <TableCell>{balance.dtBalance}</TableCell>
                 <TableCell>{balance.dtFinish}</TableCell>
                 <TableCell align="right">
-                  <Print onClick={() => {
-                    setSelectBalanceId(balance.id)
-                    setTimeout(() => {
-                      handlePrint()
-                    }, 100);
-                  }}/>
+                  <Print onClick={() => loadDataReport(balance)}/>
                 </TableCell>
               </TableRow>
             </React.Fragment>
@@ -160,15 +167,15 @@ const BalanceByBeep = () => {
         loadData={loadData}
       />
 
-      <Box ref={documentReport} style={{
-        display: selectBalanceId ? 'block' : 'none',
-        zIndex: -1
-      }}>
-        <Report
-          selectBalanceId={selectBalanceId}
-          onClose={() => setSelectBalanceId(false)}
-        />
-      </Box>
+      {
+        dataReport && (
+        <Box ref={documentReport}>
+          <Report
+            data={dataReport}
+          />
+        </Box>
+        )
+      }
     </Box>
   )
 }

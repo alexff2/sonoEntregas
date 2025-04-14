@@ -96,6 +96,8 @@ module.exports = {
       const { id } = request.params
 
       const data = await BalanceByBeepService.reportBalance(id)
+      const balance = await BalanceByBeepService.findById(id)
+      data.balance = balance
       return response.status(200).json(data)
     } catch (error) {
       errorCath(error, response)

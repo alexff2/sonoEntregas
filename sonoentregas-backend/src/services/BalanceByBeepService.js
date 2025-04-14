@@ -138,19 +138,28 @@ class BalanceByBeepService {
   }
 
   async reportBalance(id) {
-    const productsScript = balanceScripts.balanceReport(id)
-    const products = await BalanceByBeepModel._query(1, productsScript, QueryTypes.SELECT)
+    const productsExcessScript = balanceScripts.balanceExcess(id)
+    const productsExcess = await BalanceByBeepModel._query(1, productsExcessScript, QueryTypes.SELECT)
+
+    const productsLackScript = balanceScripts.balanceLack(id)
+    const productsLack = await BalanceByBeepModel._query(1, productsLackScript, QueryTypes.SELECT)
 
     const uniqueProductsWithDivergenceScript = balanceScripts.uniqueProductsWithDivergence(id)
     const uniqueProductsWithDivergence = await BalanceByBeepModel._query(1, uniqueProductsWithDivergenceScript, QueryTypes.SELECT)
 
-    const uniqueProductsQtdScript = balanceScripts.uniqueProductsQtd()
-    const uniqueProductsQtd = await BalanceByBeepModel._query(1, uniqueProductsQtdScript, QueryTypes.SELECT)
+    const quantityActiveProductsScript = balanceScripts.quantityActiveProducts()
+    const quantityActiveProducts = await BalanceByBeepModel._query(1, quantityActiveProductsScript, QueryTypes.SELECT)
+
+    const divergencePercentage = ((uniqueProductsWithDivergence.length / quantityActiveProducts[0].qtd) * 100).toFixed(2)
 
     return {
-      products,
-      uniqueProducts: uniqueProductsWithDivergence.length,
-      uniqueProductsQtd: uniqueProductsQtd[0].qtd,
+      productsExcess,
+      productsLack,
+      uniqueProductsWithDivergence: uniqueProductsWithDivergence.length,
+      uniqueProductsExcess: uniqueProductsWithDivergence.filter(product => product.tipo === 'SOBRA').length,
+      uniqueProductsLack: uniqueProductsWithDivergence.filter(product => product.tipo === 'FALTA').length,
+      quantityActiveProducts: quantityActiveProducts[0].qtd,
+      divergencePercentage,
     }
   }
 }
