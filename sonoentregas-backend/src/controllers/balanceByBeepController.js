@@ -14,6 +14,19 @@ module.exports = {
       errorCath(error, response)
     }
   },
+  async find(request, response) {
+    try {
+      const { typeSearch, search } = request.query
+
+      const balance = await BalanceByBeepService.find({ typeSearch, search })
+
+      return response.status(200).json({
+        balance
+      })
+    } catch (error) {
+      errorCath(error, response)
+    }
+  },
   async findById(request, response) {
     try {
       const { id } = request.params

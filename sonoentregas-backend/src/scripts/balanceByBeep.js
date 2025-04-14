@@ -47,5 +47,10 @@ module.exports = {
     FROM PRODLOJAS_SERIES_MOVIMENTOS
     WHERE outputModule IS NULL
 `
+  },
+  find(where){
+    console.log(where)
+    return `SELECT * FROM BALANCE_BY_BEEP
+    ${where.id ? 'WHERE id = ' + where.id : ''} ${where.dtBalance ? 'WHERE dtBalance >= ' + where.dtBalance : ''}`
   }
 }

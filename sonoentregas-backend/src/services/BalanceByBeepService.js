@@ -20,6 +20,25 @@ class BalanceByBeepService {
     }))
   }
 
+  async find({ typeSearch, search }) {
+    const where = {}
+    where[typeSearch] = search
+
+    const balanceScriptsFind = balanceScripts.find(where)
+
+    const balance = await BalanceByBeepModel._query(1, balanceScriptsFind, QueryTypes.SELECT)
+
+    return balance.map(item => ({
+      id: item.id,
+      description: item.description,
+      userId: item.userId,
+      dtBalance: new DateSys(item.dtBalance).getBRDateTime().date,
+      dtFinish: item.dtFinish
+        ? new DateSys(item.dtFinish).getBRDateTime().date
+        : null,
+    }))
+  }
+
   async findById(id) {
     const balance = await BalanceByBeepModel.findAny(1, {
       id

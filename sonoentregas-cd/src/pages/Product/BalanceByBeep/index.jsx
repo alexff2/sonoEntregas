@@ -22,6 +22,8 @@ import { useReactToPrint } from 'react-to-print'
 
 import api from '../../../services/api'
 
+import { useAlert } from '../../../context/alertContext'
+
 import useStyles from '../style'
 import DialogCreate from './DialogCreate'
 import Report from './report'
@@ -31,9 +33,11 @@ const BalanceByBeep = () => {
   const [ balances, setBalances ] = React.useState([])
   const [ dataReport, setDataReport ] = React.useState(false)
   const [ typeSearch, setTypeSearch ] = React.useState('id')
+  const [ search, setSearch ] = React.useState('')
   const [ openDialogCreate, setOpenDialogCreate ] = React.useState(false)
   const [ balanceIdClose, setBalanceIdClose ] = React.useState(false)
   const documentReport = React.useRef(null)
+  const { setAlert } = useAlert()
   const classes = useStyles()
 
   const handlePrint = useReactToPrint({
@@ -58,6 +62,26 @@ const BalanceByBeep = () => {
       setTimeout(() => {
         handlePrint()
       }, 500)
+    } catch (error) {
+      console.error('Error fetching data:', error)
+    }
+  }
+
+  const find = async () => {
+    if (search === '') {
+      setAlert('Preencha o campo de pesquisa')
+      return
+    }
+
+    try {
+      const { data } = await api.get('/balance-by-beep', {
+        params: {
+          typeSearch,
+          search
+        }
+      })
+
+      setBalances(data.balance)
     } catch (error) {
       console.error('Error fetching data:', error)
     }
@@ -110,11 +134,21 @@ const BalanceByBeep = () => {
               root: classes.inputRoot,
               input: classes.inputInput,
             }}
-            inputProps={{ "aria-label": "search" }}
+            type={typeSearch === 'id' ? 'number' : 'date'}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                find()
+              }
+            }}
           />
         </div>
 
-        <Button className={classes.btnSearch}>
+        <Button
+          className={classes.btnSearch}
+          onClick={find}
+        >
           Pesquisar
         </Button>
       </Box>
@@ -184,7 +218,10 @@ const BalanceByBeep = () => {
 
       <DialogClose
         balanceIdClose={balanceIdClose}
-        onClose={() => setBalanceIdClose(false)}
+        onClose={() => {
+          setBalanceIdClose(false)
+          loadData()
+        }}
       />
     </Box>
   )
