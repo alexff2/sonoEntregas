@@ -1,6 +1,7 @@
 const BalanceByBeepModel = require('../models/tables/BalanceByBeep')
 const BalanceBySerieBeepModel = require('../models/tables/BalanceByBeep/BalanceByBeepSerie')
 const ProdLojaSeriesMovimentosModel = require('../models/tables/ProdLojaSeriesMovimentos')
+const balanceScripts = require('../scripts/balanceByBeep')
 const DateSys = require('../class/Date')
 const { QueryTypes } = require('sequelize')
 
@@ -136,9 +137,21 @@ class BalanceByBeepService {
     await BalanceBySerieBeepModel.create(1, [data], false, t)
   }
 
-  async reportBalance(data) {
-    /* const report = await BalanceByBeepModel.create(data)
-    return report */
+  async reportBalance(id) {
+    const productsScript = balanceScripts.balanceReport(id)
+    const products = await BalanceByBeepModel._query(1, productsScript, QueryTypes.SELECT)
+
+    const uniqueProductsWithDivergenceScript = balanceScripts.uniqueProductsWithDivergence(id)
+    const uniqueProductsWithDivergence = await BalanceByBeepModel._query(1, uniqueProductsWithDivergenceScript, QueryTypes.SELECT)
+
+    const uniqueProductsQtdScript = balanceScripts.uniqueProductsQtd()
+    const uniqueProductsQtd = await BalanceByBeepModel._query(1, uniqueProductsQtdScript, QueryTypes.SELECT)
+
+    return {
+      products,
+      uniqueProducts: uniqueProductsWithDivergence.length,
+      uniqueProductsQtd: uniqueProductsQtd[0].qtd,
+    }
   }
 }
 

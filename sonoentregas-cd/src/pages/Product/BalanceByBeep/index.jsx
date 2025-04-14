@@ -18,17 +18,27 @@ import {
   Fab
 } from '@material-ui/core'
 import { Search, Add, Print } from '@material-ui/icons'
+import { useReactToPrint } from 'react-to-print'
 
 import api from '../../../services/api'
 
 import useStyles from '../style'
 import DialogCreate from './DialogCreate'
+import Report from './report'
 
 const BalanceByBeep = () => {
   const [ balances, setBalances ] = React.useState([])
+  const [ selectBalanceId, setSelectBalanceId ] = React.useState(false)
   const [ typeSearch, setTypeSearch ] = React.useState('id')
   const [ openDialogCreate, setOpenDialogCreate ] = React.useState(false)
+  const documentReport = React.useRef(null)
   const classes = useStyles()
+
+  const handlePrint = useReactToPrint({
+    content: () => documentReport.current,
+    documentTitle: 'Relatório do Balanço ' + selectBalanceId,
+    onAfterPrint: () => setSelectBalanceId(false),
+  })
 
   const loadData = React.useCallback(async () => {
     try {
@@ -107,20 +117,22 @@ const BalanceByBeep = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-          {balances.map((product) => (
-            <React.Fragment key={product.id}>
+          {balances.map((balance) => (
+            <React.Fragment key={balance.id}>
               <TableRow
                 hover
                 className={classes.row}
               >
-                <TableCell>{product.id}</TableCell>
-                <TableCell>{product.description}</TableCell>
-                <TableCell>{product.dtBalance}</TableCell>
-                <TableCell>{product.dtFinish}</TableCell>
+                <TableCell>{balance.id}</TableCell>
+                <TableCell>{balance.description}</TableCell>
+                <TableCell>{balance.dtBalance}</TableCell>
+                <TableCell>{balance.dtFinish}</TableCell>
                 <TableCell align="right">
                   <Print onClick={() => {
-                    /* setOpenPurchaseReport(true)
-                    setPurchaseOrderSelected(purchaseOrder) */
+                    setSelectBalanceId(balance.id)
+                    setTimeout(() => {
+                      handlePrint()
+                    }, 100);
                   }}/>
                 </TableCell>
               </TableRow>
@@ -147,6 +159,16 @@ const BalanceByBeep = () => {
         onClose={() => setOpenDialogCreate(false)}
         loadData={loadData}
       />
+
+      <Box ref={documentReport} style={{
+        display: selectBalanceId ? 'block' : 'none',
+        zIndex: -1
+      }}>
+        <Report
+          selectBalanceId={selectBalanceId}
+          onClose={() => setSelectBalanceId(false)}
+        />
+      </Box>
     </Box>
   )
 }

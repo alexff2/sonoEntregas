@@ -61,6 +61,14 @@ const BalanceByBeep = ({handleRenderBox}) => {
   }
 
   const handleCreateSerial = async () => {
+    const serialArray = serialNumberSelect.split(' ')
+    if (serialArray.length > 1) {
+      setAlertSnackbar('Número de série inválido!')
+      setSerialNumberSelect('')
+      document.getElementById('serialNumberId').focus()
+      return
+    }
+
     try {
       setOpenBackDrop(true)
       const { data } = await api.post('balance-by-beep/beep', {

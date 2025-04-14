@@ -86,7 +86,10 @@ module.exports = {
   },
   async reportBalance(request, response){
     try {
-      
+      const { id } = request.params
+
+      const data = await BalanceByBeepService.reportBalance(id)
+      return response.status(200).json(data)
     } catch (error) {
       errorCath(error, response)
     }
