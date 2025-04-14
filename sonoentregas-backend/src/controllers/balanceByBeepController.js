@@ -51,6 +51,13 @@ module.exports = {
       const { serialNumber, balanceId } = request.body
       const userId = request.user.id
 
+      if(serialNumber.length > 10 || isNaN(Number(serialNumber)) || Number(serialNumber) <= 0) {
+        throw {
+          status: 400,
+          message: 'Número invalido!',
+        }
+      }
+
       const result = await BalanceByBeepService.createBeep(connections, {
         serialNumber,
         userId,
