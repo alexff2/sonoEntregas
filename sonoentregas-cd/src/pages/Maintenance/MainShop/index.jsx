@@ -289,7 +289,7 @@ export default function TableMain() {
           <TableBody>
             {stableSort(maintenance, getComparator(order, orderBy)).map(main => (
               <TableRow key={main.ID} onClick={e =>clickMaintenance(e, main)}>
-                <TableCell style={{width: '11%'}}>{main.ID}</TableCell>
+                <TableCell style={{width: '9%'}}>{main.ID}</TableCell>
                 <TableCell style={{width: '11%'}}>{main.ID_SALE}</TableCell>
                 <TableCell>{main.NOMECLI}</TableCell>
                 <TableCell>{main.PRODUTO}</TableCell>
