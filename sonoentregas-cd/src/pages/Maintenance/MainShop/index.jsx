@@ -5,7 +5,6 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableHead,
   TableRow,
   makeStyles,
   InputBase, 
@@ -26,6 +25,8 @@ import { useMaintenance } from '../../../context/maintenanceContext'
 import api from '../../../services/api'
 import { getDateBr } from '../../../functions/getDates'
 import styleStatus from '../../../functions/styleStatus'
+import EnhancedTableHead from '../../../components/EnhancedTableHead'
+import { getComparator, stableSort } from '../../../functions/orderTable'
 
 import ReportMaintenance from '../../../components/Reports/ReportMaintenance'
 import ModalProcessMain from './ModalProcessMain'
@@ -103,6 +104,7 @@ const useStyle = makeStyles(theme => ({
     backgroundColor: theme.palette.primary.light,
     color: theme.palette.common.white,
     fontWeight: theme.typography.fontWeightBold,
+    padding: theme.spacing(1),
   },
   inputDate: {
     background: 'rgba(0,0,0,0)',
@@ -114,6 +116,8 @@ const useStyle = makeStyles(theme => ({
 }))
 
 export default function TableMain() {
+  const [ order, setOrder ] = useState('asc')
+  const [ orderBy, setOrderBy ] = useState('ID')
   const [search, setSearch] = useState('')
   const [typeSeach, setTypeSeach] = useState('STATUS')
   const [typesStatus, setTypesStatus] = useState('open')
@@ -129,7 +133,9 @@ export default function TableMain() {
   useEffect(() => {
     api
       .get('/maintenancedeliv')
-      .then( resp => setMaintenance(resp.data))
+      .then( resp => {
+        setMaintenance(resp.data)
+      })
   },[setMaintenance])
 
   const clickMaintenance = (e, main) => {
@@ -178,6 +184,23 @@ export default function TableMain() {
       setMaintenance([])
     }
   }
+
+  const handleRequestSort = (event, property) => {
+    const isAsc = orderBy === property && order === 'asc'
+    setOrder(isAsc ? 'desc' : 'asc')
+    setOrderBy(property)
+  }
+
+  const headCell = [
+    { id: 'ID', label: 'Código', class: classes.headCell },
+    { id: 'ID_SALE', label: 'Cód. Venda.', class: classes.headCell },
+    { id: 'NOMECLI', label: 'Cliente', class: classes.headCell },
+    { id: 'PRODUTO', label: 'Produto', class: classes.headCell },
+    { id: 'QUANTIDADE', label: 'QTD', class: classes.headCell },
+    { id: 'D_PREV', label: 'Previsão', class: classes.headCell },
+    { id: 'DESC_ABREV', label: 'Loja', class: classes.headCell },
+    { id: 'Actions', label: '', class: classes.headCell }
+  ]
 
   return (
     <>
@@ -256,15 +279,15 @@ export default function TableMain() {
 
       <TableContainer className={classes.paperTable} component={Paper}>
         <Table>
-          <TableHead>
-            <TableRow>
-            {['Código', 'Cód. Venda.', 'Cliente', 'Produto', 'QTD', 'Previsão', 'Visita', ''].map((item, i) =>(
-              <TableCell key={i} className={classes.headCell}>{item}</TableCell>
-            ))}
-            </TableRow>
-          </TableHead>
+          <EnhancedTableHead
+            order={order}
+            orderBy={orderBy}
+            classes={classes}
+            headCells={headCell}
+            onRequestSort={handleRequestSort}
+          />
           <TableBody>
-            {maintenance.map(main => (
+            {stableSort(maintenance, getComparator(order, orderBy)).map(main => (
               <TableRow key={main.ID} onClick={e =>clickMaintenance(e, main)}>
                 <TableCell style={{width: '11%'}}>{main.ID}</TableCell>
                 <TableCell style={{width: '11%'}}>{main.ID_SALE}</TableCell>
@@ -272,7 +295,7 @@ export default function TableMain() {
                 <TableCell>{main.PRODUTO}</TableCell>
                 <TableCell>{main.QUANTIDADE}</TableCell>
                 <TableCell>{getDateBr(main.D_PREV)}</TableCell>
-                <TableCell>{main.VISITANT}</TableCell>
+                <TableCell>{main.DESC_ABREV}</TableCell>
                 <TableCell style={{width: '15%'}}>
                   {main.STATUS !== 'No CD'
                     ? <>

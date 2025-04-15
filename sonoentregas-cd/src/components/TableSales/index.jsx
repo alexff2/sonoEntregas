@@ -236,7 +236,7 @@ export default function TableSales({
   availableStocks
 }){
   const [ order, setOrder ] = useState('asc')
-  const [ orderBy, setOrderBy ] = useState('idSales')
+  const [ orderBy, setOrderBy ] = useState('ID_SALES')
   const classes = useStyles()
 
   //Functions
@@ -254,7 +254,6 @@ export default function TableSales({
     { id: 'BAIRRO', label: 'Bairro' },
     { id: 'D_ENTREGA1', label: 'Entrega' },
     { id: 'CODLOJA', label: 'Loja' },
-    { id: '', label: '' }
   ]
 
   return(

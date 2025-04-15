@@ -252,14 +252,6 @@ export default function ModalDelivery({ setOpen, type }){
 
       setForecasts(data)
 
-      const { data: dataSales } = await api.get('sales/', {
-        params: {
-          status: 'open'
-        }
-      })
-
-      setSales(dataSales)
-
       setOpen(false)
     } catch (e) {
       setIsLoading(false)
