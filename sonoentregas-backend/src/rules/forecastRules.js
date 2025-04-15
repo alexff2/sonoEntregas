@@ -35,7 +35,7 @@ class ForecastRules {
 
     const currentDateTimezone = new Date().setHours(0,0,0,0)
 
-    if (dateForecastTimezone <= currentDateTimezone) {
+    if (dateForecastTimezone < currentDateTimezone) {
       throw {
         status: 409,
         error: {
@@ -55,19 +55,6 @@ class ForecastRules {
         status: 409,
         error: {
           message: 'outdated forecast!'
-        }
-      }
-    }
-  }
-
-  async checkExistForecastWithDate({ date }){
-    const forecast = await Forecast.findAny(0, { date })
-
-    if (forecast.length > 0) {
-      throw {
-        status: 409,
-        error: {
-          message: 'There is already a forecast for that date!'
         }
       }
     }

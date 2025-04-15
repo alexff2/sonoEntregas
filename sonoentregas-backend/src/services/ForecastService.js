@@ -186,7 +186,7 @@ class ForecastService {
     await Forecast.creatorAny(0, [{
       date: formatSqlForecastDate,
       idUserCreated: userId
-    }], true)
+    }])
 
     const idForecast = await Forecast.findAny(0, { date: formatSqlForecastDate }, 'id')
 
@@ -213,7 +213,7 @@ class ForecastService {
       }))
 
     if (salesFiltered.length > 0) {
-      await ForecastSales.creatorAny(0, salesFiltered, true)
+      await ForecastSales.creatorAny(0, salesFiltered)
 
       if (add) {
         const forecastStatus = await Forecast.findAny(0, {id: idForecast, status: 1}, 'status')

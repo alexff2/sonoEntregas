@@ -113,8 +113,6 @@ module.exports = {
 
       await ForecastsRules.checkDateInsertForecast({ date })
 
-      await ForecastsRules.checkExistForecastWithDate({ date })
-
       await ForecastsRules.checkForecastSalesIsClosed(sales)
 
       await ForecastsRules.checkSaleIsWithdrawal(sales)
