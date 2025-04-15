@@ -17,7 +17,7 @@ module.exports = {
       WHERE balanceId = ${id}
     ) B ON A.serialNumber = B.serialNumber
     INNER JOIN PRODUTOS C ON C.CODIGO = A.productId
-    WHERE B.balanceId IS NULL
+    WHERE B.balanceId IS NULL AND A.balanceId = ${id}
     ORDER BY C.NOME`
   },
   uniqueProductsWithDivergence(id) {
