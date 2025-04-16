@@ -219,7 +219,7 @@ export default function TabForecast({ forecastsFinish }) {
             <TableRow key={forecast.id} className={classes.body}>
               <TableCell>{forecast.id}</TableCell>
               <TableCell width={'50%'}>
-                {`Previsão do dia ${getDateBr(forecast.date)}`}
+                {`Previsão do dia ${getDateBr(forecast.date)} - ${forecast.description}`}
               </TableCell>
               <TableCell onClick={() => {
                 setForecastSelect(forecast)
@@ -252,7 +252,7 @@ export default function TabForecast({ forecastsFinish }) {
             <TableRow key={forecast.id} className={classes.body}>
               <TableCell>{forecast.id}</TableCell>
               <TableCell width={'50%'}>
-                {`Previsão do dia ${getDateBr(forecast.date)}`}
+                {`Previsão do dia ${getDateBr(forecast.date)} ${forecast.description ? (' - '+forecast.description) : ''}`}
               </TableCell>
               <TableCell onClick={() => {
                 setForecastSelect(forecast)

@@ -219,8 +219,8 @@ export default function ModalDelivery({ setOpen, type }){
     try {
       setIsLoading(true)
 
-      if(date === '') {
-        setErrorMsg('Selecione a data de previsão!')
+      if(date === '' || description === '') {
+        setErrorMsg('Selecione a data e a descrição da previsão!')
         setIsLoading(false)
         return
       }
@@ -243,6 +243,7 @@ export default function ModalDelivery({ setOpen, type }){
 
       const forecast = {
         date,
+        description,
         sales
       }
 
@@ -530,18 +531,28 @@ export default function ModalDelivery({ setOpen, type }){
           </FormControl>
         </div>
 
-        :<TextField
-          id="date"
-          label="Previsão"
-          defaultValue={date}
-          type="date"
-          variant="outlined"
-          onChange={e => setDate(e.target.value)}
-          className={classes.fieldDate}
-          InputLabelProps={{
-            shrink: true,
-          }}
-        />
+        :<>
+          <TextField
+            id="date"
+            label="Previsão"
+            defaultValue={date}
+            type="date"
+            variant="outlined"
+            onChange={e => setDate(e.target.value)}
+            className={classes.fieldDate}
+          /> &nbsp;
+
+          <TextField
+            id="description"
+            label="Descrição"
+            placeholder="Descrição da entrega"
+            style={{width: '52%'}}
+            variant="outlined"
+            defaultValue={''}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+          />
+        </>
       }
 
       <hr style={{ marginTop: '16px' }}/>

@@ -99,7 +99,7 @@ module.exports = {
    */
   async create(req, res){
     try {
-      const { date, sales } = req.body
+      const { date, sales, description } = req.body
       const { id: userId } = req.user
 
       if (!date || !sales) {
@@ -124,7 +124,8 @@ module.exports = {
       // Process
       const idForecast = await ForecastService.createForecast({
         userId,
-        date
+        date,
+        description,
       })
 
       await ForecastService.createSalesForecast({

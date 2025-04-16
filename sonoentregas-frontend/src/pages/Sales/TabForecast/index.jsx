@@ -40,6 +40,7 @@ export function TabForecast(){
       })
       .then(({ data }) => {
         setForecasts(data)
+        console.log(data)
         setLoading(false)
       })
       .catch(err => {
@@ -148,7 +149,7 @@ export function TabForecast(){
         {forecasts.map(forecast => (
           <div key={forecast.id} className='forecast'>
             <div className='headerPrev'>
-              <span>Previsão de {dateSqlToReact(forecast.date)}</span>
+              <span>Previsão de {dateSqlToReact(forecast.date)} {forecast.description ? (' - '+forecast.description) : ''}</span>
               <span>Criado por: {forecast.userCreated}</span>
             </div>
             {forecast.sales.map( sale => (

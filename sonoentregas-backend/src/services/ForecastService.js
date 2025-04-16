@@ -32,6 +32,7 @@
  * 
  * @typedef {Object} PropsCreateForecast
  * @property {string} date
+ * @property {string} description
  * @property {string} userId
  * 
  * @typedef {Object} PropsSalesForecast
@@ -215,12 +216,13 @@ class ForecastService {
   }
 
   /** @param {PropsCreateForecast} props */
-  async createForecast({ date, userId }) {
+  async createForecast({ date, description, userId }) {
     const formatSqlForecastDate = ObjDate.setDaysInDate(date, 0)
 
     const idForecast = await Forecast.creatorAny(0, [{
       date: formatSqlForecastDate,
-      idUserCreated: userId
+      idUserCreated: userId,
+      description,
     }])
 
     return idForecast
