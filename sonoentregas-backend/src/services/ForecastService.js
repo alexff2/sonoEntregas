@@ -218,14 +218,12 @@ class ForecastService {
   async createForecast({ date, userId }) {
     const formatSqlForecastDate = ObjDate.setDaysInDate(date, 0)
 
-    await Forecast.creatorAny(0, [{
+    const idForecast = await Forecast.creatorAny(0, [{
       date: formatSqlForecastDate,
       idUserCreated: userId
     }])
 
-    const idForecast = await Forecast.findAny(0, { date: formatSqlForecastDate }, 'id')
-
-    return idForecast[0].id
+    return idForecast
   }
 
   /** @param {PropsSalesForecast} props */

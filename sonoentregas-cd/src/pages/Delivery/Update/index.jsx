@@ -37,9 +37,9 @@ export default function Update(){
   useEffect(() => {
     const getForecast = async () => {
       try {
-        const { data: forecast } = await api.get(`/forecast/${id}/view`)
+        const { data: forecastSales } = await api.get(`/forecast/${id}/view`)
 
-        setSales(forecast === '' ? [] : forecast.sales)
+        setSales(forecastSales)
       } catch (error) {
         console.log(error)
       }
