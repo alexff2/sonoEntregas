@@ -58,7 +58,7 @@ export default function ForecastView({ forecastId, handleInvalidationSale }){
       try {
         const { data } = await api.get(`/forecast/${forecastId}/view`)
 
-        setSales(data.sales)
+        setSales(data)
       } catch (error) {
         console.log(error)
       }

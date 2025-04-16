@@ -147,6 +147,7 @@ class ForecastService {
 
     /** @type {IForecastSales[]} */
     const forecastSales = await Forecast._query(0, scriptSales, QueryTypes.SELECT)
+    console.log('forecastSales', forecastSales)
 
     if (forecastSales.length === 0) {
       return []
@@ -177,6 +178,40 @@ class ForecastService {
     })
 
     return forecasts
+  }
+
+  async findSalesForecast({id}){
+    const scriptSales = 
+    `SELECT A.*, C.DESC_ABREV SHOP, B.NOMECLI, B.BAIRRO, B.ID_SALES, B.D_ENTREGA1, B.FONE, B.FAX, B.VENDEDOR, B.TOTAL,
+    Convert(varchar, A.dateValidation, 103) + ' as ' +Convert(varchar, A.dateValidation, 8) dateValidationFormat
+    FROM FORECAST_SALES A
+    INNER JOIN SALES B ON A.idSale = B.ID
+    INNER JOIN LOJAS C ON B.CODLOJA = C.CODLOJA
+    WHERE A.idForecast = ${id}
+    `
+
+    /** @type {IForecastSales[]} */
+    const forecastSales = await Forecast._query(0, scriptSales, QueryTypes.SELECT)
+
+    if (forecastSales.length === 0) {
+      return []
+    }
+
+    const scriptProduct = `
+    SELECT A.*, B.idForecast, C.NOME, D.NVTOTAL FROM FORECAST_PRODUCT A
+    INNER JOIN FORECAST_SALES B ON A.idForecastSale = B.id
+    INNER JOIN ${process.env.CD_BASE}..PRODUTOS C ON A.COD_ORIGINAL = C.ALTERNATI
+    INNER JOIN SALES_PROD D ON D.COD_ORIGINAL = A.COD_ORIGINAL AND D.ID_SALE_ID = B.idSale
+    WHERE A.idForecastSale in (${forecastSales.map(sale => sale.id)})`
+
+    /**@type {IForecastProduct[]} */
+    const forecastProduct = await Forecast._query(0, scriptProduct, QueryTypes.SELECT)
+
+    forecastSales.forEach(forecastSale => {
+      forecastSale['products'] = forecastProduct.filter(prod => prod.idForecastSale === forecastSale.id)
+    })
+
+    return forecastSales
   }
 
   /** @param {PropsCreateForecast} props */

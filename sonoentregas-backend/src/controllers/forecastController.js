@@ -16,9 +16,9 @@ module.exports = {
         throw new Error('id not exist!')
       }
 
-      const forecast = await ForecastService.findForecast({ id })
+      const sales = await ForecastService.findSalesForecast({ id })
 
-      return res.status(200).json(forecast[0])
+      return res.status(200).json(sales)
     } catch (e) {
       console.log(e)
 
