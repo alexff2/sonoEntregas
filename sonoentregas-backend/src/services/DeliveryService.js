@@ -46,6 +46,7 @@ const Sales = require('../models/Sales')
 const scripts = require('../scripts/delivery')
 const MainService = require('../services/MainService')
 const Date = require('../class/Date')
+const e = require('express')
 
 module.exports = {
   async findUnique(/** @type {number} */id){
@@ -415,5 +416,21 @@ module.exports = {
     const deliveries = await Delivery._query(0, script, QueryTypes.SELECT)
 
     return deliveries
-  }
+  },
+  /**
+   * @param {object} props
+   */
+  async extraRoutes({dateStart, dateEnd}){
+    const extraRoutesAssistantsScript = scripts.extraRoutesAssistants({dateStart, dateEnd})
+    const extraRoutesAssistants = await Delivery._query(0, extraRoutesAssistantsScript, QueryTypes.SELECT)
+
+    const extraRoutesDriversScript = scripts.extraRoutesDrivers({dateStart, dateEnd})
+    const extraRoutesDrivers = await Delivery._query(0, extraRoutesDriversScript, QueryTypes.SELECT)
+
+
+    return {
+      assistants: extraRoutesAssistants,
+      drivers: extraRoutesDrivers,
+    }
+  },
 }

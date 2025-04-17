@@ -377,5 +377,27 @@ module.exports = {
 
       return res.status(status).json(error)
     }
-  }
+  },
+  /**
+   * @param {any} req
+   * @param {any} res
+   */
+  async extraRoutes(req, res) {
+    const { dateStart, dateEnd } = req.query
+
+    try {
+      const extraRoutes = await DeliveryService.extraRoutes({dateStart, dateEnd})
+
+      return res.json({
+        extraRoutes
+      })
+    } catch (e) {
+      console.log(e)
+
+      let status = e.status ? e.status : 400
+      let error = e.error ? e.error : e
+
+      return res.status(status).json(error)
+    }
+  },
 }

@@ -1,3 +1,5 @@
+const { extraRoutes } = require("../services/DeliveryService")
+
 module.exports = {
   findToBeepDelivery(id) {
     return `
@@ -135,5 +137,29 @@ module.exports = {
     ) a
     where a.qtd_realized + a.qtd_return > 0
     order by a.DESCRIPTION`
-  }
+  },
+  extraRoutesAssistants({dateStart, dateEnd}){
+    return `
+    SELECT A.DESCRIPTION, SUM(A.QTD) QTD FROM (
+      SELECT B.DESCRIPTION, (COUNT(A.ID_ASSISTANT) - 1) QTD, A.D_DELIVERED
+      FROM DELIVERYS A
+      INNER JOIN USERS B ON A.ID_ASSISTANT = B.ID
+      WHERE D_DELIVERED BETWEEN '${dateStart}' AND '${dateEnd}'
+      GROUP BY A.ID_ASSISTANT, A.D_DELIVERED, B.DESCRIPTION
+      HAVING (COUNT(A.ID_ASSISTANT) - 1) > 0
+    ) A
+    GROUP BY A.DESCRIPTION`
+  },
+  extraRoutesDrivers({dateStart, dateEnd}){
+    return `
+    SELECT A.DESCRIPTION, SUM(A.QTD) QTD FROM (
+      SELECT B.DESCRIPTION, (COUNT(A.ID_DRIVER) - 1) QTD, A.D_DELIVERED
+      FROM DELIVERYS A
+      INNER JOIN USERS B ON A.ID_DRIVER = B.ID
+      WHERE D_DELIVERED BETWEEN '${dateStart}' AND '${dateEnd}'
+      GROUP BY A.ID_DRIVER, A.D_DELIVERED, B.DESCRIPTION
+      HAVING (COUNT(A.ID_DRIVER) - 1) > 0
+    ) A
+    GROUP BY A.DESCRIPTION`
+  },
 }
