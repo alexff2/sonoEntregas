@@ -28,8 +28,8 @@ function SetEstoque({ product }) {
           </td>
           <td>
             { process.env.REACT_APP_STOCK_BEEP === '1'
-                ? (product.CD.EST_BEEP - product.CD.EST_RESERVA)
-                : (product.CD.EST_KARDEX - product.CD.EST_RESERVA)
+                ? (product.CD.EST_BEEP - product.CD.EST_RESERVA - product.CD.QTD_MAINTENANCE)
+                : (product.CD.EST_KARDEX - product.CD.EST_RESERVA - product.CD.QTD_MAINTENANCE)
             }
           </td>
           <td>
