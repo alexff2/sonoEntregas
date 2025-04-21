@@ -138,7 +138,7 @@ function Row({ sale, type, setSales, availableStocks }) {
   return(
     <React.Fragment>
       <TableRow className={ type === 'home' ? classes.row : classes.row1 }>
-        <TableCell>
+        <TableCell onClick={setInformation}>
           {type === 'home' && <IconButton aria-label="expand row" style={{padding: 0}} onClick={() => setOpen(!open)}>
             {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
           </IconButton>}
