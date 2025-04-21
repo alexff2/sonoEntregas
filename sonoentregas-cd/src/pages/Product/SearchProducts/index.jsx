@@ -132,7 +132,8 @@ export default function SearchProducts() {
               <TableCell>Descrição</TableCell>
               <TableCell align="right">Qtd Kardex</TableCell>
               <TableCell align="right">Qtd Bipada</TableCell>
-              <TableCell align="right">Qtd Reservado</TableCell>
+              <TableCell align="right">Qtd DAV</TableCell>
+              <TableCell align="right">Qtd Ass.</TableCell>
               <TableCell align="right">Qtd Disp. Loja</TableCell>
             </TableRow>
           </TableHead>
@@ -150,6 +151,7 @@ export default function SearchProducts() {
                 <TableCell align="right">{product.EST_KARDEX}</TableCell>
                 <TableCell align="right">{product.EST_BEEP}</TableCell>
                 <TableCell align="right">{product.EST_RESERVA}</TableCell>
+                <TableCell align="right">{product.QTD_MAINTENANCE}</TableCell>
                 <TableCell align="right">{product.EST_DISPONIVEL}</TableCell>
               </TableRow>
               {serialNumbersProduct.COD_ORIGINAL === product.COD_ORIGINAL && (
