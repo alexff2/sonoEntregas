@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Box,
   Fab,
@@ -15,8 +16,8 @@ import Modal from '../../components/Modal'
 import ModalDelivery from './Modals/ModalDelivery'
 import ModalView from './Modals/ModalView'
 import ModalDelivering from './Modals/ModalDelivering'
-import TableDelivery from './Tables/TableDelivery'
-import TableForecast from './Tables/TableForecast'
+import TableDelivery from './Delivery/TableDelivery'
+import TableForecast from './Forecast/TableForecast'
 import ModalAddSale from './Update/ModalAddSale'
 //Context
 import { useDelivery } from '../../context/deliveryContext'
@@ -96,6 +97,7 @@ export default function Delivery() {
   const [ selectDelivery, setSelectDelivery ] = useState({})
   const [ typeForecasDelivery, setTypeForecasDelivery ] = useState('')
 
+  const navigate = useNavigate()
   const { setDelivery } = useDelivery()
   const { setDeliveryFinish } = useDeliveryFinish()
   const { forecasts, setForecasts } = useForecasts()
@@ -322,7 +324,7 @@ export default function Delivery() {
               >Retirada</Typography>
             </Box>
           </Paper>
-          <Paper className={classes.card}  onClick={() => openModals('forecast', 'create')}>
+          <Paper className={classes.card}  onClick={() => navigate('/app/forecast/create/0')}>
             <Box>
               <Typography
                 variant="h6"

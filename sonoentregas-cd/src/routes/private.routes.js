@@ -7,6 +7,7 @@ import Home from '../pages/Home'
 
 import Delivery from '../pages/Delivery'
 import DeliveryUpdate from '../pages/Delivery/Update'
+import ForecastCreate from '../pages/Delivery/Forecast/Create'
 
 import Cars from '../pages/Cars'
 import Users from '../pages/Users'
@@ -41,8 +42,10 @@ export default function PrivateRoutes(){
         <Route path="/" element={<Navigate to="/app/home"/>} />
         <Route path="/app/home" element={<Home />} />
         <Route path="/app/transports" element={<Cars />} />
+
         <Route path="/app/delivery" element={<Delivery />} />
         <Route path="/app/delivery/update/:type/:id" element={<DeliveryUpdate />}/>
+        <Route path="/app/forecast/create/:id" element={<ForecastCreate />}/>
 
         <Route path="/app/sales/returns" element={<SalesReturns />} />
         <Route path="/app/sales/search" element={<SalesSearch />} />

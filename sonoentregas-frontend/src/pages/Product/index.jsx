@@ -62,7 +62,7 @@ export default function Product(){
           <thead>
             <tr>
               <th>Código</th>
-              <th>Descricão</th>
+              <th>Descrição</th>
               <th>Estoque</th>
               <th>Reserva</th>
               <th>Disponível</th>
