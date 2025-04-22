@@ -39,7 +39,7 @@ class ForecastRules {
       throw {
         status: 409,
         error: {
-          message: 'Forecast date must be greater than the current date!'
+          message: 'A data da previsão deve ser igual ou superior à data atual!'
         }
       }
     }

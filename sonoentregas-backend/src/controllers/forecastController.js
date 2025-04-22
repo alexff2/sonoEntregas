@@ -99,28 +99,10 @@ module.exports = {
    */
   async create(req, res){
     try {
-      const { date, sales, description } = req.body
+      const { date, description } = req.body
       const { id: userId } = req.user
 
-      if (!date || !sales) {
-        throw {
-          status: 400,
-          error: {
-            message: 'Enter the forecast date in month(2 char)/day(2 char)/year(4 char) format and sales in an array of objects'
-          }
-        }
-      }
-
       await ForecastsRules.checkDateInsertForecast({ date })
-
-      await ForecastsRules.checkForecastSalesIsClosed(sales)
-
-      await ForecastsRules.checkSaleIsWithdrawal(sales)
-
-      await ForecastsRules.checkStatusProduct(sales)
-
-      await ForecastsRules.checkAvailableStock(sales)
-
       // Process
       const idForecast = await ForecastService.createForecast({
         userId,
@@ -128,14 +110,7 @@ module.exports = {
         description,
       })
 
-      await ForecastService.createSalesForecast({
-        sales,
-        idForecast,
-        userId,
-        add: false
-      })
-
-      return res.status(201).json()
+      return res.status(201).json({ idForecast })
     } catch (e) {
       console.log(e)
 

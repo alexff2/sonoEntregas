@@ -16,10 +16,12 @@ import api from '../../../services/api'
 import { ButtonSuccess, ButtonCancel } from '../../../components/Buttons'
 import Table from './Table'
 
+import { useAlertSnackbar } from '../../../context/alertSnackbarContext'
+import { useBackdrop } from '../../../context/backdropContext'
+
 const stateInicialBooleans = {
   isDisabledHeader: false,
   renderComponent: false,
-  isDisableBtnSave: false,
 }
 
 const stateInitialForecast = {
@@ -43,6 +45,8 @@ const useStyles = makeStyles(theme => ({
 export default function Create() {
   const [stateBoolean, setStateBoolean] = useState(stateInicialBooleans)
   const [forecast, setForecast] = useState(stateInitialForecast)
+  const { setAlertSnackbar } = useAlertSnackbar()
+  const { setOpenBackDrop } = useBackdrop()
   const { id } = useParams()
   const navigate = useNavigate()
 
@@ -58,25 +62,31 @@ export default function Create() {
 
   const handleSubmitSave = async () => {
     if (forecast.description === '') {
-      alert('Preencha a descrição')
+      setAlertSnackbar('Preencha a descrição')
       return
     }
+
     try {
+      setOpenBackDrop(true)
       setStateBoolean(state => ({ ...state,  isDisableBtnSave: true }))
-      /* Chamada para cadastrar*/
+
+      const { data } = await api.post('forecast', forecast)
 
       setForecast(state => ({
         ...state,
-        id: 11326,
+        id: data.idForecast,
       }))
-    } catch (error) {
-      console.log(error)
-    } finally {
       setStateBoolean(state => ({
         ...state,
         isDisabledHeader: true,
-        isDisableBtnSave: true
       }))
+    } catch (error) {
+      console.log(error.response)
+      if (error.response.status === 409) {
+        setAlertSnackbar(error.response.data.message)
+      }
+    } finally {
+      setOpenBackDrop(false)
     }
   }
 
@@ -95,8 +105,7 @@ export default function Create() {
   const handleEditHeader = () => {
     setStateBoolean(state => ({
       ...state,
-      isDisabledHeader: false,
-      isDisableBtnSave: false
+      isDisabledHeader: false
     }))
   }
 
@@ -158,7 +167,7 @@ export default function Create() {
         <Box pt={2}>
           {!stateBoolean.isDisabledHeader
             ? <>
-                <ButtonSuccess loading={stateBoolean.isDisableBtnSave} onClick={handleSubmitSave}>Gravar</ButtonSuccess>
+                <ButtonSuccess onClick={handleSubmitSave}>Gravar</ButtonSuccess>
                 <ButtonCancel disabled={stateBoolean.isDisabledHeader} onClick={handleCancel}>Cancelar</ButtonCancel>
               </>
             : <Button variant='outlined' onClick={handleEditHeader}>Editar</Button>
