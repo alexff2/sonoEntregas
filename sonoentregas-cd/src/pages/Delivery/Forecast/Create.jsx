@@ -112,6 +112,16 @@ export default function Create() {
   useEffect(() => {
     const fetchData = async () => {
       if(id !== '0') {
+        const { data } = await api.get(`/forecast/${id}`)
+
+        setForecast({
+          ...data.forecast,
+        })
+
+        setStateBoolean(state => ({
+          ...state,
+          isDisabledHeader: true
+        }))
       }
 
       setStateBoolean(state => ({
@@ -159,19 +169,18 @@ export default function Create() {
             variant="outlined"
             className={classes.description}
             disabled={stateBoolean.isDisabledHeader}
-            value={forecast.description}
+            value={forecast.description ?? ''}
             onChange={handleChange}
           />
         </Box>
 
         <Box pt={2}>
-          {!stateBoolean.isDisabledHeader
-            ? <>
-                <ButtonSuccess onClick={handleSubmitSave}>Gravar</ButtonSuccess>
-                <ButtonCancel disabled={stateBoolean.isDisabledHeader} onClick={handleCancel}>Cancelar</ButtonCancel>
-              </>
-            : <Button variant='outlined' onClick={handleEditHeader}>Editar</Button>
-          }
+          {!stateBoolean.isDisabledHeader && (
+            <>
+              <ButtonSuccess onClick={handleSubmitSave}>Gravar</ButtonSuccess>
+              <ButtonCancel disabled={stateBoolean.isDisabledHeader} onClick={handleCancel}>Cancelar</ButtonCancel>
+            </>
+          )}
         </Box>
 
         <Divider style={{margin: '20px 0'}}/>

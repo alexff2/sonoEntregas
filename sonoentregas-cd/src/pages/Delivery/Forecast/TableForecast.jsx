@@ -263,7 +263,7 @@ export default function TabForecast({ forecastsFinish }) {
 
               <TableCell>
                 <Tooltip title='Atualizar previsão'>
-                  <IconButton onClick={() => navigate(`update/forecast/${forecast.id}`)}>
+                  <IconButton onClick={() => navigate(`/app/forecast/create/${forecast.id}`)}>
                     <EditSharp/>
                   </IconButton>
                 </Tooltip>

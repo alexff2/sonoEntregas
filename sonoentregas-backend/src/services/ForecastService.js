@@ -181,6 +181,23 @@ class ForecastService {
     return forecasts
   }
 
+  async findForecastById({ id }){
+    /** @type {IForecast[]} */
+    const forecast = await Forecast.findAny(0, { id })
+    if (forecast.length === 0) {
+      throw {
+        status: 404,
+        message: 'Forecast not found!'
+      }
+    }
+
+    const sales = await this.findSalesForecast({ id })
+
+    forecast[0]['sales'] = sales
+
+    return forecast[0]
+  }
+
   async findSalesForecast({id}){
     const scriptSales = 
     `SELECT A.*, C.DESC_ABREV SHOP, B.NOMECLI, B.BAIRRO, B.ID_SALES, B.D_ENTREGA1, B.FONE, B.FAX, B.VENDEDOR, B.TOTAL,
