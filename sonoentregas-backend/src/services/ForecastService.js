@@ -314,7 +314,23 @@ class ForecastService {
     await ForecastProduct.creatorAny(0, forecastProduct, true)
   }
 
+  async updateForecast({ id, date, description }){
+    const formatSqlForecastDate = ObjDate.setDaysInDate(date, 0)
+
+    await Forecast.updateAny(0, {
+      date: formatSqlForecastDate,
+      description
+    }, { id })
+  }
+
   async startedForecast({ id }){
+    const sales = await this.findSalesForecast({id})
+    if (sales.length === 0) {
+      throw {
+        status: 409,
+        message: 'Previsão não contêm vendas para validação'
+      }
+    }
     await Forecast.updateAny(0, { status: 1}, { id })
 
     await ForecastSales.updateAny(0, { canRemove: 0 }, { idForecast: id })

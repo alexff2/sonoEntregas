@@ -120,6 +120,8 @@ export default function TabForecast({ forecastsFinish }) {
         console.log(e.response.data)
 
         setAlert('Servidor')
+      } else if (e.response.status === 409) {
+        setAlert(e.response.data.message)
       } else {
         console.log(e.response.data)
       }

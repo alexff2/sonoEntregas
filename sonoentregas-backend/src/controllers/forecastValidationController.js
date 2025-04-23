@@ -9,7 +9,7 @@ module.exports = {
    */
   async validation(req, res){
     try {
-      const { idForecast, id } = req.params
+      const { idSale, id } = req.params
       const { validationStatus, contact, obs } = req.body
 
       const { id: userId } = req.user
@@ -24,12 +24,12 @@ module.exports = {
         })
       }
 
-      await ForecastRules.checkExistValidForecast({ id: idForecast })
+      await ForecastRules.checkExistValidForecast({ id })
 
-      await ForecastRules.checkForecastSaleIsValidated({ id })
+      await ForecastRules.checkForecastSaleIsValidated({ id: idSale })
 
       await ForecastService.validateSale({
-        id,
+        id: idSale,
         validationStatus,
         contact,
         userId,
@@ -52,7 +52,7 @@ module.exports = {
    */
   async requestInvalidation(req, res){
     try {
-      const { idForecast, id } = req.params
+      const { id, idSale } = req.params
       const { contact, obs } =  req.body
 
       const { id: userId } = req.user
@@ -63,9 +63,9 @@ module.exports = {
         })
       }
 
-      await ForecastRules.checkExistForecast({ id: idForecast })
+      await ForecastRules.checkExistForecast({ id })
 
-      const forecastSale = await ForecastRules.checkForecastSaleNotValidated({ id })
+      const forecastSale = await ForecastRules.checkForecastSaleNotValidated({ id: idSale })
 
       if (forecastSale.requestInvalidate) {
         throw {
@@ -81,7 +81,7 @@ module.exports = {
         }
       }
 
-      await ForecastService.requestInvalidation({ id, contact, obs })
+      await ForecastService.requestInvalidation({ id: idSale, contact, obs })
 
       return res.status(200).json(`cancellation request by ${userId}`)
     } catch (e) {
@@ -99,13 +99,13 @@ module.exports = {
    */
   async invalidate(req, res){
     try {
-      const { idForecast, id } = req.params
+      const { id, idSale } = req.params
 
       const { id: userId } = req.user
 
-      await ForecastRules.checkExistForecast({ id: idForecast })
+      await ForecastRules.checkExistForecast({ id })
 
-      const forecastSales = await ForecastRules.checkForecastSaleNotValidated({ id })
+      const forecastSales = await ForecastRules.checkForecastSaleNotValidated({ id: idSale })
 
       if (!forecastSales.requestInvalidate) {
         throw {
@@ -121,7 +121,7 @@ module.exports = {
         }
       }
 
-      await ForecastService.invalidateSale({ id })
+      await ForecastService.invalidateSale({ id: idSale })
 
       return res.status(200).json(userId)
     } catch (e) {
@@ -139,13 +139,13 @@ module.exports = {
    */
   async authRemove(req, res){
     try {
-      const { id, idForecast } = req.params
+      const { id, idSale } = req.params
 
       const { id: userId } = req.user
 
-      await ForecastRules.checkExistForecast({ id: idForecast })
+      await ForecastRules.checkExistForecast({ id })
 
-      const forecastSale = await ForecastRules.checkForecastSaleIsValidated({ id })
+      const forecastSale = await ForecastRules.checkForecastSaleIsValidated({ id: idSale })
 
       if (forecastSale.canRemove) {
         throw {
@@ -154,7 +154,7 @@ module.exports = {
         }
       }
 
-      await ForecastService.authorizeRemove({ id })
+      await ForecastService.authorizeRemove({ id: idSale })
 
       return res.status(200).json(`Removal allowed by user ${userId}`)
     } catch (e) {

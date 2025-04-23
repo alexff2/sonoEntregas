@@ -148,6 +148,35 @@ module.exports = {
    * @param {any} req
    * @param {any} res
    */
+  async update(req, res){
+    try {
+      const { id } = req.params
+      const { date, description } = req.body
+
+      await ForecastsRules.checkDateInsertForecast({ date })
+
+      await ForecastsRules.checkExistForecast({ id })
+
+      await ForecastService.updateForecast({
+        id,
+        date,
+        description,
+      })
+
+      return res.status(200).json('')
+    } catch (e) {
+      console.log(e)
+
+      let status = e.status ? e.status : 400
+      let error = e.error ? e.error : e
+
+      return res.status(status).json(error)
+    }
+  },
+  /**
+   * @param {any} req
+   * @param {any} res
+   */
   async started(req, res){
     try {
       const { id } = req.params

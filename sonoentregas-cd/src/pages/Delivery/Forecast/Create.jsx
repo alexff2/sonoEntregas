@@ -70,12 +70,16 @@ export default function Create() {
       setOpenBackDrop(true)
       setStateBoolean(state => ({ ...state,  isDisableBtnSave: true }))
 
-      const { data } = await api.post('forecast', forecast)
+      if (forecast.id === 0) {
+        const { data } = await api.post('forecast', forecast)
+        setForecast(state => ({
+          ...state,
+          id: data.idForecast,
+        }))
+      } else {
+        await api.put(`forecast/${forecast.id}`, forecast)
+      }
 
-      setForecast(state => ({
-        ...state,
-        id: data.idForecast,
-      }))
       setStateBoolean(state => ({
         ...state,
         isDisabledHeader: true,
@@ -102,12 +106,12 @@ export default function Create() {
     }))
   }
 
-  /* const handleEditHeader = () => {
+  const handleEditHeader = () => {
     setStateBoolean(state => ({
       ...state,
       isDisabledHeader: false
     }))
-  } */
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -173,11 +177,17 @@ export default function Create() {
         </Box>
 
         <Box pt={2}>
-          {!stateBoolean.isDisabledHeader && (
+          {!stateBoolean.isDisabledHeader ? (
             <>
               <ButtonSuccess onClick={handleSubmitSave}>Gravar</ButtonSuccess>
               <ButtonCancel disabled={stateBoolean.isDisabledHeader} onClick={handleCancel}>Cancelar</ButtonCancel>
             </>
+          ) : (
+            <Button
+              variant="contained"
+              disabled={forecast.status !== null}
+              onClick={handleEditHeader}
+            >Editar</Button>
           )}
         </Box>
 
