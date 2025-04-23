@@ -72,7 +72,7 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-export default function ModalAddSale({ setOpen, forecast }){
+export default function ModalAddSale({ setOpen, forecast, getForecastSales }) {
   const [ openModalSelectSalesWithSameNumber, setOpenModalSelectSalesWithSameNumber ] = useState(false)
   const [ slideInputs, setSlideInputs ] = useState(true)
   const [ slideTable, setSlideTable ] = useState(false)
@@ -215,9 +215,7 @@ export default function ModalAddSale({ setOpen, forecast }){
     try {
       setIsLoading(true)
 
-      let saleFiltered
-
-      saleFiltered = saleSelected.filter( sale => {
+      const saleFiltered = saleSelected.filter( sale => {
         sale.products = sale.products.filter( prod => prod.check)
 
         if (sale.products.length > 0) {
@@ -234,8 +232,7 @@ export default function ModalAddSale({ setOpen, forecast }){
 
       await api.post(`/forecast/${forecast.id}/sales/add`, { sales: saleFiltered })
 
-      forecast.sales.push(saleFiltered[0])
-
+      getForecastSales()
       setOpen(false)
     } catch (e) {
       if (!e.response){

@@ -114,9 +114,7 @@ export default function Create() {
       if(id !== '0') {
         const { data } = await api.get(`/forecast/${id}`)
 
-        setForecast({
-          ...data.forecast,
-        })
+        setForecast(data.forecast)
 
         setStateBoolean(state => ({
           ...state,
@@ -186,7 +184,7 @@ export default function Create() {
         <Divider style={{margin: '20px 0'}}/>
 
         {stateBoolean.isDisabledHeader && (
-          <Table forecast={forecast} />
+          <Table forecast={forecast} setForecast={setForecast} />
         )}
       </Box>
     </>

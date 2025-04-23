@@ -26,6 +26,7 @@ import ModalAddSale from './ModalAddSale'
 
 import { getComparator, stableSort } from '../../../functions/orderTable'
 import { getDateBr } from '../../../functions/getDates'
+import api from '../../../services/api'
 
 const useToolbarStyles = makeStyles((theme) => ({
   root: {
@@ -71,10 +72,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const TableToolbar = props => {
+const TableToolbar = ({ numSelected, handleRemoveSales, forecast, getForecastSales }) => {
   const [ openModalAddSale, setOpenModalAddSale ] = useState(false)
   const classes = useToolbarStyles()
-  const { numSelected, handleRemoveSales, forecast } = props
 
   return (
     <Toolbar
@@ -107,13 +107,13 @@ const TableToolbar = props => {
       )}
 
       <Modal  open={openModalAddSale} setOpen={setOpenModalAddSale}>
-        <ModalAddSale setOpen={setOpenModalAddSale} forecast={forecast}/>
+        <ModalAddSale setOpen={setOpenModalAddSale} forecast={forecast} getForecastSales={getForecastSales} />
       </Modal>
     </Toolbar>
-  );
+  )
 }
 
-export default function TableAdd({ forecast }) {
+export default function TableAdd({ forecast, setForecast }) {
   const [order, setOrder] = React.useState('asc')
   const [orderBy, setOrderBy] = React.useState('ID_SALES')
   const [selected, setSelected] = React.useState([])
@@ -152,37 +152,30 @@ export default function TableAdd({ forecast }) {
     return selected.indexOf(sale.id) !== -1
   }
 
-  const removeForecastSale = async () => {
-   /*  try {
-      const forecasts = forecastsContext
+  const getForecastSales = async () => {
+    try {
+      const { data } = await api.get(`forecast/${forecast.id}`)
 
-      for (let indexForecast = 0; indexForecast < forecasts.length; indexForecast++){
-        if (forecasts[indexForecast].id === parseInt(idData)) {
-          for(let index = 0; index < selected.length; index++) {
-
-            await api.delete(`forecast/sale/${selected[index]}`)
-
-            const saleFilter = forecasts[indexForecast].sales.filter( sale => sale.id !== selected[index])
-
-            forecasts[indexForecast].sales = saleFilter
-          }
-        }
-      }
-
-      setForecasts([...forecasts])
-
-      setSelected([])
+      setForecast(data.forecast)
     } catch (e) {
       console.log(e)
-      const { data } = await api.get('forecast')
-      
-      setForecasts(data)
-      setSelected([])
-    } */
+    }
   }
 
-  const handleRemoveSales = () => {
-    removeForecastSale()
+  const removeForecastSale = async () => {
+    try {
+      for(let index = 0; index < selected.length; index++) {
+        await api.delete(`forecast/sale/${selected[index]}`)
+      }
+
+      forecast.sales = forecast.sales.filter(sale => {
+        return selected.indexOf(sale.id) === -1
+      })
+    } catch (e) {
+      console.log(e)
+    } finally {
+      setSelected([])
+    }
   }
 
   const headCells = [
@@ -199,8 +192,10 @@ export default function TableAdd({ forecast }) {
       <Paper className={classes.paper}>
         <TableToolbar
           numSelected={selected.length}
-          handleRemoveSales={handleRemoveSales}
+          handleRemoveSales={removeForecastSale}
           forecast={forecast}
+          getForecastSales={getForecastSales}
+          setForecast={setForecast}
         />
 
         <TableContainer>
