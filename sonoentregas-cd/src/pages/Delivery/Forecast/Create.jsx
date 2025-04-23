@@ -102,12 +102,12 @@ export default function Create() {
     }))
   }
 
-  const handleEditHeader = () => {
+  /* const handleEditHeader = () => {
     setStateBoolean(state => ({
       ...state,
       isDisabledHeader: false
     }))
-  }
+  } */
 
   useEffect(() => {
     const fetchData = async () => {
@@ -186,7 +186,7 @@ export default function Create() {
         <Divider style={{margin: '20px 0'}}/>
 
         {stateBoolean.isDisabledHeader && (
-          <Table id={forecast.id} />
+          <Table forecast={forecast} />
         )}
       </Box>
     </>

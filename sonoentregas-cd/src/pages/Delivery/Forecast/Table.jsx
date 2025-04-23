@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import clsx from 'clsx'
 import { lighten, makeStyles } from '@material-ui/core/styles'
 import {
@@ -22,11 +22,10 @@ import { Delete as DeleteIcon, Add, SubdirectoryArrowRight } from '@material-ui/
 
 import EnhancedTableHead from '../../../components/EnhancedTableHead'
 import Modal from '../../../components/Modal'
-/* import ModalAddSale from '../Update/ModalAddSale' */
+import ModalAddSale from './ModalAddSale'
 
 import { getComparator, stableSort } from '../../../functions/orderTable'
 import { getDateBr } from '../../../functions/getDates'
-import api from '../../../services/api'
 
 const useToolbarStyles = makeStyles((theme) => ({
   root: {
@@ -72,10 +71,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const TableToolbar = (props) => {
+const TableToolbar = props => {
   const [ openModalAddSale, setOpenModalAddSale ] = useState(false)
   const classes = useToolbarStyles()
-  const { numSelected, handleRemoveSales } = props
+  const { numSelected, handleRemoveSales, forecast } = props
 
   return (
     <Toolbar
@@ -107,18 +106,17 @@ const TableToolbar = (props) => {
         </Tooltip>
       )}
 
-      {/* <Modal  open={openModalAddSale} setOpen={setOpenModalAddSale}>
-        <ModalAddSale setOpen={setOpenModalAddSale}/>
-      </Modal> */}
+      <Modal  open={openModalAddSale} setOpen={setOpenModalAddSale}>
+        <ModalAddSale setOpen={setOpenModalAddSale} forecast={forecast}/>
+      </Modal>
     </Toolbar>
   );
 }
 
-export default function TableAdd({ id }) {
+export default function TableAdd({ forecast }) {
   const [order, setOrder] = React.useState('asc')
   const [orderBy, setOrderBy] = React.useState('ID_SALES')
   const [selected, setSelected] = React.useState([])
-  const [sales, setSales] = React.useState([])
 
   const classes = useStyles()
 
@@ -187,20 +185,6 @@ export default function TableAdd({ id }) {
     removeForecastSale()
   }
 
-  const getForecast = React.useCallback(async () => {
-    try {
-      const { data: forecastSales } = await api.get(`/forecast/${id}/view`)
-
-      setSales(forecastSales)
-    } catch (error) {
-      console.log(error)
-    }
-  }, [id])
-
-  useEffect(() => {
-    getForecast()
-  }, [getForecast])
-
   const headCells = [
     { id: 'ID_SALES', label: 'DAV' },
     { id: 'NOMECLI', label: 'Cliente' },
@@ -213,7 +197,12 @@ export default function TableAdd({ id }) {
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>
-        <TableToolbar numSelected={selected.length} handleRemoveSales={handleRemoveSales}/>
+        <TableToolbar
+          numSelected={selected.length}
+          handleRemoveSales={handleRemoveSales}
+          forecast={forecast}
+        />
+
         <TableContainer>
           <Table
             className={classes.table}
@@ -227,7 +216,7 @@ export default function TableAdd({ id }) {
               headCells={headCells}
             />
             <TableBody>
-              {stableSort(sales, getComparator(order, orderBy))
+              {stableSort(forecast.sales, getComparator(order, orderBy))
                 .map((sale, index) => {
                   const isItemSelected = isSelected(sale)
                   const labelId = `enhanced-table-checkbox-${index}`

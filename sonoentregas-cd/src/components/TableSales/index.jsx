@@ -254,6 +254,7 @@ export default function TableSales({
     { id: 'BAIRRO', label: 'Bairro' },
     { id: 'D_ENTREGA1', label: 'Entrega' },
     { id: 'CODLOJA', label: 'Loja' },
+    { id: '', label: '' },
   ]
 
   return(
