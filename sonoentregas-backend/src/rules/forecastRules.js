@@ -209,7 +209,7 @@ class ForecastRules {
       INNER JOIN PRODLOJAS B ON A.CODIGO = B.CODIGO
       LEFT JOIN ( SELECT COD_ORIGINAL, SUM(QUANTIDADE) qtdFullForecast
           FROM ${process.env.ENTREGAS_BASE}..SALES_PROD 
-          WHERE [STATUS] = 'Em Previsão'
+          WHERE [STATUS] IN ('Em Previsão', 'Em lançamento')
           GROUP BY COD_ORIGINAL) C ON A.ALTERNATI = C.COD_ORIGINAL
       WHERE B.CODLOJA = 1 AND A.ALTERNATI IN (${codOriginal})
     `, QueryTypes.SELECT)
