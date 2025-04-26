@@ -148,7 +148,6 @@ class ForecastService {
 
     /** @type {IForecastSales[]} */
     const forecastSales = await Forecast._query(0, scriptSales, QueryTypes.SELECT)
-    console.log('forecastSales', forecastSales)
 
     if (forecastSales.length === 0) {
       return []
