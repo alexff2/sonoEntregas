@@ -27,7 +27,7 @@ import EnhancedTableHead from '../EnhancedTableHead'
 import { getDateBr } from '../../functions/getDates'
 import { getComparator, stableSort } from '../../functions/orderTable'
 
-const CheckProd = ({ product, classes, availableStocks }) => {
+const CheckProd = ({ product, classes, availableStocks, ID_MAINTENANCE }) => {
   const [ qtdDelivery, setQtdDelivery ] = useState(product.openQuantity)
   const [ inputNumber, setInputNumber ] = useState(false)
 
@@ -80,7 +80,7 @@ const CheckProd = ({ product, classes, availableStocks }) => {
             style={{width: 40}}
             defaultValue={product.openQuantity}
             max={ product.openQuantity }
-            min={1}
+            min={ID_MAINTENANCE ? product.openQuantity : 1}
             onChange={e => setQtdDelivery(parseInt(e.target.value))}
             disabled={inputNumber}
           />
@@ -172,7 +172,10 @@ function Row({ sale, type, setSales, availableStocks }) {
           <Collapse in={ type !== 'home' ? true : open} timeout="auto" unmountOnExit>
             <Box margin={0}>
               <Typography variant="h6" gutterBottom component="div" style={{padding: '0 10px', margin: 0}}>
-                Produtos
+                Produtos 
+                {sale.ID_MAINTENANCE && (
+                  <Box style={{background: 'orange', color: '#FFF', fontSize: 14, padding: 4}}>Assistência: {sale.ID_MAINTENANCE}</Box>
+                )}
               </Typography>
               <Table size="small" aria-label="products">
                 <TableHead>
@@ -210,6 +213,7 @@ function Row({ sale, type, setSales, availableStocks }) {
                           product={product}
                           classes={classes}
                           availableStocks={availableStocks}
+                          ID_MAINTENANCE={sale.ID_MAINTENANCE}
                         />
                       }
                       {type === 'delivery' &&

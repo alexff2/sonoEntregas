@@ -33,6 +33,7 @@ const ViewVendas = require('../models/ViewVendas')
 const ViewSalesProd = require('../models/ViewSalesProd')
 const Empresas = require('../models/ShopsSce')
 const Forecast = require('../models/tables/Forecast')
+const scriptForecast = require('../scripts/forecast')
 const { difDate } = require('../functions/getDate')
 
 /**
@@ -138,22 +139,41 @@ module.exports = {
   async findToCreateForecast(idSale){
     /**@type {ISales[] | []} */
     let sales = await Sales.findAny(0, { ID_SALES: idSale })
+    let maintenance = await Sales._query(0, scriptForecast.findSaleMaintenance({ idSale }), QueryTypes.SELECT)
 
-    if (sales.length === 0) {
+    if (sales.length === 0 && maintenance.length === 0) {
       return ''
     }
 
     sales = sales.filter( sale => sale.STATUS === 'Aberta' )
+    maintenance = maintenance.filter( sale => sale.STATUS === 'No CD' )
 
-    if (sales.length === 0) {
+    if (sales.length === 0 && maintenance.length === 0) {
       return []
     }
 
-    return setUpSalesProduct(sales)
+    let products = []
+
+    if (sales.length !== 0) {
+      const scriptFindSaleProductToForecast = scriptForecast.findSaleProductToForecast({ idSale, idShops: sales.map(sale => sale.CODLOJA) })
+      const saleProducts = await SalesProd._query(0, scriptFindSaleProductToForecast, QueryTypes.SELECT)
+      products = [...products, ...saleProducts]
+    }
+
+    if (maintenance.length !== 0) {
+      const scriptFindSaleProductMaintenance = scriptForecast.findSaleProductMaintenanceToForecast({ idSale, idShops: maintenance.map(sale => sale.CODLOJA) })
+      const productsMaintenance = await SalesProd._query(0, scriptFindSaleProductMaintenance, QueryTypes.SELECT)
+      products = [...products, ...productsMaintenance]
+    }
+
+    return addProductInSale({
+      sales: [...sales, ...maintenance],
+      products
+    })
   },
   /**
    * @param {number} idProduct 
-   * @returns 
+   * @returns
    */
   async findToCreateForecastByProduct(idProduct){
     const scriptSalesFind = `
