@@ -212,10 +212,10 @@ module.exports = {
   async addSale(req, res){
     try {
       const { id } = req.params
-      const { sales } = req.body
+      const { sale } = req.body
       const { id: userId } = req.user
 
-      if (!sales) {
+      if (!sale) {
         throw {
           status: 400,
           error: {
@@ -226,16 +226,14 @@ module.exports = {
 
       await ForecastsRules.checkExistValidForecast({ id })
 
-      await ForecastsRules.checkForecastSalesIsClosed(sales)
+      await ForecastsRules.checkForecastSales(sale)
 
-      await ForecastsRules.checkSaleIsWithdrawal(sales)
+      !sale.ID_MAINTENANCE && await ForecastsRules.checkStatusProduct(sale)
 
-      await ForecastsRules.checkStatusProduct(sales)
-
-      await ForecastsRules.checkAvailableStock(sales)
+      await ForecastsRules.checkAvailableStock(sale)
 
       await ForecastService.createSalesForecast({
-        sales,
+        sale,
         userId,
         idForecast: id,
         add: true

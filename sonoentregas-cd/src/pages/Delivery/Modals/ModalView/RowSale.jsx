@@ -62,6 +62,11 @@ const RowSale = ({ sale, type, status, handleInvalidationSale }) => {
                 {sale.OBS && ` - OBS: ${sale.OBS}`}
                 {sale.obs && ` - Validado em: ${sale.dateValidationFormat} | Obs: ${sale.obs}`}
               </span>
+              {sale.isMaintenance && (
+                <Box style={{background: 'orange', color: '#FFF', fontSize: 14, padding: 4}}>
+                  Assistência: {sale.products.map(product => product.ID_MAINTENANCE).join(', ')}
+                </Box>
+              )}
             </Typography>
             <Table size="small" aria-label="purchases">
               <TableHead>

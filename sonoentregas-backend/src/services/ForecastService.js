@@ -7,9 +7,11 @@
  * @property {number} QUANTIDADE
  * @property {number} QTD_MOUNTING
  * @property {number} qtdDelivery
+ * @property {number} ID_MAINTENANCE
  * 
  * @typedef {Object} ISale
  * @property {number} ID
+ * @property {number} ID_MAINTENANCE
  * @property {IProduct[]} products
  * 
  * @typedef {Object} IForecastSales
@@ -23,6 +25,7 @@
  * @property {number} idForecastSale
  * @property {string} COD_ORIGINAL
  * @property {number} quantityForecast
+ * @property {number | undefined} ID_MAINTENANCE
  * 
  * @typedef {Object} IForecast
  * @property {number} id
@@ -36,7 +39,7 @@
  * @property {string} userId
  * 
  * @typedef {Object} PropsSalesForecast
- * @property {ISale[]} sales
+ * @property {ISale} sale
  * @property {string} userId
  * @property {string} idForecast
  * @property {boolean} add
@@ -56,6 +59,7 @@ const { QueryTypes } = require('sequelize')
 const Forecast = require('../models/tables/Forecast')
 const ForecastSales = require('../models/tables/Forecast/ForecastSales')
 const ForecastProduct = require('../models/tables/Forecast/ForecastProduct')
+const MaintenanceModel = require('../models/tables/Maintenance')
 const Sale = require('../models/Sales')
 const SalesProd = require('../models/SalesProd')
 const Users = require('../models/Users')
@@ -245,72 +249,79 @@ class ForecastService {
   }
 
   /** @param {PropsSalesForecast} props */
-  async createSalesForecast({ sales, userId, idForecast, add }){
+  async createSalesForecast({ sale, userId, idForecast, add }) {
     /**@type {IForecastSales[]} */
-    const forecastSalesSaved = await ForecastSales.findAny(0, { idForecast, in: { idSale: sales.map( sale => sale.ID) }})
+    const forecastSaleSaved = await ForecastSales.findAny(0, { idForecast, idSale: sale.ID })
 
-    const salesFiltered = sales
-      .filter( sale => {
-        const forecastSaleSaved = forecastSalesSaved.find( forecastSale => forecastSale.idSale === sale.ID)
-        if (forecastSaleSaved) {
-          return false
-        }
-        return true
-      })
-      .map(sale => ({
-        idForecast,
-        idSale: sale.ID,
-        idUserCreate: userId
-      }))
-
-    if (salesFiltered.length > 0) {
-      await ForecastSales.creatorAny(0, salesFiltered)
-
-      if (add) {
-        const forecastStatus = await Forecast.findAny(0, {id: idForecast, status: 1}, 'status')
-
-        if (forecastStatus[0]) {
-          const idCreate = await ForecastSales._query(0, 'SELECT MAX(id) id FROM FORECAST_SALES', QueryTypes.SELECT)
+    const connectionEntrega = await Forecast._query(0)
+    
+    try {  
+      if (forecastSaleSaved.length === 0) {
+        await ForecastSales.creatorAny(0, [{
+          idForecast,
+          idSale: sale.ID,
+          idUserCreate: userId,
+          isMaintenance: sale.ID_MAINTENANCE ? 1 : 0,
+        }], false, connectionEntrega)
   
-          await ForecastSales.updateAny(0, { canRemove: 0 }, { id: idCreate[0].id })
-        }
-      }
-    }
-
-    /**@type {IForecastSales[]} */
-    const forecastSales = await ForecastSales.findAny(0, { idForecast })
-
-    /**@type {IForecastProduct[] | []} */
-    let forecastProduct = []
-
-    for(let i = 0; i < sales.length; i++) {
-      const forecastSale = forecastSales.find( forecastSale => forecastSale.idSale === sales[i].ID)
-
-      if (forecastSale) {
-        for(let j = 0; j < sales[i].products.length; j++) {
-          const { COD_ORIGINAL } = sales[i].products[j]
+        if (add) {
+          const forecastStatus = await Forecast.findAny(0, {id: idForecast, status: 1}, 'status', connectionEntrega)
   
-          if ((sales[i].products[j].qtdDelivery + sales[i].products[j].QTD_MOUNTING) === sales[i].products[j].QUANTIDADE) {
-            await SalesProd.updateAny(0, { STATUS: 'Em Previsão' }, {
-              ID_SALE_ID: sales[i].ID,
-              COD_ORIGINAL: COD_ORIGINAL
-            })
+          if (forecastStatus[0]) {
+            const idCreate = await ForecastSales._query(0, 'SELECT MAX(id) id FROM FORECAST_SALES', QueryTypes.SELECT, connectionEntrega)
+    
+            await ForecastSales.updateAny(0, { canRemove: 0 }, { id: idCreate[0].id }, connectionEntrega)
           }
-  
-          const prod = await SalesProd.findAny(0, {ID_SALE_ID: sales[i].ID, STATUS: 'Enviado'})
-  
-          prod.length === 0 && await Sale.updateAny(0, { STATUS: 'Fechada' }, { ID: sales[i].ID })
-  
-          forecastProduct = [...forecastProduct, {
-            idForecastSale: forecastSale.id,
-            COD_ORIGINAL: sales[i].products[j].COD_ORIGINAL,
-            quantityForecast: sales[i].products[j].qtdDelivery
-          }]
         }
       }
-    }
 
-    await ForecastProduct.creatorAny(0, forecastProduct, true)
+      let forecastProduct = []
+
+      /**@type {IForecastSales[]} */
+      const forecastSale = await ForecastSales.findAny(0, { idForecast, idSale: sale.ID }, '*', connectionEntrega)
+
+      if (forecastSale[0]) {
+        for(let j = 0; j < sale.products.length; j++) {
+          const { COD_ORIGINAL, qtdDelivery, QTD_MOUNTING, QUANTIDADE, ID_MAINTENANCE } = sale.products[j]
+  
+          if ((qtdDelivery + QTD_MOUNTING) === QUANTIDADE) {
+            ID_MAINTENANCE
+              ? await MaintenanceModel.updateAny(0, { STATUS: 'Em Previsão' }, { ID: ID_MAINTENANCE }, connectionEntrega)
+              : await SalesProd.updateAny(0, { STATUS: 'Em Previsão' }, { ID_SALE_ID: sale.ID, COD_ORIGINAL: COD_ORIGINAL }, connectionEntrega)
+          }
+
+          if (!ID_MAINTENANCE) {
+            const prod = await SalesProd.findAny(0, {ID_SALE_ID: sale.ID, STATUS: 'Enviado'}, 'COD_ORIGINAL', connectionEntrega)
+            prod.length === 0 && await Sale.updateAny(0, { STATUS: 'Fechada' }, { ID: sale.ID }, connectionEntrega)
+          }
+
+          const dataForecastProduct = ID_MAINTENANCE
+            ? {
+              idForecastSale: forecastSale[0].id,
+              COD_ORIGINAL: COD_ORIGINAL,
+              quantityForecast: qtdDelivery,
+              ID_MAINTENANCE: ID_MAINTENANCE,
+            } : {
+              idForecastSale: forecastSale[0].id,
+              COD_ORIGINAL: COD_ORIGINAL,
+              quantityForecast: qtdDelivery,
+            }
+
+          forecastProduct = [...forecastProduct, dataForecastProduct]
+        }
+      }
+
+      await ForecastProduct.creatorAny(0, forecastProduct, true, connectionEntrega)
+
+      await connectionEntrega.transaction.commit()
+    } catch (error) {
+      try {
+        await connectionEntrega.transaction.rollback()
+      } catch (rollbackError) {
+        console.warn('Erro ao tentar dar rollback:', rollbackError.message)
+      }
+      throw error
+    }
   }
 
   async updateForecast({ id, date, description }){

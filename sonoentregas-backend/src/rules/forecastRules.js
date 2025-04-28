@@ -24,6 +24,7 @@
 const { QueryTypes } = require('sequelize')
 const ObjDate = require('../functions/getDate')
 const Sale = require('../models/Sales')
+const MaintenanceModel = require('../models/tables/Maintenance')
 const SalesProd = require('../models/SalesProd')
 const Forecast = require('../models/tables/Forecast')
 const ForecastSales = require('../models/tables/Forecast/ForecastSales')
@@ -110,114 +111,100 @@ class ForecastRules {
     return forecast[0]
   }
 
-  /** @param {Sale[]} sales */
-  async checkSaleIsWithdrawal(sales){
-    const salesIsWithdrawal = await Sale.findAny(0, { isWithdrawal: 1, in: { ID: sales.map( sale => sale.ID) }})
+  async checkForecastSales(saleToForecast){
+    const maintenance = saleToForecast.ID_MAINTENANCE ? await MaintenanceModel.findAny(0, { ID: saleToForecast.ID_MAINTENANCE }) : []
 
-    if (salesIsWithdrawal.length > 0) {
+    if (maintenance.length > 0) {
+      return
+    }
+
+    const sales = await Sale.findAny(0, { ID: saleToForecast.ID })
+
+    if (sales.length === 0) {
       throw {
-        status: 400,
+        status: 500,
         error: {
-          message: 'Sales with STATUS isWithdrawal',
-          salesIsWithdrawal
+          message: 'Sales not found'
         },
       }
     }
-  }
 
-  /** @param {Sale[]} sales */
-  async checkForecastSalesIsClosed(sales){
-    const salesClosed = await Sale.findAny(0, { STATUS: 'Fechada', in: { ID: sales.map( sale => sale.ID) }})
-
-    if (salesClosed.length > 0) {
+    if (sales[0].STATUS === 'Fechado') {
       throw {
         status: 400,
         error: {
           message: 'Sales with STATUS closed',
-          salesClosed
+        },
+      }
+    }
+
+    if (sales[0].isWithdrawal) {
+      throw {
+        status: 400,
+        error: {
+          message: 'Sales with STATUS isWithdrawal',
         },
       }
     }
   }
 
-  /** @param {Sale[]} sales */
-  async checkStatusProduct(sales){
+  /** @param {Sale} sale */
+  async checkStatusProduct(sale){
     /** @type {SaleProdProps[]} */
-    const saleProds = await SalesProd.findAny(0, { in: { ID_SALE_ID: sales.map( sale => sale.ID) }})
+    const saleProds = await SalesProd.findAny(0, { ID_SALE_ID: sale.ID })
 
-    sales.forEach(sale => {
-      sale.products.forEach(prod => {
-        const saleProd = saleProds.find(saleProd => {
-          return saleProd.ID_SALE_ID === sale.ID && saleProd.COD_ORIGINAL === prod.COD_ORIGINAL
-        })
-
-        if (!saleProd) {
-          throw {
-            status: 400,
-            error: {
-              message: 'Product does not belong to this sale in the database!',
-              idSaleId: sale.ID,
-              prod: prod.COD_ORIGINAL
-            },
-          }
-        } else if (saleProd.STATUS !== 'Enviado') {
-          throw {
-            status: 400,
-            error: {
-              message: `The Product isn't in 'shipped' status!`,
-              idSaleId: sale.ID,
-              prod: prod.COD_ORIGINAL
-            },
-          }
-        }
+    sale.products.forEach(prod => {
+      const saleProd = saleProds.find(saleProd => {
+        return saleProd.ID_SALE_ID === sale.ID && saleProd.COD_ORIGINAL === prod.COD_ORIGINAL
       })
+
+      if (!saleProd) {
+        throw {
+          status: 400,
+          error: {
+            message: 'Product does not belong to this sale in the database!',
+            idSaleId: sale.ID,
+            prod: prod.COD_ORIGINAL
+          },
+        }
+      } else if (saleProd.STATUS !== 'Enviado') {
+        throw {
+          status: 400,
+          error: {
+            message: `The Product isn't in 'shipped' status!`,
+            idSaleId: sale.ID,
+            prod: prod.COD_ORIGINAL
+          },
+        }
+      }
     })
+      
   }
-  /** @param {Sale[]} sales */
-  async checkAvailableStock(sales){
-    var qtdProducts = []
-    var codOriginal = ''
-
-    sales.forEach(sale => {
-      sale.products.forEach(product => {
-        const qtdProduct = qtdProducts.length > 0 ? qtdProducts.find( qtdProduct => qtdProduct.COD_ORIGINAL === product.COD_ORIGINAL) : undefined
-
-        if (!qtdProduct) {
-          qtdProducts = [...qtdProducts, { 
-            COD_ORIGINAL: product.COD_ORIGINAL,
-            qtdDelivery: product.qtdDelivery
-          }]
-
-          if (codOriginal === '') {
-            codOriginal = `'${product.COD_ORIGINAL}'`
-          } else {
-            codOriginal += `, '${product.COD_ORIGINAL}'`
-          }
-        } else {
-          qtdProducts.forEach( qtdProductReleased => {
-            if (qtdProductReleased.COD_ORIGINAL === product.COD_ORIGINAL) {
-              qtdProductReleased.qtdDelivery += product.qtdDelivery
-            }
-          })
-        }
-      })
-    })
+  /** @param {Sale} sale */
+  async checkAvailableStock(sale){
+    const codOriginal = sale.products.map(product => `'${product.COD_ORIGINAL}'`)
 
     const estProducts = await SalesProd._query(1, `
-      SELECT A.ALTERNATI, B.EST_LOJA - ISNULL(C.qtdFullForecast, 0) qtdAvailableStock
+      SELECT A.ALTERNATI, B.EST_LOJA - ISNULL(C.qtdForecastSales, 0) - ISNULL(D.qtdForecastMaintenance, 0) qtdAvailableStock
       FROM PRODUTOS A
       INNER JOIN PRODLOJAS B ON A.CODIGO = B.CODIGO
-      LEFT JOIN ( SELECT COD_ORIGINAL, SUM(QUANTIDADE) qtdFullForecast
+      LEFT JOIN ( SELECT COD_ORIGINAL, SUM(QUANTIDADE) qtdForecastSales
           FROM ${process.env.ENTREGAS_BASE}..SALES_PROD 
           WHERE [STATUS] IN ('Em Previsão', 'Em lançamento')
-          GROUP BY COD_ORIGINAL) C ON A.ALTERNATI = C.COD_ORIGINAL
+          GROUP BY COD_ORIGINAL)
+      C ON A.ALTERNATI = C.COD_ORIGINAL
+      LEFT JOIN ( SELECT COD_ORIGINAL, SUM(QUANTIDADE) qtdForecastMaintenance
+          FROM ${process.env.ENTREGAS_BASE}..MAINTENANCE
+          WHERE [STATUS] IN ('Em Previsão', 'Em lançamento')
+          GROUP BY COD_ORIGINAL)
+      D ON A.ALTERNATI = C.COD_ORIGINAL
       WHERE B.CODLOJA = 1 AND A.ALTERNATI IN (${codOriginal})
     `, QueryTypes.SELECT)
 
     estProducts.forEach( estProduct => {
-      qtdProducts.forEach( qtdProduct => {
-        if (estProduct.ALTERNATI === qtdProduct.COD_ORIGINAL) {
-          if (estProduct.qtdAvailableStock < qtdProduct.qtdDelivery) {
+      sale.products.forEach( product => {
+        if (estProduct.ALTERNATI === product.COD_ORIGINAL) {
+          if (estProduct.qtdAvailableStock < product.qtdDelivery) {
             throw {
               status: 409,
               error: {

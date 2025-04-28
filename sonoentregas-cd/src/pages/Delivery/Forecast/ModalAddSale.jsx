@@ -230,7 +230,7 @@ export default function ModalAddSale({ setOpen, forecast, getForecastSales }) {
         return
       }
 
-      await api.post(`/forecast/${forecast.id}/sales/add`, { sales: saleFiltered })
+      await api.post(`/forecast/${forecast.id}/sales/add`, { sale: saleFiltered[0] })
 
       getForecastSales()
       setOpen(false)
