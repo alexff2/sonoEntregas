@@ -197,7 +197,7 @@ class ForecastRules {
           FROM ${process.env.ENTREGAS_BASE}..MAINTENANCE
           WHERE [STATUS] IN ('Em Previsão', 'Em lançamento')
           GROUP BY COD_ORIGINAL)
-      D ON A.ALTERNATI = C.COD_ORIGINAL
+      D ON A.ALTERNATI = D.COD_ORIGINAL
       WHERE B.CODLOJA = 1 AND A.ALTERNATI IN (${codOriginal})
     `, QueryTypes.SELECT)
 
