@@ -185,7 +185,7 @@ class BalanceByBeepService {
   async close(t, { id, userId }) {
     const data = {
       dtFinish: new Date().toISOString(),
-      userId,
+      userFinishId: userId,
     }
 
     const createMirrorAvailableProducts = balanceScripts.createMirrorAvailableProducts(id)

@@ -29,7 +29,7 @@ module.exports = {
         WHERE balanceId = ${id}
       ) B ON A.serialNumber = B.serialNumber
       INNER JOIN PRODUTOS C ON C.CODIGO = A.productId
-      WHERE B.balanceId IS NULL
+      WHERE B.balanceId IS NULL AND A.balanceId = ${id}
       UNION
       SELECT A.productIdNotFound, B.NOME product, A.serialNumber, 'SOBRA' tipo FROM BALANCE_BY_BEEP_SERIES A
       INNER JOIN PRODUTOS B
