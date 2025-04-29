@@ -8,6 +8,9 @@
 const Maintenance = require('../models/tables/Maintenance')
 const MaintDeliv = require('../models/tables/MaintenanceDeliv')
 const ViewMaintDeliv = require('../models/views/ViewMaintDeliv')
+const ForecastSaleModel = require('../models/tables/Forecast/ForecastSales')
+const ForecastProductsModel = require('../models/tables/Forecast/ForecastProduct')
+const ForecastModel = require('../models/tables/Forecast')
 
 const MainService = require('../services/MainService')
 
@@ -74,27 +77,38 @@ module.exports = {
   async create(req, res) {
     const connectionEntrega = await Maintenance._query(0)
 
-     try {
-       var { idMaint, idDriver, idAssist, idDelivMain, idUser, obs } = req.body
+      try {
+        var { idMaint, idDriver, idAssist, idDelivMain, idUser, obs } = req.body
 
-       const D_MOUNTING = ObjDate.getDate()
+        const D_MOUNTING = ObjDate.getDate()
 
-       idDelivMain =  idDelivMain === 0 ? 'NULL' : idDelivMain
-       obs =  obs === '' ? 'NULL' : `'${obs}'`
+        idDelivMain =  idDelivMain === 0 ? 'NULL' : idDelivMain
+        obs =  obs === '' ? 'NULL' : `'${obs}'`
 
-       await MaintDeliv.creatorNotReturn(0, `${idMaint}, '${D_MOUNTING}', NULL, NULL, 1, NULL, ${idDriver}, ${idAssist}, ${idDelivMain}, ${idUser}, ${obs}`, false, connectionEntrega)
+        await MaintDeliv.creatorNotReturn(0, `${idMaint}, '${D_MOUNTING}', NULL, NULL, 1, NULL, ${idDriver}, ${idAssist}, ${idDelivMain}, ${idUser}, ${obs}`, false, connectionEntrega)
 
-       await Maintenance.updateAny(0, { STATUS: 'Em lançamento' }, { ID: idMaint }, connectionEntrega)
+        await Maintenance.updateAny(0, { STATUS: 'Em lançamento' }, { ID: idMaint }, connectionEntrega)
 
-       const maintenanceResponse = await MainService.getViewMaint('null', 'CD', connectionEntrega)
-       
-       await connectionEntrega.transaction.commit()
-       return res.json(maintenanceResponse)
-     } catch (error) {
-       await connectionEntrega.transaction.rollback()
-       console.log(error)
-       return res.json(error)
-    }
+        const forecastProduct = await ForecastProductsModel.findAny(0, { ID_MAINTENANCE: idMaint }, 'idForecastSale', connectionEntrega)
+        const forecastSales = await ForecastSaleModel.findAny(0, { in: { ID: forecastProduct.map(product => product.idForecastSale) }, validationStatus: 1 }, 'id, idForecast', connectionEntrega)
+        const forecast = await ForecastModel.findAny(0, { in: { ID: forecastSales.map(forecastSale => forecastSale.idForecast) }, status: true }, 'id', connectionEntrega)
+        const forecastSaleId = forecastSales.filter(forecastSale => forecastSale.idForecast === forecast[0].id).map(forecastSale => forecastSale.id)
+        await ForecastSaleModel.updateAny(0, { idDelivery: idDelivMain }, { in: { ID: forecastSaleId } }, connectionEntrega)
+
+        const maintenanceResponse = await MainService.getViewMaint('null', 'CD', connectionEntrega)
+        
+        await connectionEntrega.transaction.commit()
+        return res.json(maintenanceResponse)
+      } catch (error) {
+        try {
+          await connectionEntrega.transaction.rollback()
+        }
+        catch (error) {
+          console.warn(error)
+        }
+        console.log(error)
+        return res.json(error)
+      }
   },
   /**
    * @param {*} req

@@ -1,8 +1,8 @@
 const StyleStatus = status => {
   var background
-  if (status === 'Em lançamento') {
+  if (status === 'Em lançamento' || status === 'No CD') {
     background = '#2196f3'
-  } else if (status === 'Entregando' || status === 'Em deslocamento' || status === 'Em previsão') {
+  } else if (status === 'Entregando' || status === 'Em deslocamento' || status.toUpperCase === 'Em previsão'.toUpperCase) {
     background = '#ff9800'
   } else if (status === 'Finalizada') {
     background = '#388e3c'

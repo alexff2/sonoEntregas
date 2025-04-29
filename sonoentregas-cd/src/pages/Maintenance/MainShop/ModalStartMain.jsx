@@ -18,10 +18,6 @@ import {
 
 import { ButtonCancel, ButtonSuccess } from '../../../components/Buttons'
 
-import { useCars } from '../../../context/carsContext'
-import { useDrivers } from '../../../context/driverContext'
-import { useAssistants } from '../../../context/assistantContext'
-import { useDelivery } from '../../../context/deliveryContext'
 import { useAlert } from '../../../context/alertContext'
 import { useMaintenance } from '../../../context/maintenanceContext'
 import { useBackdrop } from '../../../context/backdropContext'
@@ -76,6 +72,10 @@ const useStyles = makeStyles(theme => ({
 }))
 
 export default function ModalStartMain({ selectMain, setOpen }) {
+  const [cars, setCars] = useState([])
+  const [delivery, setDelivery] = useState([])
+  const [drivers, setDrivers] = useState([])
+  const [assistants, setAssistants] = useState([])
   const [isDisabled, setIsDisabled] = useState(false)
   const [idDelivMain, setIdDelivMain] = useState(0)
   const [idCar, setIdCar] = useState(0)
@@ -83,10 +83,6 @@ export default function ModalStartMain({ selectMain, setOpen }) {
   const [idAssist, setIdAssist] = useState(0)
   const [obs, setObs] = useState('')
   const { setChildrenModal, setOpen: setOpenAlert } = useAlert()
-  const { cars, setCars } = useCars()
-  const { drivers, setDrivers } = useDrivers()
-  const { assistants, setAssistants } = useAssistants()
-  const { delivery, setDelivery } = useDelivery()
   const { setMaintenance } = useMaintenance()
   const { setOpenBackDrop } = useBackdrop()
 
@@ -95,26 +91,19 @@ export default function ModalStartMain({ selectMain, setOpen }) {
   useEffect(() => {
     const searchUsers = async () => {
       setOpenBackDrop(true)
-      if (assistants.length === 0) {
-        const { data: usersResponse } = await api.get('users/0')
-        const { data: carsResponse } = await api.get('cars')
+      const { data: usersResponse } = await api.get('users/0')
+      const { data: carsResponse } = await api.get('cars')
+      const { data: dataDeliveries } = await api.get('delivery/open')
 
-        setCars(carsResponse)
-        setDrivers(usersResponse.filter(user => user.OFFICE === 'Driver'))
-        setAssistants(usersResponse.filter(user => user.OFFICE === 'Assistant'))
-      }
-
-      if(delivery.length === 0) {
-        const { data: dataDeliveries } = await api.get('delivery/open')
-
-        setDelivery(dataDeliveries)
-      }
-
+      setCars(carsResponse)
+      setDrivers(usersResponse.filter(user => user.OFFICE === 'Driver'))
+      setAssistants(usersResponse.filter(user => user.OFFICE === 'Assistant'))
+      setDelivery(dataDeliveries)
       setOpenBackDrop(false)
     }
 
     searchUsers()
-  }, [setCars, setDrivers, setAssistants, assistants, delivery, setDelivery, setOpenBackDrop])
+  }, [setOpenBackDrop])
 
   const validateFilds = fields => {
     for(var i = 0; i < fields.length; i++){
@@ -158,7 +147,8 @@ export default function ModalStartMain({ selectMain, setOpen }) {
           idDriver,
           idAssist,
           obs,
-          idUser: 0
+          idUser: 0,
+          ID_SALE: selectMain.ID_SALE,
         })
         setOpen(false)
         setMaintenance(data)
@@ -183,7 +173,7 @@ export default function ModalStartMain({ selectMain, setOpen }) {
           </div>
           <div style={{width: '50%'}}>
             <label>Cliente: <span>{selectMain.NOMECLI}</span></label>
-            <label>Endereço: <span>{selectMain.ENDE}</span></label>
+            <label>Endereço: <span>{selectMain.ENDERECO}</span></label>
           </div>
           <div style={{width: '35%'}}> 
             <label>Obs Loja: <span>{selectMain.OBS}</span></label>

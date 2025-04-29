@@ -138,7 +138,7 @@ export default function TableMain() {
       })
   },[setMaintenance])
 
-  const clickMaintenance = (e, main) => {
+  const clickMaintenance = async (e, main) => {
     setSelectMain(main)
     if(e.target.id === 'btnStartMain') setOpenModalStart(true)
     else if (e.target.id === 'btnProcessMain') setOpenModalProcess(true)
@@ -297,9 +297,9 @@ export default function TableMain() {
                 <TableCell>{getDateBr(main.D_PREV)}</TableCell>
                 <TableCell>{main.DESC_ABREV}</TableCell>
                 <TableCell style={{width: '15%'}}>
-                  {main.STATUS !== 'No CD'
+                  {main.STATUS !== 'Em Previsão'
                     ? <>
-                        { (main.ID_DELIV_MAINT && (main.STATUS === 'Em lançamento' || main.STATUS === 'Finalizada'))
+                        { (main.ID_DELIV_MAINT && (main.STATUS === 'No CD' || main.STATUS === 'Em lançamento' || main.STATUS === 'Finalizada'))
                           ? main.STATUS
                           : <div
                               style={styleStatus(main.STATUS)}
