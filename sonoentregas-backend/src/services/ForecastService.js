@@ -205,7 +205,7 @@ class ForecastService {
 
   async findSalesForecast({id}){
     const scriptSales = 
-    `SELECT A.*, C.DESC_ABREV SHOP, B.NOMECLI, B.BAIRRO, B.ID_SALES, B.D_ENTREGA1, B.FONE, B.FAX, B.VENDEDOR, B.TOTAL,
+    `SELECT A.*, C.DESC_ABREV SHOP, B.NOMECLI, B.BAIRRO, B.ID_SALES, B.D_ENTREGA1, B.FONE, B.FAX, B.VENDEDOR, B.TOTAL, B.EMISSAO,
     Convert(varchar, A.dateValidation, 103) + ' as ' +Convert(varchar, A.dateValidation, 8) dateValidationFormat
     FROM FORECAST_SALES A
     INNER JOIN SALES B ON A.idSale = B.ID
