@@ -19,7 +19,9 @@
  * @property {number} idForecast
  * @property {number} idForecastSale
  * @property {number} idSale
+ * @property {IForecastProduct[]} products
  * @property {boolean} validationStatus
+ * @property {boolean} isMaintenance
  * 
  * @typedef {Object} IForecastProduct
  * @property {number} idForecastSale
@@ -352,10 +354,11 @@ class ForecastService {
 
   /** @param { PropsDeleteSale } props */
   async deleteSaleForecast({ forecastSale }){
-    await this.setSendStatusInSalesProd({ forecastSale })
+    forecastSale.isMaintenance 
+      ? await MaintenanceModel.updateAny(0, { STATUS: 'No CD' }, { in: {ID: forecastSale.products.map(prod => prod.ID_MAINTENANCE)} })
+      : await this.setSendStatusInSalesProd({ forecastSale })
 
     await ForecastProduct.deleteNotReturn(0, forecastSale.id, 'idForecastSale')
-
     await ForecastSales.deleteNotReturn(0, forecastSale.id)
   }
 

@@ -234,6 +234,10 @@ class ForecastRules {
       }
     }
 
+    const forecastProducts = await ForecastProduct.findAny(0, { idForecastSale: forecastSale[0].id })
+
+    forecastSale[0].products = forecastProducts
+
     return forecastSale[0]
   }
 
