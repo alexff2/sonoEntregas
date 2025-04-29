@@ -18,6 +18,22 @@ const ObjDate = require('../functions/getDate')
 
 module.exports = {
   /**
+   * @param {*} req 
+   * @param {*} res 
+   * @returns 
+   */
+  async findIfExistMaintenanceDeliveryOpenByDeliveryId(req, res) {
+    const { id } = req.params
+    try {
+      const maintenanceDelivery = await MainService.findIfExistMaintenanceDeliveryOpenByDeliveryId(id)
+
+      return res.json(maintenanceDelivery.length > 0)
+    } catch (error) {
+      console.log(error)
+      return res.status(400).json(error)
+    }
+  },
+  /**
    * @param {*} _req 
    * @param {*} res 
    * @returns 

@@ -9,7 +9,6 @@ import {
 } from "@material-ui/core"
 
 import { ButtonCancel, ButtonSuccess } from '../../../../components/Buttons'
-import ModalALert from '../../../../components/ModalAlert'
 
 import RowSale from './RowSale'
 import TableHeadSale from './TableHeadSale'
@@ -17,6 +16,7 @@ import TableHeadSale from './TableHeadSale'
 //context
 import { useDelivery } from '../../../../context/deliveryContext'
 import { useDeliveryFinish } from '../../../../context/deliveryFinishContext'
+import { useAlert } from '../../../../context/alertContext'
 
 import api from '../../../../services/api'
 
@@ -69,29 +69,37 @@ const useStyles = makeStyles(theme => ({
 
 export default function ModalView({ setOpen, type, id }){
   //States
-  const [ openModalAlert, setOpenModalAlert ] = useState(false)
-  const [ childrenModalAlert, setChildrenOpenModalAlert ] = useState('')
   const [ date, setDate ] = useState(false)
   const [ disabledBtnSave, setDisabledBtnSave ] = useState(false)
   const [ selectDelivery, setSelectDelivery ] = useState()
 
   const { setDelivery } = useDelivery()
   const { deliveryFinish, setDeliveryFinish } = useDeliveryFinish()
+  const { setAlert } = useAlert()
 
   const classes = useStyles()
 
   useEffect(() => {
-    api.get(`delivery/${id}/sales/view`)
-      .then(({ data }) => {
-        type === 'open' && data.sales.forEach(sale =>{
-          sale.products.forEach(produto => {
-            produto.DELIVERED = true
-            produto.STATUS = 'Enviado'
-          })
+    const loadingData = async () => {
+      const { data } = await api.get(`maintenance-delivery/${id}/check-exist-delivery-open`)
+      if(data){
+        setAlert('Existe uma ou mais assistência em aberto, finalize-a(s) para continuar')
+        setOpen(false)
+        return
+      }
+
+      const { data: delivery } = await api.get(`delivery/${id}/sales/view`)
+      type === 'open' && delivery.sales.forEach(sale =>{
+        sale.products.forEach(produto => {
+          produto.DELIVERED = true
+          produto.STATUS = 'Enviado'
         })
-        setSelectDelivery(data)
       })
-  }, [type, id])
+      setSelectDelivery(delivery)
+    }
+
+    loadingData()
+  }, [type, id, setAlert, setOpen])
 
   //Functions
 
@@ -116,13 +124,11 @@ export default function ModalView({ setOpen, type, id }){
         setDeliveryFinish([...deliveryFinish, selectDelivery])
         setOpen(false)
       } else {
-        setChildrenOpenModalAlert('Selecione a data de entrega')
-        setOpenModalAlert(true)
+        setAlert('Selecione a data de entrega')
       }
     } catch (error) {
       console.log(error)
-      setChildrenOpenModalAlert('Erro de conexão, entrar em contato com ADM')
-      setOpenModalAlert(true)
+      setAlert('Erro de conexão, entrar em contato com ADM')
     }
   }
 
@@ -210,12 +216,6 @@ export default function ModalView({ setOpen, type, id }){
           />
         </div>
       }
-
-      <ModalALert
-        open={openModalAlert}
-        setOpen={setOpenModalAlert}
-        children={childrenModalAlert}
-      />
     </form>
   )
 }

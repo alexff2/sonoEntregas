@@ -170,6 +170,7 @@ routes.post('/maintenance', maintenanceController.create)
 routes.delete('/maintenance/:id', maintenanceController.delete)
 routes.get('/maintenance/:typeSeach/:search/:codloja', maintenanceController.findMain)
 //Maintenance Delivery
+routes.get('/maintenance-delivery/:id/check-exist-delivery-open', maintenanceDelivController.findIfExistMaintenanceDeliveryOpenByDeliveryId)
 routes.get('/maintenancedeliv', maintenanceDelivController.index)
 routes.get('/maintenancedeliv/:idMain', maintenanceDelivController.findMaintId)
 routes.get('/maintenancedeliv/:typeSeach/:search', maintenanceDelivController.findMaintDeliv)

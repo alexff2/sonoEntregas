@@ -16,7 +16,14 @@ const ObjDate = require('../functions/getDate')
 
 module.exports = {
   /**
-
+   * @param {number} deliveryId
+   * @returns {Promise<Object[]>}
+   */
+  async findIfExistMaintenanceDeliveryOpenByDeliveryId(deliveryId) {
+    const maintenanceDeliveries = await MaintenanceDeliv.findAny(0, { ID_DELIV_MAIN: deliveryId, isNull: 'D_DELIVERED' })
+    return maintenanceDeliveries
+  },
+  /**
    * @param {Conditions} conditions 
    * @param {boolean} cd
    * @param {object} condition
