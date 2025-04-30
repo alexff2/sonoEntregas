@@ -127,6 +127,7 @@ export default function ModalDelivery({ setOpen, type }){
   const [ codCar, setCodCar ] = useState(false)
   const [ codDriver, setCodDriver ] = useState(false)
   const [ codAssistant, setCodAssistant ] = useState(false)
+  const [ codAssistant2, setCodAssistant2 ] = useState(false)
   const [ search, setSearch ] = useState('')
   const [ typeSearch, setTypeSearch ] = useState('idSale')
   const [ deliverySales, setDeliverySales ] = useState([])
@@ -185,6 +186,7 @@ export default function ModalDelivery({ setOpen, type }){
         ID_CAR: codCar,
         ID_DRIVER: codDriver,
         ID_ASSISTANT: codAssistant,
+        ID_ASSISTANT2: codAssistant2,
         D_MOUNTING: date,
         salesProd
       })
@@ -451,7 +453,7 @@ export default function ModalDelivery({ setOpen, type }){
             id="description"
             label="Descrição"
             placeholder="Descrição da entrega"
-            style={{width: '52%'}}
+            style={{width: '40%'}}
             InputLabelProps={{
               shrink: true,
             }}
@@ -493,13 +495,32 @@ export default function ModalDelivery({ setOpen, type }){
           </FormControl>
 
           <FormControl variant="outlined" className={classes.formControl}>
-            <InputLabel id="assistantLabel">Auxiliar</InputLabel>
+            <InputLabel id="assistantLabel">Auxiliar 1</InputLabel>
             <Select
               labelId="assistantLabel"
               label="Auxiliar"
               id="assistant"
               defaultValue={0}
               onChange={(e) => setCodAssistant(e.target.value)}
+              disabled={type === 'forecast' ? true : false}
+            >
+              <MenuItem value={0}>
+                <em>None</em>
+              </MenuItem>
+              {assistants.map( item => (
+                <MenuItem key={item.ID} value={item.ID}>{item.DESCRIPTION}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl variant="outlined" className={classes.formControl}>
+            <InputLabel id="assistantLabel">Auxiliar 2</InputLabel>
+            <Select
+              labelId="assistantLabel"
+              label="Auxiliar"
+              id="assistant"
+              defaultValue={0}
+              onChange={(e) => setCodAssistant2(e.target.value)}
               disabled={type === 'forecast' ? true : false}
             >
               <MenuItem value={0}>

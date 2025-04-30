@@ -86,13 +86,14 @@ module.exports = {
   async create( req, res ){
     try {
       const { id: user_id } = req.user
-      const { description, ID_CAR, ID_DRIVER, ID_ASSISTANT, D_MOUNTING, salesProd } = req.body
+      const { description, ID_CAR, ID_DRIVER, ID_ASSISTANT, ID_ASSISTANT2, D_MOUNTING, salesProd } = req.body
 
       const deliveryCreateId = await Deliveries.creatorAny(0, [{
         description,
         ID_CAR,
         ID_DRIVER,
         ID_ASSISTANT,
+        ID_ASSISTANT2,
         STATUS: 'Em lançamento',
         ID_USER_MOUNT: user_id,
         dateCreated: new Date().getISODateTimeBr().dateTime,

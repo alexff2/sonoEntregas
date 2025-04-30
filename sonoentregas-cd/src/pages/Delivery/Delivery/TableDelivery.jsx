@@ -59,7 +59,7 @@ export default function TableDelivery({ type, deleteDelivery, openModals }){
       <Table aria-label="customized table">
         <TableHead>
           <TableRow>
-          {['Código', 'Descrição', 'Motorista', 'Auxiliar', 'Veículo', 'Status'].map((value, index) => (
+          {['Código', 'Descrição', 'Motorista', 'Auxiliar 1', 'Auxiliar 2', 'Veículo', 'Status'].map((value, index) => (
             <TableCell className={classes.headCell} key={index}>{value}</TableCell>
           ))}
             <TableCell  className={classes.headCell} colSpan={2}/>
@@ -73,6 +73,7 @@ export default function TableDelivery({ type, deleteDelivery, openModals }){
             <TableCell width={'25%'}>{item.DESCRIPTION+' - '+item.D_MOUNTING}</TableCell>
             <TableCell width={'13%'}>{item.DRIVER}</TableCell>
             <TableCell width={'13%'}>{item.ASSISTANT}</TableCell>
+            <TableCell width={'13%'}>{item.ASSISTANT2}</TableCell>
             <TableCell width={'10%'}>{item.CAR}</TableCell>
             <TableCell width={'15%'}>
               <div 
