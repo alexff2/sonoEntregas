@@ -19,7 +19,7 @@ module.exports = {
       let where = ''
 
       if (!status) {
-        where = `${typeSearch} = '${search}'`
+        where = `${typeSearch} LIKE '${search}'`
 
         sales = await SalesService.findSales(where)
       } else {

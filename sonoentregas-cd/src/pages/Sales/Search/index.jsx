@@ -242,24 +242,20 @@ export default function Sales() {
         if (response.data === ''){
           console.log(response)
           setAlertSnackbar('Venda(s) não encontrada(s)!') 
-          setAlertSnackbar(true)
         } else {
           setSales(response.data)
         }
       } else {
         setAlertSnackbar('Preencha o campo de pesquisa!') 
-        setAlertSnackbar(true)
         setSales([])
       }
     } catch (e) {
       console.log(e.response)
       if (e.response.status === 400) {
         setAlertSnackbar("Requisição Incorreta (Verifique valor digitado)!")
-        setAlertSnackbar(true)
         setSales([])
       } else {
         setAlertSnackbar("Erro ao comunicar com o Servidor")
-        setAlertSnackbar(true)
         setSales([])
       }
     }
