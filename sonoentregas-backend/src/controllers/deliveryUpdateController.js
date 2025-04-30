@@ -117,9 +117,9 @@ module.exports = {
         }
       }
 
-      await ForecastsRules.checkStatusProduct([SaleRules.sale])
+      await ForecastsRules.checkStatusProduct(SaleRules.sale)
 
-      await ForecastsRules.checkAvailableStock([SaleRules.sale])
+      await ForecastsRules.checkAvailableStock(SaleRules.sale)
 
       await DeliveryService.saleAndProductsWithdrawal( SaleRules.sale, date, user_id, whoWithdrew)
 
