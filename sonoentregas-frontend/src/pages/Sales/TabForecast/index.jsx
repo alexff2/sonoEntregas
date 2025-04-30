@@ -141,65 +141,65 @@ export function TabForecast(){
 
   return(
     <>
-    { loading
-      ? <div className="loadingTable">
-        <LoadingCircle />
-      </div>
-      : <>
-        {forecasts.map(forecast => (
-          <div key={forecast.id} className='forecast'>
-            <div className='headerPrev'>
-              <span>Previsão de {dateSqlToReact(forecast.date)} {forecast.description ? (' - '+forecast.description) : ''}</span>
-              <span>Criado por: {forecast.userCreated}</span>
-            </div>
-            {forecast.sales.map( sale => (
-              <React.Fragment key={sale.id}>
-                <div className="salePrev">
-                  <span>{sale.ID_SALES}</span>
-                  <span>
-                    {sale.NOMECLI} { sale.validationStatus !== null &&
-                      <>
-                        {!sale.validationStatus
-                          ? <strong style={{color: 'var(--red)'}}> - Negada</strong> 
-                          : <strong style={{color: 'var(--green)'}}> - Confirmada</strong>}
-                      </>}
-                  </span>
-                  <span>{sale.FONE}{sale.FAX && (' / '+sale.FAX)}</span>
-                  <span><strong>Vendedor: </strong>{sale.VENDEDOR}</span>
-                  <div className="btnValidRemove">
-                  {(!sale.canRemove && (sale.validationStatus === null || (sale.validationStatus && !sale.requestInvalidate))) && 
-                    <button
-                      className="btnValidation"
-                      style={{background: 'var(--blue)'}}
-                      onClick={() => handleClickValidate(sale)}
-                    >
-                      { sale.validationStatus === null && 'Validar' }
-                      { sale.validationStatus && 'Invalidar' }
-                    </button>}
-                    {(sale.validationStatus === null && !sale.canRemove) && 
-                    <button
-                      className="btnRemove"
-                      style={{background: 'var(--green)'}}
-                      onClick={() => handleDelete(sale)}
-                    >
-                      Remove
-                    </button>}
-                  </div>
-                </div>
-                {sale.products.map( product => (
-                  <div key={product.COD_ORIGINAL} className="productPrev">
-                    <span><BsArrowReturnRight /></span>
-                    <span>{product.COD_ORIGINAL}</span>
-                    <span>{product.NOME}</span>
-                    <span><FormatValue>{product.NVTOTAL}</FormatValue></span>
-                  </div>
-                ))}
-              </React.Fragment>
-            ))}
+      { loading
+        ? <div className="loadingTable">
+            <LoadingCircle />
           </div>
-        ))}
-      </>
-    }
+        : <>
+            {forecasts.map(forecast => (
+              <div key={forecast.id} className='forecast'>
+                <div className='headerPrev'>
+                  <span>Previsão de {dateSqlToReact(forecast.date)} {forecast.description ? (' - '+forecast.description) : ''}</span>
+                  <span>Criado por: {forecast.userCreated}</span>
+                </div>
+                {forecast.sales.map( sale => (
+                  <React.Fragment key={sale.id}>
+                    <div className="salePrev">
+                      <span>{sale.ID_SALES}</span>
+                      <span>
+                        {sale.NOMECLI} { sale.validationStatus !== null &&
+                          <>
+                            {!sale.validationStatus
+                              ? <strong style={{color: 'var(--red)'}}> - Negada</strong> 
+                              : <strong style={{color: 'var(--green)'}}> - Confirmada</strong>}
+                          </>}
+                      </span>
+                      <span>{sale.FONE}{sale.FAX && (' / '+sale.FAX)}</span>
+                      <span><strong>Vendedor: </strong>{sale.VENDEDOR}</span>
+                      <div className="btnValidRemove">
+                      {(!sale.canRemove && (sale.validationStatus === null || (sale.validationStatus && !sale.requestInvalidate))) && 
+                        <button
+                          className="btnValidation"
+                          style={{background: 'var(--blue)'}}
+                          onClick={() => handleClickValidate(sale)}
+                        >
+                          { sale.validationStatus === null && 'Validar' }
+                          { sale.validationStatus && 'Invalidar' }
+                        </button>}
+                        {(sale.validationStatus === null && !sale.canRemove) && 
+                        <button
+                          className="btnRemove"
+                          style={{background: 'var(--green)'}}
+                          onClick={() => handleDelete(sale)}
+                        >
+                          Remove
+                        </button>}
+                      </div>
+                    </div>
+                    {sale.products.map( product => (
+                      <div key={product.COD_ORIGINAL} className="productPrev">
+                        <span><BsArrowReturnRight /></span>
+                        <span>{product.COD_ORIGINAL}</span>
+                        <span>{product.NOME}</span>
+                        <span><FormatValue>{product.NVTOTAL}</FormatValue></span>
+                      </div>
+                    ))}
+                  </React.Fragment>
+                ))}
+              </div>
+            ))}
+          </>
+      }
 
       <Modal openModal={openModalStatus} setOpenModal={setOpenModalStatus}>
         <h2>
