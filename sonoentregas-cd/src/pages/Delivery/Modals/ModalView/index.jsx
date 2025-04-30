@@ -81,11 +81,13 @@ export default function ModalView({ setOpen, type, id }){
 
   useEffect(() => {
     const loadingData = async () => {
-      const { data } = await api.get(`maintenance-delivery/${id}/check-exist-delivery-open`)
-      if(data){
-        setAlert('Existe uma ou mais assistência em aberto, finalize-a(s) para continuar')
-        setOpen(false)
-        return
+      if (type !== 'close') {
+        const { data } = await api.get(`maintenance-delivery/${id}/check-exist-delivery-open`)
+        if(data){
+          setAlert('Existe uma ou mais assistência em aberto, finalize-a(s) para continuar')
+          setOpen(false)
+          return
+        }
       }
 
       const { data: delivery } = await api.get(`delivery/${id}/sales/view`)
