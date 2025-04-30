@@ -50,9 +50,8 @@ module.exports = {
 
       /** @type{IProduct[]} */
       const products = await Products._query(1, `
-      SELECT A.ALTERNATI AS COD_ORIGINAL, A.NOME,
-      CASE WHEN B.QTD IS NULL THEN 0 ELSE B.QTD END PENDENTE,
-      CASE WHEN C.PEDIDO IS NULL THEN 0 ELSE C.PEDIDO END PEDIDO, D.EST_LOJA
+      SELECT A.ALTERNATI AS COD_ORIGINAL, A.NOME, ISNULL(E.QTD_MAINTENANCE, 0) + ISNULL(B.QTD, 0) PENDENTE,
+      ISNULL(C.PEDIDO, 0) PEDIDO, D.EST_LOJA
       FROM PRODUTOS A
       INNER JOIN PRODLOJAS D ON D.CODIGO = A.CODIGO
       LEFT JOIN (
@@ -60,6 +59,12 @@ module.exports = {
       FROM ${connections[0].database}..SALES_PROD where STATUS IN ('Enviado', 'Em Previsão', 'Em Lançamento')
       GROUP BY COD_ORIGINAL
       ) B ON A.ALTERNATI = B.COD_ORIGINAL
+      LEFT JOIN (
+        SELECT COD_ORIGINAL, SUM(QUANTIDADE) QTD_MAINTENANCE
+        FROM ${connections[0].database}..MAINTENANCE
+        WHERE STATUS IN ('No CD', 'Em Previsão', 'Em Lançamento')
+        GROUP BY COD_ORIGINAL
+      ) E ON E.COD_ORIGINAL = A.ALTERNATI
       LEFT JOIN (
           SELECT CODPRODUTO, SUM(QTE_PEDIDO) - SUM(QTE_CHEGADA) PEDIDO
           FROM VIEW_SALDO_PEDIDO_PRODUTO
