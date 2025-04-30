@@ -159,25 +159,26 @@ export default function TableMain() {
       } else  if (typeSeach === 'STATUS' && typesStatus === 'close'){
         resp = await api.get(`maintenancedeliv/${typesStatus}/${search}`)
       } else {
-        if (search !== '') {
-          if (typeSeach === 'ID_SALE') {
-            if (isNaN(parseInt(search))) {
-              setAlert('Digite apenas números!') 
-              return
-            }
-          }
-          resp = await api.get(`maintenancedeliv/${typeSeach}/${search}`)
-        } else {
+        if (search === '') {
           setAlert('Preencha o campo de pesquisa!') 
           return
         }
+
+        if (typeSeach === 'ID_SALE') {
+          if (isNaN(parseInt(search))) {
+            setAlert('Digite apenas números!') 
+            return
+          }
+        }
+
+        resp = await api.get(`maintenancedeliv/${typeSeach}/${search}`)
       }
 
       if (resp.data.length === 0){
         setAlert('Assistência(s) não encontrada(s)!') 
-      } else {
-        setMaintenance(resp.data)
-      }
+      } 
+
+      setMaintenance(resp.data)
     } catch (e) {
       console.log(e)
       setAlert("Erro ao comunicar com o Servidor")
@@ -215,6 +216,7 @@ export default function TableMain() {
             value={typeSeach}
           >
             <MenuItem value={'STATUS'}>STATUS</MenuItem>
+            <MenuItem value={'ID'}>Código</MenuItem>
             <MenuItem value={'ID_SALE'}>DAV</MenuItem>
             <MenuItem value={'NOMECLI'}>Cliente</MenuItem>
           </Select>
@@ -232,7 +234,6 @@ export default function TableMain() {
                   input: classes.inputInput,
                 }
               }
-              inputProps={{ 'aria-label': 'search' }}
               onChange={e => setSearch(e.target.value)}
               onKeyPress={e => e.key === 'Enter' ? searchMain() : null}
             />
