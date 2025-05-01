@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Box,
   Table,
@@ -242,6 +242,20 @@ export default function TableSales({
   const [ order, setOrder ] = useState('asc')
   const [ orderBy, setOrderBy ] = useState('ID_SALES')
   const classes = useStyles()
+  const { setAddress } = useAddress()
+
+  useEffect(() => {
+    if (sales.length === 0 && type === 'home') return
+
+    setAddress({
+      OBS2: sales[0].OBS2,
+      ENDERECO: sales[0].ENDERECO,
+      PONTOREF: sales[0].PONTOREF,
+      OBS: sales[0].OBS,
+      SCHEDULED: sales[0].SCHEDULED,
+      OBS_SCHEDULED: sales[0].OBS_SCHEDULED
+    })
+  }, [setAddress, sales])
 
   //Functions
 
