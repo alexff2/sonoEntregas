@@ -93,7 +93,7 @@ module.exports = {
         ID_CAR,
         ID_DRIVER,
         ID_ASSISTANT,
-        ID_ASSISTANT2,
+        ID_ASSISTANT2: ID_ASSISTANT2 ? ID_ASSISTANT2 : 0,
         STATUS: 'Em lançamento',
         ID_USER_MOUNT: user_id,
         dateCreated: new Date().getISODateTimeBr().dateTime,
