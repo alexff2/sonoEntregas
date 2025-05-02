@@ -245,7 +245,7 @@ export default function TableSales({
   const { setAddress } = useAddress()
 
   useEffect(() => {
-    if (sales.length === 0 && type === 'home') return
+    if (sales.length === 0 || type === 'home') return
 
     setAddress({
       OBS2: sales[0].OBS2,
@@ -255,7 +255,7 @@ export default function TableSales({
       SCHEDULED: sales[0].SCHEDULED,
       OBS_SCHEDULED: sales[0].OBS_SCHEDULED
     })
-  }, [setAddress, sales])
+  }, [setAddress, sales, type])
 
   //Functions
 
