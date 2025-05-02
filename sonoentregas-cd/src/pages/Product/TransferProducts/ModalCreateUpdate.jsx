@@ -14,7 +14,6 @@ import api from '../../../services/api'
 const useStyles = makeStyles(theme => ({
   boxField: {
     display: 'flex',
-    justifyContent: 'space-between',
     gap: 8,
   },
   boxTablesProducts: {
@@ -139,6 +138,16 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
   const handleSendTransfer = async e => {
     e.preventDefault()
 
+    if (originId !== 1 && reason === '') {
+      setAlertSnackbar('🚫 Preencha o campo "Nº Ent."')
+      return
+    }
+
+    if (originId !== 1 && reason === 0) {
+      setAlertSnackbar('Atenção!!!!! 🚫🚫🚫🚫 Valor zerado')
+      return
+    }
+
     try {
       const originShop = shopsSce.filter(shop => shop.code === originId).map(shop => shop.name)
       const destinyShop = shopsSce.filter(shop => shop.code === destinyId).map(shop => shop.name)
@@ -229,9 +238,6 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
           variant='outlined'
           placeholder=''
           value={transferUpdate ? transferUpdate.id : ''}
-          InputLabelProps={{
-            shrink: true,
-          }}
           required
           disabled
           style={{ width: 90 }}
@@ -244,24 +250,24 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
           type='date'
           value={issue}
           onChange={e => setIssue(e.target.value)}
-          InputLabelProps={{
-            shrink: true,
-          }}
           required
           margin='dense'
         />
         <TextField
           id="reason"
-          label="Motivo"
+          label="Nº Ent."
           variant='outlined'
-          placeholder='Motivo'
+          placeholder='Nº Ent.'
           value={reason}
-          onChange={e => setReason(e.target.value)}
-          InputLabelProps={{
-            shrink: true,
+          onChange={e => {
+            if (isNaN(Number(e.target.value))) return
+
+            setReason(Number(e.target.value))
           }}
           required
           margin='dense'
+          style={{ opacity: originId === 1 ? '0' : '1', width: '20%' }}
+          disabled={originId === 1}
         />
         <TextField
           id="observation"
@@ -270,9 +276,7 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
           placeholder='Observação'
           value={observation}
           onChange={e => setObservation(e.target.value)}
-          InputLabelProps={{
-            shrink: true,
-          }}
+          style={{ flex: 1 }}
           required
           margin='dense'
         />
@@ -350,9 +354,6 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
           variant='outlined'
           value={search}
           onChange={e => setSearch(e.target.value)}
-          InputLabelProps={{
-            shrink: true,
-          }}
           style={{ width: '65%' }}
           margin='dense'
           onKeyDown={e => keyPres(e.key)}
@@ -370,9 +371,6 @@ export default function CreateUpdate({ transferUpdate, setTransfers, setOpen }) 
               return
             }
             setQuantity(Number(e.target.value))
-          }}
-          InputLabelProps={{
-            shrink: true,
           }}
           style={{ width: '20%' }}
           margin='dense'

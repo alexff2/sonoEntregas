@@ -173,7 +173,7 @@ export default function Transfer() {
               <TableCell>Emissão</TableCell>
               <TableCell>Origem</TableCell>
               <TableCell>Destino</TableCell>
-              <TableCell>Motivo</TableCell>
+              <TableCell>Nº Ent</TableCell>
               <TableCell>Observação</TableCell>
               <TableCell>Usuário</TableCell>
               <TableCell></TableCell>
