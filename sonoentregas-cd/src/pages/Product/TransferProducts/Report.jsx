@@ -15,6 +15,7 @@ import {
   Typography
 } from '@material-ui/core'
 import { useReactToPrint } from 'react-to-print'
+import MonetaryValue from '../../../components/MonetaryValue'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -126,10 +127,12 @@ export default function Report({ transferToPrint, onClose }) {
                   <TableCell>{product.name}</TableCell>
                   <TableCell align='center'>{product.quantity}</TableCell>
                   <TableCell align='right'>
-                    {product.purchasePrice.toFixed(2).replace('.', ',')}
+                    <MonetaryValue>{product.purchasePrice}</MonetaryValue>
                   </TableCell>
                   <TableCell align='right'>
-                    {(product.quantity * product.purchasePrice).toFixed(2).replace('.', ',')}
+                    <MonetaryValue>
+                      {(product.quantity * product.purchasePrice)}
+                    </MonetaryValue>
                   </TableCell>
                 </TableRow>
               ))}
@@ -141,7 +144,9 @@ export default function Report({ transferToPrint, onClose }) {
                   {transferToPrint.products.reduce((acc, product) => acc + product.quantity, 0)}
                 </TableCell>
                 <TableCell colSpan={2} align='right'>
-                  {transferToPrint.products.reduce((acc, product) => acc + (product.quantity * product.purchasePrice), 0).toFixed(2).replace('.', ',')}
+                  <MonetaryValue>
+                    {transferToPrint.products.reduce((acc, product) => acc + (product.quantity * product.purchasePrice), 0)}
+                  </MonetaryValue>
                 </TableCell>
               </TableRow>
             </TableFooter>
