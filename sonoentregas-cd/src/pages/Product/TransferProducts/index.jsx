@@ -84,11 +84,15 @@ const Row = ({ transfer, handleOpenCreateUpdate, transferPrint }) => {
               <EditSharp />
             </IconButton>
           </Tooltip>
-          <Tooltip title='Imprimir Transferência'>
-            <IconButton onClick={() => transferPrint(transfer)}>
-              <Print />
-            </IconButton>
-          </Tooltip>
+          {
+            transfer.type === 'D' && (
+              <Tooltip title='Imprimir Transferência'>
+                <IconButton onClick={() => transferPrint(transfer)}>
+                  <Print />
+                </IconButton>
+              </Tooltip>
+            )
+          }
         </TableCell>
       </TableRow>
 
