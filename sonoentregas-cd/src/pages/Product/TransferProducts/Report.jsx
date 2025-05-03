@@ -85,11 +85,10 @@ export default function Report({ transferToPrint, onClose }) {
             <Typography>Hora: {currentDateTime.split(',')[1]}</Typography>
           </Box>
           <Box>
-            <Typography variant='h6'>Comprovante de Entrega</Typography>
+            <Typography variant='h6'>Comprovante de Transferência</Typography>
             <Typography variant='h6'>Nº {transferToPrint?.id}</Typography>
           </Box>
           <Box>
-            <Typography>Pag. 1</Typography>
             <Typography>Usuário: {transferToPrint.user}</Typography>
           </Box>
         </Box>
