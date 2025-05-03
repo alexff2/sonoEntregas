@@ -175,6 +175,7 @@ class TransferServices {
         originId: transfer.LOJAORIGEM,
         destiny: shops.filter(shop => shop.code === transfer.LOJADESTINO)[0].name,
         destinyId: transfer.LOJADESTINO,
+        destinyAddress: shops.filter(shop => shop.code === transfer.LOJADESTINO)[0].address,
         reason: transfer.MOTIVO,
         observation: transfer.OBSERVA,
         user: transfer.USUARIO,

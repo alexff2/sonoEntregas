@@ -1,6 +1,25 @@
 import React, { useState } from 'react'
-import { Box, Button, Collapse, Fab, FormControl, IconButton, InputBase, InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@material-ui/core'
-import { Add, Search as SearchIcon, KeyboardArrowDown, KeyboardArrowUp, EditSharp } from '@material-ui/icons'
+import {
+  Box,
+  Button,
+  Collapse,
+  Fab,
+  FormControl,
+  IconButton,
+  InputBase,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Tooltip,
+} from '@material-ui/core'
+import { Add, Search as SearchIcon, KeyboardArrowDown, KeyboardArrowUp, EditSharp, Print } from '@material-ui/icons'
 
 import useStyles from '../style'
 
@@ -14,6 +33,7 @@ import { getDateSql } from '../../../functions/getDates'
 import Modal from '../../../components/Modal'
 import ModalCreateUpdate from './ModalCreateUpdate'
 import ShowProducts from './ShowProducts'
+import Report from './Report'
 
 export const CellStatus = ({ children }) => {
   return (
@@ -39,7 +59,7 @@ export const CellStatus = ({ children }) => {
   )
 }
 
-const Row = ({ transfer, handleOpenCreateUpdate }) => {
+const Row = ({ transfer, handleOpenCreateUpdate, transferPrint }) => {
   const [openTableProducts, setOpenTableProducts] = useState(false)
 
   return(
@@ -58,10 +78,15 @@ const Row = ({ transfer, handleOpenCreateUpdate }) => {
         <TableCell>{transfer.reason}</TableCell>
         <TableCell>{transfer.observation}</TableCell>
         <TableCell>{transfer.user}</TableCell>
-        <TableCell>
+        <TableCell style={{ display: 'flex' }}>
           <Tooltip title='Atualizar Transferência'>
             <IconButton onClick={() => handleOpenCreateUpdate(transfer)}>
               <EditSharp />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title='Imprimir Transferência'>
+            <IconButton onClick={() => transferPrint(transfer)}>
+              <Print />
             </IconButton>
           </Tooltip>
         </TableCell>
@@ -81,8 +106,9 @@ const Row = ({ transfer, handleOpenCreateUpdate }) => {
 
 export default function Transfer() {
   const [ openModalCreateUpdate, setOpenModalCreateUpdate ] = useState(false)
+  const [ openModalPrinter, setOpenModalPrinter ] = useState(false)
   const [ transfers, setTransfers ] = useState([])
-  const [ transferUpdate, setTransferUpdate ] = useState(null)
+  const [ selectTransfer, setSelectTransfer ] = useState(null)
   const [ search, setSearch ] = useState('')
   const [ typeSearch, setTypeSearch ] = useState('id')
 
@@ -115,7 +141,12 @@ export default function Transfer() {
 
   const handleOpenCreateUpdate = transfer => {
     setOpenModalCreateUpdate(true)
-    setTransferUpdate(transfer)
+    setSelectTransfer(transfer)
+  }
+
+  const transferPrint = transfer => {
+    setSelectTransfer(transfer)
+    setOpenModalPrinter(true)
   }
 
   const handleChangeTypeSearch = e => {
@@ -185,6 +216,7 @@ export default function Transfer() {
                 key={transfer.id}
                 transfer={transfer}
                 handleOpenCreateUpdate={handleOpenCreateUpdate}
+                transferPrint={transferPrint}
               />
             ))}
           </TableBody>
@@ -200,14 +232,24 @@ export default function Transfer() {
       </Fab>
 
       <Modal
-        title={transferUpdate ? 'Atualização de transferência': 'Criação de transferência'}
+        title={selectTransfer ? 'Atualização de transferência': 'Criação de transferência'}
         open={openModalCreateUpdate}
         setOpen={setOpenModalCreateUpdate}
       >
         <ModalCreateUpdate
-          transferUpdate={transferUpdate}
+          transferUpdate={selectTransfer}
           setTransfers={setTransfers}
           setOpen={setOpenModalCreateUpdate}
+        />
+      </Modal>
+
+      <Modal
+        open={openModalPrinter}
+        setOpen={setOpenModalPrinter}
+      >
+        <Report
+          transferToPrint={selectTransfer}
+          onClose={() => setOpenModalPrinter(false)}
         />
       </Modal>
     </Box>
