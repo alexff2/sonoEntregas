@@ -95,9 +95,14 @@ export default function Report({ transferToPrint, onClose }) {
 
         <Divider style={{ margin: '8px 0' }} />
 
-        <Box className={classes.information}>
+        <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography variant='subtitle1'><strong>Origem:</strong> {transferToPrint?.origin}</Typography>
-          <Divider style={{ margin: '8px 0' }} />
+          <Typography variant='subtitle1'><strong>Emissão:</strong> {transferToPrint?.issue}</Typography>
+        </Box>
+
+        <Divider style={{ margin: '8px 0' }} />
+
+        <Box className={classes.information}>
           <Typography variant='subtitle1'><strong>Destino:</strong> {transferToPrint?.destiny}</Typography>
           <Typography variant='subtitle1'><strong>End Dest:</strong> {transferToPrint?.destinyAddress}</Typography>
           <Typography variant='subtitle1'><strong>Observação:</strong> {transferToPrint?.observation}</Typography>
