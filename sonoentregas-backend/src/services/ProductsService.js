@@ -41,12 +41,27 @@ module.exports = {
   },
   async findProduct(type, search) {
     const script = 
-    `SELECT A.CODIGO code, B.ALTERNATI generalCode, B.NOME name, A.EST_ATUAL stock, A.PCO_COMPRA purchasePrice, B.CBARRA barCode
+    `SELECT A.CODIGO code, B.ALTERNATI generalCode, B.NOME name, (A.EST_ATUAL - ISNULL(C.qtdForecast, 0)) stock, A.PCO_COMPRA purchasePrice, B.CBARRA barCode
     FROM PRODLOJAS A
     INNER JOIN PRODUTOS B ON A.CODIGO = B.CODIGO
+    LEFT JOIN (
+      SELECT A.COD_ORIGINAL, SUM(A.qtdForecast) qtdForecast FROM (
+      SELECT COD_ORIGINAL, SUM(QUANTIDADE) qtdForecast, 'sales' TIPO
+      FROM ${process.env.ENTREGAS_BASE}..SALES_PROD
+      WHERE [STATUS] IN ('Em Previsão', 'Em lançamento')
+      GROUP BY COD_ORIGINAL
+      UNION
+      SELECT A.COD_ORIGINAL, SUM(QUANTIDADE) qtdForecast, 'maintenance' TIPO
+      FROM ${process.env.ENTREGAS_BASE}..MAINTENANCE A
+      INNER JOIN ${process.env.ENTREGAS_BASE}..MAINTENANCE_DELIV B ON A.ID = B.ID_MAINT
+      WHERE A.[STATUS] IN ('Em Previsão', 'Em lançamento')
+      GROUP BY COD_ORIGINAL) A
+      GROUP BY A.COD_ORIGINAL
+    ) C ON B.ALTERNATI = C.COD_ORIGINAL
     WHERE A.CODLOJA = 1 AND ${type === 'code' ? 'B.ALTERNATI' : 'B.NOME'} LIKE '${search}%'AND B.ATIVO = 'S'`
 
     const products = await ProductModel._query(1, script, QueryTypes.SELECT)
+    console.log('products', products)
 
     return products
   },
