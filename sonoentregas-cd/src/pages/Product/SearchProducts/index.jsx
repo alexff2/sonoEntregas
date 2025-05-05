@@ -131,7 +131,7 @@ export default function SearchProducts() {
               <TableCell>Cod Alterna</TableCell>
               <TableCell>Descrição</TableCell>
               <TableCell align="right">Qtd Kardex</TableCell>
-              <TableCell align="right">Qtd Bipada</TableCell>
+              {process.env.REACT_APP_STOCK_BEEP === '1' && <TableCell align="right">Qtd Bipada</TableCell>}
               <TableCell align="right">Qtd DAV</TableCell>
               <TableCell align="right">Qtd Ass.</TableCell>
               <TableCell align="right">Qtd Disp. Loja</TableCell>
@@ -149,10 +149,13 @@ export default function SearchProducts() {
                 <TableCell>{product.COD_ORIGINAL}</TableCell>
                 <TableCell>{product.NOME}</TableCell>
                 <TableCell align="right">{product.EST_KARDEX}</TableCell>
-                <TableCell align="right">{product.EST_BEEP}</TableCell>
+                {process.env.REACT_APP_STOCK_BEEP === '1' &&  <TableCell align="right">{product.EST_BEEP}</TableCell>}
                 <TableCell align="right">{product.EST_RESERVA}</TableCell>
                 <TableCell align="right">{product.QTD_MAINTENANCE}</TableCell>
-                <TableCell align="right">{product.EST_DISPONIVEL}</TableCell>
+                {process.env.REACT_APP_STOCK_BEEP === '1' 
+                  ? <TableCell align="right">{product.EST_DISPONIVEL}</TableCell>
+                  : <TableCell align="right">{product.EST_KARDEX + product.EST_DISPONIVEL}</TableCell>
+                }
               </TableRow>
               {serialNumbersProduct.COD_ORIGINAL === product.COD_ORIGINAL && (
                 <TableRow>
