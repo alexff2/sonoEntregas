@@ -13,6 +13,7 @@ CREATE TABLE FORECAST_SALES (
 	canRemove bit NOT NULL DEFAULT 1,
 	createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	[idDelivery] [varchar](20) NULL,
+	[isMaintenance] [bit] NULL,
 )
 
 CREATE UNIQUE INDEX idForecastIdSale ON FORECAST_SALES (idForecast ASC, idSale ASC)
