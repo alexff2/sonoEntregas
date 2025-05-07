@@ -69,7 +69,7 @@ const PurchaseOrderReport = ({ purchaseOrder }) => {
   const unitTotal = purchaseOrderProducts.reduce((prev, currentValue) => prev + currentValue.value, 0)
   const valueTotal = purchaseOrderProducts.reduce((prev, currentValue) => prev + currentValue.total, 0)
 
-  const paginatedProducts = splitReportTable(purchaseOrderProducts, 34, 34)
+  const paginatedProducts = splitReportTable(purchaseOrderProducts, 32, 34)
 
   const currentDateTime = new Date().toLocaleString('pt-BR', {
     dateStyle: 'short',
@@ -128,6 +128,8 @@ const PurchaseOrderReport = ({ purchaseOrder }) => {
                 </Typography>
               </Grid>
             </Grid>
+
+            <Box><strong>Obs: </strong> {purchaseOrder.obs}</Box>
 
             {/* Products Table */}
             <Table className={classes.table} size="small">
