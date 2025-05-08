@@ -388,28 +388,38 @@ class ForecastService {
     { id })
   }
   
-  async finishForecastService({ id }){
+  async finishForecastService({ id }, connectionEntrega){
     /**@type {IForecastSales[]} */
-    const forecastSales = await ForecastSales.findAny(0, { idForecast: id, validationStatus: 0 })
+    const salesDeniedForecast = await ForecastSales.findAny(0, { idForecast: id, validationStatus: 0 }, '*', connectionEntrega)
 
-    if (forecastSales.length > 0) {
+    if (salesDeniedForecast.length > 0) {
       /**@type {IForecastProduct[]} */
-      const forecastProduct = await ForecastProduct.findAny(0, { in: { idForecastSale: forecastSales.map( sale => sale.id) }})
+      const forecastProducts = await ForecastProduct.findAny(0, { in: { idForecastSale: salesDeniedForecast.map( saleForecast => saleForecast.id) }}, '*', connectionEntrega)
 
-      for (let i = 0; i < forecastSales.length; i++) {
-        const ID_SALE_ID = forecastSales[i].idSale
+      for (let i = 0; i < salesDeniedForecast.length; i++) {
+        const ID_SALE_ID = salesDeniedForecast[i].idSale
 
-        const COD_ORIGINAL = forecastProduct
-          .filter(product => product.idForecastSale === forecastSales[i].id)
-          .map(product => product.COD_ORIGINAL)
+        const forecastProduct = forecastProducts
+          .filter(product => product.idForecastSale === salesDeniedForecast[i].id)
 
-        await SalesProd.updateAny(0, { STATUS: 'Enviado' }, { ID_SALE_ID, in: { COD_ORIGINAL } })
+        salesDeniedForecast[i].isMaintenance
+          ? await MaintenanceModel.updateAny(0, { STATUS: 'No CD' }, { in: {ID: forecastProduct.map(prod => prod.ID_MAINTENANCE)} }, connectionEntrega)
+          : await SalesProd.updateAny(
+            0,
+            { STATUS: 'Enviado' },
+            { ID_SALE_ID, in: { COD_ORIGINAL: forecastProduct.map(product => product.COD_ORIGINAL) } },
+            connectionEntrega
+          )
       }
+      
+      const salesDeniedForecastNotMaintenance = salesDeniedForecast.filter(sale => !sale.isMaintenance)
 
-      await Sale.updateAny(0, { STATUS: 'Aberta' }, { in: { ID: forecastSales.map( sale => sale.idSale)} })      
+      if(salesDeniedForecastNotMaintenance.length > 0) {
+        await Sale.updateAny(0, { STATUS: 'Aberta' }, { in: { ID: salesDeniedForecastNotMaintenance.map( sale => sale.idSale)} }, connectionEntrega)
+      }
     }
 
-    await Forecast.updateAny(0, { status: 0 }, { id })
+    await Forecast.updateAny(0, { status: 0 }, { id }, connectionEntrega)
   }
 
   async setSendStatusInSalesProd({ forecastSale }) {

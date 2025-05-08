@@ -262,18 +262,9 @@ class ForecastRules {
   }
 
   async saleOnRoute({forecastSale}) {
-    /**@type {import('../services/ForecastService').IForecastProduct[]} */
-    const forecastProducts = await ForecastProduct.findAny(0, { idForecastSale: forecastSale.id })
+    const forecastSaleFind = await ForecastSales.findAny(0, { id: forecastSale.id, isNull: 'idDelivery' })
 
-    const COD_ORIGINAL = forecastProducts.map(forecastProduct => forecastProduct.COD_ORIGINAL)
-
-    const saleProd = await SalesProd.findAny(0, { 
-      ID_SALE_ID: forecastSale.idSale,
-      STATUS: 'Em Previsão',
-      in: { COD_ORIGINAL }
-    })
-
-    if (saleProd.length > 0) {
+    if (forecastSaleFind.length > 0) {
       return false
     }
 
