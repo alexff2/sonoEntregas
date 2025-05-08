@@ -2,6 +2,7 @@
 
 const ForecastService = require('../services/ForecastService')
 const ForecastsRules = require('../rules/forecastRules')
+const ModelConnection = require('../databases/MSSQL/Model/index')
 
 module.exports = {
   /**
@@ -284,6 +285,9 @@ module.exports = {
    * @param {any} res
    */
   async finishForecast(req, res){
+    const modelConnection = new ModelConnection()
+    const connectionEntrega = await modelConnection._query(0)
+
     try {
       const { id } = req.params
       const { id: userId } = req.user
@@ -303,11 +307,15 @@ module.exports = {
 
       await ForecastsRules.checkForecastIsDelivering({ id })
 
-      await ForecastService.finishForecastService({ id })
+      await ForecastService.finishForecastService({ id }, connectionEntrega)
+      connectionEntrega.transaction.commit()
 
       return res.status(200).json(`Finish by user ${userId}`)
     } catch (e) {
       console.log(e)
+      if (connectionEntrega.transaction) {
+        connectionEntrega.transaction.rollback()
+      }
 
       let status = e.status ? e.status : 400
       let error = e.error ? e.error : e
