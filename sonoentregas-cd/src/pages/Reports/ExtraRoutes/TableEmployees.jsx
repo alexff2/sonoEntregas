@@ -14,10 +14,13 @@ import EnhancedTableHead from '../../../components/EnhancedTableHead'
 import { getComparator, stableSort } from '../../../functions/orderTable'
 
 import { useStyle } from '../style'
+import MonetaryValue from '../../../components/MonetaryValue'
 
 const headCells = [
   {id: 'DESCRIPTION', label: 'DESCRIÇÃO'},
   {id: 'QTD', label: 'QUANT.'},
+  {id: 'VALOR', label: 'VALOR'},
+  {id: 'CHAVE_PIX', label: 'CHAVE PIX'},
 ]
 
 const TableEmployees = ({ employees, title }) => {
@@ -31,6 +34,9 @@ const TableEmployees = ({ employees, title }) => {
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   }
+
+  const qtdTotal = employees.reduce((acc, item) => acc + item.QTD, 0)
+  const valorTotal = employees.reduce((acc, item) => acc + item.VALOR, 0)
 
   return (
     <Box width={'100%'} display={'flex'} flexDirection={'column'} alignItems={'center'}>
@@ -58,6 +64,12 @@ const TableEmployees = ({ employees, title }) => {
               <TableRow key={i} className={classe.rowBody}>
                 <TableCell>{item.DESCRIPTION}</TableCell>
                 <TableCell>{item.QTD}</TableCell>
+                <TableCell>
+                  <MonetaryValue>
+                    {item.VALOR}
+                  </MonetaryValue>
+                </TableCell>
+                <TableCell>{item.CHAVE_PIX}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -65,7 +77,12 @@ const TableEmployees = ({ employees, title }) => {
           <TableFooter>
             <TableRow className={classe.rowBody}>
               <TableCell>TOTAIS</TableCell>
-              <TableCell>{employees.reduce((acc, item) => acc + item.QTD, 0)}</TableCell>
+              <TableCell>{qtdTotal}</TableCell>
+              <TableCell colSpan={2}>
+                <MonetaryValue>
+                  {valorTotal}
+                </MonetaryValue>
+              </TableCell>
             </TableRow>
           </TableFooter>
         </Table>
