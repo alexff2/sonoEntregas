@@ -145,7 +145,7 @@ function Row({ sale, type, setSales, availableStocks }) {
         </TableCell>
         <TableCell onClick={setInformation}>{sale.ID_SALES}</TableCell>
         <TableCell onClick={setInformation}>{sale.NOMECLI}</TableCell>
-        <TableCell onClick={setInformation}>{sale.BAIRRO}</TableCell>
+        <TableCell onClick={setInformation}>{getDateBr(sale.EMISSAO)}</TableCell>
         <TableCell
           onClick={setInformation}
           style={styleDateDelivery()}
@@ -269,7 +269,7 @@ export default function TableSales({
     { id: '', label: '' },
     { id: 'ID_SALES', label: 'DAV' },
     { id: 'NOMECLI', label: 'Cliente' },
-    { id: 'BAIRRO', label: 'Bairro' },
+    { id: 'EMISSAO', label: 'Emissão' },
     { id: 'D_ENTREGA1', label: 'Entrega' },
     { id: 'CODLOJA', label: 'Loja' },
     { id: '', label: '' },
