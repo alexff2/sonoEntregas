@@ -68,14 +68,14 @@ export default function ExtraRoutes(){
       { extraRoutes.assistants && extraRoutes.assistants.length > 0 &&
         <TableEmployees
           employees={extraRoutes.assistants}
-          title={'Rotas extras por Assistente'}
+          title={'Rotas extras por Assistentes'}
         />
       }
 
       { extraRoutes.drivers && extraRoutes.drivers.length > 0 &&
         <TableEmployees
           employees={extraRoutes.drivers}
-          title={'Rotas extras por Lojas'}
+          title={'Rotas extras por Motoristas'}
         />
       }
 
