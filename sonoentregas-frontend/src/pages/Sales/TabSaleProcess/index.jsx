@@ -24,6 +24,10 @@ export function TabSalesProcess() {
     setLoading(true)
     api.get(`/delivery/${codLoja}/sales/shops`)
       .then(({ data }) => {
+        if (data.length === 0) {
+          setLoading(false)
+          return
+        }
         setSalesMounting(data.filter(delivery => delivery.STATUS === 'Em lançamento'))
         setSalesDelivering(data.filter(delivery => delivery.STATUS === 'Entregando'))
         setLoading(false)

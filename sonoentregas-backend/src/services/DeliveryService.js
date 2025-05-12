@@ -164,10 +164,18 @@ module.exports = {
       }
     }, 'ID')
 
+    if (deliveriesId.length === 0) {
+      return []
+    }
+
     const sales = await ViewDeliverySales.findAny(0, {
       CODLOJA: idShop,
       in: { ID_DELIVERY: deliveriesId.map(delivery => delivery.ID)}
     })
+
+    if (sales.length === 0) {
+      return []
+    }
 
     const products = await ViewDeliveryProd2.findAny(0, {
       CODLOJA: idShop,
