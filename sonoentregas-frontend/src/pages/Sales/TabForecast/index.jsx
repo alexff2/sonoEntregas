@@ -39,8 +39,7 @@ export function TabForecast(){
         }
       })
       .then(({ data }) => {
-        setForecasts(data)
-        console.log(data)
+        setForecasts(data.filter(forecast => forecast.sales.length !== 0))
         setLoading(false)
       })
       .catch(err => {
