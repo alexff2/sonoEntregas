@@ -154,7 +154,7 @@ export function TabForecast(){
                 {forecast.sales.map( sale => (
                   <React.Fragment key={sale.id}>
                     <div className="salePrev">
-                      <span>{sale.ID_SALES}</span>
+                      <span style={sale.isMaintenance ? {color: 'orange'} : {}}>{sale.ID_SALES}</span>
                       <span>
                         {sale.NOMECLI} { sale.validationStatus !== null &&
                           <>
@@ -190,7 +190,9 @@ export function TabForecast(){
                         <span><BsArrowReturnRight /></span>
                         <span>{product.COD_ORIGINAL}</span>
                         <span>{product.NOME}</span>
-                        <span><FormatValue>{product.NVTOTAL}</FormatValue></span>
+                        { product.ID_MAINTENANCE && 
+                          (<span>Assistência Nº: {product.ID_MAINTENANCE}</span>)
+                        }
                       </div>
                     ))}
                   </React.Fragment>

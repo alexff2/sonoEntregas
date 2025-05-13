@@ -74,11 +74,13 @@
 }
 .forecast .productPrev span:nth-child(3) {
   display: inline-block;
-  width: 55%;
+  margin-right: 20px;
 }
 .forecast .productPrev span:nth-child(4) {
   display: inline-block;
-  width: 20%;
+  padding: 2px 8px;
+  background-color: orange;
+  color: #FFF;
 }
 
 .sales-field.validateField label {
