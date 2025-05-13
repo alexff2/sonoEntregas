@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { BsArrowReturnRight } from 'react-icons/bs'
 
-import { FormatValue } from '../../../components/FormatValue'
-
 import { useAuthenticate } from '../../../context/authContext'
 import { useModalAlert } from '../../../context/modalAlertContext'
 

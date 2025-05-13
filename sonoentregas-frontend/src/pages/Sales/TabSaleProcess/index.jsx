@@ -4,7 +4,6 @@ import { BsArrowReturnRight } from 'react-icons/bs'
 import './style.css'
 
 import api from '../../../services/api'
-//import { dateSqlToReact } from '../../../functions/getDate'
 
 import { useAuthenticate } from '../../../context/authContext'
 import { useModalAlert } from '../../../context/modalAlertContext'
