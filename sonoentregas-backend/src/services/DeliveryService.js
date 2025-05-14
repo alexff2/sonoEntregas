@@ -46,7 +46,6 @@ const Sales = require('../models/Sales')
 const scripts = require('../scripts/delivery')
 const MainService = require('../services/MainService')
 const Date = require('../class/Date')
-const e = require('express')
 
 module.exports = {
   async findUnique(/** @type {number} */id){
