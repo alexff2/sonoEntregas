@@ -26,9 +26,14 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   toolbar: theme.mixins.toolbar,
-  alert: {
+  alertWarning: {
     '& .MuiSnackbarContent-root': {
       background: '#FD4659',
+    },
+  },
+  alertSuccess: {
+    '& .MuiSnackbarContent-root': {
+      background: '#4CAF50',
     },
   },
   backdrop: {
@@ -42,7 +47,7 @@ export default function App(props) {
   const [mobileOpen, setMobileOpen] = useState(false)
   
   const { childrenModal, open, setOpen, type } = useAlert()
-  const { childrenSnackbar, openSnackbar, setOpenSnackbar } = useAlertSnackbar()
+  const { childrenSnackbar, openSnackbar, setOpenSnackbar, type: typeSnackbar } = useAlertSnackbar()
   const { openBackDrop } = useBackdrop()
   const { window } = props
 
@@ -90,11 +95,11 @@ export default function App(props) {
       }
       <Snackbar
         open={openSnackbar}
-        anchorOrigin={{vertical: 'top', horizontal: 'center'}}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         autoHideDuration={4000}
         onClose={handleClose}
         message={childrenSnackbar}
-        className={classes.alert}
+        className={typeSnackbar === 'warning' ? classes.alertWarning : classes.alertSuccess}
       />
     </Box>
   )

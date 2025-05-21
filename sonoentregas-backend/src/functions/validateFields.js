@@ -26,6 +26,6 @@ function validateFieldsObject(fieldObj) {
   return invalidValues.length === 0
 }
 
-export {
+module.exports = {
   validateFields, validateObs, validateFieldsObject
 }

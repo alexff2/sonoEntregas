@@ -13,22 +13,21 @@ import { Add } from '@material-ui/icons'
 
 //Components
 import Modal from '../../components/Modal'
-import ModalDelivery from './Modals/ModalDelivery'
 import ModalView from './Modals/ModalView'
 import ModalDelivering from './Modals/ModalDelivering'
 import TableDelivery from './Delivery/TableDelivery'
 import TableForecast from './Forecast/TableForecast'
-import ModalAddSale from './Update/ModalAddSale'
+import Withdrawal from './Withdrawal'
 //Context
 import { useDelivery } from '../../context/deliveryContext'
 import { useDeliveryFinish } from '../../context/deliveryFinishContext'
 import { useForecasts } from '../../context/forecastsContext'
 import { useSale } from '../../context/saleContext'
 import { useAlert } from '../../context/alertContext'
+import { useBackdrop } from '../../context/backdropContext'
 
 import { getDateSql, getObjDate } from '../../functions/getDates'
 import api from '../../services/api'
-import LoadingCircleModal from '../../components/LoadingCircleModal'
 
 const useStyle = makeStyles(theme => ({
   btnAdd: {
@@ -85,17 +84,14 @@ const useStyle = makeStyles(theme => ({
 export default function Delivery() {
   //Modals Open States
   const [ openModalSelect, setOpenModalSelect ] = useState(false)
-  const [ openModalCreateForecastDelivery, setOpenModalCreateForecastDelivery ] = useState(false)
   const [ openModalWithdrawal, setOpenModalWithdrawal ] = useState(false)
   const [ openModalDelivering, setOpenModalDelivering ] = useState(false)
   const [ openFinish, setOpenFinish ] = useState(false)
   const [ openView, setOpenView ] = useState(false)
-  const [ openLoading, setOpenLoading ] = useState(false)
   const [ forecastsFinish, setForecastsFinish ] = useState([])
 
   //States
   const [ selectDelivery, setSelectDelivery ] = useState({})
-  const [ typeForecasDelivery, setTypeForecasDelivery ] = useState('')
 
   const navigate = useNavigate()
   const { setDelivery } = useDelivery()
@@ -103,12 +99,13 @@ export default function Delivery() {
   const { forecasts, setForecasts } = useForecasts()
   const { setSales } = useSale()
   const { setAlert } = useAlert()
+  const { setOpenBackDrop } = useBackdrop()
 
   const classes = useStyle()
 
   useEffect(() => {
     const updateSys = async () => {
-      setOpenLoading(true)
+      setOpenBackDrop(true)
       try {
         const { data: dataDeliveries } = await api.get('delivery/open')
         const { data: dataDeliveriesFinished } = await api.get(`delivery/close/${getDateSql()}`)
@@ -118,9 +115,9 @@ export default function Delivery() {
         setDeliveryFinish(dataDeliveriesFinished)
         setForecasts(dataForecasts)
 
-        setOpenLoading(false)
+        setOpenBackDrop(false)
       } catch (error) {
-        setOpenLoading(false)
+        setOpenBackDrop(false)
         setAlert('Erro ao atualizar sistema, entre em contato com ADM!')
         console.log(error)
       }
@@ -131,7 +128,8 @@ export default function Delivery() {
     setForecasts,
     setDelivery,
     setAlert,
-    setDeliveryFinish
+    setDeliveryFinish,
+    setOpenBackDrop
   ])
 
   const checkDataForecast = (date) => {
@@ -174,11 +172,6 @@ export default function Delivery() {
 
   const openModals = (item, modal) => {
     switch (modal) {
-      case 'create':
-        setOpenModalSelect(false)
-        setOpenModalCreateForecastDelivery(true)
-        setTypeForecasDelivery(item)
-        break;
       case 'withdrawal':
         setOpenModalSelect(false)
         setOpenModalWithdrawal(true)
@@ -247,8 +240,6 @@ export default function Delivery() {
 
   return (
     <>
-      <LoadingCircleModal open={openLoading} />
-
       <Box>
         <div className={classes.boxTabHeader} style={{paddingTop: '1rem'}}>
           <span>Previsões</span>
@@ -307,7 +298,7 @@ export default function Delivery() {
           <Add />
         </Fab>
       </Box>
-      
+
       {/* Modais*/}
       <Modal
         open={openModalSelect}
@@ -334,7 +325,7 @@ export default function Delivery() {
             </Box>
           </Paper>
           {forecastsAvailable.length > 0 &&
-            <Paper className={classes.card}  onClick={() => openModals('delivery', 'create')}>
+            <Paper className={classes.card}  onClick={() => navigate('/app/delivery/create')}>
               <Box>
                 <Typography
                   variant="h6"
@@ -347,22 +338,11 @@ export default function Delivery() {
         </Box>
       </Modal>
 
-      <Modal 
-        open={openModalCreateForecastDelivery}
-        setOpen={setOpenModalCreateForecastDelivery}
-        title={typeForecasDelivery === 'forecast' ? 'Lançar Previsão' : 'Carregar caminhão'}
-      >
-        <ModalDelivery
-          setOpen={setOpenModalCreateForecastDelivery}
-          type={typeForecasDelivery}
-        />
-      </Modal>
-
       <Modal
         open={openModalWithdrawal}
         setOpen={setOpenModalWithdrawal}
       >
-        <ModalAddSale setOpen={setOpenModalWithdrawal} typeModal='withdrawal'/>
+        <Withdrawal setOpen={setOpenModalWithdrawal} typeModal='withdrawal'/>
       </Modal>
 
       <Modal

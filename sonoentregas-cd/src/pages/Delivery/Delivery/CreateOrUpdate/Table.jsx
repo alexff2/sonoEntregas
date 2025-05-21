@@ -1,5 +1,4 @@
-import React, { useState } from 'react'
-import { useParams } from 'react-router'
+import React from 'react'
 import clsx from 'clsx'
 import { lighten, makeStyles } from '@material-ui/core/styles'
 import {
@@ -21,17 +20,13 @@ import {
 } from '@material-ui/core'
 import { Delete as DeleteIcon, Add, SubdirectoryArrowRight } from '@material-ui/icons'
 
-import EnhancedTableHead from '../../../components/EnhancedTableHead'
-import Modal from '../../../components/Modal'
-import ModalAddSale from './ModalAddSale'
+import EnhancedTableHead from '../../../../components/EnhancedTableHead'
 
-import { useForecasts } from '../../../context/forecastsContext'
+import { getComparator, stableSort } from '../../../../functions/orderTable'
+import { getDateBr } from '../../../../functions/getDates'
+import api from '../../../../services/api'
 
-import { getComparator, stableSort } from '../../../functions/orderTable'
-import { getDateBr } from '../../../functions/getDates'
-import api from '../../../services/api'
-
-const useToolbarStyles = makeStyles((theme) => ({
+const useToolbarStyles = makeStyles(theme => ({
   root: {
     paddingLeft: theme.spacing(2),
     paddingRight: theme.spacing(1),
@@ -51,7 +46,7 @@ const useToolbarStyles = makeStyles((theme) => ({
   },
 }))
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   root: {
     width: '100%',
   },
@@ -75,10 +70,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const TableToolbar = (props) => {
-  const [ openModalAddSale, setOpenModalAddSale ] = useState(false)
-  const classes = useToolbarStyles();
-  const { numSelected, handleRemoveSales } = props;
+const TableToolbar = props => {
+  const classes = useToolbarStyles()
+  const { numSelected, handleRemoveSales, setOpenModalAddSale } = props
 
   return (
     <Toolbar
@@ -109,22 +103,16 @@ const TableToolbar = (props) => {
           </IconButton>
         </Tooltip>
       )}
-
-      <Modal  open={openModalAddSale} setOpen={setOpenModalAddSale}>
-        <ModalAddSale setOpen={setOpenModalAddSale}/>
-      </Modal>
     </Toolbar>
-  );
+  )
 }
 
-export default function TableSalesUpdate({ sales, setSales }) {
+export default function TableSalesUpdate({ sales, setSales, setOpenModalAddSale }) {
   const [order, setOrder] = React.useState('asc')
   const [orderBy, setOrderBy] = React.useState('ID_SALES')
   const [selected, setSelected] = React.useState([])
 
   const classes = useStyles()
-  const { type, id: idData } = useParams()
-  const { setForecasts, forecasts: forecastsContext } = useForecasts()
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -133,39 +121,24 @@ export default function TableSalesUpdate({ sales, setSales }) {
   }
 
   const handleClick = sale => {
-    if (type === 'forecast' && !sale.canRemove) {
-      return
-    }
-
-    const id = type === 'forecast' ? sale.id : sale.ID
-
-    const selectedIndex = selected.indexOf(id)
+    const selectedIndex = selected.indexOf(sale.ID)
 
     let newSelected = []
 
     if (selectedIndex === -1) {
-      newSelected = [...selected, id]
+      newSelected = [...selected, sale.ID]
     } else {
-      newSelected = selected.filter((item) => item !== id)
+      newSelected = selected.filter((item) => item !== sale.ID)
     }
 
     setSelected(newSelected)
   }
 
-  const isSelected = sale => {
-    if (type === 'forecast' && !sale.canRemove) {
-      return false
-    }
+  const isSelected = sale => selected.indexOf(sale.ID) !== -1
 
-    const id = type === 'forecast' ? sale.id : sale.ID
-
-    return selected.indexOf(id) !== -1
-  }
-
-  const removeDeliverySales = async () => {
+  const handleRemoveSales = async () => {
     try {
-      setSales(sales.filter( sale => !selected.includes(type === 'forecast' ? sale.id : sale.ID)))
-      /* const salesFind = sales.filter( sale => selected.includes(type === 'forecast' ? sale.id : sale.ID)) */
+      setSales(sales.filter( sale => !selected.includes(sale.ID)))
       for(let index = 0; index < selected.length; index++) {
         const saleFind = sales.find( sale => sale.ID === selected[index])
 
@@ -176,39 +149,6 @@ export default function TableSalesUpdate({ sales, setSales }) {
     } catch (e) {
       console.log(e)
     }
-  }
-
-  const removeForecastSale = async () => {
-    try {
-      const forecasts = forecastsContext
-
-      for (let indexForecast = 0; indexForecast < forecasts.length; indexForecast++){
-        if (forecasts[indexForecast].id === parseInt(idData)) {
-          for(let index = 0; index < selected.length; index++) {
-
-            await api.delete(`forecast/sale/${selected[index]}`)
-
-            const saleFilter = forecasts[indexForecast].sales.filter( sale => sale.id !== selected[index])
-
-            forecasts[indexForecast].sales = saleFilter
-          }
-        }
-      }
-
-      setForecasts([...forecasts])
-
-      setSelected([])
-    } catch (e) {
-      console.log(e)
-      const { data } = await api.get('forecast')
-      
-      setForecasts(data)
-      setSelected([])
-    }
-  }
-
-  const handleRemoveSales = () => {
-    type === 'forecast' ? removeForecastSale() : removeDeliverySales()
   }
 
   const headCells = [
@@ -223,7 +163,12 @@ export default function TableSalesUpdate({ sales, setSales }) {
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>
-        <TableToolbar numSelected={selected.length} typ={type} handleRemoveSales={handleRemoveSales}/>
+        <TableToolbar
+          numSelected={selected.length}
+          handleRemoveSales={handleRemoveSales}
+          setOpenModalAddSale={setOpenModalAddSale}
+        />
+
         <TableContainer>
           <Table
             className={classes.table}
@@ -245,7 +190,7 @@ export default function TableSalesUpdate({ sales, setSales }) {
                   const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (
-                    <React.Fragment key={type === 'forecast' ? sale.id : sale.ID}>
+                    <React.Fragment key={sale.ID}>
                       <TableRow
                         hover
                         onClick={() => handleClick(sale)}
@@ -262,18 +207,10 @@ export default function TableSalesUpdate({ sales, setSales }) {
                         <TableCell>{getDateBr(sale.D_ENTREGA1)}</TableCell>
                         <TableCell>{sale.SHOP}</TableCell>
                         <TableCell padding="checkbox">
-                          { (type === 'forecast' && sale.canRemove) &&
-                            <Checkbox
-                              checked={isItemSelected}
-                              inputProps={{ 'aria-labelledby': labelId }}
-                            />
-                          }
-                          { (type === 'delivery') &&
-                            <Checkbox
-                              checked={isItemSelected}
-                              inputProps={{ 'aria-labelledby': labelId }}
-                            />
-                          }
+                          <Checkbox
+                            checked={isItemSelected}
+                            inputProps={{ 'aria-labelledby': labelId }}
+                          />
                         </TableCell>
                       </TableRow>
                       <TableRow>

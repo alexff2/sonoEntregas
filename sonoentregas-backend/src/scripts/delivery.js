@@ -1,5 +1,3 @@
-const { extraRoutes } = require("../services/DeliveryService")
-
 module.exports = {
   findToBeepDelivery(id) {
     return `

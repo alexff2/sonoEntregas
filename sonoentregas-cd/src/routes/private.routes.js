@@ -6,7 +6,7 @@ import App from '../Templates/App'
 import Home from '../pages/Home'
 
 import Delivery from '../pages/Delivery'
-import DeliveryUpdate from '../pages/Delivery/Update'
+import CreateOrUpdate from '../pages/Delivery/Delivery/CreateOrUpdate'
 import ForecastCreate from '../pages/Delivery/Forecast/Create'
 
 import Cars from '../pages/Cars'
@@ -33,7 +33,6 @@ import ExtraRoutesReport from '../pages/Reports/ExtraRoutes'
 
 import Maintenance from '../pages/Maintenance'
 import Beeping from '../pages/Beeping'
-//import Error from './pages/Error'
 
 export default function PrivateRoutes(){
   return(
@@ -44,7 +43,8 @@ export default function PrivateRoutes(){
         <Route path="/app/transports" element={<Cars />} />
 
         <Route path="/app/delivery" element={<Delivery />} />
-        <Route path="/app/delivery/update/:type/:id" element={<DeliveryUpdate />}/>
+        <Route path="/app/delivery/create" element={<CreateOrUpdate />}/>
+        <Route path="/app/delivery/:id/update" element={<CreateOrUpdate />}/>
         <Route path="/app/forecast/create/:id" element={<ForecastCreate />}/>
 
         <Route path="/app/sales/returns" element={<SalesReturns />} />

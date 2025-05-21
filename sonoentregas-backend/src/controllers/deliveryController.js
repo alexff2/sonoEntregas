@@ -14,6 +14,7 @@ const Date = require('../class/Date')
 const DeliveriesService = require('../services/DeliveryService')
 const ForecastService = require('../services/ForecastService')
 const errorCath = require('../functions/error')
+const { validateFields } = require('../functions/validateFields')
 
 module.exports = {
   /**
@@ -86,30 +87,34 @@ module.exports = {
   async create( req, res ){
     try {
       const { id: user_id } = req.user
-      const { description, ID_CAR, ID_DRIVER, ID_ASSISTANT, ID_ASSISTANT2, D_MOUNTING, salesProd } = req.body
+      const { DESCRIPTION, ID_CAR, ID_DRIVER, ID_ASSISTANT, ID_ASSISTANT2, D_MOUNTING } = req.body
 
-      const deliveryCreateId = await Deliveries.creatorAny(0, [{
-        description,
+      if (!validateFields([DESCRIPTION, ID_CAR, ID_DRIVER, ID_ASSISTANT, D_MOUNTING])) {
+        console.log('Preencha todos os campos obrigatórios')
+        return res.status(400).json({ message: 'Preencha todos os campos obrigatórios' })
+      }
+
+      const dataCreate = {
+        DESCRIPTION,
         ID_CAR,
         ID_DRIVER,
         ID_ASSISTANT,
-        ID_ASSISTANT2: ID_ASSISTANT2 ? ID_ASSISTANT2 : 0,
         STATUS: 'Em lançamento',
         ID_USER_MOUNT: user_id,
         dateCreated: new Date().getISODateTimeBr().dateTime,
         D_MOUNTING,
-      }])
+      }
 
-      const dataDelivery = await ViewDeliveries.findSome(0, `ID = ${deliveryCreateId}`)
+      const deliveryCreateId = await Deliveries.creatorAny(0, [
+        ID_ASSISTANT2 === 0 ? dataCreate : { ...dataCreate, ID_ASSISTANT2 },
+      ])
 
-      await DeliveriesService.addSale({ salesProd, idDelivery: dataDelivery[0].ID })
+      const delivery =  await DeliveriesService.findDelivery(deliveryCreateId)
 
-      await ForecastService.setIdDeliveryInForecastSales({salesProd, idDelivery: dataDelivery[0].ID})
-
-      return res.json({ success: true})
+      return res.json({ delivery })
     } catch (error) {
       console.log(error)
-      res.status(400).json(error)
+      return res.status(400).json(error)
     }
   },
   /**
