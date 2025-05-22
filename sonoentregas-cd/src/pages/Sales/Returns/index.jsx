@@ -484,7 +484,7 @@ export default function Returns(){
               {
                 returnSaleSelect?.statusLocal === 'Finalizar' && 
                 <Box>
-                  <h3>Finalizar entrega {returnSaleSelect.deliveryId}</h3>
+                  <h3>Finalizar devolução: {returnSaleSelect.deliveryId}</h3>
                   <ButtonSuccess
                     onClick={finishSaleReturn}
                   >Confirmar</ButtonSuccess>
