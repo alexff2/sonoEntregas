@@ -54,7 +54,7 @@ module.exports = {
       WHERE B.DONE = 0 AND B.ID_DELIV_MAIN = ${id}
       UNION
       SELECT C.CODIGO id, C.APLICACAO mask, C.NOME nameFull, B.quantity,
-      ISNULL(D.quantityBeep, 0) quntityBeep, B.id moduleId, C.SUBG subGroupId,
+      ISNULL(D.quantityBeep, 0) quntityBeep, A.id moduleId, C.SUBG subGroupId,
       B.quantity - ISNULL(D.quantityBeep, 0) quantityPedding, 'saleReturn' module
       FROM ${process.env.ENTREGAS_BASE}..RETURNS_SALES A
       INNER JOIN ${process.env.ENTREGAS_BASE}..RETURNS_SALES_PRODUCTS B ON A.id = B.returnsSalesId
