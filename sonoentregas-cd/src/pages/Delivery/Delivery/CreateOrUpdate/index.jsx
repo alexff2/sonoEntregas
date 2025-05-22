@@ -42,8 +42,13 @@ export default function CreateOrUpdate(){
       if (id) {
         try {
           const { data } = await api.get(`/delivery/${id}/sales/view`)
+
+          const issuedDate = data.D_MOUNTING.split('/')
   
-          setDelivery(data)
+          setDelivery({
+            ...data,
+            D_MOUNTING: `${issuedDate[2]}-${issuedDate[1]}-${issuedDate[0]}`,
+          })
           setSales(data.sales)
         } catch (error) {
           console.log(error)

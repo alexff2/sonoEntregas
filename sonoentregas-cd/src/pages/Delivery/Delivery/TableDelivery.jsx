@@ -83,7 +83,7 @@ export default function TableDelivery({ type, deleteDelivery, openModals }){
             </TableCell>
             {item.STATUS === 'Em lançamento' &&
               <TableCell width={'10%'} align="right">
-                <NavLink to={`update/delivery/${item.ID}`} className={classes.link}>
+                <NavLink to={`${item.ID}/update`} className={classes.link}>
                   <Edit />
                 </NavLink>
                 <Delete onClick={()=> deleteDelivery(item.ID)}/>

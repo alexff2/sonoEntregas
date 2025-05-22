@@ -76,7 +76,7 @@ export default function Header({ delivery, setDelivery, stateBoolean, setStateBo
     })
   }
 
-  const handleSubmit = async () => {
+  const handleSubmitCreate = async () => {
     if (!validateFieldsObject({ ...delivery, ID: true, ID_ASSISTANT2: true})) {
       setAlertSnackbar('Preencha todos os campos obrigatórios.')
       return
@@ -86,8 +86,12 @@ export default function Header({ delivery, setDelivery, stateBoolean, setStateBo
 
     try {
       const {data} = await api.post('/delivery', delivery)
-      setDelivery(data.delivery)
-      setAlertSnackbar('Entrega gravada com sucesso.', 'success')
+      const issuedDate = data.D_MOUNTING.split('/')
+      setDelivery({
+        ...data,
+        D_MOUNTING: `${issuedDate[2]}-${issuedDate[1]}-${issuedDate[0]}`,
+      })
+      setAlertSnackbar('Rota gravada com sucesso.', 'success')
       setStateBoolean(state => ({
         ...state,
         isEnableHeader: false
@@ -95,7 +99,39 @@ export default function Header({ delivery, setDelivery, stateBoolean, setStateBo
       setLoading(false)
     } catch (error) {
       setLoading(false)
-      setAlertSnackbar('Erro ao gravar entrega.')
+      setAlertSnackbar('Erro ao gravar rota.')
+      console.log(error)
+    }
+  }
+
+  const handleSubmitUpdate = async () => {
+    setLoading(true)
+
+    try {
+      await api.put(`/delivery/${delivery.ID}/header`, {
+        description: delivery.DESCRIPTION,
+        D_MOUNTING: delivery.D_MOUNTING,
+        ID_DRIVER: delivery.ID_DRIVER,
+        ID_ASSISTANT: delivery.ID_ASSISTANT,
+        ID_ASSISTANT2: delivery.ID_ASSISTANT2,
+        ID_CAR: delivery.ID_CAR
+      })
+
+      const { data } = await api.get(`/delivery/${delivery.ID}/sales/view`)
+
+      const issuedDate = data.D_MOUNTING.split('/')
+      setDelivery({
+        ...data,
+        D_MOUNTING: `${issuedDate[2]}-${issuedDate[1]}-${issuedDate[0]}`,
+      })
+      setAlertSnackbar('Rota atualizada com sucesso.', 'success')
+      setStateBoolean(state => ({
+        ...state,
+        isEnableHeader: false
+      }))
+      setLoading(false)
+    } catch (error) {
+      setLoading(false)
       console.log(error)
     }
   }
@@ -109,7 +145,6 @@ export default function Header({ delivery, setDelivery, stateBoolean, setStateBo
       ...state,
       isEnableHeader: !state.isEnableHeader
     }))
-    setLoading(!loading)
   }
 
   if (drivers.length === 0 || assistants.length === 0 || cars.length === 0) {
@@ -131,7 +166,7 @@ export default function Header({ delivery, setDelivery, stateBoolean, setStateBo
           <TextField
             id="description"
             label="Descrição"
-            placeholder="Descrição da entrega"
+            placeholder="Descrição da rota"
             style={{width: '52%'}}
             variant="outlined"
             value={delivery?.DESCRIPTION}
@@ -226,7 +261,10 @@ export default function Header({ delivery, setDelivery, stateBoolean, setStateBo
         <Box pt={2}>
           {stateBoolean.isEnableHeader 
             ?<>
-              <ButtonSuccess loading={loading} onClick={handleSubmit}>Gravar</ButtonSuccess>
+              { delivery.ID === 0
+                 ? <ButtonSuccess loading={loading} onClick={handleSubmitCreate}>Criar</ButtonSuccess>
+                 : <ButtonSuccess loading={loading} onClick={handleSubmitUpdate}>Atualizar</ButtonSuccess>
+              }
               <ButtonCancel onClick={toggleHeader}>Cancelar</ButtonCancel>
             </>
             :<Button variant='outlined' onClick={toggleHeader}>Editar</Button>}
