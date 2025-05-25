@@ -176,14 +176,21 @@ function Row({ sale, type, setSales, availableStocks }) {
                 {sale.ID_MAINTENANCE && (
                   <Box style={{background: 'orange', color: '#FFF', fontSize: 14, padding: 4}}>Assistência: {sale.ID_MAINTENANCE}</Box>
                 )}
+                {sale.isMaintenance && (
+                  <Box style={{background: 'orange', color: '#FFF', fontSize: 14, padding: 4}}>Assistência: {sale.products.map(product => product.ID_MAINTENANCE)}</Box>
+                )}
               </Typography>
               <Table size="small" aria-label="products">
                 <TableHead>
                   <TableRow className={classes.tableProductsCells}>
                     <TableCell>Código</TableCell>
                     <TableCell>Descrição</TableCell>
-                    <TableCell>Qtd. Tot.</TableCell>
-                    <TableCell>Qtd. Proc.</TableCell>
+                    {type !== 'delivery' && (
+                      <>
+                        <TableCell>Qtd. Tot.</TableCell>
+                        <TableCell>Qtd. Proc.</TableCell>
+                      </>
+                    )}
                     {type === 'forecast' &&
                       <>
                         <TableCell>Qtd Disp</TableCell>
@@ -205,8 +212,12 @@ function Row({ sale, type, setSales, availableStocks }) {
                         {product.COD_ORIGINAL}
                       </TableCell>
                       <TableCell>{product.NOME}</TableCell>
-                      <TableCell>{product.QUANTIDADE}</TableCell>
-                      <TableCell>{product.QTD_MOUNTING}</TableCell>
+                      {type !== 'delivery' && 
+                        <>
+                          <TableCell>{product.QUANTIDADE}</TableCell>
+                          <TableCell>{product.QTD_MOUNTING}</TableCell>
+                        </>
+                      }
 
                       {type === 'forecast' && 
                         <CheckProd 
@@ -279,7 +290,7 @@ export default function TableSales({
     <TableContainer
       component={Paper}
       className={classes.tabContainer}
-      style={type === 'home' ? { height: 'calc(100vh - 280px)' } : { height: 'calc(100vh - 490px)' }}
+      style={type === 'home' ? { height: 'calc(100vh - 280px)' } : { height: 'auto' }}
     >
       <Table>
 

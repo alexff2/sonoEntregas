@@ -18,6 +18,8 @@
  * @property {string} EMISSAO
  * @property {string} D_ENVIO
  * @property {string} D_ENTREGA1
+ * @property {number | null} idDelivery
+ * @property {boolean} isMaintenance
  * @property {string} ENDERECO
  * @property {IProduct[] | []} products
  * 
@@ -210,9 +212,10 @@ module.exports = {
     const forecasts = await Forecast.findAny(0, { STATUS: 1 })
 
     if (forecasts.length === 0) {
-      return {
-        notFound: {
-          message: 'Nenhuma previsão criada!'
+      throw {
+        status: 404,
+        error: {
+          message: 'Não há previsões abertas!'
         }
       }
     }
@@ -221,11 +224,16 @@ module.exports = {
     const sales = await Sales.findAny(0, { ID_SALES: idSale })
 
     if (sales.length === 0) {
-      return ''
+      throw {
+        status: 404,
+        error: {
+          message: 'Venda não enviada ao CD!'
+        }
+      }
     }
 
     const scriptSales = 
-    `SELECT A.id as idForecastSale, A.validationStatus, C.[date], B.*
+    `SELECT A.id as idForecastSale, A.validationStatus, A.idDelivery, A.isMaintenance, C.[date], B.*
     FROM FORECAST_SALES A
     INNER JOIN SALES B ON A.idSale = B.ID
     INNER JOIN FORECAST C ON A.idForecast = C.id
@@ -235,8 +243,9 @@ module.exports = {
     const forecastSales = await Forecast._query(0, scriptSales, QueryTypes.SELECT)
 
     if (forecastSales.length === 0) {
-      return {
-        notFound: {
+      throw {
+        status: 409,
+        error: {
           message: 'Venda requisitada não está em uma previsão aberta!'
         }
       }
@@ -245,44 +254,50 @@ module.exports = {
     const validationSales = forecastSales.filter(sale => typeof sale.validationStatus === 'boolean')
 
     if (validationSales.length === 0) {
-      return {
-        notFound: {
+      throw {
+        status: 409,
+        error: {
            message: 'Venda não validada, solicite que a loja entre em contato com cliente!'
         }
       }
     }
 
-    const confirmedSales = forecastSales.filter(sale => sale.validationStatus)
+    const confirmedSales = validationSales.filter(sale => sale.validationStatus)
 
     if (confirmedSales.length === 0) {
-      return {
-        notFound: {
+      throw {
+        status: 409,
+        error: {
            message: 'A entrega desta venda foi recusada pelo cliente, acesse a previsão para ver o motivo!'
         }
       }
     }
 
-    const scriptProduct = 
-    `SELECT B.*, A.quantityForecast, A.idForecastSale FROM VIEW_SALES_PROD B
-    INNER JOIN (SELECT A.*, B.idSale
-                FROM FORECAST_PRODUCT A
-                INNER JOIN FORECAST_SALES B ON A.idForecastSale = B.id) A
-    ON A.idSale = B.ID_SALE_ID AND A.COD_ORIGINAL = B.COD_ORIGINAL
-    WHERE (B.STATUS = 'Em Previsão' OR B.STATUS = 'Enviado')
-    AND A.idForecastSale in (${forecastSales.map(sale => sale.idForecastSale)})`
+    const salesWithoutRoutes = confirmedSales.filter(sale => !sale.idDelivery)
+    console.log(salesWithoutRoutes)
 
-    /**@type {IProduct[]} */
-    const forecastProduct = await Forecast._query(0, scriptProduct, QueryTypes.SELECT)
-
-    if (forecastProduct.length === 0) {
-      return {
-        notFound: {
-           message: 'Produtos já em rota, ou já entregues!'
+    if (salesWithoutRoutes.length === 0) {
+      throw {
+        status: 409,
+        error: {
+          message: 'A venda já está vinculada a uma rota!'
         }
       }
     }
 
-    return addProductInSale({sales: forecastSales, products: forecastProduct })
+    const scriptProduct = 
+    `SELECT B.*, A.quantityForecast, A.idForecastSale, A.ID_MAINTENANCE, B.DESCRICAO NOME
+    FROM SALES_PROD B
+    INNER JOIN (SELECT A.*, B.idSale
+                FROM FORECAST_PRODUCT A
+                INNER JOIN FORECAST_SALES B ON A.idForecastSale = B.id) A
+    ON A.idSale = B.ID_SALE_ID AND A.COD_ORIGINAL = B.COD_ORIGINAL
+    WHERE A.idForecastSale in (${forecastSales.map(sale => sale.idForecastSale)})`
+
+    /**@type {IProduct[]} */
+    const forecastProduct = await Forecast._query(0, scriptProduct, QueryTypes.SELECT)
+
+    return addProductInSale({sales: salesWithoutRoutes, products: forecastProduct })
   },
   async findSalesToReport(){
     /**@type {ISales[] | []} */
