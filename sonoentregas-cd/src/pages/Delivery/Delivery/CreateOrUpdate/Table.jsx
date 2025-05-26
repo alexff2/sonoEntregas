@@ -224,6 +224,13 @@ export default function TableSalesUpdate({ sales, setSales, setOpenModalAddSale 
                                 <ListItemText secondary={
                                   <React.Fragment>
                                     {`${product.COD_ORIGINAL} - ${product.NOME}`}
+                                    {
+                                      product.ID_MAINTENANCE && (
+                                        <span style={{marginLeft: 20, padding: '1px 4px', color: '#FFF', background: 'orange'}}>
+                                          Assistência: {product.ID_MAINTENANCE}
+                                        </span>
+                                      )
+                                    }
                                   </React.Fragment>
                                 }/>
                               </ListItem>

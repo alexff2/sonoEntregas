@@ -103,53 +103,28 @@ module.exports = {
         .getBRDateTime()
         .date
 
-      const scriptValuesByDelivery =`
-      SELECT C.ID_DELIVERY, SUM(C.QTD_DELIV * B.PCO_COMPRA) COST, SUM(C.QTD_DELIV * D.UNITARIO1) PRICE FROM SONO..PRODUTOS A
-      INNER JOIN ${process.env.CD_BASE}..PRODLOJAS B ON A.CODIGO = B.CODIGO
-      INNER JOIN DELIVERYS_PROD C ON C.COD_ORIGINAL = A.ALTERNATI
-      INNER JOIN SALES_PROD D ON C.ID_SALE = D.ID_SALES AND C.CODLOJA = D.CODLOJA AND C.COD_ORIGINAL = D.COD_ORIGINAL
-      WHERE B.CODLOJA = 1
-      AND C.ID_DELIVERY = ${id}
-      GROUP BY C.ID_DELIVERY`
-
       /**@type {IValueDelivery[]} */
-      const valuesByDelivery = await ViewDeliverySales._query(0, scriptValuesByDelivery, QueryTypes.SELECT)
-
-      delivery['sales'] = []
-
-      const valuesDelivery = valuesByDelivery.find(value => value.ID_DELIVERY === delivery.ID)
-
-      if (valuesDelivery) {
-        delivery.COST = valuesDelivery.COST
-        delivery.PRICE = valuesDelivery.PRICE
-      }
+      const deliveryMonetaryValues = await ViewDeliverySales._query(0, scripts.deliveryMonetaryValues(id), QueryTypes.SELECT)
+      delivery.COST = deliveryMonetaryValues.length > 0 ? deliveryMonetaryValues[0].COST : 0
+      delivery.PRICE = deliveryMonetaryValues.length > 0 ? deliveryMonetaryValues[0].PRICE : 0
 
       const sales = await ViewDeliverySales.findSome(0, `ID_DELIVERY = ${id}`)
-
-      const vDeliveryProd2 = await ViewDeliveryProd2.findSome(0, `ID_DELIVERY = ${id}`)
-
+      const products = await ViewDeliveryProd2.findSome(0, `ID_DELIVERY = ${id}`)
       const shops = await Empresas._query(0, 'SELECT * FROM LOJAS', QueryTypes.SELECT)
-
       sales.forEach(sale => {
-
-        sale["products"] = []
-
-        vDeliveryProd2.forEach(saleProd => {
-          if (sale.ID_SALES === saleProd.ID_SALES && sale.CODLOJA === saleProd.CODLOJA && saleProd.ID_DELIVERY === sale.ID_DELIVERY) {
-            sale.products.push(saleProd)
-          }
-        })
-
-        if (sale.ID_DELIVERY === delivery.ID) {
-          delivery.sales.push(sale)
-        }
-
-        shops.forEach( shops => {
-          if (shops.CODLOJA === sale.CODLOJA) {
-            sale['SHOP'] = shops.DESC_ABREV
-          }
-        })
+        sale['products'] = products.filter(saleProd => sale.ID === saleProd.ID_SALE_ID)
+        sale['SHOP'] = shops.filter( shops => shops.CODLOJA === sale.CODLOJA).map( shop => shop.DESC_ABREV)
       })
+
+      const salesMaintenance = await ViewDeliverySales._query(0, scripts.maintenanceSale(id), QueryTypes.SELECT)
+      const productsMaintenance = await ViewDeliverySales._query(0, scripts.maintenanceProducts(id), QueryTypes.SELECT)
+      salesMaintenance.forEach(sale => {
+        sale['products'] = productsMaintenance.filter(product => product.ID_SALE_ID === sale.ID)
+        sale['isMaintenance'] = true
+        sale['SHOP'] = shops.filter( shops => shops.CODLOJA === sale.CODLOJA).map( shop => shop.DESC_ABREV)
+      })
+
+      delivery.sales = [...sales, ...salesMaintenance]
 
       return delivery
     } catch (error) {

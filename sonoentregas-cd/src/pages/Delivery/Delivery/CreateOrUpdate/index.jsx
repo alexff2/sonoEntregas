@@ -50,6 +50,7 @@ export default function CreateOrUpdate(){
             D_MOUNTING: `${issuedDate[2]}-${issuedDate[1]}-${issuedDate[0]}`,
           })
           setSales(data.sales)
+          console.log(data.sales)
         } catch (error) {
           console.log(error)
         }
