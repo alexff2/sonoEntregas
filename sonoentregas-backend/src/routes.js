@@ -174,7 +174,6 @@ routes.get('/maintenance-delivery/:id/check-exist-delivery-open', maintenanceDel
 routes.get('/maintenancedeliv', maintenanceDelivController.index)
 routes.get('/maintenancedeliv/:idMain', maintenanceDelivController.findMaintId)
 routes.get('/maintenancedeliv/:typeSeach/:search', maintenanceDelivController.findMaintDeliv)
-routes.post('/maintenancedeliv', maintenanceDelivController.create)
 routes.put('/maintenancedeliv/:id', maintenanceDelivController.update)
 //Maintenance Visit
 routes.post('/maintenance/visit', mainVisitController.create)

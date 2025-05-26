@@ -29,8 +29,6 @@ import EnhancedTableHead from '../../../components/EnhancedTableHead'
 import { getComparator, stableSort } from '../../../functions/orderTable'
 
 import ReportMaintenance from '../../../components/Reports/ReportMaintenance'
-import ModalProcessMain from './ModalProcessMain'
-import ModalStartMain from './ModalStartMain'
 import ModalMain from './ModalMain'
 import Modal from '../../../components/Modal'
 
@@ -123,8 +121,6 @@ export default function TableMain() {
   const [typesStatus, setTypesStatus] = useState('open')
   const [openModalMain, setOpenModalMain] = useState(false)
   const [openReport, setOpenReport] = useState(false)
-  const [openModalProcess, setOpenModalProcess] = useState(false)
-  const [openModalStart, setOpenModalStart] = useState(false)
   const [selectMain, setSelectMain] = useState({})
   const { maintenance, setMaintenance } = useMaintenance()
   const { setAlert } = useAlert()
@@ -140,9 +136,7 @@ export default function TableMain() {
 
   const clickMaintenance = async (e, main) => {
     setSelectMain(main)
-    if(e.target.id === 'btnStartMain') setOpenModalStart(true)
-    else if (e.target.id === 'btnProcessMain') setOpenModalProcess(true)
-    else setOpenModalMain(true)
+    setOpenModalMain(true)
   }
 
   const clickReport = () => {
@@ -242,7 +236,7 @@ export default function TableMain() {
         {typeSeach === 'STATUS' &&
         <>
           <FormControl variant="outlined">
-            <InputLabel id="fieldStatus" className={classes.label}>Estatus</InputLabel>
+            <InputLabel id="fieldStatus" className={classes.label}>Status</InputLabel>
             <Select
               label="Status"
               labelId="fieldStatus"
@@ -298,38 +292,15 @@ export default function TableMain() {
                 <TableCell>{getDateBr(main.D_PREV)}</TableCell>
                 <TableCell>{main.DESC_ABREV}</TableCell>
                 <TableCell style={{width: '15%'}}>
-                  {main.STATUS !== 'Em Previsão'
-                    ? <>
-                        { (main.ID_DELIV_MAINT && (main.STATUS === 'No CD' || main.STATUS === 'Em lançamento' || main.STATUS === 'Finalizada'))
-                          ? main.STATUS
-                          : <div
-                              style={styleStatus(main.STATUS)}
-                              id="btnProcessMain"
-                            >{main.STATUS}</div>
-                        }
-                      </>
-                    : <div
-                        className={classes.btnStartMain}
-                        id="btnStartMain"
-                      >Iniciar</div>
-                  }
+                  <div
+                    style={styleStatus(main.STATUS)}
+                  >{main.STATUS}</div>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-
-      <Modal
-        open={openModalStart}
-        setOpen={setOpenModalStart}
-        title="Iniciar Assistência"
-      >
-        <ModalStartMain
-          setOpen={setOpenModalStart}
-          selectMain={selectMain}
-        />
-      </Modal>
 
       <Modal
         open={openModalMain}
@@ -347,14 +318,6 @@ export default function TableMain() {
         openModal={openReport}
         setOpenModal={setOpenReport}
       />
-
-      <Modal
-        open={openModalProcess}
-        setOpen={setOpenModalProcess}
-        title="Processar Assistência"
-      >
-        <ModalProcessMain main={selectMain} setOpen={setOpenModalProcess}/>
-      </Modal>
     </>
   )
 }

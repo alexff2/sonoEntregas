@@ -182,19 +182,7 @@ export default function ModalAddSale({ setOpen, idDelivery, setSales }){
     try {
       setIsLoading(true)
 
-      if(saleSelected.length === 0) {
-        setErrorMsg('Selecione ao menos um produto das vendas inseridas!')
-        setIsLoading(false)
-        return
-      }
-
-      let salesProd = []
-
-      saleSelected.forEach(sale => {
-        salesProd = [...salesProd, ...sale.products]
-      })
-
-      await api.post(`/delivery/${idDelivery}/sales/add`, { salesProd })
+      await api.post(`/delivery/${idDelivery}/sales/add`, { sale: saleSelected[0] })
 
       const { data } = await api.get(`/delivery/${idDelivery}/sales/view`)
 

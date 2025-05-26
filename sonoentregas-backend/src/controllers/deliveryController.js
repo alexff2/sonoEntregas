@@ -122,20 +122,20 @@ module.exports = {
    * @param {*} res 
    */
   async addSale( req, res ) {
+    const connectionEntrega = await Deliveries._query(0)
+
     try {
       const { id } = req.params
       const { id: user_id } = req.user
-      const { salesProd } = req.body
-      //Faltou validação
+      const { sale } = req.body
 
-      await DeliveriesService.addSale({ salesProd, idDelivery: id })
+      await DeliveriesService.addSale({ sale, userId: user_id, idDelivery: id, connectionEntrega })
 
-      await ForecastService.setIdDeliveryInForecastSales({salesProd, idDelivery: id })
-
+      await connectionEntrega.transaction.commit()
       return res.json({ message: `Update by${user_id}` })
     } catch (e) {
       console.log(e)
-
+      await connectionEntrega.transaction.rollback()
       return res.status(400).json(e)
     }
   },

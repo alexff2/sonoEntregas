@@ -436,12 +436,6 @@ class ForecastService {
     await Sale.updateAny(0, { STATUS: 'Aberta' }, { ID: forecastSale.idSale })
   }
 
-  async setIdDeliveryInForecastSales({ salesProd, idDelivery }){
-    const idForecastSale = salesProd.map(prod => prod.idForecastSale)
-
-    await ForecastSales.updateAny(0, { idDelivery }, { in: { id: idForecastSale } })
-  }
-
   async setIdDeliveryNullInForecastSales({ idDelivery, idSale }, connectionEntrega){
     await ForecastSales._query(
       0,

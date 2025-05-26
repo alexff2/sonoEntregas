@@ -35,11 +35,14 @@
 const { QueryTypes } = require('sequelize')
 
 const Delivery = require('../models/Deliverys')
-const ViewDeliveries = require('../models/ViewDeliverys')
 const DeliveryProd = require('../models/DeliveryProd')
-const SalesProd = require('../models/SalesProd')
+const ViewDeliveries = require('../models/ViewDeliverys')
 const ViewDeliverySales = require('../models/ViewDeliverySales')
 const ViewDeliveryProd2 = require('../models/ViewDeliveryProd2')
+const ForecastSales = require('../models/tables/Forecast/ForecastSales')
+const MaintenanceModel = require('../models/tables/Maintenance')
+const MaintenanceDeliveryModel = require('../models/tables/MaintenanceDeliv')
+const SalesProd = require('../models/SalesProd')
 const Empresas = require('../models/ShopsSce')
 const Sales = require('../models/Sales')
 
@@ -280,20 +283,42 @@ module.exports = {
 
     await SalesProd._query(0, script, QueryTypes.UPDATE)
   },
-  async addSale({ salesProd, idDelivery }){
-    for(let i = 0; i < salesProd.length; i++) {
-      var { ID_SALES, CODLOJA, COD_ORIGINAL, quantityForecast } = salesProd[i]
+  async addSale({ sale, idDelivery, userId, connectionEntrega }){
+    if (!sale.isMaintenance) {
+      const valueProd =  sale.products.map( product => ({
+        ID_DELIVERY: idDelivery,
+        ID_SALE: product.ID_SALES,
+        CODLOJA: product.CODLOJA,
+        QTD_DELIV: product.quantityForecast,
+        COD_ORIGINAL: product.COD_ORIGINAL,
+        DELIVERED: 0
+      }))
 
-      var valueProd = `${idDelivery}, ${ID_SALES}, ${CODLOJA}, ${quantityForecast}, '${COD_ORIGINAL}', 0`
-
-      await DeliveryProd.creatorNotReturn(0, valueProd, true)
+      await DeliveryProd.creatorAny(0, valueProd, true, connectionEntrega)
 
       await SalesProd.updateAny(0, { STATUS: 'Em lançamento' }, {
-        CODLOJA,
-        ID_SALES,
-        COD_ORIGINAL
-      })
+        ID_SALE_ID: sale.ID,
+        in: { COD_ORIGINAL: sale.products.map(product => product.COD_ORIGINAL) }
+      }, connectionEntrega)
+    } else {
+      const delivery = await Delivery.findAny(0, { ID: idDelivery }, 'ID, D_MOUNTING, ID_DRIVER, ID_ASSISTANT', connectionEntrega)
+
+      const valueProd =  sale.products.map( product => ({
+        ID_MAINT: product.ID_MAINTENANCE,
+        D_MOUNTING: delivery[0].D_MOUNTING,
+        DONE: 1,
+        ID_DRIVER: delivery[0].ID_DRIVER,
+        ID_ASSISTANT: delivery[0].ID_ASSISTANT,
+        ID_DELIV_MAIN: idDelivery,
+        ID_USER: userId,
+      }))
+
+      await MaintenanceDeliveryModel.creatorAny(0, valueProd, false, connectionEntrega)
+
+      await MaintenanceModel.updateAny(0, { STATUS: 'Em lançamento' }, { in: { ID: sale.products.map(product => product.ID_MAINTENANCE) } }, connectionEntrega)      
     }
+
+    await ForecastSales.updateAny(0, { idDelivery }, { id: sale.idForecastSale }, connectionEntrega)
   },
   async rmvSale({ salesProd }, connectionEntrega){
     const script = `DELETE DELIVERYS_PROD WHERE ID_DELIVERY = ${salesProd[0].ID_DELIVERY} AND ID_SALE = ${salesProd[0].ID_SALES} AND CODLOJA = ${salesProd[0].CODLOJA}`
