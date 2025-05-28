@@ -112,7 +112,9 @@ class ForecastRules {
   }
 
   async checkForecastSales(saleToForecast){
-    const maintenance = saleToForecast.ID_MAINTENANCE ? await MaintenanceModel.findAny(0, { ID: saleToForecast.ID_MAINTENANCE }) : []
+    const maintenance = saleToForecast.isMaintenance
+      ? await MaintenanceModel.findAny(0, { in: { ID: saleToForecast.products.map(product => product.ID_MAINTENANCE) }})
+      : []
 
     if (maintenance.length > 0) {
       return

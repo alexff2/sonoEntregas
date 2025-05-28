@@ -11,7 +11,7 @@
  * 
  * @typedef {Object} ISale
  * @property {number} ID
- * @property {number} ID_MAINTENANCE
+ * @property {number} isMaintenance
  * @property {IProduct[]} products
  * 
  * @typedef {Object} IForecastSales
@@ -263,7 +263,7 @@ class ForecastService {
           idForecast,
           idSale: sale.ID,
           idUserCreate: userId,
-          isMaintenance: sale.ID_MAINTENANCE ? 1 : 0,
+          isMaintenance: sale.isMaintenance,
         }], false, connectionEntrega)
   
         if (add) {

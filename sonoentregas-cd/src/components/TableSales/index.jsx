@@ -172,12 +172,9 @@ function Row({ sale, type, setSales, availableStocks }) {
           <Collapse in={ type !== 'home' ? true : open} timeout="auto" unmountOnExit>
             <Box margin={0}>
               <Typography variant="h6" gutterBottom component="div" style={{padding: '0 10px', margin: 0}}>
-                Produtos 
-                {sale.ID_MAINTENANCE && (
-                  <Box style={{background: 'orange', color: '#FFF', fontSize: 14, padding: 4}}>Assistência: {sale.ID_MAINTENANCE}</Box>
-                )}
+                Produtos
                 {sale.isMaintenance && (
-                  <Box style={{background: 'orange', color: '#FFF', fontSize: 14, padding: 4}}>Assistência: {sale.products.map(product => product.ID_MAINTENANCE)}</Box>
+                  <Box style={{background: 'orange', color: '#FFF', fontSize: 14, padding: 4}}>Assistência(s): {sale.products.map(product => product.ID_MAINTENANCE).join(', ')}</Box>
                 )}
               </Typography>
               <Table size="small" aria-label="products">

@@ -229,7 +229,7 @@ module.exports = {
 
       await ForecastsRules.checkForecastSales(sale)
 
-      !sale.ID_MAINTENANCE && await ForecastsRules.checkStatusProduct(sale)
+      !sale.isMaintenance && await ForecastsRules.checkStatusProduct(sale)
 
       await ForecastsRules.checkAvailableStock(sale)
 
