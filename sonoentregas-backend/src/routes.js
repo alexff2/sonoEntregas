@@ -152,13 +152,12 @@ routes.get('/delivery/:idShop/sales/shops', deliveryController.findDeliveryBySho
 routes.post('/delivery', ensureAuthenticated, deliveryController.create)
 routes.post('/delivery/:id/sales/add', ensureAuthenticated, deliveryController.addSale)
 routes.post('/delivery/sale/rmv', ensureAuthenticated, deliveryController.rmvSale)
-routes.delete('/delivery/:id', ensureAuthenticated, deliveryController.delete)
-
 routes.post('/delivery/withdrawal', ensureAuthenticated, deliveryUpdateController.withdrawalSale)
 routes.put('/delivery/:id/header', ensureAuthenticated, deliveryUpdateController.updateHeader)
 routes.put('/delivery/:id/delivering/developing', ensureAuthenticated, deliveryUpdateController.delivering)
 routes.put('/delivery/:id/finish/developing', ensureAuthenticated, deliveryUpdateController.finish)
 routes.put('/delivery/status/:id', ensureAuthenticated, deliveryUpdateController.updateStatus)
+routes.delete('/delivery/:id', ensureAuthenticated, deliveryController.delete)
 
 //Homes
 routes.get('/home', homeController.index)

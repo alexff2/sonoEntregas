@@ -436,15 +436,6 @@ class ForecastService {
     await Sale.updateAny(0, { STATUS: 'Aberta' }, { ID: forecastSale.idSale })
   }
 
-  async setIdDeliveryNullInForecastSales({ idDelivery, idSale }, connectionEntrega){
-    await ForecastSales._query(
-      0,
-      `UPDATE FORECAST_SALES SET idDelivery = NULL WHERE idDelivery = ${idDelivery} AND idSale = ${idSale}`,
-      QueryTypes.UPDATE,
-      connectionEntrega
-    )
-  }
-
   async setIdDeliveryNullInAllForecastSales({ idDelivery }){
     await ForecastSales._query(0, `UPDATE FORECAST_SALES SET idDelivery = NULL WHERE idDelivery = (${idDelivery})`, QueryTypes.UPDATE)
   }

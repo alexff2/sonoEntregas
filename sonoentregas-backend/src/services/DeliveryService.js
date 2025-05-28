@@ -112,6 +112,7 @@ module.exports = {
       const products = await ViewDeliveryProd2.findSome(0, `ID_DELIVERY = ${id}`)
       const shops = await Empresas._query(0, 'SELECT * FROM LOJAS', QueryTypes.SELECT)
       sales.forEach(sale => {
+        sale['isMaintenance'] = false
         sale['products'] = products.filter(saleProd => sale.ID === saleProd.ID_SALE_ID)
         sale['SHOP'] = shops.filter( shops => shops.CODLOJA === sale.CODLOJA).map( shop => shop.DESC_ABREV)
       })
@@ -119,8 +120,8 @@ module.exports = {
       const salesMaintenance = await ViewDeliverySales._query(0, scripts.maintenanceSale(id), QueryTypes.SELECT)
       const productsMaintenance = await ViewDeliverySales._query(0, scripts.maintenanceProducts(id), QueryTypes.SELECT)
       salesMaintenance.forEach(sale => {
-        sale['products'] = productsMaintenance.filter(product => product.ID_SALE_ID === sale.ID)
         sale['isMaintenance'] = true
+        sale['products'] = productsMaintenance.filter(product => product.ID_SALE_ID === sale.ID)
         sale['SHOP'] = shops.filter( shops => shops.CODLOJA === sale.CODLOJA).map( shop => shop.DESC_ABREV)
       })
 
@@ -295,15 +296,37 @@ module.exports = {
 
     await ForecastSales.updateAny(0, { idDelivery }, { id: sale.idForecastSale }, connectionEntrega)
   },
-  async rmvSale({ salesProd }, connectionEntrega){
-    const script = `DELETE DELIVERYS_PROD WHERE ID_DELIVERY = ${salesProd[0].ID_DELIVERY} AND ID_SALE = ${salesProd[0].ID_SALES} AND CODLOJA = ${salesProd[0].CODLOJA}`
+  async rmvSale({ sale }, connectionEntrega){
+    await ForecastSales.updateAny(
+      0,
+      { idDelivery: 'NULL' },
+      { idSale: sale.ID, idDelivery: sale.products[0].ID_DELIVERY },
+      connectionEntrega
+    )
 
-    await DeliveryProd._query(0, script, QueryTypes.DELETE, connectionEntrega)
+    if (!sale.isMaintenance) {
+      await DeliveryProd.deleteAny(0, {
+        ID_DELIVERY: sale.products[0].ID_DELIVERY,
+        ID_SALE: sale.ID_SALES,
+        CODLOJA: sale.CODLOJA,
+      })
 
-    await SalesProd.updateAny(0, { STATUS: 'Em Previsão' }, {
-      ID_SALES: salesProd[0].ID_SALES,
-      CODLOJA: salesProd[0].CODLOJA,
-      in: { COD_ORIGINAL: salesProd.map(product => product.COD_ORIGINAL) }
+      await SalesProd.updateAny(0, { STATUS: 'Em Previsão' }, {
+        ID_SALES: sale.ID_SALES,
+        CODLOJA: sale.CODLOJA,
+        in: { COD_ORIGINAL: sale.products.map(product => product.COD_ORIGINAL) }
+      }, connectionEntrega)
+
+      return
+    }
+
+    await MaintenanceDeliveryModel.deleteAny(0, {
+      ID_DELIV_MAIN: sale.products[0].ID_DELIVERY,
+      in: { ID_MAINT: sale.products.map(product => product.ID_MAINTENANCE) },
+    }, connectionEntrega)
+
+    await MaintenanceModel.updateAny(0, { STATUS: 'Em Previsão' }, {
+      in: { ID: sale.products.map(product => product.ID_MAINTENANCE)}
     }, connectionEntrega)
   },
   /**

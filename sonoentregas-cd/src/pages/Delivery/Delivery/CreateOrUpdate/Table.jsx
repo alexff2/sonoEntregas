@@ -142,7 +142,7 @@ export default function TableSalesUpdate({ sales, setSales, setOpenModalAddSale 
       for(let index = 0; index < selected.length; index++) {
         const saleFind = sales.find( sale => sale.ID === selected[index])
 
-        await api.post(`delivery/sale/rmv`, { salesProd: saleFind.products })
+        await api.post(`delivery/sale/rmv`, { sale: saleFind })
       }
 
       setSelected([])

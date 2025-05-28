@@ -148,14 +148,9 @@ module.exports = {
 
     try {
       const { id: user_id } = req.user
-      const { salesProd } = req.body
+      const { sale } = req.body
 
-      await DeliveriesService.rmvSale({ salesProd }, connectionEntrega)
-
-      await ForecastService.setIdDeliveryNullInForecastSales(
-        { idDelivery: salesProd[0].ID_DELIVERY, idSale: salesProd[0].ID_SALE_ID },
-        connectionEntrega
-      )
+      await DeliveriesService.rmvSale({ sale }, connectionEntrega)
 
       await connectionEntrega.transaction.commit()
       return res.json({ message: `Update by${user_id}` })
