@@ -354,12 +354,39 @@ class ForecastService {
 
   /** @param { PropsDeleteSale } props */
   async deleteSaleForecast({ forecastSale }){
-    forecastSale.isMaintenance 
-      ? await MaintenanceModel.updateAny(0, { STATUS: 'No CD' }, { in: {ID: forecastSale.products.map(prod => prod.ID_MAINTENANCE)} })
-      : await this.setSendStatusInSalesProd({ forecastSale })
+    const connectionEntrega = await Forecast._query(0)
 
-    await ForecastProduct.deleteNotReturn(0, forecastSale.id, 'idForecastSale')
-    await ForecastSales.deleteNotReturn(0, forecastSale.id)
+    try {
+      if (forecastSale.isMaintenance ) {
+        await MaintenanceModel.updateAny(0, {STATUS: 'No CD'}, {
+          in: {
+            ID: forecastSale.products.map(prod => prod.ID_MAINTENANCE)
+          }
+        },connectionEntrega)
+      } else {
+        const forecastProduct = await ForecastProduct.findAny(0, { idForecastSale: forecastSale.id }, '*', connectionEntrega)
+
+        await SalesProd.updateAny(0, { STATUS: 'Enviado' }, {
+          ID_SALE_ID: forecastSale.idSale,
+          in: {
+            COD_ORIGINAL: forecastProduct.map(prod => prod.COD_ORIGINAL)
+          }
+        }, connectionEntrega)
+
+        await Sale.updateAny(0, { STATUS: 'Aberta' }, { ID: forecastSale.idSale }, connectionEntrega)
+      }
+
+      await ForecastProduct.deleteNotReturn(0, forecastSale.id, 'idForecastSale', connectionEntrega)
+      await ForecastSales.deleteNotReturn(0, forecastSale.id, 'id', connectionEntrega)
+      await connectionEntrega.transaction.commit()
+    } catch (error) {
+      try {
+        await connectionEntrega.transaction.rollback()
+      } catch (rollbackError) {
+        console.warn('Erro ao tentar dar rollback:', rollbackError.message)
+      }
+      throw error
+    }
   }
 
   /** @param {PropsValidation} props */
@@ -422,22 +449,8 @@ class ForecastService {
     await Forecast.updateAny(0, { status: 0 }, { id }, connectionEntrega)
   }
 
-  async setSendStatusInSalesProd({ forecastSale }) {
-    /** @type { IForecastProduct[] } */
-    const forecastProduct = await ForecastProduct.findAny(0, { idForecastSale: forecastSale.id })
-
-    await SalesProd.updateAny(0, { STATUS: 'Enviado' }, {
-      ID_SALE_ID: forecastSale.idSale,
-      in: {
-        COD_ORIGINAL: forecastProduct.map(prod => prod.COD_ORIGINAL)
-      }
-    })
-
-    await Sale.updateAny(0, { STATUS: 'Aberta' }, { ID: forecastSale.idSale })
-  }
-
   async setIdDeliveryNullInAllForecastSales({ idDelivery }){
-    await ForecastSales._query(0, `UPDATE FORECAST_SALES SET idDelivery = NULL WHERE idDelivery = (${idDelivery})`, QueryTypes.UPDATE)
+    await ForecastSales.updateAny(0, { idDelivery: 'NULL' }, { idDelivery })
   }
 }
 
