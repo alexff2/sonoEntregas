@@ -53,7 +53,6 @@ const PageReport = ({ products, lastPage, result, classe, pageNumber, months }) 
               months.month3,
               'TOTAL',
               'M.TRI',
-              'M.SEM',
               'PEND.',
               'ESTOQUE',
               'PED',
@@ -73,7 +72,6 @@ const PageReport = ({ products, lastPage, result, classe, pageNumber, months }) 
               <TableCell>{product.QTD_MES3}</TableCell>
               <TableCell>{product.Tot}</TableCell>
               <TableCell>{product.MedMen}</TableCell>
-              <TableCell>{product.MedSem}</TableCell>
               <TableCell>{product.PENDENTE}</TableCell>
               <TableCell>{product.EST_LOJA}</TableCell>
               <TableCell>{product.PEDIDO}</TableCell>
@@ -91,12 +89,11 @@ const PageReport = ({ products, lastPage, result, classe, pageNumber, months }) 
                 <TableCell>{result.valueMonth3}</TableCell>
                 <TableCell>{result.valueMonth1 + result.valueMonth2 + result.valueMonth3}</TableCell>
                 <TableCell>{Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/3)}</TableCell>
-                <TableCell>{Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/9)}</TableCell>
                 <TableCell>{result.valuePend}</TableCell>
                 <TableCell>{result.valueEstLoja} / {result.valueEstDep}</TableCell>
                 <TableCell>{result.valuePed}</TableCell>
                 <TableCell>
-                  {(Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/9) + result.valuePend)-result.valueEstLoja-result.valuePed}
+                  {(Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/3) + result.valuePend)-result.valueEstLoja-result.valuePed}
                 </TableCell>
               </TableRow>
             </TableFooter>)}
@@ -202,8 +199,8 @@ export default function OrderSuggestion() {
     result.valuePed += productsFilter[i].PEDIDO
     productsFilter[i]['Tot'] = productsFilter[i].QTD_MES1 + productsFilter[i].QTD_MES2 + productsFilter[i].QTD_MES3
     productsFilter[i]['MedMen'] = Math.floor((productsFilter[i].QTD_MES1 + productsFilter[i].QTD_MES2 + productsFilter[i].QTD_MES3) / 3)
-    productsFilter[i]['MedSem'] = Math.floor((productsFilter[i].QTD_MES1 + productsFilter[i].QTD_MES2 + productsFilter[i].QTD_MES3) / 9)
-    productsFilter[i]['Result'] = (Math.floor((productsFilter[i].QTD_MES1 + productsFilter[i].QTD_MES2 + productsFilter[i].QTD_MES3)/9) + productsFilter[i].PENDENTE)-productsFilter[i].EST_LOJA-productsFilter[i].PEDIDO
+    productsFilter[i]['MedSem'] = Math.floor((productsFilter[i].QTD_MES1 + productsFilter[i].QTD_MES2 + productsFilter[i].QTD_MES3) / 3)
+    productsFilter[i]['Result'] = (Math.floor((productsFilter[i].QTD_MES1 + productsFilter[i].QTD_MES2 + productsFilter[i].QTD_MES3)/3) + productsFilter[i].PENDENTE)-productsFilter[i].EST_LOJA-productsFilter[i].PEDIDO
   }
 
   const productsReport = splitReportTable(productsFilter, 49, 47)
@@ -254,7 +251,6 @@ export default function OrderSuggestion() {
                 month3,
                 'TOTAL',
                 'MEDIA TRI',
-                'MEDIA SEM',
                 'PENDENTE',
                 'ESTOQUE',
                 'PEDIDO',
@@ -274,7 +270,6 @@ export default function OrderSuggestion() {
                 <TableCell>{product.QTD_MES3}</TableCell>
                 <TableCell>{product.Tot}</TableCell>
                 <TableCell>{product.MedMen}</TableCell>
-                <TableCell>{product.MedSem}</TableCell>
                 <TableCell>{product.PENDENTE}</TableCell>
                 <TableCell>{product.EST_LOJA}</TableCell>
                 <TableCell>{product.PEDIDO}</TableCell>
@@ -292,12 +287,11 @@ export default function OrderSuggestion() {
               <TableCell>{result.valueMonth3}</TableCell>
               <TableCell>{result.valueMonth1 + result.valueMonth2 + result.valueMonth3}</TableCell>
               <TableCell>{Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/3)}</TableCell>
-              <TableCell>{Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/9)}</TableCell>
               <TableCell>{result.valuePend}</TableCell>
               <TableCell>{result.valueEstLoja} / {result.valueEstDep}</TableCell>
               <TableCell>{result.valuePed}</TableCell>
               <TableCell>
-                {(Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/9) + result.valuePend)-result.valueEstLoja-result.valuePed}
+                {(Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/3) + result.valuePend)-result.valueEstLoja-result.valuePed}
               </TableCell>
             </TableRow>
           </TableFooter>
@@ -335,7 +329,6 @@ export default function OrderSuggestion() {
                     month3,
                     'TOTAL',
                     'M.TRI',
-                    'M.SEM',
                     'PEND.',
                     'ESTOQUE',
                     'PED',
@@ -355,7 +348,6 @@ export default function OrderSuggestion() {
                     <TableCell>{product.QTD_MES3}</TableCell>
                     <TableCell>{product.Tot}</TableCell>
                     <TableCell>{product.MedMen}</TableCell>
-                    <TableCell>{product.MedSem}</TableCell>
                     <TableCell>{product.PENDENTE}</TableCell>
                     <TableCell>{product.EST_LOJA}</TableCell>
                     <TableCell>{product.PEDIDO}</TableCell>
@@ -373,12 +365,11 @@ export default function OrderSuggestion() {
                   <TableCell>{result.valueMonth3}</TableCell>
                   <TableCell>{result.valueMonth1 + result.valueMonth2 + result.valueMonth3}</TableCell>
                   <TableCell>{Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/3)}</TableCell>
-                  <TableCell>{Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/9)}</TableCell>
                   <TableCell>{result.valuePend}</TableCell>
                   <TableCell>{result.valueEstLoja} / {result.valueEstDep}</TableCell>
                   <TableCell>{result.valuePed}</TableCell>
                   <TableCell>
-                    {(Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/9) + result.valuePend)-result.valueEstLoja-result.valuePed}
+                    {(Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/3) + result.valuePend)-result.valueEstLoja-result.valuePed}
                   </TableCell>
                 </TableRow>
               </TableFooter>}
