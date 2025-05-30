@@ -180,68 +180,42 @@ module.exports = {
 
     return deliveries
   },
-  async updateDelivery({ delivery, id, user_id, maintenances }, conditions){
+  async delivering({id, date, userId, connections}){
+    const delivery = await Delivery.findAny(0, { ID: id }, 'ID, STATUS', connections.entrega)
+
+    if (delivery.length === 0) {
+      throw {
+        error: 'Delivery not found'
+      }
+    }
+    if (delivery[0].STATUS !== 'Em lançamento') {
+      throw {
+        error: 'Only deliveries in "Em lançamento" status can be delivered'
+      }
+    }
+
     const dateTimeNow = new Date().getISODateTimeBr().dateTime
 
-    if (delivery.STATUS === 'Entregando') {
-      await Delivery.updateAny(0, {
-        STATUS: delivery.STATUS,
-        ID_USER_DELIVERING: user_id,
-        dateUpdateDelivering: dateTimeNow,
-        D_DELIVERING: delivery.date
-      }, { id }, conditions.entrega)
+    const maintenances = await MainService.findMain({
+      codloja: 0,
+      typeSeach: 'ID_DELIV_MAINT',
+      search: id
+    }, false, connections.entrega)
 
-      for(let i = 0; i < maintenances.length; i++) {
-        maintenances[i]["date"] = delivery.date
-
-        await MainService.moveToMaint(maintenances[i].ID_MAINT_DELIV, maintenances[i], conditions)
-      }
-    } else if (delivery.STATUS === 'Finalizada') {
-      await Delivery.updateAny(0, {
-        STATUS: delivery.STATUS,
-        ID_USER_DELIVERED: user_id,
-        dateUpdateDelivered: dateTimeNow,
-        D_DELIVERED: delivery.date
-      }, { id }, conditions.entrega)
+    for(const maintenance of maintenances) {
+      maintenance.date = date
+      await MainService.moveToMaint(maintenance.ID_MAINT_DELIV, maintenance, connections)
     }
-  },
-  /**
-   * @param {{ sales: string | any[]; }} delivery
-   * @param {number} id
-   * @param {Object} conditions
-   */
-  async updateDeliveryProd(delivery, id, conditions){
-    for (let i = 0; i < delivery.sales.length; i++) {
-      for (let j = 0; j < delivery.sales[i].products.length; j++) {
 
-        let qtd = delivery.sales[i].products[j].QTD_DELIV
-        let cod = delivery.sales[i].products[j].COD_ORIGINAL
-        let reason = delivery.sales[i].products[j].REASON_RETURN
-        let status = delivery.sales[i].products[j].STATUS
-        let upSt = delivery.sales[i].products[j].UPST === undefined 
-          ? true 
-          : delivery.sales[i].products[j].UPST
-        let DELIVERED = delivery.sales[i].products[j].DELIVERED
-        let codLoja = delivery.sales[i].CODLOJA
-        let idSales = delivery.sales[i].ID_SALES
+    await SalesProd._query(0, scripts.setSalesProdDelivering(id), QueryTypes.UPDATE, connections.entrega)
+    await SalesProd._query(0, scripts.updateStockProdLojasByDeliveryProd(id), QueryTypes.UPDATE, connections.entrega)
 
-        upSt && await Delivery._query(0, `UPDATE SALES_PROD SET STATUS = '${status}' WHERE ID_SALES = ${idSales} AND CODLOJA = ${codLoja} AND COD_ORIGINAL = '${cod}'`, QueryTypes.UPDATE, conditions.entrega)
-
-        if (status === 'Entregando') {
-          await Delivery._query(1,`UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL - ${qtd}, EST_LOJA = EST_LOJA - ${qtd} FROM PRODLOJAS A INNER JOIN PRODUTOS B ON A.CODIGO = B.CODIGO WHERE A.CODLOJA = 1 AND B.ALTERNATI = '${cod}'`, QueryTypes.UPDATE, conditions.sce)
-
-        } else if (DELIVERED) {
-
-          await Delivery._query(0, `UPDATE DELIVERYS_PROD SET DELIVERED = 1, REASON_RETURN = '${reason}' WHERE ID_DELIVERY = ${id} AND ID_SALE = ${idSales} AND CODLOJA = ${codLoja} AND COD_ORIGINAL = '${cod}'`, QueryTypes.UPDATE, conditions.entrega)
-
-          await Delivery._query(0, `UPDATE SALES_PROD SET STATUS = 'Enviado' WHERE ID_SALES = ${idSales} AND CODLOJA = ${codLoja} AND COD_ORIGINAL = '${cod}'`, QueryTypes.UPDATE, conditions.entrega)
-
-          await Delivery._query(1,`UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL + ${qtd}, EST_LOJA = EST_LOJA + ${qtd} FROM PRODLOJAS A INNER JOIN PRODUTOS B ON A.CODIGO = B.CODIGO WHERE A.CODLOJA = 1 AND B.ALTERNATI = '${cod}'`, QueryTypes.UPDATE, conditions.sce)
-          
-          await Delivery._query(0, `UPDATE SALES SET STATUS = 'Aberta' WHERE ID_SALES = ${idSales} AND CODLOJA = ${codLoja}`, QueryTypes.UPDATE, conditions.entrega)
-        }
-      }
-    }
+    await Delivery.updateAny(0, {
+      STATUS: 'Entregando',
+      ID_USER_DELIVERING: userId,
+      dateUpdateDelivering: dateTimeNow,
+      D_DELIVERING: date
+    }, { id }, connections.entrega)
   },
   /**
    * @param {number} idDelivery

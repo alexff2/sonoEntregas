@@ -154,9 +154,8 @@ routes.post('/delivery/:id/sales/add', ensureAuthenticated, deliveryController.a
 routes.post('/delivery/sale/rmv', ensureAuthenticated, deliveryController.rmvSale)
 routes.post('/delivery/withdrawal', ensureAuthenticated, deliveryUpdateController.withdrawalSale)
 routes.put('/delivery/:id/header', ensureAuthenticated, deliveryUpdateController.updateHeader)
-routes.put('/delivery/:id/delivering/developing', ensureAuthenticated, deliveryUpdateController.delivering)
+routes.put('/delivery/:id/delivering', ensureAuthenticated, deliveryUpdateController.delivering)
 routes.put('/delivery/:id/finish/developing', ensureAuthenticated, deliveryUpdateController.finish)
-routes.put('/delivery/status/:id', ensureAuthenticated, deliveryUpdateController.updateStatus)
 routes.delete('/delivery/:id', ensureAuthenticated, deliveryController.delete)
 
 //Homes
@@ -173,7 +172,6 @@ routes.get('/maintenance-delivery/:id/check-exist-delivery-open', maintenanceDel
 routes.get('/maintenancedeliv', maintenanceDelivController.index)
 routes.get('/maintenancedeliv/:idMain', maintenanceDelivController.findMaintId)
 routes.get('/maintenancedeliv/:typeSeach/:search', maintenanceDelivController.findMaintDeliv)
-routes.put('/maintenancedeliv/:id', maintenanceDelivController.update)
 //Maintenance Visit
 routes.post('/maintenance/visit', mainVisitController.create)
 routes.put('/maintenance/visit/reschedule/:id', mainVisitController.reschedule)

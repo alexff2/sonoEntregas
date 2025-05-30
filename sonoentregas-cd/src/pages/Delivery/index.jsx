@@ -14,7 +14,7 @@ import { Add } from '@material-ui/icons'
 //Components
 import Modal from '../../components/Modal'
 import ModalView from './Modals/ModalView'
-import ModalDelivering from './Modals/ModalDelivering'
+import ModalDelivering from './Delivery/ModalDelivering'
 import TableDelivery from './Delivery/TableDelivery'
 import TableForecast from './Forecast/TableForecast'
 import Withdrawal from './Withdrawal'

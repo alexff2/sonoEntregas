@@ -9,7 +9,6 @@
 const Deliveries = require('../models/Deliverys')
 
 const DeliveryService = require('../services/DeliveryService')
-const MainService = require('../services/MainService')
 const ForecastsRules = require('../rules/forecastRules')
 const DeliveriesRules = require('../rules/DeliveriesRules')
 
@@ -46,46 +45,37 @@ module.exports = {
    * @param {*} req 
    * @param {*} res 
    */
-  async updateStatus( req, res ){
-    const { id } = req.params
-    const delivery = req.body
-    const { id: user_id } = req.user
-
+  async delivering(req, res){
+    const {id} = req.params
+    const {date} = req.body
+    const {id: userId} = req.user
     const sce = await Deliveries._query(1)
     const entrega = await Deliveries._query(0)
 
     try {
-      const maintenances = await MainService.findMain({
-        codloja: 0,
-        typeSeach: 'ID_DELIV_MAINT',
-        search: id
-      }, false, entrega)
-
-      await DeliveryService.updateDeliveryProd(delivery, id, { entrega, sce })
-
-      await DeliveryService.updateDelivery({
-        delivery,
+      await DeliveryService.delivering({
         id,
-        user_id,
-        maintenances
-      }, { entrega, sce })
+        date,
+        userId,
+        connections: {sce, entrega}
+      })
 
       await sce.transaction.commit()
       await entrega.transaction.commit()
-
-      return res.json(delivery)
+      return res.json({ message: `Delivery updated by ${userId}` })
     } catch (e) {
-      console.log(e)
-      await sce.transaction.rollback()
-      await entrega.transaction.rollback()
-      res.status(400).json(e)
+     try {
+        await sce.transaction.rollback()
+        await entrega.transaction.rollback()
+      } catch (rollbackError) {
+        console.error('Rollback failed:', rollbackError)
+      }
+      console.error('Error during delivery:', e)
+      return res.status(400).json({
+        error: e.message || 'An error occurred during delivery.'
+      })
     }
   },
-  /**
-   * @param {*} req 
-   * @param {*} res 
-   */
-  async delivering(req, res){},
   /**
    * @param {*} req 
    * @param {*} res 

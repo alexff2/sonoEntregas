@@ -206,7 +206,7 @@ export default function ModalAddSale({ setOpen, idDelivery, setSales }){
   React.useEffect(() => {
     setTimeout(() => {
       document.getElementById('idSale').focus()
-    }, 1000)
+    }, 100)
   }, [])
 
   return(

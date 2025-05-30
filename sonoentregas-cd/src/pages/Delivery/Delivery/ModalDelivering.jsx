@@ -38,8 +38,7 @@ const useStyle = makeStyles(theme => ({
 }))
 
 export default function ModalDelivering({ setOpen, selectDelivery }){
-  const [ date, setDate ] = useState('')
-  const [ sales, setSales ] = useState([])
+  const [ date, setDate ] = useState(new Date().toISOString().slice(0, 10))
   const [ beepPendantProducts, setBeepPendantProducts ] = useState([])
   const [ error, setError ] = useState(false)
   const [ childrenError, setChildrenError ] = useState('')
@@ -54,7 +53,6 @@ export default function ModalDelivering({ setOpen, selectDelivery }){
     setOpenBackDrop(true)
     const getDelivery = async () => {
       try {
-        const { data: delivery } = await api.get(`/delivery/${selectDelivery.ID}/sales/view`)
         if(process.env.REACT_APP_STOCK_BEEP === '1'){
           const { data: productsBeep } = await api.get('delivery', {
             params: {
@@ -74,7 +72,6 @@ export default function ModalDelivering({ setOpen, selectDelivery }){
   
           setBeepPendantProducts(pendantProducts)
         }
-        setSales(delivery.sales)
         setOpenBackDrop(false)
       } catch (error) {
         console.log(error)
@@ -89,30 +86,16 @@ export default function ModalDelivering({ setOpen, selectDelivery }){
     try {
       if (date === '') {
         setError(true)
-  
         setChildrenError('Selecione uma data válida!')
-
         return
       }
-
       setDisabledBtnSave(true)
 
-      selectDelivery["sales"] = sales
-      selectDelivery.STATUS = 'Entregando'
-      selectDelivery['date'] = date
-  
-      selectDelivery.sales.forEach(sale =>{
-        sale.products.forEach(produto => {
-          produto.STATUS = 'Entregando'
-          if (produto.QUANTIDADE !== (produto.QTD_DELIVERING + produto.QTD_DELIV)) produto['UPST'] = false
-        }
-      )})
-
-      await api.put(`delivery/status/${selectDelivery.ID}`, selectDelivery)
-
+      await api.put(`delivery/${selectDelivery.ID}/delivering`, {
+        date,
+      })
       const {data} = await api.get('delivery/open')
       setDelivery(data)
-
       setOpen(false)
     } catch (e) {
       setDisabledBtnSave(false)
@@ -165,6 +148,7 @@ export default function ModalDelivering({ setOpen, selectDelivery }){
             <span>Selecione a data de saída:</span>
             <TextField
               type="date"
+              value={date}
               onChange={e => setDate(e.target.value)}
               InputLabelProps={{
                 shrink: true
