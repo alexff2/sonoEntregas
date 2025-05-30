@@ -12,7 +12,6 @@ const SalesProd = require('../models/SalesProd')
 
 const Date = require('../class/Date')
 const DeliveriesService = require('../services/DeliveryService')
-const ForecastService = require('../services/ForecastService')
 const errorCath = require('../functions/error')
 const { validateFields } = require('../functions/validateFields')
 
@@ -111,7 +110,7 @@ module.exports = {
 
       const delivery =  await DeliveriesService.findDelivery(deliveryCreateId)
 
-      return res.json({ delivery })
+      return res.json({delivery})
     } catch (error) {
       console.log(error)
       return res.status(400).json(error)
@@ -169,21 +168,12 @@ module.exports = {
     try {
       const { id } = req.params
       
-      const deliveryProd = await DeliveryProd.findSome(0, `ID_DELIVERY = ${id}`)
+      await DeliveriesService.delete(id)
 
-      await ForecastService.setIdDeliveryNullInAllForecastSales({ idDelivery: id })
-      
-      for (let i = 0; i < deliveryProd.length; i++) {        
-        await SalesProd._query(0, `UPDATE SALES_PROD SET STATUS = 'Em Previsão' WHERE ID_SALES = ${deliveryProd[i].ID_SALE} AND CODLOJA = ${deliveryProd[i].CODLOJA} AND COD_ORIGINAL = '${deliveryProd[i].COD_ORIGINAL}'`)
-      }
-
-      await Deliveries.deleteNotReturn(0, id)
-
-      await DeliveryProd.deleteNotReturn(0, id, 'ID_DELIVERY')
-
-      res.json({delete: true})
+      return res.json({delete: true})
     } catch (error) {
-      res.status(400).json(error)
+      console.log(error)
+      return res.status(400).json(error)
     }
   },
   /**

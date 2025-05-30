@@ -208,4 +208,12 @@ module.exports = {
       INNER JOIN SONO..PRODUTOS D ON A.COD_ORIGINAL = D.ALTERNATI
       WHERE C.ID_DELIV_MAIN = ${idDelivery}`
   },
+  returnsSalesProdForForecasting(idDelivery) {
+    return `
+    UPDATE SALES_PROD SET STATUS = 'Em Previsão'
+    FROM DELIVERYS_PROD A
+    INNER JOIN SALES_PROD B ON A.CODLOJA = B.CODLOJA AND A.ID_SALE = B.ID_SALES AND A.COD_ORIGINAL = B.COD_ORIGINAL
+    WHERE B.STATUS = 'Em lançamento'
+    AND A.ID_DELIVERY = ${idDelivery}`
+  }
 }

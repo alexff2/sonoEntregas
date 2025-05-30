@@ -463,4 +463,48 @@ module.exports = {
       drivers: extraRoutesDrivers,
     }
   },
+  async delete(/** @type {number} */id){
+    const connectionEntrega = await Delivery._query(0)
+    try {
+
+      const delivery = await Delivery.findAny(0, { ID: id }, 'ID, STATUS', connectionEntrega)
+  
+      if (delivery.length === 0) {
+        throw {
+          error: 'Delivery not found'
+        }
+      }
+  
+      if (delivery[0].STATUS !== 'Em lançamento') {
+        throw {
+          error: 'Only deliveries in "Em lançamento" status can be deleted'
+        }
+      }
+
+      const maintenanceDelivery = await MaintenanceDeliveryModel.findAny(0, { ID_DELIV_MAIN: id }, 'ID_MAINT', connectionEntrega)
+
+      if (maintenanceDelivery.length !== 0) {
+        await MaintenanceDeliveryModel.deleteAny(0, {ID_DELIV_MAIN: id}, connectionEntrega)
+        await MaintenanceModel.updateAny(
+          0,
+          {STATUS: 'Em Previsão'},
+          {in: {ID: maintenanceDelivery.map(item => item.ID_MAINT)}},
+          connectionEntrega
+        )
+      }
+
+      await SalesProd._query(0, scripts.returnsSalesProdForForecasting(id), QueryTypes.UPDATE, connectionEntrega)
+      await DeliveryProd.deleteAny(0, {ID_DELIVERY: id}, connectionEntrega)
+      await Delivery.deleteAny(0, {ID: id}, connectionEntrega)
+      await ForecastSales.updateAny(0, {idDelivery: 'NULL'}, {idDelivery: id}, connectionEntrega)
+      await connectionEntrega.transaction.commit()
+    } catch (error) {
+      try {
+        await connectionEntrega.transaction.rollback()
+      } catch (rollbackError) {
+        console.warn('Erro ao tentar dar rollback:', rollbackError.message)
+      }
+      throw error
+    }
+  }
 }

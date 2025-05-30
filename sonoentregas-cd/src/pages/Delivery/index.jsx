@@ -22,7 +22,6 @@ import Withdrawal from './Withdrawal'
 import { useDelivery } from '../../context/deliveryContext'
 import { useDeliveryFinish } from '../../context/deliveryFinishContext'
 import { useForecasts } from '../../context/forecastsContext'
-import { useSale } from '../../context/saleContext'
 import { useAlert } from '../../context/alertContext'
 import { useBackdrop } from '../../context/backdropContext'
 
@@ -97,7 +96,6 @@ export default function Delivery() {
   const { setDelivery } = useDelivery()
   const { setDeliveryFinish } = useDeliveryFinish()
   const { forecasts, setForecasts } = useForecasts()
-  const { setSales } = useSale()
   const { setAlert } = useAlert()
   const { setOpenBackDrop } = useBackdrop()
 
@@ -144,19 +142,10 @@ export default function Delivery() {
   //Functions
   const deleteDelivery = async cod => {
     try {
-      const { data } = await api.delete(`delivery/${cod}`)
+      await api.delete(`delivery/${cod}`)
 
-      const { data: dataDeliv } = await api.get('delivery/status/') 
+      const { data: dataDeliv } = await api.get('delivery/open') 
       setDelivery(dataDeliv)
-
-      if (data.delete) {
-        const { data: dataSales } = await api.get('sales/', {
-          params: {
-            status: 'open'
-          }
-        })
-        setSales(dataSales)
-      }      
     } catch (e) {
       if (!e.response){
         console.log(e)

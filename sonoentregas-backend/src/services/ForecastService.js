@@ -448,10 +448,6 @@ class ForecastService {
 
     await Forecast.updateAny(0, { status: 0 }, { id }, connectionEntrega)
   }
-
-  async setIdDeliveryNullInAllForecastSales({ idDelivery }){
-    await ForecastSales.updateAny(0, { idDelivery: 'NULL' }, { idDelivery })
-  }
 }
 
 module.exports = new ForecastService()
