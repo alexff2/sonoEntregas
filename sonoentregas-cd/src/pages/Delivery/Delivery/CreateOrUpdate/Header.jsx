@@ -76,8 +76,20 @@ export default function Header({ delivery, setDelivery, stateBoolean, setStateBo
     })
   }
 
-  const handleSubmitCreate = async () => {
-    if (!validateFieldsObject({ ...delivery, ID: true, ID_ASSISTANT2: true})) {
+  const validateFields = () => {
+    const isValid = validateFieldsObject({
+      description: delivery.DESCRIPTION,
+      D_MOUNTING: delivery.D_MOUNTING,
+      ID_DRIVER: delivery.ID_DRIVER,
+      ID_ASSISTANT: delivery.ID_ASSISTANT,
+      ID_CAR: delivery.ID_CAR
+    })
+
+    return isValid
+  }
+
+  const handleSubmitCreate = async () => {    
+    if (!validateFields()) {
       setAlertSnackbar('Preencha todos os campos obrigatórios.')
       return
     }
@@ -86,9 +98,10 @@ export default function Header({ delivery, setDelivery, stateBoolean, setStateBo
 
     try {
       const {data} = await api.post('/delivery', delivery)
-      const issuedDate = data.D_MOUNTING.split('/')
+      const issuedDate = data.delivery.D_MOUNTING.split('/')
       setDelivery({
-        ...data,
+        ...data.delivery,
+        ID_ASSISTANT2: data.delivery.ID_ASSISTANT2 || 0,
         D_MOUNTING: `${issuedDate[2]}-${issuedDate[1]}-${issuedDate[0]}`,
       })
       setAlertSnackbar('Rota gravada com sucesso.', 'success')
@@ -105,6 +118,10 @@ export default function Header({ delivery, setDelivery, stateBoolean, setStateBo
   }
 
   const handleSubmitUpdate = async () => {
+    if (!validateFields()) {
+      setAlertSnackbar('Preencha todos os campos obrigatórios.')
+      return
+    }
     setLoading(true)
 
     try {
@@ -122,6 +139,7 @@ export default function Header({ delivery, setDelivery, stateBoolean, setStateBo
       const issuedDate = data.D_MOUNTING.split('/')
       setDelivery({
         ...data,
+        ID_ASSISTANT2: data.ID_ASSISTANT2 || 0,
         D_MOUNTING: `${issuedDate[2]}-${issuedDate[1]}-${issuedDate[0]}`,
       })
       setAlertSnackbar('Rota atualizada com sucesso.', 'success')

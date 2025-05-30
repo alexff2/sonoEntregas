@@ -47,6 +47,7 @@ export default function CreateOrUpdate(){
   
           setDelivery({
             ...data,
+            ID_ASSISTANT2: data.ID_ASSISTANT2 || 0,
             D_MOUNTING: `${issuedDate[2]}-${issuedDate[1]}-${issuedDate[0]}`,
           })
           setSales(data.sales)

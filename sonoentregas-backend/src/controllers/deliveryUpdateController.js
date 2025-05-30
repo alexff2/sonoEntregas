@@ -20,21 +20,22 @@ module.exports = {
    */
   async updateHeader( req, res ) {
     try {
-      const { id } = req.params
-      const { id: user_id } = req.user
-      const { description, D_MOUNTING, ID_CAR, ID_DRIVER, ID_ASSISTANT, ID_ASSISTANT2 } = req.body
+      const {id} = req.params
+      const {id: user_id} = req.user
+      const {description, D_MOUNTING, ID_CAR, ID_DRIVER, ID_ASSISTANT, ID_ASSISTANT2} = req.body
 
       const dataCreate = {
         description,
         D_MOUNTING,
         ID_CAR,
         ID_DRIVER,
-        ID_ASSISTANT
+        ID_ASSISTANT,
+        ID_ASSISTANT2: ID_ASSISTANT2 === 0 ? 'NULL' : ID_ASSISTANT2
       }
 
-      await Deliveries.updateAny(0, ID_ASSISTANT2 === 0 ? dataCreate : { ...dataCreate, ID_ASSISTANT2 }, { id })
+      await Deliveries.updateAny(0, dataCreate, {id})
 
-      return res.json({ message: `Update by${user_id}` })
+      return res.json({message: `Update by${user_id}`})
     } catch (e) {
       console.log(e)
 
