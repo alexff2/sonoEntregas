@@ -155,7 +155,8 @@ routes.post('/delivery/sale/rmv', ensureAuthenticated, deliveryController.rmvSal
 routes.post('/delivery/withdrawal', ensureAuthenticated, deliveryUpdateController.withdrawalSale)
 routes.put('/delivery/:id/header', ensureAuthenticated, deliveryUpdateController.updateHeader)
 routes.put('/delivery/:id/delivering', ensureAuthenticated, deliveryUpdateController.delivering)
-routes.put('/delivery/:id/finish/developing', ensureAuthenticated, deliveryUpdateController.finish)
+routes.put('/delivery/:id/returns', ensureAuthenticated, deliveryUpdateController.returns)
+routes.put('/delivery/:id/finish', ensureAuthenticated, deliveryUpdateController.finish)
 routes.delete('/delivery/:id', ensureAuthenticated, deliveryController.delete)
 
 //Homes

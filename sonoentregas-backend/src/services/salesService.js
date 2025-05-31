@@ -274,7 +274,6 @@ module.exports = {
     }
 
     const salesWithoutRoutes = confirmedSales.filter(sale => !sale.idDelivery)
-    console.log(salesWithoutRoutes)
 
     if (salesWithoutRoutes.length === 0) {
       throw {

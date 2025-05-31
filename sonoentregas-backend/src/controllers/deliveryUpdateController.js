@@ -80,7 +80,67 @@ module.exports = {
    * @param {*} req 
    * @param {*} res 
    */
-  async finish(req, res){},
+  async returns(req, res){
+    const {id} = req.params
+    const {product} = req.body
+    const connectionEntrega = await Deliveries._query(0)
+
+    try {
+      await DeliveryService.returns({
+        id,
+        connectionEntrega,
+        product
+      })
+
+      await connectionEntrega.transaction.commit()
+      return res.json({message: 'Done'})
+    } catch (e) {
+      try {
+        await connectionEntrega.transaction.rollback()
+      } catch (rollbackError) {
+        console.error('Rollback failed:', rollbackError)
+      }
+      console.error('Error during delivery finish:', e)
+      return res.status(400).json({
+        error: e.message || 'An error occurred while returns the delivery.'
+      })
+    } 
+  },
+  /**
+   * @param {*} req 
+   * @param {*} res 
+   */
+  async finish(req, res){
+    const {id} = req.params
+    const {id: userId} = req.user
+    const {date} = req.body
+    const sce = await Deliveries._query(1)
+    const entrega = await Deliveries._query(0)
+
+    try {
+      await DeliveryService.finish({
+        id,
+        userId,
+        date,
+        connections: {sce, entrega}
+      })
+
+      await sce.transaction.commit()
+      await entrega.transaction.commit()
+      return res.json({ message: `Delivery finished by ${userId}` })
+    } catch (e) {
+      try {
+        await sce.transaction.rollback()
+        await entrega.transaction.rollback()
+      } catch (rollbackError) {
+        console.error('Rollback failed:', rollbackError)
+      }
+      console.error('Error during delivery finish:', e)
+      return res.status(400).json({
+        error: e.message || 'An error occurred while finishing the delivery.'
+      })
+    }
+  },
   /**
    * @param {*} req 
    * @param {*} res 

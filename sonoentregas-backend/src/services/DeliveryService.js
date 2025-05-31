@@ -47,7 +47,6 @@ const Empresas = require('../models/ShopsSce')
 const Sales = require('../models/Sales')
 
 const scripts = require('../scripts/delivery')
-const MainService = require('../services/MainService')
 const Date = require('../class/Date')
 
 module.exports = {
@@ -196,19 +195,11 @@ module.exports = {
 
     const dateTimeNow = new Date().getISODateTimeBr().dateTime
 
-    const maintenances = await MainService.findMain({
-      codloja: 0,
-      typeSeach: 'ID_DELIV_MAINT',
-      search: id
-    }, false, connections.entrega)
+    await SalesProd._query(0, scripts.decreaseStockOfRouteProducts(id), QueryTypes.UPDATE, connections.entrega)
 
-    for(const maintenance of maintenances) {
-      maintenance.date = date
-      await MainService.moveToMaint(maintenance.ID_MAINT_DELIV, maintenance, connections)
-    }
-
+    const maintenanceDeliveries = await MaintenanceDeliveryModel.findAny(0, {ID_DELIV_MAIN: id}, 'ID_MAINT', connections.entrega)
+    await MaintenanceModel.updateAny(0, {STATUS: 'Em deslocamento'}, {in: {ID: maintenanceDeliveries.map(item => item.ID_MAINT)}}, connections.entrega)
     await SalesProd._query(0, scripts.setSalesProdDelivering(id), QueryTypes.UPDATE, connections.entrega)
-    await SalesProd._query(0, scripts.updateStockProdLojasByDeliveryProd(id), QueryTypes.UPDATE, connections.entrega)
 
     await Delivery.updateAny(0, {
       STATUS: 'Entregando',
@@ -217,21 +208,63 @@ module.exports = {
       D_DELIVERING: date
     }, { id }, connections.entrega)
   },
-  /**
-   * @param {number} idDelivery
-   */
-  async updateStockByIdDelivery(idDelivery){ // No used
-    const script = `UPDATE ${process.env.CD_BASE}..PRODLOJAS SET EST_ATUAL = EST_ATUAL - C.QTD, EST_LOJA = EST_LOJA - C.QTD
-    FROM ${process.env.CD_BASE}..PRODLOJAS A INNER JOIN ${process.env.CD_BASE}..PRODUTOS B ON A.CODIGO = B.CODIGO 
-    INNER JOIN (
-      SELECT COD_ORIGINAL, SUM(QTD_DELIV) QTD
-      FROM DELIVERYS_PROD 
-      WHERE ID_DELIVERY = ${idDelivery}
-      GROUP BY COD_ORIGINAL) C
-    ON B.ALTERNATI = C.COD_ORIGINAL
-    WHERE A.CODLOJA = 1`
+  async returns({id, product, connectionEntrega}){
+    const delivery = await Delivery.findAny(0, { ID: id }, 'ID, STATUS', connectionEntrega)
+    if (delivery.length === 0) {
+      throw {
+        error: 'Delivery not found'
+      }
+    }
 
-    await SalesProd._query(0, script, QueryTypes.UPDATE)
+    if (delivery[0].STATUS !== 'Entregando') {
+      throw {
+        error: 'Only deliveries in "Entregando" status can be finished'
+      }
+    }
+
+    if (product.ID_MAINTENANCE) {
+      await MaintenanceDeliveryModel.updateAny(0, {
+        DONE: 0,
+        D_DELIVERED: new Date().getISODateTimeBr().date,
+        REASON_RETURN: product.REASON_RETURN,
+      }, {ID_DELIV_MAIN: id, ID_MAINT: product.ID_MAINTENANCE}, connectionEntrega)
+
+      return
+    }
+
+    await DeliveryProd.updateAny(0, {
+      DELIVERED: 1,
+      REASON_RETURN: product.REASON_RETURN,
+    }, {
+      ID_DELIVERY: id,
+      ID_SALE: product.ID_SALES,
+      COD_ORIGINAL: product.COD_ORIGINAL,
+      CODLOJA: product.CODLOJA
+    }, connectionEntrega)
+  },
+  async finish({id, date, userId, connections}){
+    const delivery = await Delivery.findAny(0, { ID: id }, 'ID, STATUS', connections.entrega)
+
+    if (delivery.length === 0) {
+      throw {
+        error: 'Delivery not found'
+      }
+    }
+
+    if (delivery[0].STATUS !== 'Entregando') {
+      throw {
+        error: 'Only deliveries in "Entregando" status can be finished'
+      }
+    }
+
+    const dateTimeNow = new Date().getISODateTimeBr().dateTime
+
+    await Delivery.updateAny(0, {
+      STATUS: 'Finalizada',
+      ID_USER_DELIVERED: userId,
+      dateUpdateDelivered: dateTimeNow,
+      D_DELIVERED: date,
+    }, {id}, connections.entrega)
   },
   async addSale({ sale, idDelivery, userId, connectionEntrega }){
     if (!sale.isMaintenance) {
@@ -251,14 +284,9 @@ module.exports = {
         in: { COD_ORIGINAL: sale.products.map(product => product.COD_ORIGINAL) }
       }, connectionEntrega)
     } else {
-      const delivery = await Delivery.findAny(0, { ID: idDelivery }, 'ID, D_MOUNTING, ID_DRIVER, ID_ASSISTANT', connectionEntrega)
-
       const valueProd =  sale.products.map( product => ({
         ID_MAINT: product.ID_MAINTENANCE,
-        D_MOUNTING: delivery[0].D_MOUNTING,
         DONE: 1,
-        ID_DRIVER: delivery[0].ID_DRIVER,
-        ID_ASSISTANT: delivery[0].ID_ASSISTANT,
         ID_DELIV_MAIN: idDelivery,
         ID_USER: userId,
       }))
@@ -467,10 +495,15 @@ module.exports = {
         )
       }
 
-      await SalesProd._query(0, scripts.returnsSalesProdForForecasting(id), QueryTypes.UPDATE, connectionEntrega)
-      await DeliveryProd.deleteAny(0, {ID_DELIVERY: id}, connectionEntrega)
+      const deliveryProd = await DeliveryProd.findAny(0, { ID_DELIVERY: id }, 'ID_DELIVERY', connectionEntrega)
+
+      if (deliveryProd.length !== 0) {
+        await SalesProd._query(0, scripts.returnsSalesProdForForecasting(id), QueryTypes.UPDATE, connectionEntrega)
+        await DeliveryProd.deleteAny(0, {ID_DELIVERY: id}, connectionEntrega)
+        await ForecastSales.updateAny(0, {idDelivery: 'NULL'}, {idDelivery: id}, connectionEntrega)
+      }
+
       await Delivery.deleteAny(0, {ID: id}, connectionEntrega)
-      await ForecastSales.updateAny(0, {idDelivery: 'NULL'}, {idDelivery: id}, connectionEntrega)
       await connectionEntrega.transaction.commit()
     } catch (error) {
       try {
