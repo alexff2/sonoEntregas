@@ -44,7 +44,7 @@
  * @property {ISale} sale
  * @property {string} userId
  * @property {string} idForecast
- * @property {boolean} add
+ * @property {boolean} addAfterSendingToShop
  * 
  * @typedef {Object} PropsValidation
  * @property {number} id
@@ -251,7 +251,7 @@ class ForecastService {
   }
 
   /** @param {PropsSalesForecast} props */
-  async createSalesForecast({ sale, userId, idForecast, add }) {
+  async createSalesForecast({ sale, userId, idForecast, addAfterSendingToShop }) {
     /**@type {IForecastSales[]} */
     const forecastSaleSaved = await ForecastSales.findAny(0, { idForecast, idSale: sale.ID })
 
@@ -266,7 +266,7 @@ class ForecastService {
           isMaintenance: !!sale.isMaintenance,
         }], false, connectionEntrega)
   
-        if (add) {
+        if (addAfterSendingToShop) {
           const forecastStatus = await Forecast.findAny(0, {id: idForecast, status: 1}, 'status', connectionEntrega)
   
           if (forecastStatus[0]) {
