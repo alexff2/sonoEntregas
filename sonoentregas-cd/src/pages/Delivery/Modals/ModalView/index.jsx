@@ -5,18 +5,10 @@ import {
   TableBody,
   TableContainer,
   Paper,
-  TextField
 } from "@material-ui/core"
-
-import { ButtonCancel, ButtonSuccess } from '../../../../components/Buttons'
 
 import RowSale from './RowSale'
 import TableHeadSale from './TableHeadSale'
-
-//context
-import { useDelivery } from '../../../../context/deliveryContext'
-import { useDeliveryFinish } from '../../../../context/deliveryFinishContext'
-import { useAlert } from '../../../../context/alertContext'
 
 import api from '../../../../services/api'
 
@@ -67,16 +59,8 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-export default function ModalView({ setOpen, type, id }){
-  //States
-  const [ date, setDate ] = useState(false)
-  const [ disabledBtnSave, setDisabledBtnSave ] = useState(false)
+export default function ModalView({ id }){
   const [ selectDelivery, setSelectDelivery ] = useState()
-
-  const { setDelivery } = useDelivery()
-  const { deliveryFinish, setDeliveryFinish } = useDeliveryFinish()
-  const { setAlert } = useAlert()
-
   const classes = useStyles()
 
   useEffect(() => {
@@ -88,40 +72,8 @@ export default function ModalView({ setOpen, type, id }){
     loadingData()
   }, [id])
 
-  //Functions
-
-  const finish = async () => {
-    try {
-      if(date){
-        setDisabledBtnSave(true)
-    
-        selectDelivery.STATUS = 'Finalizada'
-        selectDelivery['date'] = date
-  
-        selectDelivery.sales.forEach(sale =>{
-          sale.products.forEach(produto => {
-            if (produto.QUANTIDADE !== produto.QTD_DELIVERED + produto.QTD_DELIV) produto['UPST'] = false
-          })
-        })
-  
-        await api.put(`delivery/status/${selectDelivery.ID}`, selectDelivery)
-  
-        const { data: deliveriesOpen } = await api.get('delivery/open') 
-        setDelivery(deliveriesOpen)
-        setDeliveryFinish([...deliveryFinish, selectDelivery])
-        setOpen(false)
-      } else {
-        setAlert('Selecione a data de entrega')
-      }
-    } catch (error) {
-      console.log(error)
-      setAlert('Erro de conexão, entrar em contato com ADM')
-    }
-  }
-
-  //Main Component
   return(
-    <form>
+    <div>
       <h3 className={classes.titleModalFinish}>
         { selectDelivery?.DESCRIPTION } - { selectDelivery?.sales.length } Venda(s)
       </h3>
@@ -151,25 +103,6 @@ export default function ModalView({ setOpen, type, id }){
         </div>
       </div>
 
-      {type !== 'close' &&
-        <div
-          style={{ 
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 4,
-            marginBottom: 4
-          }}
-        >
-          <strong>Data: </strong>
-          <TextField 
-            type="date"
-            required
-            onChange={e => setDate(e.target.value)}
-          />
-        </div>
-      }
-
       <TableContainer component={Paper}>
         <Table aria-label="collapsible table">
           <TableHeadSale />
@@ -179,30 +112,12 @@ export default function ModalView({ setOpen, type, id }){
               <RowSale
                 key={index}
                 sale={sale}
-                classes={classes}
-                type={type}
                 status={selectDelivery?.STATUS}
               />
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-
-
-      {type !== 'close' &&
-        <div className={classes.btnActions}>
-          <ButtonSuccess 
-            children={"Finalizar"}
-            onClick={finish}
-            disabled={disabledBtnSave}
-          />
-          <ButtonCancel 
-            children="Cancelar"
-            onClick={() => setOpen(false)}
-            className={classes.btnCancel}
-          />
-        </div>
-      }
-    </form>
+    </div>
   )
 }

@@ -75,15 +75,16 @@ const RowSale = ({ sale, type, status, handleInvalidationSale }) => {
                   <TableCell>Descrição</TableCell>
                   <TableCell>Qtd. Entrega</TableCell>
                   <TableCell align="right">Valor (R$)</TableCell>
-                  {type === 'open' && <TableCell></TableCell>}
+                  <TableCell></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {sale.products.map((product) => (
-                  <RowProd key={product.COD_ORIGINAL}
-                    product={product}
+                  <RowProd
+                    key={product.COD_ORIGINAL}
                     status={status}
                     type={type}
+                    product={product}
                   />
                 ))}
               </TableBody>

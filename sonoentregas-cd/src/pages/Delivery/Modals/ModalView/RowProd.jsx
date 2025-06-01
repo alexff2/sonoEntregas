@@ -1,27 +1,24 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { 
   Box,
   TableRow,
   TableCell,
-  Checkbox
  } from '@material-ui/core'
 
-const RowProd = ({product, status, type })=>{
-  const [ checkProd, setCheckProd ] = useState(false)
+ const StatusProduct = ({color='red', label}) => {
+  return (
+    <span
+      style={{
+        fontSize: 12,
+        backgroundColor: color,
+        color: 'white',
+        padding: 3
+      }}
+    >{label}</span>
+  )
+}
 
-  const checkedPro = e => {
-    if (e.target.checked) {
-      setCheckProd(true)
-      product.STATUS = 'Finalizada'
-      product.DELIVERED = false //false is zero
-      product.REASON_RETURN = 'NULL'
-    } else {
-      setCheckProd(false)
-      product.STATUS = 'Enviado'
-      product.DELIVERED = true //false is zero
-    }
-  }
-
+const RowProd = ({product, type, status})=>{
   return(
     <>
       <TableRow>
@@ -35,45 +32,17 @@ const RowProd = ({product, status, type })=>{
             .NumberFormat('pt-br',{style: 'currency', currency: 'BRL'})
             .format(product.NVTOTAL)
         }</TableCell>
-        {type === 'open' &&
-          <TableCell align="right">
-            <Checkbox
-              onChange={checkedPro}
-              checked={checkProd}
-            />
-          </TableCell>
-        }
-        {status === 'Finalizada' &&
-          <TableCell align="right">
-            {product.DELIVERED ? 
-              <span style={{
-                fontSize: 12,
-                backgroundColor: 'red',
-                color: 'white',
-                padding: 3
-              }}>Retorno</span>  : 
-              <span style={{
-                fontSize: 12,
-                backgroundColor: 'green',
-                color: 'white',
-                padding: 3
-              }}>Entregue</span>}
-          </TableCell>
-        }
+        <TableCell align="right">
+          {(type !== 'forecastView' && status === 'Finalizada') && <>
+            {product.REASON_RETURN
+              ? <StatusProduct color="red" label="Retorno" />
+              : <StatusProduct color="green" label="Entregue" />
+            }
+          </>
+          }
+        </TableCell>
       </TableRow>
-      {(!checkProd && type === 'open') &&
-        <TableRow>
-          <TableCell colSpan={5}>
-            <Box>
-              Motivo de retorno: 
-              <input type="text" onChange={
-                e => product.REASON_RETURN = e.target.value
-              }/>
-            </Box>
-          </TableCell>
-        </TableRow>
-      }
-      { (status === 'Finalizada' && product.REASON_RETURN !== null) &&
+      {product.REASON_RETURN &&
         <TableRow>
           <TableCell colSpan={5}>
             <Box>

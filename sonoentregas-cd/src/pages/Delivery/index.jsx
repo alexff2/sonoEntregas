@@ -339,7 +339,6 @@ export default function Delivery() {
         <FinishModal
           id={selectDelivery.ID} 
           setOpen={setOpenFinish}
-          type={'open'}
         />
       </Modal>
 
@@ -351,7 +350,6 @@ export default function Delivery() {
         <ModalView
           id={selectDelivery.ID} 
           setOpen={setOpenView}
-          type={'close'}
         />
       </Modal>
 
