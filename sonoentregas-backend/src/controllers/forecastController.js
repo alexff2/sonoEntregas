@@ -237,7 +237,7 @@ module.exports = {
         sale,
         userId,
         idForecast: id,
-        add: true
+        addAfterSendingToShop: true
       })
 
       return res.status(200).json('')

@@ -263,7 +263,7 @@ class ForecastService {
           idForecast,
           idSale: sale.ID,
           idUserCreate: userId,
-          isMaintenance: sale.isMaintenance,
+          isMaintenance: !!sale.isMaintenance,
         }], false, connectionEntrega)
   
         if (add) {
