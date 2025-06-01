@@ -191,12 +191,12 @@ module.exports = {
   },
   maintenanceSale(idDelivery) {
     return `
-      SELECT B.ID, B.ID_SALES, B.NOMECLI, B.CODLOJA, B.D_ENTREGA1, B.BAIRRO, A.STATUS
+      SELECT B.ID, B.ID_SALES, B.NOMECLI, B.CODLOJA, B.D_ENTREGA1, B.BAIRRO
       FROM MAINTENANCE A
       INNER JOIN SALES B ON A.ID_SALE = B.ID_SALES AND A.CODLOJA = B.CODLOJA
       INNER JOIN MAINTENANCE_DELIV C ON A.ID = C.ID_MAINT
       WHERE C.ID_DELIV_MAIN = ${idDelivery}
-      GROUP BY B.ID, B.ID_SALES, B.NOMECLI, B.CODLOJA, B.D_ENTREGA1, B.BAIRRO, A.STATUS`
+      GROUP BY B.ID, B.ID_SALES, B.NOMECLI, B.CODLOJA, B.D_ENTREGA1, B.BAIRRO`
   },
   maintenanceProducts(idDelivery) {
     return `
@@ -207,6 +207,14 @@ module.exports = {
       INNER JOIN MAINTENANCE_DELIV C ON A.ID = C.ID_MAINT
       INNER JOIN ${process.env.CD_BASE}..PRODUTOS D ON A.COD_ORIGINAL = D.ALTERNATI
       WHERE C.ID_DELIV_MAIN = ${idDelivery}`
+  },
+  finIdSalesIdReturn(idDelivery) {
+    return `
+      SELECT B.ID_SALE_ID
+      FROM DELIVERYS_PROD A
+      INNER JOIN SALES_PROD B ON A.CODLOJA = B.CODLOJA AND A.ID_SALE = B.ID_SALES AND A.COD_ORIGINAL = B.COD_ORIGINAL
+      WHERE A.DELIVERED = 1
+      AND A.ID_DELIVERY = ${idDelivery}`
   },
   returnsSalesProdForForecasting(idDelivery) {
     return `

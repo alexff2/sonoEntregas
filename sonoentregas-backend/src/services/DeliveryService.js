@@ -289,6 +289,8 @@ module.exports = {
       }
     }
 
+    const idsSalesId = await DeliveryProd._query(0,scripts.finIdSalesIdReturn(id), QueryTypes.SELECT, connections.entrega)
+    await Sales.updateAny(0, {STATUS: 'Aberta'}, {in: {ID: idsSalesId.map(item => item.ID_SALE_ID)}}, connections.entrega)
     await SalesProd._query(0, scripts.setSalesProdDelivered(id), QueryTypes.UPDATE, connections.entrega)
     await MaintenanceModel._query(0, scripts.setMaintenanceDelivered(id), QueryTypes.UPDATE, connections.entrega)
 
