@@ -100,9 +100,35 @@ module.exports = {
       } catch (rollbackError) {
         console.error('Rollback failed:', rollbackError)
       }
-      console.error('Error during delivery finish:', e)
+      console.error('Error during returns delivery:', e)
       return res.status(400).json({
         error: e.message || 'An error occurred while returns the delivery.'
+      })
+    } 
+  },
+  async returnsDelete(req, res){
+    const {id} = req.params
+    const {product} = req.body
+    const connectionEntrega = await Deliveries._query(0)
+
+    try {
+      await DeliveryService.returnsDelete({
+        id,
+        connectionEntrega,
+        product
+      })
+
+      await connectionEntrega.transaction.commit()
+      return res.json({message: 'Done'})
+    } catch (e) {
+      try {
+        await connectionEntrega.transaction.rollback()
+      } catch (rollbackError) {
+        console.error('Rollback failed:', rollbackError)
+      }
+      console.error('Error during delivery returns delete:', e)
+      return res.status(400).json({
+        error: e.message || 'An error occurred while returns delete the delivery.'
       })
     } 
   },

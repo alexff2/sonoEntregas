@@ -225,7 +225,6 @@ module.exports = {
     if (product.ID_MAINTENANCE) {
       await MaintenanceDeliveryModel.updateAny(0, {
         DONE: 0,
-        D_DELIVERED: new Date().getISODateTimeBr().date,
         REASON_RETURN: product.REASON_RETURN,
       }, {ID_DELIV_MAIN: id, ID_MAINT: product.ID_MAINTENANCE}, connectionEntrega)
 
@@ -235,6 +234,39 @@ module.exports = {
     await DeliveryProd.updateAny(0, {
       DELIVERED: 1,
       REASON_RETURN: product.REASON_RETURN,
+    }, {
+      ID_DELIVERY: id,
+      ID_SALE: product.ID_SALES,
+      COD_ORIGINAL: product.COD_ORIGINAL,
+      CODLOJA: product.CODLOJA
+    }, connectionEntrega)
+  },
+  async returnsDelete({id, product, connectionEntrega}){
+    const delivery = await Delivery.findAny(0, { ID: id }, 'ID, STATUS', connectionEntrega)
+    if (delivery.length === 0) {
+      throw {
+        error: 'Delivery not found'
+      }
+    }
+
+    if (delivery[0].STATUS !== 'Entregando') {
+      throw {
+        error: 'Only deliveries in "Entregando" status can be finished'
+      }
+    }
+
+    if (product.ID_MAINTENANCE) {
+      await MaintenanceDeliveryModel.updateAny(0, {
+        DONE: 1,
+        REASON_RETURN: 'NULL',
+      }, {ID_DELIV_MAIN: id, ID_MAINT: product.ID_MAINTENANCE}, connectionEntrega)
+
+      return
+    }
+
+    await DeliveryProd.updateAny(0, {
+      DELIVERED: 0,
+      REASON_RETURN: 'NULL',
     }, {
       ID_DELIVERY: id,
       ID_SALE: product.ID_SALES,
@@ -257,8 +289,12 @@ module.exports = {
       }
     }
 
-    const dateTimeNow = new Date().getISODateTimeBr().dateTime
+    await SalesProd._query(0, scripts.setSalesProdDelivered(id), QueryTypes.UPDATE, connections.entrega)
+    await MaintenanceModel._query(0, scripts.setMaintenanceDelivered(id), QueryTypes.UPDATE, connections.entrega)
 
+    await SalesProd._query(0, scripts.increaseStockOfRouteProducts(id), QueryTypes.UPDATE, connections.entrega)
+
+    const dateTimeNow = new Date().getISODateTimeBr().dateTime
     await Delivery.updateAny(0, {
       STATUS: 'Finalizada',
       ID_USER_DELIVERED: userId,

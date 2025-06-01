@@ -156,6 +156,7 @@ routes.post('/delivery/withdrawal', ensureAuthenticated, deliveryUpdateControlle
 routes.put('/delivery/:id/header', ensureAuthenticated, deliveryUpdateController.updateHeader)
 routes.put('/delivery/:id/delivering', ensureAuthenticated, deliveryUpdateController.delivering)
 routes.put('/delivery/:id/returns', ensureAuthenticated, deliveryUpdateController.returns)
+routes.put('/delivery/:id/returns-delete', ensureAuthenticated, deliveryUpdateController.returnsDelete)
 routes.put('/delivery/:id/finish', ensureAuthenticated, deliveryUpdateController.finish)
 routes.delete('/delivery/:id', ensureAuthenticated, deliveryController.delete)
 
@@ -169,7 +170,6 @@ routes.post('/maintenance', maintenanceController.create)
 routes.delete('/maintenance/:id', maintenanceController.delete)
 routes.get('/maintenance/:typeSeach/:search/:codloja', maintenanceController.findMain)
 //Maintenance Delivery
-routes.get('/maintenance-delivery/:id/check-exist-delivery-open', maintenanceDelivController.findIfExistMaintenanceDeliveryOpenByDeliveryId)
 routes.get('/maintenancedeliv', maintenanceDelivController.index)
 routes.get('/maintenancedeliv/:idMain', maintenanceDelivController.findMaintId)
 routes.get('/maintenancedeliv/:typeSeach/:search', maintenanceDelivController.findMaintDeliv)

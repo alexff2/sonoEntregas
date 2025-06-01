@@ -15,6 +15,7 @@ import { Add } from '@material-ui/icons'
 import Modal from '../../components/Modal'
 import ModalView from './Modals/ModalView'
 import ModalDelivering from './Delivery/ModalDelivering'
+import FinishModal from './Delivery/FinishModal'
 import TableDelivery from './Delivery/TableDelivery'
 import TableForecast from './Forecast/TableForecast'
 import Withdrawal from './Withdrawal'
@@ -168,10 +169,6 @@ export default function Delivery() {
       case 'view':
         setSelectDelivery(item)
         setOpenView(true)
-        break;
-      case 'finish':
-        setSelectDelivery(item)
-        setOpenFinish(true)
         break;
       case 'status':
         if (item.STATUS === 'Em lançamento') {
@@ -339,7 +336,7 @@ export default function Delivery() {
         setOpen={setOpenFinish}
         title={"Finalizar Entrega"}
       >
-        <ModalView
+        <FinishModal
           id={selectDelivery.ID} 
           setOpen={setOpenFinish}
           type={'open'}
