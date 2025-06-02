@@ -198,7 +198,7 @@ module.exports = {
     await SalesProd._query(0, scripts.decreaseStockOfRouteProducts(id), QueryTypes.UPDATE, connections.entrega)
 
     const maintenanceDeliveries = await MaintenanceDeliveryModel.findAny(0, {ID_DELIV_MAIN: id}, 'ID_MAINT', connections.entrega)
-    await MaintenanceModel.updateAny(0, {STATUS: 'Em deslocamento'}, {in: {ID: maintenanceDeliveries.map(item => item.ID_MAINT)}}, connections.entrega)
+    if (maintenanceDeliveries.length > 0) await MaintenanceModel.updateAny(0, {STATUS: 'Em deslocamento'}, {in: {ID: maintenanceDeliveries.map(item => item.ID_MAINT)}}, connections.entrega)
     await SalesProd._query(0, scripts.setSalesProdDelivering(id), QueryTypes.UPDATE, connections.entrega)
 
     await Delivery.updateAny(0, {
@@ -290,7 +290,7 @@ module.exports = {
     }
 
     const idsSalesId = await DeliveryProd._query(0,scripts.finIdSalesIdReturn(id), QueryTypes.SELECT, connections.entrega)
-    await Sales.updateAny(0, {STATUS: 'Aberta'}, {in: {ID: idsSalesId.map(item => item.ID_SALE_ID)}}, connections.entrega)
+    if (idsSalesId.length > 0) await Sales.updateAny(0, {STATUS: 'Aberta'}, {in: {ID: idsSalesId.map(item => item.ID_SALE_ID)}}, connections.entrega)
     await SalesProd._query(0, scripts.setSalesProdDelivered(id), QueryTypes.UPDATE, connections.entrega)
     await MaintenanceModel._query(0, scripts.setMaintenanceDelivered(id), QueryTypes.UPDATE, connections.entrega)
 
