@@ -138,7 +138,7 @@ module.exports = {
   },
   extraRoutesAssistants({dateStart, dateEnd}){
     return `
-    SELECT B.ID, B.DESCRIPTION, A.QTD
+    SELECT B.ID, B.DESCRIPTION, A.QTD, B.CHAVE_PIX, A.QTD * 125 VALOR
     FROM (
       SELECT ASSISTANT, SUM(QTD) QTD
       FROM (
