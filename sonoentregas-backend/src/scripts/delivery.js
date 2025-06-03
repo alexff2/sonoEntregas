@@ -138,7 +138,7 @@ module.exports = {
   },
   extraRoutesAssistants({dateStart, dateEnd}){
     return `
-    SELECT B.ID, B.DESCRIPTION, A.QTD, B.CHAVE_PIX, A.QTD * 125 VALOR
+    SELECT B.ID, B.DESCRIPTION, A.QTD, B.CHAVE_PIX, A.QTD * 70 VALOR
     FROM (
       SELECT ASSISTANT, SUM(QTD) QTD
       FROM (
@@ -161,7 +161,7 @@ module.exports = {
   },
   extraRoutesDrivers({dateStart, dateEnd}){
     return `
-    SELECT A.DESCRIPTION, SUM(A.QTD) QTD, A.CHAVE_PIX, (SUM(A.QTD) * 125) VALOR FROM (
+    SELECT A.DESCRIPTION, SUM(A.QTD) QTD, A.CHAVE_PIX, (SUM(A.QTD) * 70) VALOR FROM (
       SELECT B.DESCRIPTION, (COUNT(A.ID_DRIVER) - 1) QTD, A.D_DELIVERING, B.CHAVE_PIX
       FROM DELIVERYS A
       INNER JOIN USERS B ON A.ID_DRIVER = B.ID
