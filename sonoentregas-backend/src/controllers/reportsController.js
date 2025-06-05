@@ -30,6 +30,7 @@ const DreService = require('../services/DreService')
 const DeliveryService = require('../services/DeliveryService')
 const ShopSceService = require('../services/ShopSceService')
 const connections = require('../databases/MSSQL/connections')
+const scriptProducts = require('../scripts/products')
 
 module.exports = {
   /**
@@ -401,4 +402,22 @@ module.exports = {
       return res.status(status).json(error)
     }
   },
+  /**
+   * @param {any} req
+   * @param {any} res
+   */
+  async getPendingProductsOutOfStock(req, res) {
+    try {
+      const pendingProductsOutOfStock = await Products._query(1, scriptProducts.getPendingProductsOutOfStock({date: req.query.date}), QueryTypes.SELECT)
+
+      return res.json(pendingProductsOutOfStock)
+    } catch (e) {
+      console.log(e)
+
+      let status = e.status ? e.status : 400
+      let error = e.error ? e.error : e
+
+      return res.status(status).json(error)
+    }
+  }
 }

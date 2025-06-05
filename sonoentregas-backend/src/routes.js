@@ -182,6 +182,7 @@ routes.put('/maintvisit/finish/:id', mainVisitController.finishVisit)
 routes.get('/catdef', catDefController.index)
 //Reports
 routes.get('/reports', reportsController.listProducts)
+routes.get('/reports/pending-products-out-of-stock', reportsController.getPendingProductsOutOfStock)
 routes.get('/reports/sales/open', reportsController.salesOpen)
 routes.get('/reports/products/movement', reportsController.productsMovement)
 routes.get('/reports/purchase/requests', reportsController.purchaseRequest)
