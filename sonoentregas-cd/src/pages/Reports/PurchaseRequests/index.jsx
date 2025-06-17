@@ -65,7 +65,16 @@ const PageReport = ({ purchaseRequest, classesTable, pageNumber, order, orderBy,
               <TableCell>{item.DIAS_EMIS}</TableCell>
               <TableCell>{item.VALORBRUTO.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
               <TableCell>{item.VALOR_CHEGADA.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
-              <TableCell>{item.FACTORY_DATA}</TableCell>
+              <TableCell>
+                {item.FACTORY_DATA
+                    ? item.FACTORY_DATA
+                    : <>
+                        {(item.PED_FAB && item.PED_FAB !== '') ? `PF: ${item.PED_FAB}` : ''}
+                        {(item.LOTE && item.LOTE !== '') ? ` / L: ${item.LOTE}` : ''}
+                        {(item.CARGA && item.CARGA !== '') ? ` / C: ${item.CARGA}` : ''}
+                      </>
+                  }
+              </TableCell>
               <TableCell>{item.OBS}</TableCell>
             </TableRow>))}
         </TableBody>
@@ -136,7 +145,7 @@ export default function PurchaseRequests(){
     {id: 'DIAS_EMIS', label: 'DIAS'},
     {id: 'VALORBRUTO', label: 'VALOR'},
     {id: 'VALORCHEGADA', label: 'VL CHEGOU'},
-    {id: 'FACTORY_DATA', label: 'PED FORNECEDOR'},
+    {id: 'FACTORY_DATA', label: 'DADOS FABRICA'},
     {id: 'OBS', label: 'OBSERVAÇÃO'},
   ]
 
@@ -146,7 +155,7 @@ export default function PurchaseRequests(){
     {id: 'DIAS_EMIS', label: 'DIAS'},
     {id: 'VALORBRUTO', label: 'VALOR'},
     {id: 'VALORCHEGADA', label: 'VL CHEG', class: classesTable.headCellValuePurchase},
-    {id: 'FACTORY_DATA', label: 'PED FOR', class: classesTable.headCellNumberPurchase},
+    {id: 'FACTORY_DATA', label: 'D FAB', class: classesTable.headCellNumberPurchase},
     {id: 'OBS', label: 'OBSERVAÇÃO'},
   ]
 
@@ -279,7 +288,16 @@ return(
               <TableCell>
                 <BrMonetaryValue value={item.VALOR_CHEGADA}/>
               </TableCell>
-              <TableCell>{item.FACTORY_DATA}</TableCell>
+              <TableCell>
+                {item.FACTORY_DATA
+                    ? item.FACTORY_DATA
+                    : <>
+                        {(item.PED_FAB && item.PED_FAB !== '') ? `PF: ${item.PED_FAB}` : ''}
+                        {(item.LOTE && item.LOTE !== '') ? ` / L: ${item.LOTE}` : ''}
+                        {(item.CARGA && item.CARGA !== '') ? ` / C: ${item.CARGA}` : ''}
+                      </>
+                  }
+              </TableCell>
               <TableCell>{item.OBS}</TableCell>
             </TableRow>
           ))}

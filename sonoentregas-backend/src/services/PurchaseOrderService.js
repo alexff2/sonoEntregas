@@ -78,7 +78,9 @@ class PurchaseOrderService {
       issue: 'EMISSAO',
       type: 'TIPOFRETE',
       type1: 'TIPO_PEDIDO',
-      factoryData: 'FACTORY_DATA',
+      PED_FAB: 'PED_FAB',
+      LOTE: 'LOTE',
+      CARGA: 'CARGA',
       obs: 'OBSERVACAO',
       employeeId: 'COMPRADOR',
     }

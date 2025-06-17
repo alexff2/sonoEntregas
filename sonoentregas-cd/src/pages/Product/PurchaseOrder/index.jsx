@@ -108,19 +108,19 @@ export default function PurchaseOrder() {
     }
   }
 
-  const handleChangeFactoryData = e => {
+  const handleChangeFactoryData = (key, value) => {
     try {
-      setPurchaseOrderSelected(state => ({...state, factoryData: e.target.value}))
+      setPurchaseOrderSelected(state => ({...state, [key]: value}))
 
       debounce(async () => {
         await api.put(`purchase/order/${purchaseOrderSelected.id}`, {
-          fieldToUpdate: 'factoryData',
-          value: e.target.value
+          fieldToUpdate: key,
+          value: value
         })
 
         setPurchaseOrders(state => state.map(purchaseOrder => {
           if (purchaseOrder.id === purchaseOrderSelected.id) {
-            purchaseOrder.factoryData = e.target.value
+            purchaseOrder[key] = value
           }
 
           return purchaseOrder
@@ -178,13 +178,12 @@ export default function PurchaseOrder() {
           <TableHead>
             <TableRow className={classes.rowHeader}>
               <TableCell>Status</TableCell>
-              <TableCell>Nº do pedido</TableCell>
+              <TableCell>Nº</TableCell>
               <TableCell>Emissão</TableCell>
               <TableCell>Lançamento</TableCell>
               <TableCell>Comprador</TableCell>
               <TableCell align="right">Dados Fab.</TableCell>
               <TableCell align="right">R$ Total</TableCell>
-              <TableCell align="right">Nº da nota</TableCell>
               <TableCell></TableCell>
             </TableRow>
           </TableHead>
@@ -229,10 +228,16 @@ export default function PurchaseOrder() {
                     setOpenChangeFactoryData(true)
                   }}
                 >
-                  {purchaseOrder.factoryData}
+                  {purchaseOrder.factoryData
+                    ? purchaseOrder.factoryData
+                    : <>
+                        {(purchaseOrder.PED_FAB && purchaseOrder.PED_FAB !== '') ? `PF: ${purchaseOrder.PED_FAB}` : ''}
+                        {(purchaseOrder.LOTE && purchaseOrder.LOTE !== '') ? ` / L: ${purchaseOrder.LOTE}` : ''}
+                        {(purchaseOrder.CARGA && purchaseOrder.CARGA !== '') ? ` / C: ${purchaseOrder.CARGA}` : ''}
+                      </>
+                  }
                 </TableCell>
                 <TableCell align="right">{purchaseOrder.value}</TableCell>
-                <TableCell align="right">{purchaseOrder.noteNumber}</TableCell>
                 <TableCell align="right">
                   <Print onClick={() => {
                     setOpenPurchaseReport(true)
@@ -290,15 +295,38 @@ export default function PurchaseOrder() {
             setPurchaseOrderSelected()
           }}
         >
-          <InputBase
-            placeholder="Digite a PEDIDO LOTE CARGA"
-            style={{
-              width: '270px',
-              padding: 8
-            }}
-            value={purchaseOrderSelected.factoryData}
-            onChange={handleChangeFactoryData}
-          />
+          <Box display="flex" flexDirection="column" padding={2}>
+            <InputBase
+              placeholder="Ped. Fábrica"
+              style={{
+                padding: '8px 12px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+              }}
+              value={purchaseOrderSelected.PED_FAB || ''}
+              onChange={e => handleChangeFactoryData('PED_FAB', e.target.value)}
+            />
+            <InputBase
+              placeholder="Lote"
+              style={{
+                padding: '8px 12px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+              }}
+              value={purchaseOrderSelected.LOTE || ''}
+              onChange={e => handleChangeFactoryData('LOTE', e.target.value)}
+            />
+            <InputBase
+              placeholder="Carga"
+              style={{
+                padding: '8px 12px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+              }}
+              value={purchaseOrderSelected.CARGA || ''}
+              onChange={e => handleChangeFactoryData('CARGA', e.target.value)}
+            />
+          </Box>
         </Dialog>
       }
 
