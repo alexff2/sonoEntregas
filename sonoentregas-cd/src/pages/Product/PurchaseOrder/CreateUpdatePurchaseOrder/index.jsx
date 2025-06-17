@@ -82,7 +82,6 @@ const purchaseOrderStates = {
   issue: '2010-01-01',
   type: 'normal',
   type1: 'normal',
-  factoryData: '',
   employeeId: '',
   employeeName: '',
   obs: ''
@@ -164,6 +163,25 @@ export default function CreateUpdatePurchaseOrder({
       }, 1300)
     } catch (error) {
       console.log(error)
+      setAlertSnackbar('Erro interno!')
+    }
+  }
+
+  const updatePurchaseOrderObs = e => {
+    try {
+      setPurChaseOrder(state => ({...state, obs: e.target.value}))
+      debounce(async () => {
+        setOpenBackDrop(true)
+        await api.put(`purchase/order/${purchaseOrder.id}`, {
+          fieldToUpdate: 'obs',
+          value: e.target.value
+        })
+
+        setOpenBackDrop(false)
+      }, 1300)
+    } catch (error) {
+      console.log(error)
+      setOpenBackDrop(false)
       setAlertSnackbar('Erro interno!')
     }
   }
@@ -394,13 +412,6 @@ export default function CreateUpdatePurchaseOrder({
               }}
             />
           </Box>
-          <Input
-            id='factoryData'
-            label='Dados da Fabrica'
-            width={210}
-            value={purchaseOrder.factoryData}
-            onChange={handleChange}
-          />
           <FormControl component='fieldset'>
             <RadioGroup
               aria-label='type'
@@ -624,10 +635,9 @@ export default function CreateUpdatePurchaseOrder({
           />&nbsp;&nbsp;&nbsp;
           Observações: &nbsp;
           <Input
-            id='obs'
             style={{margin: 0, flex: 1}}
             value={purchaseOrder.obs}
-            onChange={handleChange}
+            onChange={updatePurchaseOrderObs}
           />
         </Box>
 
