@@ -8,6 +8,20 @@ const SalesService = require('../services/salesService')
 
 module.exports = {
   /**
+   * @param {*} _req
+   * @param {*} res
+   */
+  async findSalesToHome(_req, res){
+    try {
+      const sales = await SalesService.findSalesToHome()
+
+      return res.json({sales})
+    } catch (error) {
+      console.log(error)
+      return res.status(400).json(error)
+    }
+  },
+  /**
    * @param {*} req 
    * @param {*} res 
    */

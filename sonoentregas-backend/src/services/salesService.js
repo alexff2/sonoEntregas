@@ -14,6 +14,7 @@
  * @property {number} ID
  * @property {number} ID_SALES
  * @property {number} CODLOJA
+ * @property {number} SHOP
  * @property {string} STATUS
  * @property {string} EMISSAO
  * @property {string} D_ENVIO
@@ -36,6 +37,7 @@ const ViewSalesProd = require('../models/ViewSalesProd')
 const Empresas = require('../models/ShopsSce')
 const Forecast = require('../models/tables/Forecast')
 const scriptForecast = require('../scripts/forecast')
+const scriptSales = require('../scripts/sales')
 const { difDate } = require('../functions/getDate')
 
 /**
@@ -83,6 +85,25 @@ const setUpSalesProduct = async (/** @type {ISales[]} */ sales, where = '') => {
 }
 
 module.exports = {
+  async findSalesToHome() {
+    /**@type {ISales[] | []} */
+    const sales = await Sales.findAny(0, {STATUS: 'Aberta'})
+
+    if (sales.length === 0) {
+      return []
+    }
+
+    const shops = await Empresas._query(0, 'SELECT * FROM LOJAS', QueryTypes.SELECT)
+    const salesProducts = await SalesProd._query(0, scriptSales.salesProductsByIdSaleId(sales.map(sale => sale.ID)), QueryTypes.SELECT)
+
+    sales.forEach(sale => {
+      sale.SHOP = shops.find(shop => shop.CODLOJA === sale.CODLOJA)?.DESC_ABREV || 'Loja Desconhecida'
+
+      sale.products = salesProducts.filter(product => product.ID_SALE_ID === sale.ID)
+    })
+
+    return sales
+  },
   /**
    * @param {*} where 
    * @returns 

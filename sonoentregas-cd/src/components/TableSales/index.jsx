@@ -203,8 +203,8 @@ function Row({ sale, type, setSales, availableStocks }) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {sale.products.map((product) => (
-                    <TableRow key={product.CODPRODUTO} className={classes.tableProductsCells}>
+                  {sale.products.map((product, key) => (
+                    <TableRow key={key} className={classes.tableProductsCells}>
                       <TableCell>
                         {product.COD_ORIGINAL}
                       </TableCell>
@@ -248,7 +248,7 @@ export default function TableSales({
   availableStocks
 }){
   const [ order, setOrder ] = useState('asc')
-  const [ orderBy, setOrderBy ] = useState('ID_SALES')
+  const [ orderBy, setOrderBy ] = useState('D_ENTREGA1')
   const classes = useStyles()
   const { setAddress } = useAddress()
 

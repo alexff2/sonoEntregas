@@ -88,12 +88,12 @@ export default function Cards(){
 
   useEffect(()=>{
     setOpenBackDrop(true)
-    api.get('sales/', {
+    api.get('sales/home', {
       params: {
         status: 'open'
       }
     }).then(resp => {
-      setSales(resp.data)
+      setSales(resp.data.sales)
       setOpenBackDrop(false)
     }).catch(e => {
       console.log(e)
