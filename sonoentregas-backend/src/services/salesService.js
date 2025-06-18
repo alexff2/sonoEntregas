@@ -173,40 +173,6 @@ module.exports = {
       products
     })
   },
-  /**
-   * @param {number} idProduct 
-   * @returns
-   */
-  async findToCreateForecastByProduct(idProduct){
-    const scriptSalesFind = `
-    select ID_SALES from VIEW_SALES_PROD
-    where [STATUS] = 'Enviado' and EST_LOJA > 0 and COD_ORIGINAL = '${idProduct}'`
-
-    const idSales = await Sales._query(0, scriptSalesFind, QueryTypes.SELECT)
-
-    if (idSales.length === 0) {
-      return {
-        notFound: {
-          message: 'Produto não encontrado, não pendente e/ou sem estoque!'
-        }
-      }
-    }
-
-    /**@type {ISales[] | []} */
-    let sales = await Sales.findAny(0, { in: { ID_SALES: idSales.map(sale => sale.ID_SALES) }})
-
-    if (sales.length === 0) {
-      return ''
-    }
-
-    sales = sales.filter( sale => sale.STATUS === 'Aberta' )
-
-    if (sales.length === 0) {
-      return []
-    }
-
-    return setUpSalesProduct(sales)
-  },
   async findToCreateRoutes({ idSale }){
     /**@type {IForecast[]} */
     const forecasts = await Forecast.findAny(0, { STATUS: 1 })

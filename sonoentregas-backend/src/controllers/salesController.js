@@ -50,26 +50,6 @@ module.exports = {
    * @param {*} req 
    * @param {*} res 
    */
-  async findSalesToCreatedForecastByProduct(req, res){
-    try {
-      const { idProduct } = req.params
-
-      const sales = await SalesService.findToCreateForecastByProduct(idProduct)
-
-      return res.json(sales)
-    } catch (e) {
-      console.log(e)
-
-      let status = e.status ? e.status : 400
-      let error = e.error ? e.error : e
-
-      return res.status(status).json(error)
-    }
-  },
-  /**
-   * @param {*} req 
-   * @param {*} res 
-   */
   async findSalesToCreatedForecast(req, res){
     try {
       const { idSale } = req.params

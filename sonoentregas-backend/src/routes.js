@@ -107,7 +107,6 @@ routes.put('/users/:userId', usersController.update)
 //Sales Sono Delivery
 routes.get('/sales', salesController.findSales)
 routes.get('/sales/:idSale/forecast/create', salesController.findSalesToCreatedForecast)
-routes.get('/sales/forecast/create/product/:idProduct', salesController.findSalesToCreatedForecastByProduct)
 routes.get('/sales/:idSale/routes/create', salesController.findSalesToCreatedDelivery)
 routes.get('/sales/:idSale/loja/:idLoja/product/:idProduct', salesController.findProductDetails)
 routes.put('/sales/:id/reschedule', salesController.updateDateDelivery)
