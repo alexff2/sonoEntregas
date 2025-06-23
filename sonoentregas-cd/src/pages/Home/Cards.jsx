@@ -139,7 +139,7 @@ export default function Cards(){
         setItens([
           {
             icon: ShoppingCart,
-            value: `${resp.data.salesPending} / ${resp.data.salesUnscheduled}`,
+            value: `${resp.data.salesPending+resp.data.salesUnscheduled}`,
             title: 'Vendas Pendentes',
           },
           {
