@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/core'
 const useStyles = makeStyles( theme =>({
   tabContainer: {
     borderRadius: '4px 0 0 0',
+    height: 'auto',
     display: 'block',
     overflowY: 'auto',
     overflowX: 'hidden',
@@ -10,9 +11,20 @@ const useStyles = makeStyles( theme =>({
       overflowX: 'auto'
     }
   },
+  tabContainerHome: {
+    borderRadius: '4px 0 0 0',
+    height: 'calc(100vh - 280px)',
+    display: 'block',
+    overflowY: 'auto',
+    overflowX: 'hidden',
+    [theme.breakpoints.down('lg')]: {
+      overflowX: 'auto',
+      height: 'calc(100vh - 240px)',
+    }
+  },
   tableHead: {
-    background: theme.palette.primary.main,
     '& > th': {
+      background: theme.palette.primary.main,
       padding: 4,
       color: theme.palette.common.white,
       fontWeight: theme.typography.fontWeightBold,

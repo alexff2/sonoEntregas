@@ -22,7 +22,9 @@ const useStyles = makeStyles((theme) => ({
     },
     [theme.breakpoints.up('sm')]: {
       padding: theme.spacing(3),
-      flexGrow: 1
+      paddingTop: theme.spacing(2),
+      paddingBottom: theme.spacing(1),
+      flexGrow: 1,
     },
   },
   toolbar: theme.mixins.toolbar,

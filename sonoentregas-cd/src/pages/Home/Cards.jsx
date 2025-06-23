@@ -34,10 +34,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    padding: theme.spacing(2),
-    [theme.breakpoints.down('lg')]: {
-      padding: theme.spacing(1),
-    }
+    padding: theme.spacing(1),
   },
   icon: {
     fontSize: theme.typography.h3.fontSize,
@@ -107,7 +104,7 @@ export default function Cards(){
         setItens([
           {
             icon: ShoppingCart,
-            value: `${resp.data.salesPending} / ${resp.data.salesUnscheduled}`,
+            value: `${resp.data.salesPending + resp.data.salesUnscheduled}`,
             title: 'Vendas Pendentes',
           },
           {

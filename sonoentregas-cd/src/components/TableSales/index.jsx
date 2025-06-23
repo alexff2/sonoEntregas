@@ -286,11 +286,9 @@ export default function TableSales({
   return(
     <TableContainer
       component={Paper}
-      className={classes.tabContainer}
-      style={type === 'home' ? { height: 'calc(100vh - 280px)' } : { height: 'auto' }}
+      className={type === 'home' ? classes.tabContainerHome : classes.tabContainer}
     >
-      <Table>
-
+      <Table stickyHeader>
         <EnhancedTableHead
           order={order}
           orderBy={orderBy}
