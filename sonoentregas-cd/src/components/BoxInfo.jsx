@@ -11,7 +11,7 @@ const useStyles = makeStyles( theme => ({
   container: {
     borderRadius: '0 4px 0 0',
     height: '100%',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('lg')]: {
       fontSize: '10px'
     }
   },

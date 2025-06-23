@@ -34,26 +34,32 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    padding: theme.spacing(2)
+    padding: theme.spacing(2),
+    [theme.breakpoints.down('lg')]: {
+      padding: theme.spacing(1),
+    }
   },
   icon: {
     fontSize: theme.typography.h3.fontSize,
-    color: theme.palette.text.secondary
+    color: theme.palette.text.secondary,
+    [theme.breakpoints.down('lg')]: {
+      fontSize: '30px'
+    }
   },
-  text: {}
+  text: {
+    [theme.breakpoints.down('lg')]: {
+      fontSize: '14px'
+    }
+  }
 }));
 
 const Item = ({classes, title, icon: Icon, value, searchHome}) => {
   const { setSales }  = useSale()
   
   const searchSales = async () => {
-    const { data } = await api.get('sales/', {
-      params: {
-        status: 'open'
-      }
-    })
+    const { data } = await api.get('sales/home')
 
-    setSales(data)
+    setSales(data.sales)
     searchHome()
   }
   
@@ -88,11 +94,7 @@ export default function Cards(){
 
   useEffect(()=>{
     setOpenBackDrop(true)
-    api.get('sales/home', {
-      params: {
-        status: 'open'
-      }
-    }).then(resp => {
+    api.get('sales/home').then(resp => {
       setSales(resp.data.sales)
       setOpenBackDrop(false)
     }).catch(e => {

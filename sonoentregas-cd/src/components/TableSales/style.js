@@ -6,7 +6,7 @@ const useStyles = makeStyles( theme =>({
     display: 'block',
     overflowY: 'auto',
     overflowX: 'hidden',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('lg')]: {
       overflowX: 'auto'
     }
   },
@@ -17,7 +17,7 @@ const useStyles = makeStyles( theme =>({
       color: theme.palette.common.white,
       fontWeight: theme.typography.fontWeightBold,
     },
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('lg')]: {
       '& > th': {
         fontSize: '10px'
       }
@@ -36,7 +36,7 @@ const useStyles = makeStyles( theme =>({
     '& > td' : {
       padding: 4,
     },
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('lg')]: {
       '& > td': {
         fontSize: '10px'
       }
@@ -61,7 +61,7 @@ const useStyles = makeStyles( theme =>({
       padding: '0 8px',
       fontSize: '12px'
     },
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('lg')]: {
       '& > th': {
         padding: '0 4px',
         fontSize: '10px'

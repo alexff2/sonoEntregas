@@ -13,4 +13,3 @@ module.exports = {
     WHERE A.ID_SALE_ID IN (${idSalesId})`
   }
 }
-  
