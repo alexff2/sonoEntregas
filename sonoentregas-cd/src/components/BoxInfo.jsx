@@ -2,12 +2,13 @@ import React from 'react'
 import {
   Box,
   makeStyles,
-  Paper
+  Paper,
+  Typography
 } from '@material-ui/core'
 
 import { useAddress } from '../context/addressContext'
 
-const useStyles = makeStyles( theme => ({
+const useStyles = makeStyles(theme => ({
   container: {
     borderRadius: '0 4px 0 0',
     height: '100%',
@@ -23,41 +24,83 @@ const useStyles = makeStyles( theme => ({
     height: 33,
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    '& > h6': {
+      [theme.breakpoints.down('lg')]: {
+        fontSize: '10px'
+      }
+    }
   },
   bodyBox: {
     padding: 10,
     '& > div': {
       fontWeight: theme.typography.fontWeightBold,
+      marginBottom: 6,
       '& > span': {
         fontWeight: theme.typography.fontWeightLight,
       }
     }
+  },
+  obsLoja: {
+    color: theme.palette.error.main
+  },
+  obsAgendamento: {
+    color: theme.palette.error.main
+  },
+  emptyState: {
+    marginTop: 100,
+    textAlign: 'center'
   }
 }))
 
-export default function BoxInfo(){
+export default function BoxInfo() {
   const { address } = useAddress()
   const classes = useStyles()
 
-  return(
+  if (!address) {
+    return (
+      <Box component={Paper} className={classes.container}>
+        <Box className={classes.headBox}>
+          <Typography variant="subtitle1">Endereços e Observações</Typography>
+        </Box>
+        <Box className={classes.bodyBox}>
+          <Typography className={classes.emptyState}>
+            Clique em uma venda para mostrar informações
+          </Typography>
+        </Box>
+      </Box>
+    )
+  }
+
+  return (
     <Box component={Paper} className={classes.container}>
       <Box className={classes.headBox}>
-        <span>Endereços e Observações</span>
+        <Typography variant="subtitle1">Endereços e Observações</Typography>
       </Box>
-      
-      { address 
-        ?<Box className={classes.bodyBox}>
-          <div>Observação Loja: <span style={{color: 'red'}}>{address.OBS2}</span> </div><br />
-          <div>Endereço: <span>{address.ENDERECO}</span></div>
-          <div>Ponto de referência: <span>{address.PONTOREF}</span></div>
-          <div>Observação DAV: <span>{address.OBS}</span></div>
-          {address.SCHEDULED && <div style={{color: 'red'}}>Obs. Agendamento: <span>{address.OBS_SCHEDULED}</span></div>}
-        </Box> 
-        :<Box className={classes.bodyBox} textAlign="center">
-          <div style={{marginTop: 100}}>Clique em uma venda para mostrar informações</div>
-        </Box>
-      }
+      <Box className={classes.bodyBox}>
+        <div>
+          Observação Loja:{' '}
+          <span className={classes.obsLoja}>{address.OBS2 || '-'}</span>
+        </div>
+        <div>
+          Endereço:{' '}
+          <span>{address.ENDERECO || '-'}</span>
+        </div>
+        <div>
+          Ponto de referência:{' '}
+          <span>{address.PONTOREF || '-'}</span>
+        </div>
+        <div>
+          Observação DAV:{' '}
+          <span>{address.OBS || '-'}</span>
+        </div>
+        {address.SCHEDULED && (
+          <div className={classes.obsAgendamento}>
+            Obs. Agendamento:{' '}
+            <span>{address.OBS_SCHEDULED || '-'}</span>
+          </div>
+        )}
+      </Box>
     </Box>
   )
 }
