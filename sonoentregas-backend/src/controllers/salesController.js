@@ -22,6 +22,56 @@ module.exports = {
     }
   },
   /**
+   * @param {*} req
+   * @param {*} res
+   */
+  async findSalesToShopById(req, res){
+    try {
+      const sales = await SalesService.findSalesToShopById({
+        saleId: req.params.saleId,
+        shopId: req.query.shopId ? parseInt(req.query.shopId) : null,
+        status: req.query.status ? req.query.status : 'Aberta'
+      })
+
+      return res.json({sales})
+    } catch (error) {
+      console.log(error)
+      return res.status(400).json(error)
+    }
+  },
+  /**
+   * @param {*} req
+   * @param {*} res
+   */
+  async findSalesToShopByName(req, res){
+    try {
+      const sales = await SalesService.findSalesToShopByName({
+        client: req.query.client ? req.query.client : '',
+        shopId: req.query.shopId ? parseInt(req.query.shopId) : null,
+        status: req.query.status ? req.query.status : 'Aberta'
+      })
+
+      return res.json({sales})
+    } catch (error) {
+      console.log(error)
+      return res.status(400).json(error)
+    }
+  },
+  /**
+   * @param {*} req
+   * @param {*} res
+   */
+  async findOpenSalesToShop(req, res){
+    try {
+      const sales = await SalesService.findOpenSalesToShop({shopId: req.query.shopId ? parseInt(req.query.shopId) : null})
+
+      return res.json({sales})
+    } catch (error) {
+      console.log(error)
+      return res.status(400).json(error)
+    }
+  },
+  /**
    * @param {*} req 
    * @param {*} res 
    */

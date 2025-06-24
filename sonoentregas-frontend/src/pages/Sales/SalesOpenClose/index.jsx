@@ -9,7 +9,6 @@ import { useModalAlert } from '../../../context/modalAlertContext'
 
 import LoadingCircle from '../../../components/LoadingCircle'
 import Status from '../../../components/Status'
-import { FormatValue } from "../../../components/FormatValue"
 import ConfirmDialog from "../../../components/ConfirmDialog"
 
 import ModalSaleDetail from '../ModalSaleDetail'
@@ -94,21 +93,17 @@ function Row({ sale, cancelSubmitSales, reverseStock, saleDetail, updateAddress 
               <thead>
                 <tr id="trProd">
                   <td>Código</td>
+                  <td>Qtd</td>
                   <td>Descrição</td>
-                  <td className="qtdProd">Quantidade</td>
-                  <td>Valor (R$)</td>
                   <td></td>
                 </tr>
               </thead>
               <tbody>
-                {sale.products.map((product) => (
-                  <tr key={product.CODPRODUTO} onClick={e => clickProd(e, product)}>
+                {sale.products.map((product, index) => (
+                  <tr key={index} onClick={e => clickProd(e, product)}>
                     <td>{product.COD_ORIGINAL}</td>
-                    <td>{product.DESCRIPTION_SHOP}</td>
                     <td>{product.QUANTIDADE}</td>
-                    <td>{
-                      <FormatValue>{product.NVTOTAL}</FormatValue>
-                    }</td>
+                    <td>{product.NOME}</td>
                     <TdStatus product={product}/>
                   </tr>
                 ))}
@@ -135,55 +130,125 @@ export default function TabSaleWaiting({ type }) {
   const { cod: codLoja } = shopAuth
 
   useEffect(()=> {
-    setLoading(true)
-
-    api
-      .get(`sales/`, {
-        params: {
-          codLoja,
-          status: type,
-          typeSearch: type === 'open' ? undefined : 'D_DELIVERED',
-          search: type === 'open' ? undefined : getDateToSql()
-        }
-      })
-      .then(resp => {
-        if(resp.data){
-          setSales(resp.data)
-        }
+    const getData = async () => {
+      setLoading(true)
+      try {
+        const {data} = type !== 'open'
+          ? await api.get(`sales/`, {
+              params: {
+                codLoja,
+                status: type,
+                typeSearch: 'D_DELIVERED',
+                search: getDateToSql()
+              }
+            })
+          : await api.get(`sales/shop`, {params: {shopId: codLoja}})
+        type !== 'open' ? setSales(data) : setSales(data.sales)
         setLoading(false)
-      })
-    .catch( e => console.log(e) )
+      } catch (error) {
+        setLoading(false)
+        console.log(error)
+      }
+    }
+    getData()
   },[codLoja, type])
 
-  const searchSales = async () => {
+  const getOpenSales = async () => {
     setLoading(true)
     try {
-      if (typeSearch !== 'All' && search === '') {
-        console.log(typeSearch, search)
-        setAlert('Preencha o campo de pesquisa!')
-        return
-      }
+      const { data } = await api.get(`sales/shop`, {
+        params: {
+          shopId: codLoja,
+        }
+      })
+      setSales(data.sales)
+      setLoading(false)
+    } catch (error) {
+      setLoading(false)
+      console.log(error)
+      setAlert('Erro ao conectar com o Servidor!')
+    }
+  }
 
+  const getSalesById = async () => {
+    setLoading(true)
+    try {
+      const params = type === 'open'
+        ? { shopId: codLoja }
+        : { shopId: codLoja, status: 'Fechada' }
+
+      const { data } = await api.get(`sales/${search}/shop`, {params})
+      setSales(data.sales)
+      setLoading(false)
+    } catch (error) {
+      setLoading(false)
+      console.log(error)
+      setAlert('Erro ao conectar com o Servidor!')
+    }
+  }
+
+  const getSalesByName = async () => {
+    setLoading(true)
+    try {
+      const params = type === 'open'
+        ? { shopId: codLoja, client: search }
+        : { shopId: codLoja, client: search, status: 'Fechada' }
+
+      const { data } = await api.get(`sales/shop-by-name`, {params})
+      setSales(data.sales)
+      setLoading(false)
+    } catch (error) {
+      setLoading(false)
+      console.log(error)
+      setAlert('Erro ao conectar com o Servidor!')
+    }
+  }
+
+  const getFinishSalesByDate = async () => {
+    setLoading(true)
+    try {
       const { data } = await api.get(`sales/`, {
         params: {
           codLoja,
           status: type,
-          typeSearch: typeSearch === 'All' ? undefined : typeSearch,
-          search: search === '' ? undefined : search
+          typeSearch: 'D_DELIVERED',
+          search
         }
       })
-
-      if (data.length === 0){
-        setAlert('Venda(s) não encontrada(s)!') 
-      } else {
-        setSales(data)
-      }
-
+      setSales(data)
       setLoading(false)
-    } catch (e) {
+    } catch (error) {
       setLoading(false)
-      console.log(e)
-      setAlert("Erro ao comunicar com o Servidor")
+      console.log(error)
+      setAlert('Erro ao conectar com o Servidor!')
+    }
+  }
+
+  const searchSales = async () => {
+    if (typeSearch !== 'All' && search === '') {
+      console.log(typeSearch, search)
+      setAlert('Preencha o campo de pesquisa!')
+      return
+    }
+
+    if (typeSearch === 'All' && type === 'open') {
+      getOpenSales()
+      return
+    }
+
+    if (typeSearch === 'ID_SALES') {
+      getSalesById()
+      return
+    }
+
+    if (typeSearch === 'NOMECLI') {
+      getSalesByName()
+      return
+    }
+
+    if (typeSearch === 'D_DELIVERED') {
+      getFinishSalesByDate()
+      return
     }
   }
 
@@ -300,7 +365,7 @@ export default function TabSaleWaiting({ type }) {
           <input
             type="date"
             onChange={e => setSearch(e.target.value)}
-            onKeyPress={e => e.key === 'Enter' && searchSales()}
+            onKeyDown={e => e.key === 'Enter' && searchSales()}
             value={search}
           />
         </div>
@@ -326,7 +391,7 @@ export default function TabSaleWaiting({ type }) {
             </tr>
           </thead>
           <tbody>
-            {sales.map( sale => (
+            {sales.map(sale => (
               <Row 
                 key={sale.ID} 
                 sale={sale}

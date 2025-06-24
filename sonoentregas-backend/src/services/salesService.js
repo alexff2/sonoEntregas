@@ -84,6 +84,21 @@ const setUpSalesProduct = async (/** @type {ISales[]} */ sales, where = '') => {
   return addProductInSale({ sales, products: viewSalesProd })
 }
 
+const setProductsToFindSales = async (/** @type {ISales[]} */ sales, finish = false) => {
+  const shops = await Empresas._query(0, 'SELECT * FROM LOJAS', QueryTypes.SELECT)
+  const salesProducts = await SalesProd._query(0, scriptSales.salesProductsByIdSaleId(sales.map(sale => sale.ID), finish), QueryTypes.SELECT)
+  if (salesProducts.length === 0) {
+    return []
+  }
+
+  sales.forEach(sale => {
+    sale.SHOP = shops.find(shop => shop.CODLOJA === sale.CODLOJA)?.DESC_ABREV || 'Loja Desconhecida'
+
+    sale.products = salesProducts.filter(product => product.ID_SALE_ID === sale.ID)
+  })
+  return sales
+}
+
 module.exports = {
   async findSalesToHome() {
     /**@type {ISales[] | []} */
@@ -93,16 +108,37 @@ module.exports = {
       return []
     }
 
-    const shops = await Empresas._query(0, 'SELECT * FROM LOJAS', QueryTypes.SELECT)
-    const salesProducts = await SalesProd._query(0, scriptSales.salesProductsByIdSaleId(sales.map(sale => sale.ID)), QueryTypes.SELECT)
+    return setProductsToFindSales(sales)
+  },
+  async findSalesToShopById({saleId, shopId, status = 'Aberta'}) {
+    /**@type {ISales[] | []} */
+    const sales = await Sales.findAny(0, {CODLOJA: shopId, ID_SALES: saleId, STATUS: status})
 
-    sales.forEach(sale => {
-      sale.SHOP = shops.find(shop => shop.CODLOJA === sale.CODLOJA)?.DESC_ABREV || 'Loja Desconhecida'
+    if (sales.length === 0) {
+      return []
+    }
 
-      sale.products = salesProducts.filter(product => product.ID_SALE_ID === sale.ID)
-    })
+    return setProductsToFindSales(sales, status === 'Fechada')
+  },
+  async findSalesToShopByName({client, shopId, status = 'Aberta'}) {
+    /**@type {ISales[] | []} */
+    const sales = await Sales._query(0, scriptSales.salesByName({client, shopId, status}), QueryTypes.SELECT)
 
-    return sales
+    if (sales.length === 0) {
+      return []
+    }
+
+    return setProductsToFindSales(sales, status === 'Fechada')
+  },
+  async findOpenSalesToShop({shopId}) {
+    /**@type {ISales[] | []} */
+    const sales = await Sales.findAny(0, {STATUS: 'Aberta', CODLOJA: shopId})
+
+    if (sales.length === 0) {
+      return []
+    }
+
+    return setProductsToFindSales(sales)
   },
   /**
    * @param {*} where 
