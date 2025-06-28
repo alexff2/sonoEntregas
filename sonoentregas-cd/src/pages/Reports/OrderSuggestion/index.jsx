@@ -51,11 +51,11 @@ const PageReport = ({ products, lastPage, result, classe, pageNumber, months }) 
               months.month1,
               months.month2,
               months.month3,
-              'TOTAL',
               'M.TRI',
               'PEND.',
               'ESTOQUE',
               'PED',
+              'MIN',
               'COMP'
             ].map((th, i) => (
               <TableCell  color={'black'} key={i}>{th}</TableCell>
@@ -70,14 +70,12 @@ const PageReport = ({ products, lastPage, result, classe, pageNumber, months }) 
               <TableCell>{product.QTD_MES1}</TableCell>
               <TableCell>{product.QTD_MES2}</TableCell>
               <TableCell>{product.QTD_MES3}</TableCell>
-              <TableCell>{product.Tot}</TableCell>
               <TableCell>{product.MedMen}</TableCell>
               <TableCell>{product.PENDENTE}</TableCell>
               <TableCell>{product.EST_LOJA}</TableCell>
               <TableCell>{product.PEDIDO}</TableCell>
-              <TableCell>
-                {product.Result}
-              </TableCell>
+              <TableCell>{product.CompraMinima}</TableCell>
+              <TableCell>{product.Result}</TableCell>
             </TableRow>))}
         </TableBody>
           {lastPage && (
@@ -87,11 +85,11 @@ const PageReport = ({ products, lastPage, result, classe, pageNumber, months }) 
                 <TableCell>{result.valueMonth1}</TableCell>
                 <TableCell>{result.valueMonth2}</TableCell>
                 <TableCell>{result.valueMonth3}</TableCell>
-                <TableCell>{result.valueMonth1 + result.valueMonth2 + result.valueMonth3}</TableCell>
                 <TableCell>{Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/3)}</TableCell>
                 <TableCell>{result.valuePend}</TableCell>
                 <TableCell>{result.valueEstLoja} / {result.valueEstDep}</TableCell>
                 <TableCell>{result.valuePed}</TableCell>
+                <TableCell>{result.valueCompraMinima}</TableCell>
                 <TableCell>
                   {(Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/3) + result.valuePend)-result.valueEstLoja-result.valuePed}
                 </TableCell>
@@ -105,14 +103,14 @@ const PageReport = ({ products, lastPage, result, classe, pageNumber, months }) 
 export default function OrderSuggestion() {
   const { month, monthAbbreviated, years, currentMonth, currentYears, dateTimeBr } = dateAndTimeCurrent()
 
+  const [ isOpenFilter, setIsOpenFilter ] = useState(true)
+  const [ openReport, setOpenReport ] = useState(false)
+  const [ disabledButton, setDisabledButton ] = useState(false)
   const [ selectedYears, setSelectedYears ] = useState(currentYears)
   const [ selectedMonth, setSelectedMonth ] = useState(currentMonth - 1)
   const [ resultFilter, setResultFilter ] = useState('positives')
   const [ search, setSearch ] = useState('')
   const [ products, setProducts ] = useState([])
-  const [ isOpenFilter, setIsOpenFilter ] = useState(true)
-  const [ openReport, setOpenReport ] = useState(false)
-  const [ disabledButton, setDisabledButton ] = useState(false)
 
   const classe = useStyle()
 
@@ -146,7 +144,7 @@ export default function OrderSuggestion() {
 
   const handleFilterReport = async () => {
     setDisabledButton(true)
-    const { data } = await api.get('reports', {
+    const { data } = await api.get('reports/order-suggestion', {
       params: {
         monthBase: selectedMonth,
         yearBase: selectedYears
@@ -187,7 +185,8 @@ export default function OrderSuggestion() {
     valuePend: 0,
     valueEstLoja: 0,
     valueEstDep: 0,
-    valuePed: 0
+    valuePed: 0,
+    valueCompraMinima: 0
   }
 
   for(var i = 0; i < productsFilter.length; i++) {
@@ -197,10 +196,14 @@ export default function OrderSuggestion() {
     result.valuePend += productsFilter[i].PENDENTE
     result.valueEstLoja += productsFilter[i].EST_LOJA
     result.valuePed += productsFilter[i].PEDIDO
+    result.valueCompraMinima += productsFilter[i].PENDENTE-productsFilter[i].EST_LOJA-productsFilter[i].PEDIDO
+
     productsFilter[i]['Tot'] = productsFilter[i].QTD_MES1 + productsFilter[i].QTD_MES2 + productsFilter[i].QTD_MES3
     productsFilter[i]['MedMen'] = Math.floor((productsFilter[i].QTD_MES1 + productsFilter[i].QTD_MES2 + productsFilter[i].QTD_MES3) / 3)
-    productsFilter[i]['MedSem'] = Math.floor((productsFilter[i].QTD_MES1 + productsFilter[i].QTD_MES2 + productsFilter[i].QTD_MES3) / 3)
-    productsFilter[i]['Result'] = (Math.floor((productsFilter[i].QTD_MES1 + productsFilter[i].QTD_MES2 + productsFilter[i].QTD_MES3)/3) + productsFilter[i].PENDENTE)-productsFilter[i].EST_LOJA-productsFilter[i].PEDIDO
+    productsFilter[i]['CompraMinima'] = productsFilter[i].PENDENTE-productsFilter[i].EST_LOJA-productsFilter[i].PEDIDO
+    productsFilter[i]['Result'] = 
+      (Math.floor((productsFilter[i].QTD_MES1 + productsFilter[i].QTD_MES2 + productsFilter[i].QTD_MES3)/3) + productsFilter[i].PENDENTE)
+      -productsFilter[i].EST_LOJA-productsFilter[i].PEDIDO
   }
 
   const productsReport = splitReportTable(productsFilter, 49, 47)
@@ -253,8 +256,9 @@ export default function OrderSuggestion() {
                 'MEDIA TRI',
                 'PENDENTE',
                 'ESTOQUE',
-                'PEDIDO',
-                'COMPRA'
+                'PEDIDOS',
+                'COMP.MIN',
+                'COMP.MAX'
               ].map((th, i) => (
                 <TableCell key={i}>{th}</TableCell>
               ))}
@@ -273,6 +277,7 @@ export default function OrderSuggestion() {
                 <TableCell>{product.PENDENTE}</TableCell>
                 <TableCell>{product.EST_LOJA}</TableCell>
                 <TableCell>{product.PEDIDO}</TableCell>
+                <TableCell>{product.CompraMinima}</TableCell>
                 <TableCell style={ product.Result < 0 ? {color: 'green'} : {color: 'red'}}>
                   {product.Result}
                 </TableCell>
@@ -290,6 +295,7 @@ export default function OrderSuggestion() {
               <TableCell>{result.valuePend}</TableCell>
               <TableCell>{result.valueEstLoja} / {result.valueEstDep}</TableCell>
               <TableCell>{result.valuePed}</TableCell>
+              <TableCell>{result.valueCompraMinima}</TableCell>
               <TableCell>
                 {(Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/3) + result.valuePend)-result.valueEstLoja-result.valuePed}
               </TableCell>
@@ -327,12 +333,12 @@ export default function OrderSuggestion() {
                     month1,
                     month2,
                     month3,
-                    'TOTAL',
                     'M.TRI',
                     'PEND.',
                     'ESTOQUE',
                     'PED',
-                    'COMP'
+                    'MIN',
+                    'MAX'
                   ].map((th, i) => (
                     <TableCell  color={'black'} key={i}>{th}</TableCell>
                   ))}
@@ -346,14 +352,12 @@ export default function OrderSuggestion() {
                     <TableCell>{product.QTD_MES1}</TableCell>
                     <TableCell>{product.QTD_MES2}</TableCell>
                     <TableCell>{product.QTD_MES3}</TableCell>
-                    <TableCell>{product.Tot}</TableCell>
                     <TableCell>{product.MedMen}</TableCell>
                     <TableCell>{product.PENDENTE}</TableCell>
                     <TableCell>{product.EST_LOJA}</TableCell>
                     <TableCell>{product.PEDIDO}</TableCell>
-                    <TableCell>
-                      {product.Result}
-                    </TableCell>
+                    <TableCell>{product.CompraMinima}</TableCell>
+                    <TableCell>{product.Result}</TableCell>
                   </TableRow>
                   ))}
               </TableBody>
@@ -363,11 +367,11 @@ export default function OrderSuggestion() {
                   <TableCell>{result.valueMonth1}</TableCell>
                   <TableCell>{result.valueMonth2}</TableCell>
                   <TableCell>{result.valueMonth3}</TableCell>
-                  <TableCell>{result.valueMonth1 + result.valueMonth2 + result.valueMonth3}</TableCell>
                   <TableCell>{Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/3)}</TableCell>
                   <TableCell>{result.valuePend}</TableCell>
                   <TableCell>{result.valueEstLoja} / {result.valueEstDep}</TableCell>
                   <TableCell>{result.valuePed}</TableCell>
+                  <TableCell>{result.valueCompraMinima}</TableCell>
                   <TableCell>
                     {(Math.floor((result.valueMonth1 + result.valueMonth2 + result.valueMonth3)/3) + result.valuePend)-result.valueEstLoja-result.valuePed}
                   </TableCell>

@@ -72,7 +72,7 @@ module.exports = {
           GROUP BY CODPRODUTO
       ) C ON A.CODIGO = C.CODPRODUTO
       WHERE A.ATIVO = 'S' AND D.CODLOJA = 1
-      ORDER BY B.QTD DESC
+      ORDER BY A.NOME
       `, QueryTypes.SELECT)
 
       if (month1 === -1) {
