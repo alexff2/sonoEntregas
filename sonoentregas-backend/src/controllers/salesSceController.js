@@ -149,7 +149,7 @@ module.exports = {
   
           await OrcParc.creator(0, valuesOrcParc, true, entrega)
         }
-      } else if (saleFind[0].STATUS === 'Cancelada') {
+      } else if (saleFind[0].STATUS === 'Cancelada' || saleFind[0].STATUS === 'Fechada') {
         const valuesSales = `TOTAL_PROD = ${VALORPROD}, DESCONTO = ${DESCONTO}, TOTAL = ${TOTALVENDA}, ENDERECO = '${ENDERECO}', STATUS = 'Aberta', NUMERO = '${NUMERO}', BAIRRO = '${BAIRRO}', CIDADE = '${CIDADE}', ESTADO = '${ESTADO}', PONTOREF = '${PONTOREF}', OBS = '${OBS}', D_ENTREGA1 = '${D_ENTREGA1}', D_ENVIO = '${D_ENVIO}', VENDEDOR = '${VENDEDOR}', FONE = '${FONE}', CGC_CPF = '${CGC_CPF}', INS_RG = '${INS_RG}', FAX = '${fone_2}', O_V = '${O_V}', OBS2 = '${OBS2}', HAVE_OBS2 = '${HAVE_OBS2 ? 1 : 0}', isWithdrawal = ${isWithdrawal ? 1 : 0}`
 
         await Sales._query(0, `UPDATE SALES SET ${valuesSales} WHERE ID_SALES = ${CODIGOVENDA} AND CODLOJA = ${loja}`, QueryTypes.UPDATE, entrega)
@@ -207,7 +207,7 @@ module.exports = {
     const sce = await Sales._query(CODLOJA)
 
     try {
-      await SalesProd._query(0, `DELETE SALES_PROD WHERE ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA} AND CODPRODUTO = '${CODPRODUTO}'`, QueryTypes.DELETE, entrega)
+      await SalesProd.deleteAny(0, { ID_SALES, CODLOJA, CODPRODUTO }, entrega)
 
       if (DOWN_EST == null){
         await Sales._query(CODLOJA, `UPDATE PRODLOJAS SET EST_ATUAL = EST_ATUAL - ${QUANTIDADE}, EST_LOJA = EST_LOJA - ${QUANTIDADE} WHERE CODIGO = ${CODPRODUTO} AND CODLOJA = 1`, QueryTypes.UPDATE, sce)
@@ -215,14 +215,14 @@ module.exports = {
 
       await Sales._query(CODLOJA, `DELETE NVENDI2_STATUS WHERE CODIGOVENDA = ${ID_SALES} AND CODPRODUTO = ${CODPRODUTO}`, QueryTypes.UPDATE, sce)
 
-      const ProdSales = await SalesProd.findSome(0, `ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`, '*', entrega)
+      const prodSales = await SalesProd.findSome(0, `ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`, '*', entrega)
 
       const forecastSale = await Sales._query(0, `SELECT * FROM SALES A INNER JOIN FORECAST_SALES B ON A.ID = B.idSale WHERE A.ID_SALES = ${ID_SALES} AND A.CODLOJA = ${CODLOJA}`, QueryTypes.SELECT, entrega)
 
-      if (ProdSales.length === 0) {
+      if (prodSales.length === 0) {
         if (forecastSale.length === 0) {
-          await SalesProd._query(0, `DELETE SALES WHERE ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`, QueryTypes.DELETE, entrega)
-          await SalesProd._query(0, `DELETE ORCPARC WHERE ID_SALES = ${ID_SALES} AND CODLOJA = ${CODLOJA}`, QueryTypes.DELETE, entrega)
+          await Sales.deleteAny(0, { ID_SALES, CODLOJA }, entrega)
+          await OrcParc.deleteAny(0, { ID_SALES, CODLOJA }, entrega)
 
           await sce.transaction.commit()
           await entrega.transaction.commit()
@@ -235,6 +235,10 @@ module.exports = {
           await entrega.transaction.commit()
           return res.json({msg: 'Venda cancelada!', venda: false})
         }
+      }
+
+      if(prodSales.filter(prod => prod.STATUS !== 'Finalizada').length === 0){
+        await Sales.updateAny(0, { STATUS: 'Fechada' }, { ID_SALES, CODLOJA }, entrega)
       }
 
       await sce.transaction.commit()

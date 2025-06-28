@@ -25,7 +25,7 @@ function TdStatus({product}){
     return params
   }
 
-  if(product.STATUS === 'Enviado'){
+  if(product.STATUS === 'Enviado' && product.QTD_MOUNTING === 0){
     return <td id="btnCancel">Cancelar</td>
   } else if(product.STATUS === 'Finalizada' && product.DOWN_EST){
     return <td id="btnEstornar">Estornar estoque</td>
@@ -94,6 +94,7 @@ function Row({ sale, cancelSubmitSales, reverseStock, saleDetail, updateAddress 
                 <tr id="trProd">
                   <td>Código</td>
                   <td>Qtd</td>
+                  <td>Qtd Proc</td>
                   <td>Descrição</td>
                   <td></td>
                 </tr>
@@ -103,6 +104,7 @@ function Row({ sale, cancelSubmitSales, reverseStock, saleDetail, updateAddress 
                   <tr key={index} onClick={e => clickProd(e, product)}>
                     <td>{product.COD_ORIGINAL}</td>
                     <td>{product.QUANTIDADE}</td>
+                    <td>{product.QTD_MOUNTING}</td>
                     <td>{product.NOME}</td>
                     <TdStatus product={product}/>
                   </tr>
@@ -254,16 +256,8 @@ export default function TabSaleWaiting({ type }) {
 
   const cancelSubmitSales = async produto => {
     try {
-      const {data} = await api.post(`salesshop`, produto)
-
-      const { data: DataSales } = await api.get(`sales/`, {
-        params: {
-          codLoja,
-          status: type
-        }
-      })
-      setSales(DataSales)
-
+      const {data} = await api.post(`sales-shop`, produto)
+      getOpenSales()
       setAlert(data.msg)
     } catch (error) {
       setAlert('Erro no sistema, entrar em contato com ADM')
