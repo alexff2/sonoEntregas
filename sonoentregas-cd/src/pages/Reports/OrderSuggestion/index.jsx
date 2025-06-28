@@ -161,7 +161,7 @@ export default function OrderSuggestion() {
   const productsFilter = (search.length  > 0 || resultFilter !== 'all')
     ? products.filter( prod => {
         if (resultFilter === 'positives') {
-          if (prod.Result <= 0) {
+          if (prod.Result < 0) {
             return false
           }
         } else if (resultFilter === 'negatives') {
