@@ -183,22 +183,26 @@ div.sales-head {
   grid-template-columns: 3fr 1fr;
 }
 
-div.sales-field {
+div.sales-fields {
+  display: flex;
+}
+div.sales-fields-left,div.sales-fields-right {
   display: flex;
   flex-direction: column;
+  width: 50%;
 }
-
-div.sales-field div span {
+div.sales-fields div span {
   font-weight: 600;
   margin-right: 0.25rem;
 }
-div.sales-field div input {
+div.sales-fields div input {
   font-size: 0.5rem;
 }
 .divObsCkeck{
   display: flex;
   align-items: center;
 } 
+
 div.sales-buttons {
   display: flex;
   align-items: center;

@@ -118,7 +118,7 @@ module.exports = {
     const sce = await Sales._query(loja)
 
     try {
-      const { CODIGOVENDA, CODCLIENTE, NOMECLI, VALORPROD, DESCONTO, TOTALVENDA, EMISSAO, ENDERECO, NUMERO, BAIRRO, CIDADE, ESTADO, PONTOREF, OBS, products, USER_ID, VENDEDOR, FONE, CGC_CPF, INS_RG, FAX, FONE2, orcParc, O_V , OBS2, HAVE_OBS2, isWithdrawal } = req.body
+      const { CODIGOVENDA, CODCLIENTE, NOMECLI, VALORPROD, DESCONTO, TOTALVENDA, EMISSAO, ENDERECO, NUMERO, BAIRRO, CIDADE, ESTADO, PONTOREF, OBS, products, USER_ID, VENDEDOR, FONE, CGC_CPF, INS_RG, FAX, FONE2, orcParc, O_V , OBS2, HAVE_OBS2, isWithdrawal, dtPrevShop } = req.body
 
       const fone_2 = FAX ? FAX : FONE2
 
@@ -138,7 +138,7 @@ module.exports = {
 
       if (saleFind.length === 0) {
 
-        const valuesSales = `${CODIGOVENDA}, ${loja}, ${CODCLIENTE}, '${NOMECLI}', ${VALORPROD}, ${DESCONTO}, ${TOTALVENDA}, '${EMISSAO}', 'Aberta', '${ENDERECO}', '${NUMERO}', '${BAIRRO}', '${CIDADE}', '${ESTADO}', '${PONTOREF}', '${OBS}', ${USER_ID}, '${D_ENTREGA1}', '${D_ENVIO}', '${VENDEDOR}', '${FONE}', '${CGC_CPF}', '${INS_RG}', '${fone_2}', '${O_V}', '${OBS2}', '${HAVE_OBS2 ? 1 : 0}', 0, NULL, ${isWithdrawal ? 1 : 0}, NULL`
+        const valuesSales = `${CODIGOVENDA}, ${loja}, ${CODCLIENTE}, '${NOMECLI}', ${VALORPROD}, ${DESCONTO}, ${TOTALVENDA}, '${EMISSAO}', 'Aberta', '${ENDERECO}', '${NUMERO}', '${BAIRRO}', '${CIDADE}', '${ESTADO}', '${PONTOREF}', '${OBS}', ${USER_ID}, '${D_ENTREGA1}', '${D_ENVIO}', '${VENDEDOR}', '${FONE}', '${CGC_CPF}', '${INS_RG}', '${fone_2}', '${O_V}', '${OBS2}', '${HAVE_OBS2 ? 1 : 0}', 0, NULL, ${isWithdrawal ? 1 : 0}, NULL, '${dtPrevShop}'`
 
         await Sales.creator(0, valuesSales, false, entrega)
 
@@ -150,7 +150,7 @@ module.exports = {
           await OrcParc.creator(0, valuesOrcParc, true, entrega)
         }
       } else if (saleFind[0].STATUS === 'Cancelada' || saleFind[0].STATUS === 'Fechada') {
-        const valuesSales = `TOTAL_PROD = ${VALORPROD}, DESCONTO = ${DESCONTO}, TOTAL = ${TOTALVENDA}, ENDERECO = '${ENDERECO}', STATUS = 'Aberta', NUMERO = '${NUMERO}', BAIRRO = '${BAIRRO}', CIDADE = '${CIDADE}', ESTADO = '${ESTADO}', PONTOREF = '${PONTOREF}', OBS = '${OBS}', D_ENTREGA1 = '${D_ENTREGA1}', D_ENVIO = '${D_ENVIO}', VENDEDOR = '${VENDEDOR}', FONE = '${FONE}', CGC_CPF = '${CGC_CPF}', INS_RG = '${INS_RG}', FAX = '${fone_2}', O_V = '${O_V}', OBS2 = '${OBS2}', HAVE_OBS2 = '${HAVE_OBS2 ? 1 : 0}', isWithdrawal = ${isWithdrawal ? 1 : 0}`
+        const valuesSales = `TOTAL_PROD = ${VALORPROD}, DESCONTO = ${DESCONTO}, TOTAL = ${TOTALVENDA}, ENDERECO = '${ENDERECO}', STATUS = 'Aberta', NUMERO = '${NUMERO}', BAIRRO = '${BAIRRO}', CIDADE = '${CIDADE}', ESTADO = '${ESTADO}', PONTOREF = '${PONTOREF}', OBS = '${OBS}', D_ENTREGA1 = '${D_ENTREGA1}', D_ENVIO = '${D_ENVIO}', VENDEDOR = '${VENDEDOR}', FONE = '${FONE}', CGC_CPF = '${CGC_CPF}', INS_RG = '${INS_RG}', FAX = '${fone_2}', O_V = '${O_V}', OBS2 = '${OBS2}', HAVE_OBS2 = '${HAVE_OBS2 ? 1 : 0}', isWithdrawal = ${isWithdrawal ? 1 : 0}, dtPrevShop = '${dtPrevShop}'`
 
         await Sales._query(0, `UPDATE SALES SET ${valuesSales} WHERE ID_SALES = ${CODIGOVENDA} AND CODLOJA = ${loja}`, QueryTypes.UPDATE, entrega)
 

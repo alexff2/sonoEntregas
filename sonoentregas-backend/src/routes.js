@@ -100,7 +100,7 @@ routes.put('/users/:userId', usersController.update)
   //Sales SCE Shops
   routes.get('/salesshop/:emissao/:loja', salesSceController.salesSce)
   routes.get('/sales/:codDAV/shop/:idShop/products', salesSceController.salesSceProd)
-  routes.post('/salesshop/:loja', salesSceController.sendSale)
+  routes.post('/sales-shop/:loja', salesSceController.sendSale)
   routes.post('/sales-shop', salesSceController.cancelSubmitSales)
   routes.post('/salesshop/reverse/:idSale', salesSceController.reverseStock)
   routes.put('/sales/:idSale/updateAddress', salesSceController.updateAddressClient)

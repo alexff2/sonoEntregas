@@ -83,6 +83,7 @@ export default function ModalSendSale({
   const [ orcParc, setOrcParc ] = useState([])
   const [ productSales, setProductSales ] = useState([])
   const [ openObs, setOpenObs ] = useState(false)
+  const [ dtPrevShop, setDtPrevShop ] = useState('')
   const [ isWithdrawal, setIsWithdrawal ] = useState(false)
   const [ disableButton, setDisableButton] = useState(false)
   const [ obs, setObs ] = useState('')
@@ -110,6 +111,10 @@ export default function ModalSendSale({
   },[ cod, sale, setAlert ])
 
   const submitSales = async sale => {
+    if (dtPrevShop === '') {
+      setAlert('Preencha a data de previsão da loja!')
+      return
+    }
     const sendProduct = []
 
     productSales.forEach(product => {
@@ -120,14 +125,16 @@ export default function ModalSendSale({
       setDisableButton(true)
 
       if(sendProduct.length > 0 && validateObs(obs, openObs)) {
-        sale["products"] = sendProduct
-        sale["USER_ID"] = USER_ID
-        sale["orcParc"] = orcParc
-        sale["OBS2"] = obs
-        sale["HAVE_OBS2"] = openObs
-        sale["isWithdrawal"] = isWithdrawal
-
-        const { data } = await api.post(`salesshop/${cod}`, sale)
+        const { data } = await api.post(`sales-shop/${cod}`, {
+          ...sale,
+          products: sendProduct,
+          USER_ID,
+          orcParc,
+          OBS2: obs,
+          HAVE_OBS2: openObs,
+          isWithdrawal,
+          dtPrevShop
+        })
         
         data.create && setEmissao(date)
         
@@ -165,49 +172,55 @@ export default function ModalSendSale({
     >
       <div className="modal">
         <h2>Venda selecionada</h2>
-        <div className="sales-modal">
-
-          <div className="sales-head">
-            <div className="sales-field">
-              <div><span>N Venda: </span>{sale.CODIGOVENDA}</div>
-              <div><span>Cliente: </span>{sale.NOMECLI}</div>
-              <div><span>Valor: </span>{
-                Intl
-                  .NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'})
-                  .format(sale.TOTALVENDA)
-              }</div>
-              
-              <div>
-                <span>Retirada?</span>
-                <input type="checkbox" onChange={() => setIsWithdrawal(!isWithdrawal)}/>
-                <div className="divObsCkeck">
-                  <span>Observação?</span>
-                  <input type="checkbox" onChange={() => setOpenObs(!openObs)}/>
-                </div>
-                { openObs && <textarea
-                                cols={60}
-                                onChange={e => setObs(e.target.value)}
-                                ></textarea>
-                }
-              </div>
-            </div>
-
-            <div className="sales-buttons">
-              <button className="cancel-modal">Cancelar</button>
-
-              <button
-                disabled={disableButton}
-                onClick={() => submitSales(sale)}
-              >Enviar</button>
-            </div> 
+        {loading
+          ?<div className='loadingTable' >
+            <LoadingCircle/>
           </div>
+          :<div className="sales-modal">
 
-          {loading 
-          ?
-            <div className='loadingTable' >
-              <LoadingCircle/>
+            <div className="sales-head">
+              <div className="sales-fields">
+                <div className="sales-fields-left">
+                  <div>
+                    <span>Retirada?</span>
+                    <input type="checkbox" onChange={() => setIsWithdrawal(!isWithdrawal)}/>
+                  </div>
+                  <div>
+                    <span>Data Previsão Loja: </span>
+                    <input type="date" onChange={e => setDtPrevShop(e.target.value)}/>
+                  </div>
+                  <div>
+                    <span>Observação?</span>
+                    <input type="checkbox" onChange={() => setOpenObs(!openObs)}/>
+                  </div>
+                  { openObs && <textarea
+                                  cols={60}
+                                  onChange={e => setObs(e.target.value)}
+                                  ></textarea>
+                  }
+                </div>
+
+                <div className="sales-fields-right">
+                  <div><span>N Venda: </span>{sale.CODIGOVENDA}</div>
+                  <div><span>Cliente: </span>{sale.NOMECLI}</div>
+                  <div><span>Valor: </span>{
+                    Intl
+                      .NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'})
+                      .format(sale.TOTALVENDA)
+                  }</div>
+                </div>
+              </div>
+
+              <div className="sales-buttons">
+                <button className="cancel-modal">Cancelar</button>
+
+                <button
+                  disabled={disableButton}
+                  onClick={() => submitSales(sale)}
+                >Enviar</button>
+              </div> 
             </div>
-          : 
+
             <table className="table-modal-product">
               <thead>
                 <tr>
@@ -242,8 +255,8 @@ export default function ModalSendSale({
               ))}
               </tbody>
             </table>
-          }
-        </div>
+          </div>
+        }
       </div>
     </div>
   )
