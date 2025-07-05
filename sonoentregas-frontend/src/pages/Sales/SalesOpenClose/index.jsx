@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineSearch } from 'react-icons/ai'
+import {AiOutlineSearch} from 'react-icons/ai'
+import {BsArrowReturnRight} from 'react-icons/bs'
 
 import api from '../../../services/api'
 import { dateSqlToReact, getDateToSql } from '../../../functions/getDate'
@@ -12,6 +13,7 @@ import Status from '../../../components/Status'
 import ConfirmDialog from "../../../components/ConfirmDialog"
 
 import ModalSaleDetail from '../ModalSaleDetail'
+import './style.css'
 
 function TdStatus({product}){
   const styleStatus = status => {
@@ -26,17 +28,15 @@ function TdStatus({product}){
   }
 
   if(product.STATUS === 'Enviado' && product.QTD_MOUNTING === 0){
-    return <td id="btnCancel">Cancelar</td>
+    return <span id="btnCancel">Cancelar</span>
   } else if(product.STATUS === 'Finalizada' && product.DOWN_EST){
-    return <td id="btnEstornar">Estornar estoque</td>
+    return <span id="btnEstornar">Estornar estoque</span>
   } else {
-    return <td><Status params={styleStatus(product.STATUS)}/></td>
+    return <span><Status params={styleStatus(product.STATUS)}/></span>
   }
 }
 
 function Row({ sale, cancelSubmitSales, reverseStock, saleDetail, updateAddress }) {
-  const [open, setOpen] = useState(false)
-
   const clickProd = (e, prod) => {
     if(e.target.id === 'btnCancel') cancelSubmitSales(prod)
     else if(e.target.id === 'btnEstornar') reverseStock(prod)
@@ -67,54 +67,36 @@ function Row({ sale, cancelSubmitSales, reverseStock, saleDetail, updateAddress 
   }
 
   return (
-    <>
-      <tr>
-        <td style={{width: 10}} onClick={() => setOpen(!open)}>
-          { open ? <AiOutlineArrowUp /> : <AiOutlineArrowDown /> }
-        </td>
-        <td>{sale.ID_SALES}</td>
-        <td style={{cursor: 'pointer'}} onClick={() => updateAddress(sale)}>{sale.NOMECLI}</td>
-        <td>{dateSqlToReact(sale.EMISSAO)}</td>
-        <td style={styleDateDelivery()}>
-          {sale.D_ENTREGA1 !== null
-            ? dateSqlToReact(sale.D_ENTREGA1)
-            : 'Sem agendamento'
-          }
-        </td>
-      </tr>
-
-      <tr id="trProdId">
-        <td style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={5}>
-          <div className={open ? 'tabProdSeach openDiv': 'tabProdSeach'}>
-            <h3>
-              Produtos{ sale.HAVE_OBS2? <span style={{fontSize: 12, color: 'red', fontWeight: 100}}> - {sale.OBS2}</span>: null}
-            </h3>
-            <table>
-              <thead>
-                <tr id="trProd">
-                  <td>Código</td>
-                  <td>Qtd</td>
-                  <td>Qtd Proc</td>
-                  <td>Descrição</td>
-                  <td></td>
-                </tr>
-              </thead>
-              <tbody>
-                {sale.products.map((product, index) => (
-                  <tr key={index} onClick={e => clickProd(e, product)}>
-                    <td>{product.COD_ORIGINAL}</td>
-                    <td>{product.QUANTIDADE}</td>
-                    <td>{product.QTD_MOUNTING}</td>
-                    <td>{product.NOME}</td>
-                    <TdStatus product={product}/>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+    <div className="openClosedTableRows">
+      <div  className="initialColumns">
+        <div className="columnsSaleInfo">
+          <span>{sale.ID_SALES}</span>
+          <span style={{cursor: 'pointer'}} onClick={() => updateAddress(sale)}>{sale.NOMECLI}</span>
+          <span>{sale.VENDEDOR}</span>
+          <span>{dateSqlToReact(sale.EMISSAO)}</span>
+          <span style={styleDateDelivery()}>
+            {sale.D_ENTREGA1 !== null
+              ? dateSqlToReact(sale.D_ENTREGA1)
+              : 'Sem agend.'
+            }
+          </span>
+        </div>
+        {sale.products.map((product, index) => (
+          <div className="productsInfo" key={index} onClick={e => clickProd(e, product)}>
+            <span><BsArrowReturnRight /></span>
+            <span>Qtd: {product.QUANTIDADE}</span>
+            <span>{product.NOME}</span>
+            <span>Cod: {product.COD_ORIGINAL}</span>
+            <TdStatus product={product}/>
           </div>
-        </td>
-      </tr>
-    </>
+        ))}
+        
+      </div>
+      <span className="columnObs">
+        - {sale.OBS}
+        {sale.HAVE_OBS2 && <div style={{color: 'red', fontWeight: 100}}> - {sale.OBS2}</div>}
+      </span>
+    </div>
   );
 }
 
@@ -374,17 +356,18 @@ export default function TabSaleWaiting({ type }) {
           <LoadingCircle />
         </div>
         :
-        <table>
-          <thead>
-            <tr>
-              <th id="thSales-firstItem"></th>
-              <th>Código</th>
-              <th>Cliente</th>
-              <th>Emissão</th>
-              <th>Previsão</th>
-            </tr>
-          </thead>
-          <tbody>
+        <div>
+          <div className="tableHeaderRowOpenClosed">
+            <div className="initialColumns">
+              <span>Código</span>
+              <span>Cliente</span>
+              <span>Vendedor</span>
+              <span>Emissão</span>
+              <span>Previsão</span>
+            </div>
+            <span className="columnObs">Observação</span>
+          </div>
+          <div className="tableBodyOpenClosed">
             {sales.map(sale => (
               <Row 
                 key={sale.ID} 
@@ -395,8 +378,8 @@ export default function TabSaleWaiting({ type }) {
                 updateAddress={updateAddress}
               />
             ))}
-          </tbody>
-        </table>
+          </div>
+        </div>
       }
 
       {openModalSaleDetail &&

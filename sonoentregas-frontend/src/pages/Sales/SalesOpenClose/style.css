@@ -1,0 +1,99 @@
+.tableHeaderRowOpenClosed {
+  display: flex;
+  width: calc(100% - 16px);
+}
+.tableHeaderRowOpenClosed span {
+  font-weight: bold;
+  padding: 4px;
+  background-color: var(--gray-line);
+}
+.tableHeaderRowOpenClosed .initialColumns {
+  width: 65%;
+  display: flex;
+}
+.tableHeaderRowOpenClosed .initialColumns span:nth-child(1){
+  width: 10%;
+}
+.tableHeaderRowOpenClosed .initialColumns span:nth-child(2){
+  width: 42%;
+}
+.tableHeaderRowOpenClosed .initialColumns span:nth-child(3){
+  width: 16%;
+}
+.tableHeaderRowOpenClosed .initialColumns span:nth-child(4){
+  width: 16%;
+}
+.tableHeaderRowOpenClosed .initialColumns span:nth-child(5){
+  width: 16%;
+}
+.tableHeaderRowOpenClosed .columnObs {
+  width: 35%;
+}
+
+.tableBodyOpenClosed {
+  height: calc(100vh - 360px);
+  overflow-y: auto;
+}
+
+.openClosedTableRows {
+  display: flex;
+  border-left: 1px solid var(--gray-line);
+  border-bottom: 1px solid var(--gray-line);
+  border-right: 1px solid var(--gray-line);
+}
+.openClosedTableRows .initialColumns {
+  width: 65%;
+  flex-direction: column;
+}
+.openClosedTableRows .initialColumns .columnsSaleInfo {
+  width: 100%;
+  display: flex;
+  font-weight: bold;
+}
+.openClosedTableRows .initialColumns .columnsSaleInfo span:nth-child(1){
+  width: 10%;
+}
+.openClosedTableRows .initialColumns .columnsSaleInfo span:nth-child(2){
+  width: 42%;
+}
+.openClosedTableRows .initialColumns .columnsSaleInfo span:nth-child(3){
+  width: 16%;
+}
+.openClosedTableRows .initialColumns .columnsSaleInfo span:nth-child(4){
+  width: 16%;
+}
+.openClosedTableRows .initialColumns .columnsSaleInfo span:nth-child(5){
+  width: 16%;
+}
+.openClosedTableRows .columnObs{
+  width: 35%;
+  padding: 4px;
+  font-size: 0.8rem;
+}
+.productsInfo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.productsInfo span {
+  display: inline-block;
+  padding: 2px;
+  margin-bottom: 2px;
+  font-size: 0.8rem;
+}
+.productsInfo span:nth-child(1){
+  width: 4%;
+}
+.productsInfo span:nth-child(2){
+  width: 6%;
+}
+.productsInfo span:nth-child(3){
+  width: 50%;
+}
+.productsInfo span:nth-child(4){
+  width: 15%;
+}
+.productsInfo span:nth-child(5){
+  width: 17%;
+}
