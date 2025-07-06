@@ -400,4 +400,10 @@ module.exports = {
       D_ENTREGA1: 'NULL',
     }, { ID: id }, connection)
   },
+  /**
+   * @param {object} params
+   */
+  async dtPrevShopUpdate({idSale, dtPrevShop}) {
+    await Sales.updateAny(0, {dtPrevShop}, {ID: idSale})
+  }
 }

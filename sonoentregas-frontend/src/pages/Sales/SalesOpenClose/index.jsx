@@ -14,6 +14,7 @@ import ConfirmDialog from "../../../components/ConfirmDialog"
 
 import ModalSaleDetail from '../ModalSaleDetail'
 import './style.css'
+import Modal from "../../../components/Modal"
 
 function TdStatus({product}){
   const styleStatus = status => {
@@ -37,6 +38,9 @@ function TdStatus({product}){
 }
 
 function Row({ sale, cancelSubmitSales, reverseStock, saleDetail, updateAddress }) {
+  const [ showDialogDtPrevUpdate, setShowDialogDtPrevUpdate ] = useState(false)
+  const [ newDtPrev, setNewDtPrev ] = useState(sale.dtPrevShop)
+
   const clickProd = (e, prod) => {
     if(e.target.id === 'btnCancel') cancelSubmitSales(prod)
     else if(e.target.id === 'btnEstornar') reverseStock(prod)
@@ -44,9 +48,8 @@ function Row({ sale, cancelSubmitSales, reverseStock, saleDetail, updateAddress 
   }
 
   const styleDateDelivery = () => {
-    // VERIFICAR
     var dateDelivery, dateNow, dateAlert
-    dateDelivery = new Date(sale.D_ENTREGA1)
+    dateDelivery = new Date(sale.dtPrevShop)
     dateDelivery.setHours(0,0,0,0)
 
     dateNow = new Date().setHours(0,0,0,0)
@@ -55,14 +58,22 @@ function Row({ sale, cancelSubmitSales, reverseStock, saleDetail, updateAddress 
     dateAlert.setDate(dateAlert.getDate()+2)
     dateAlert.setHours(0,0,0,0)
 
-    if (sale.D_ENTREGA1 === null) {
-      return { color: 'blue' }
-    } else if (dateDelivery < dateNow) {
+    if (dateDelivery < dateNow) {
       return { color: 'red' }
     } else if (dateDelivery >= dateNow && dateDelivery <= dateAlert){
-      return { color: 'yellow' }
+      return { color: 'blue' }
     } else {
       return { color: 'black' }
+    }
+  }
+
+  const dtPrevShopUpdateSubmit = async () => {
+    try {
+      await api.put(`/sales/${sale.ID}/dtPrevShopUpdate`, {newDtPrev})
+      sale.dtPrevShop = newDtPrev
+      setShowDialogDtPrevUpdate(false)
+    } catch (error) {
+      console.log(error)
     }
   }
 
@@ -74,20 +85,31 @@ function Row({ sale, cancelSubmitSales, reverseStock, saleDetail, updateAddress 
           <span style={{cursor: 'pointer'}} onClick={() => updateAddress(sale)}>{sale.NOMECLI}</span>
           <span>{sale.VENDEDOR}</span>
           <span>{dateSqlToReact(sale.EMISSAO)}</span>
-          <span style={styleDateDelivery()}>
-            {sale.D_ENTREGA1 !== null
-              ? dateSqlToReact(sale.D_ENTREGA1)
-              : 'Sem agend.'
-            }
+          <span
+            style={styleDateDelivery()}
+            onClick={() => setShowDialogDtPrevUpdate(true)}
+          >
+            {sale.dtPrevShop && dateSqlToReact(sale.dtPrevShop)}
           </span>
+          {
+            sale.isWithdrawal
+              ? <span style={{color: 'orange'}}>Retirada</span>
+              : <>
+                  {
+                    !sale.D_ENTREGA1
+                      ? <span style={{color: 'blue'}}>S/ Agend</span>
+                      : <span style={{color: 'green'}}>Aguardando</span>
+                  }
+                </>
+          }
         </div>
         {sale.products.map((product, index) => (
           <div className="productsInfo" key={index} onClick={e => clickProd(e, product)}>
+            <TdStatus product={product}/>
             <span><BsArrowReturnRight /></span>
             <span>Qtd: {product.QUANTIDADE}</span>
             <span>{product.NOME}</span>
             <span>Cod: {product.COD_ORIGINAL}</span>
-            <TdStatus product={product}/>
           </div>
         ))}
         
@@ -96,6 +118,24 @@ function Row({ sale, cancelSubmitSales, reverseStock, saleDetail, updateAddress 
         - {sale.OBS}
         {sale.HAVE_OBS2 && <div style={{color: 'red', fontWeight: 100}}> - {sale.OBS2}</div>}
       </span>
+
+      <Modal
+        openModal={showDialogDtPrevUpdate}
+        setOpenModal={setShowDialogDtPrevUpdate}
+      >
+        <h2>Atualizar Data de Previsão</h2>
+        <input
+          type="date"
+          value={newDtPrev}
+          onChange={e => setNewDtPrev(e.target.value)}
+        />
+        <button
+          onClick={dtPrevShopUpdateSubmit}
+        >
+          Atualizar
+        </button>
+        <button onClick={() => setShowDialogDtPrevUpdate(false)}>Cancelar</button>
+      </Modal>
     </div>
   );
 }
@@ -364,6 +404,7 @@ export default function TabSaleWaiting({ type }) {
               <span>Vendedor</span>
               <span>Emissão</span>
               <span>Previsão</span>
+              <span>Situação</span>
             </div>
             <span className="columnObs">Observação</span>
           </div>

@@ -104,6 +104,7 @@ routes.put('/users/:userId', usersController.update)
   routes.post('/sales-shop', salesSceController.cancelSubmitSales)
   routes.post('/salesshop/reverse/:idSale', salesSceController.reverseStock)
   routes.put('/sales/:idSale/updateAddress', salesSceController.updateAddressClient)
+  routes.put('/sales/:idSale/dtPrevShopUpdate', salesSceController.dtPrevShopUpdate)
 //Sales Sono Delivery
 routes.get('/sales', salesController.findSales)
 routes.get('/sales/home', salesController.findSalesToHome)

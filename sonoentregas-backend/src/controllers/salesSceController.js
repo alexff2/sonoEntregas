@@ -290,5 +290,27 @@ module.exports = {
 
       return res.status(400).json(error)
     }
+  },
+  /**
+   * @param {*} req
+   * @param {*} res
+   * @returns
+   */
+  async dtPrevShopUpdate(req, res) {
+    try {
+      const {idSale} = req.params
+      const {newDtPrev} = req.body
+  
+      await SalesService.dtPrevShopUpdate({
+        idSale,
+        dtPrevShop: newDtPrev
+      })
+  
+      return res.json({})
+    } catch (error) {
+      console.log(error)
+
+      return res.status(400).json(error)
+    }
   }
 }
