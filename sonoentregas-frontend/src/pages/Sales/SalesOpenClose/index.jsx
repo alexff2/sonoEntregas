@@ -123,18 +123,26 @@ function Row({ sale, cancelSubmitSales, reverseStock, saleDetail, updateAddress 
         openModal={showDialogDtPrevUpdate}
         setOpenModal={setShowDialogDtPrevUpdate}
       >
-        <h2>Atualizar Data de Previsão</h2>
-        <input
-          type="date"
-          value={newDtPrev}
-          onChange={e => setNewDtPrev(e.target.value)}
-        />
-        <button
-          onClick={dtPrevShopUpdateSubmit}
-        >
-          Atualizar
-        </button>
-        <button onClick={() => setShowDialogDtPrevUpdate(false)}>Cancelar</button>
+        <div className="modal-dtPrevShop">
+          <h2>Atualizar Data de Previsão</h2>
+          <input
+            type="date"
+            value={newDtPrev}
+            onChange={e => setNewDtPrev(e.target.value)}
+          />
+          <div className="buttonsModalDtPrevShop">
+            <button
+              onClick={dtPrevShopUpdateSubmit}
+            >
+              Atualizar
+            </button>
+            <button
+              onClick={() => setShowDialogDtPrevUpdate(false)}
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
       </Modal>
     </div>
   );
