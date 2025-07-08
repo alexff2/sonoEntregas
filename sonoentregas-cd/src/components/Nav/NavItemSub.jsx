@@ -74,7 +74,7 @@ function Navbar({
             }
             return true
           })
-          .filter(sub => !(sub.title === 'Atualizar Bip' && userAuth.DESCRIPTION === 'ALEXANDRE'))
+          .filter(sub => !(sub.title === 'Atualizar Bip' && userAuth.DESCRIPTION !== 'ALEXANDRE'))
           .map((sub, i) => (
             <ListItem
               key={i}
