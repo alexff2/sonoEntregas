@@ -405,5 +405,11 @@ module.exports = {
    */
   async dtPrevShopUpdate({idSale, dtPrevShop}) {
     await Sales.updateAny(0, {dtPrevShop}, {ID: idSale})
+  },
+  /**
+   * @param {object} params
+   */
+  async shopObsUpdate({idSale, shopObs}) {
+    await Sales.updateAny(0, {shopObs}, {ID: idSale})
   }
 }

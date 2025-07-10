@@ -312,5 +312,27 @@ module.exports = {
 
       return res.status(400).json(error)
     }
+  },
+  /**
+   * @param {*} req
+   * @param {*} res
+   * @returns
+   */
+  async shopObsUpdate(req, res) {
+    try {
+      const {idSale} = req.params
+      const {shopObs} = req.body
+  
+      await SalesService.shopObsUpdate({
+        idSale,
+        shopObs
+      })
+  
+      return res.json({})
+    } catch (error) {
+      console.log(error)
+
+      return res.status(400).json(error)
+    }
   }
 }

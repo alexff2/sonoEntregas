@@ -38,8 +38,10 @@ function TdStatus({product}){
 }
 
 function Row({ sale, cancelSubmitSales, reverseStock, saleDetail, updateAddress }) {
-  const [ showDialogDtPrevUpdate, setShowDialogDtPrevUpdate ] = useState(false)
-  const [ newDtPrev, setNewDtPrev ] = useState(sale.dtPrevShop)
+  const [showDialogShopObs, setShowDialogShopObs] = useState(false)
+  const [showDialogDtPrevUpdate, setShowDialogDtPrevUpdate] = useState(false)
+  const [newDtPrev, setNewDtPrev] = useState(sale.dtPrevShop)
+  const [shopObs, setShopObs] = useState(sale.shopObs)
 
   const clickProd = (e, prod) => {
     if(e.target.id === 'btnCancel') cancelSubmitSales(prod)
@@ -77,12 +79,28 @@ function Row({ sale, cancelSubmitSales, reverseStock, saleDetail, updateAddress 
     }
   }
 
+  const shopObsUpdateSubmit = async () => {
+    try {
+      await api.put(`/sales/${sale.ID}/shopObs`, {shopObs})
+      sale.shopObs = shopObs
+      setShowDialogShopObs(false)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   return (
     <div className="openClosedTableRows">
       <div  className="initialColumns">
         <div className="columnsSaleInfo">
           <span>{sale.ID_SALES}</span>
-          <span style={{cursor: 'pointer'}} onClick={() => updateAddress(sale)}>{sale.NOMECLI}</span>
+          <span
+            style={{cursor: 'pointer'}}
+            onClick={() => updateAddress(sale)}
+          >
+            <div>{sale.NOMECLI}</div>
+            <div> / {sale.BAIRRO}</div>
+          </span>
           <span>{sale.VENDEDOR}</span>
           <span>{dateSqlToReact(sale.EMISSAO)}</span>
           <span
@@ -105,32 +123,37 @@ function Row({ sale, cancelSubmitSales, reverseStock, saleDetail, updateAddress 
         </div>
         {sale.products.map((product, index) => (
           <div className="productsInfo" key={index} onClick={e => clickProd(e, product)}>
-            <TdStatus product={product}/>
             <span><BsArrowReturnRight /></span>
+            <span>Cod: {product.COD_ORIGINAL}</span>
             <span>Qtd: {product.QUANTIDADE}</span>
             <span>{product.NOME}</span>
-            <span>Cod: {product.COD_ORIGINAL}</span>
+            <TdStatus product={product}/>
+            <span></span>
           </div>
         ))}
         
       </div>
-      <span className="columnObs">
+      <span
+        className="columnObs"
+        onClick={() => setShowDialogShopObs(true)}
+      >
         - {sale.OBS}
         {sale.HAVE_OBS2 && <div style={{color: 'red', fontWeight: 100}}> - {sale.OBS2}</div>}
+        {sale.shopObs && <div style={{color: 'green', fontWeight: 'bold'}}> - {sale.shopObs}</div>}
       </span>
 
       <Modal
         openModal={showDialogDtPrevUpdate}
         setOpenModal={setShowDialogDtPrevUpdate}
       >
-        <div className="modal-dtPrevShop">
+        <div className="modal-flex-column">
           <h2>Atualizar Data de Previsão</h2>
           <input
             type="date"
             value={newDtPrev}
             onChange={e => setNewDtPrev(e.target.value)}
           />
-          <div className="buttonsModalDtPrevShop">
+          <div className="buttonsModal">
             <button
               onClick={dtPrevShopUpdateSubmit}
             >
@@ -138,6 +161,33 @@ function Row({ sale, cancelSubmitSales, reverseStock, saleDetail, updateAddress 
             </button>
             <button
               onClick={() => setShowDialogDtPrevUpdate(false)}
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        openModal={showDialogShopObs}
+        setOpenModal={setShowDialogShopObs}
+      >
+        <div className="modal-flex-column">
+          <h2>Observação Loja</h2>
+          <textarea
+            value={shopObs}
+            onChange={e => setShopObs(e.target.value)}
+            rows={5}
+            cols={30}
+          />
+          <div className="buttonsModal">
+            <button
+              onClick={shopObsUpdateSubmit}
+            >
+              Atualizar
+            </button>
+            <button
+              onClick={() => setShowDialogShopObs(false)}
             >
               Cancelar
             </button>
@@ -408,7 +458,7 @@ export default function TabSaleWaiting({ type }) {
           <div className="tableHeaderRowOpenClosed">
             <div className="initialColumns">
               <span>Código</span>
-              <span>Cliente</span>
+              <span>Cliente / bairro</span>
               <span>Vendedor</span>
               <span>Emissão</span>
               <span>Previsão</span>

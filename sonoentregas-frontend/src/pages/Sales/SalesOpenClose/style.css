@@ -61,6 +61,12 @@
 }
 .openClosedTableRows .initialColumns .columnsSaleInfo span:nth-child(2){
   width: 38%;
+  display: flex;
+  align-items: center;
+}
+.openClosedTableRows .initialColumns .columnsSaleInfo span:nth-child(2) div:nth-child(2){
+  font-size: 0.8rem;
+  opacity: 0.8;
 }
 .openClosedTableRows .initialColumns .columnsSaleInfo span:nth-child(3){
   width: 16%;
@@ -83,6 +89,10 @@
   padding: 4px;
   font-size: 0.8rem;
 }
+.openClosedTableRows .columnObs:hover {
+  background-color: antiquewhite;
+  cursor: pointer;
+}
 .productsInfo {
   display: flex;
   flex-direction: row;
@@ -96,42 +106,47 @@
   font-size: 0.8rem;
 }
 .productsInfo span:nth-child(1){
-  width: 17%;
+  width: 4%;
 }
 .productsInfo span:nth-child(2){
-  width: 4%;
+  width: 15%;
 }
 .productsInfo span:nth-child(3){
   width: 6%;
 }
 .productsInfo span:nth-child(4){
-  width: 50%;
+  width: 28%;
 }
 .productsInfo span:nth-child(5){
-  width: 15%;
+  width: 12%;
+}
+.productsInfo span:nth-child(6){
+  width: 22%;
 }
 
 /* Modal styles */
-.modal-dtPrevShop {
+.modal-flex-column {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
-.modal-dtPrevShop input {
+.modal-flex-column textarea {
   width: 100%;
   padding: 8px;
   margin-bottom: 8px;
   border: 1px solid var(--gray-line);
   border-radius: 4px;
+}
+.modal-flex-column input {
   text-align: center;
 }
-.buttonsModalDtPrevShop {
+.buttonsModal {
   display: flex;
   justify-content: space-between;
   width: 100%;
 }
-.modal-dtPrevShop button {
+.buttonsModal button {
   padding: 8px 16px;
   border: none;
   border-radius: 4px;
@@ -140,9 +155,9 @@
   cursor: pointer;
   width: 48%;
 }
-.modal-dtPrevShop button:nth-child(2) {
+.buttonsModal button:nth-child(2) {
   background-color: gray;
 }
-.modal-dtPrevShop button:hover {
+.buttonsModal button:hover {
   opacity: 0.8;
 }
