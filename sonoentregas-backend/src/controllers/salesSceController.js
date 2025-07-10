@@ -138,7 +138,7 @@ module.exports = {
 
       if (saleFind.length === 0) {
 
-        const valuesSales = `${CODIGOVENDA}, ${loja}, ${CODCLIENTE}, '${NOMECLI}', ${VALORPROD}, ${DESCONTO}, ${TOTALVENDA}, '${EMISSAO}', 'Aberta', '${ENDERECO}', '${NUMERO}', '${BAIRRO}', '${CIDADE}', '${ESTADO}', '${PONTOREF}', '${OBS}', ${USER_ID}, '${D_ENTREGA1}', '${D_ENVIO}', '${VENDEDOR}', '${FONE}', '${CGC_CPF}', '${INS_RG}', '${fone_2}', '${O_V}', '${OBS2}', '${HAVE_OBS2 ? 1 : 0}', 0, NULL, ${isWithdrawal ? 1 : 0}, NULL, '${dtPrevShop}'`
+        const valuesSales = `${CODIGOVENDA}, ${loja}, ${CODCLIENTE}, '${NOMECLI}', ${VALORPROD}, ${DESCONTO}, ${TOTALVENDA}, '${EMISSAO}', 'Aberta', '${ENDERECO}', '${NUMERO}', '${BAIRRO}', '${CIDADE}', '${ESTADO}', '${PONTOREF}', '${OBS}', ${USER_ID}, '${D_ENTREGA1}', '${D_ENVIO}', '${VENDEDOR}', '${FONE}', '${CGC_CPF}', '${INS_RG}', '${fone_2}', '${O_V}', '${OBS2}', '${HAVE_OBS2 ? 1 : 0}', 0, NULL, ${isWithdrawal ? 1 : 0}, NULL, '${dtPrevShop}', NULL`
 
         await Sales.creator(0, valuesSales, false, entrega)
 
