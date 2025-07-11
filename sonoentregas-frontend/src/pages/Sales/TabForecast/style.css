@@ -19,36 +19,45 @@
   margin-bottom: 12px;
 }
 
-.forecast .salePrev {
-  margin-top: 5px;
+.forecast .sale-container {
   border-top: 1px solid #CCC;
+  width: 100%;
+  display: flex;
+}
+
+.forecast .sale-container .sale-and-products {
+  width: 75%;
+}
+
+.forecast .sale-container .sale-and-products .sale-info-client {
+  margin-top: 5px;
   position: relative;
 }
 
-.forecast .salePrev span:nth-child(1) {
+.forecast .sale-container .sale-and-products .sale-info-client span:nth-child(1) {
   display: inline-block;
   width: 10%;
 }
-.forecast .salePrev span:nth-child(2) {
+.forecast .sale-container .sale-and-products .sale-info-client span:nth-child(2) {
   display: inline-block;
   width: 45%;
 }
-.forecast .salePrev span:nth-child(3) {
+.forecast .sale-container .sale-and-products .sale-info-client span:nth-child(3) {
   display: inline-block;
   width: 20%;
 }
-.forecast .salePrev span:nth-child(4) {
+.forecast .sale-container .sale-and-products .sale-info-client span:nth-child(4) {
   display: inline-block;
   width: 25%;
 }
 
-.forecast .salePrev .btnValidRemove {
+.forecast .sale-container .sale-and-products .sale-info-client .btnValidRemove {
   position: absolute;
   right: 0;
   top: 2px;
 }
 
-.forecast .salePrev .btnValidRemove button {
+.forecast .sale-container .sale-and-products .sale-info-client .btnValidRemove button {
   display: block;
   color: #FFF;
   padding: 3px;
@@ -60,27 +69,32 @@
   cursor: pointer;
 }
 
-.forecast .productPrev span {
+.forecast .sale-container .sale-and-products .products-info span {
   font-size: 0.8rem;
 }
-.forecast .productPrev span:nth-child(1) {
+.forecast .sale-container .sale-and-products .products-info span:nth-child(1) {
   display: inline-block;
   width: 15%;
   padding-left: 10%;
 }
-.forecast .productPrev span:nth-child(2) {
+.forecast .sale-container .sale-and-products .products-info span:nth-child(2) {
   display: inline-block;
   width: 10%;
 }
-.forecast .productPrev span:nth-child(3) {
+.forecast .sale-container .sale-and-products .products-info span:nth-child(3) {
   display: inline-block;
   margin-right: 20px;
 }
-.forecast .productPrev span:nth-child(4) {
+.forecast .sale-container .sale-and-products .products-info span:nth-child(4) {
   display: inline-block;
   padding: 2px 8px;
   background-color: orange;
   color: #FFF;
+}
+
+.forecast .sale-container .sale-obs {
+  width: 25%;
+  padding: 4px;
 }
 
 .sales-field.validateField label {
