@@ -137,7 +137,7 @@ function Row({ sale, cancelSubmitSales, reverseStock, saleDetail, updateAddress 
         className="columnObs"
         onClick={() => setShowDialogShopObs(true)}
       >
-        - {sale.OBS}
+        {(sale.OBS && sale.OBS !== 'null') && `- ${sale.OBS}`}
         {sale.HAVE_OBS2 && <div style={{color: 'red', fontWeight: 100}}> - {sale.OBS2}</div>}
         {sale.shopObs && <div style={{color: 'green', fontWeight: 'bold'}}> - {sale.shopObs}</div>}
       </span>

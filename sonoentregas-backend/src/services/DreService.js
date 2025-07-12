@@ -190,6 +190,7 @@ class DreService {
     INNER JOIN PRODUTOS C ON C.CODIGO = B.CODPRODUTO
     INNER JOIN CATEGPRODUTOS D ON D.CODIGO = C.CODCATEGORIA
     WHERE A.EMISSAO BETWEEN '${dateStart}' AND '${dateEnd}'
+    AND A.O_V = 2
     GROUP BY D.NOME`
 
     const result = await ViewVenda._query(shop, script, QueryTypes.SELECT)
