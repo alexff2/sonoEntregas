@@ -257,14 +257,22 @@ export default function Dre(){
 
           <h2>FATURAMENTO POR CATEGORIA</h2>
           <table className="tablesInDre">
-            <thead>
+            <tbody>
               {billingByCategory.map((category, i) => (
                 <tr key={i}>
-                  <th>{toLocString(category.NOME)}</th>
-                  <th>{toLocString(category.VALOR)}</th>
+                  <td>{toLocString(category.NOME)}</td>
+                  <td>{toLocString(category.VALOR)}</td>
                 </tr>
               ))}
-            </thead>
+            </tbody>
+            <tfoot>
+              <tr className='trFoot'>
+                <th>TOTAL</th>
+                <th>
+                  {toLocString(billingByCategory.reduce((acc, cur) => acc + cur.VALOR, 0))}
+                </th>
+              </tr>
+            </tfoot>
           </table>
 
           <h2>RESUMO DO FINANCEIRO</h2>
