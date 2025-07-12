@@ -182,6 +182,20 @@ class DreService {
 
     return result[0]
   }
+  async billingByCategory({ shop, dateStart, dateEnd }) {
+    const script = `
+    SELECT D.NOME, ROUND(SUM(B.NVTOTAL), 2) VALOR
+    FROM NVENDA2 A
+    INNER JOIN NVENDI2 B ON A.CODIGOVENDA = B.NUMVENDA
+    INNER JOIN PRODUTOS C ON C.CODIGO = B.CODPRODUTO
+    INNER JOIN CATEGPRODUTOS D ON D.CODIGO = C.CODCATEGORIA
+    WHERE A.EMISSAO BETWEEN '${dateStart}' AND '${dateEnd}'
+    GROUP BY D.NOME`
+
+    const result = await ViewVenda._query(shop, script, QueryTypes.SELECT)
+
+    return result
+  }
 }
 
 module.exports = new DreService()

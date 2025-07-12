@@ -77,6 +77,10 @@ export default function Dre(){
     purchasePrice: 0,
     stock: 0
   })
+  const [ billingByCategory, setBillingByCategory ] = useState([{
+    name: '',
+    value: 0
+  }])
   const { setAlert } = useModalAlert()
   const { shopAuth, userAuth } = useAuthenticate()
 
@@ -123,6 +127,7 @@ export default function Dre(){
       setBalancePoint(data.balancePoint)
       setFinancialSummary(data.financialSummary)
       setCurrentStock(data.currentStock)
+      setBillingByCategory(data.billingByCategory)
 
       setIsOpenFilter(false)
       setRenderDre(true)
@@ -247,6 +252,18 @@ export default function Dre(){
                 <th>{toLocString(balancePoint.value)}</th>
                 <th>{toLocString(balancePoint.percent)} %</th>
               </tr>
+            </thead>
+          </table>
+
+          <h2>FATURAMENTO POR CATEGORIA</h2>
+          <table className="tablesInDre">
+            <thead>
+              {billingByCategory.map((category, i) => (
+                <tr key={i}>
+                  <th>{toLocString(category.NOME)}</th>
+                  <th>{toLocString(category.VALOR)}</th>
+                </tr>
+              ))}
             </thead>
           </table>
 

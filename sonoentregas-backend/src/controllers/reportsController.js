@@ -326,6 +326,8 @@ module.exports = {
         percent: (((fixedExpenses.total.value / grossContributionMargin.percent) * 100) / revenues.grossRevenue.value) * 100
       }
 
+      const billingByCategory = await DreService.billingByCategory({ shop, dateStart, dateEnd })
+
       return res.json({
         revenues,
         variableExpenses,
@@ -335,7 +337,8 @@ module.exports = {
         balancePoint,
         financialSummary,
         currentStock,
-        shopSelected
+        shopSelected,
+        billingByCategory
       })
     } catch (e) {
       console.log(e)
