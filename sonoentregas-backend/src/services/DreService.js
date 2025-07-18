@@ -128,31 +128,43 @@ class DreService {
     select SUM(WTOTALDEBITO) value, ORIGEM AS origin from VIEW_DEBITOCLIENTE 
     where PAGAMENTO IS NULL
     AND VENCIMENTO BETWEEN '${dateStart}' AND '${dateEnd}'
-    GROUP BY ORIGEM
-    `
+    GROUP BY ORIGEM`
 
     const scriptBillsToPay = `
     select SUM(WTOTALDEBITO) value from VIEW_DEBITOFORNECEDOR 
     where PAGAMENTO IS NULL 
-    AND VENCIMENTO BETWEEN '${dateStart}' AND '${dateEnd}'
-    `
+    AND VENCIMENTO BETWEEN '${dateStart}' AND '${dateEnd}'`
 
     const scriptPurchase = `
     select SUM(TOTNF) value FROM NFISCAL WITH(NOLOCK) 
     WHERE PROCESS='T'
-    AND EMISSAO BETWEEN '${dateStart}' AND '${dateEnd}'
-    `
+    AND EMISSAO BETWEEN '${dateStart}' AND '${dateEnd}'`
+
+    const scriptCash = `SELECT ROUND(SUM(CASE WHEN B.TIPODC = 'C' THEN A.VALOR ELSE A.VALOR * -1 END), 2) value
+    FROM MOVCAIXA A
+    INNER JOIN FIN_DESPESAS B ON A.CODLAN = B.CODIGO
+    WHERE A.DATA <= '${dateEnd}'`
+
+    const scriptTreasury = `SELECT ROUND(SUM(CASE WHEN B.TIPODC = 'C' THEN A.VALOR ELSE A.VALOR * -1 END), 2) value
+    FROM TESOURARIA A
+    INNER JOIN FIN_DESPESAS B ON A.CODDESPREC = B.CODIGO
+    WHERE A.DATA <= '${dateEnd}'`
+
 
     const result = await ViewVenda._query(shop, script, QueryTypes.SELECT)
     const resultBills = await ViewVenda._query(shop, scriptBillsToPay, QueryTypes.SELECT)
     const resultPurchase = await ViewVenda._query(shop, scriptPurchase, QueryTypes.SELECT)
+    const resultCash = await ViewVenda._query(shop, scriptCash, QueryTypes.SELECT)
+    const resultTreasury = await ViewVenda._query(shop, scriptTreasury, QueryTypes.SELECT)
 
     const data = {
       titles: 0,
       card: 0,
       check: 0,
       billsToPay: resultBills[0].value || 0,
-      purchases: resultPurchase[0].value || 0
+      purchases: resultPurchase[0].value || 0,
+      cash: resultCash[0].value || 0,
+      treasury: resultTreasury[0].value || 0
     }
 
     result.forEach(r => {

@@ -67,7 +67,9 @@ export default function Dre(){
     card: 0,
     check: 0,
     billsToPay: 0,
-    purchases: 0
+    purchases: 0,
+    cash: 0,
+    treasury: 0
   })
   const [ currentStock, setCurrentStock ] = useState({
     qtdDifferentProducts: 0,
@@ -301,6 +303,16 @@ export default function Dre(){
               <tr>
                 <td>COMPRAS NO PERÍODO</td>
                 <td>{toLocString(financialSummary.purchases)}</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>VALOR FINAL DO CAIXA</td>
+                <td>{toLocString(financialSummary.cash)}</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>VALOR FINAL DA TESOURARIA</td>
+                <td>{toLocString(financialSummary.treasury)}</td>
                 <td></td>
               </tr>
             </tbody>
