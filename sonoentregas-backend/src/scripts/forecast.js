@@ -28,7 +28,10 @@ module.exports = {
     ON A.COD_ORIGINAL = D.COD_ORIGINAL
     LEFT JOIN
     ${process.env.STOCK_BEEP 
-      ? `(SELECT productId CODIGO, COUNT(*) EST_LOJA FROM ${process.env.CD_BASE}..PRODLOJAS_SERIES_MOVIMENTOS GROUP BY productId)`
+      ? `(SELECT productId CODIGO, COUNT(*) EST_LOJA
+      FROM ${process.env.CD_BASE}..PRODLOJAS_SERIES_MOVIMENTOS
+      WHERE outputBeepDate IS NULL
+      GROUP BY productId)`
       : `(SELECT * FROM ${process.env.CD_BASE}..PRODLOJAS WHERE CODLOJA = 1)`
     } E ON E.CODIGO = C.CODIGO
     WHERE A.ID_SALES = ${idSale} AND A.CODLOJA IN (${idShops})`
