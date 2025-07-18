@@ -42,7 +42,7 @@ module.exports = {
   async findProduct(type, search) {
     const script = 
     `SELECT A.CODIGO code, B.ALTERNATI generalCode, B.NOME name, (A.EST_ATUAL - ISNULL(C.qtdForecast, 0)) stock, A.PCO_COMPRA purchasePrice, B.CBARRA barCode
-    FROM ${process.env.STOCK_BEEP
+    FROM ${process.env.STOCK_BEEP === '1'
       ? `(SELECT productId CODIGO, COUNT(*) EST_ATUAL, B.PCO_COMPRA
       FROM PRODLOJAS_SERIES_MOVIMENTOS A
       INNER JOIN PRODLOJAS B ON A.productId = B.CODIGO

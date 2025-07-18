@@ -27,7 +27,7 @@ module.exports = {
                 ) D
     ON A.COD_ORIGINAL = D.COD_ORIGINAL
     LEFT JOIN
-    ${process.env.STOCK_BEEP 
+    ${process.env.STOCK_BEEP === '1'
       ? `(SELECT productId CODIGO, COUNT(*) EST_LOJA
       FROM ${process.env.CD_BASE}..PRODLOJAS_SERIES_MOVIMENTOS
       WHERE outputBeepDate IS NULL
