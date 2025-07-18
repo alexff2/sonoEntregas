@@ -54,7 +54,7 @@ module.exports = {
       SELECT A.COD_ORIGINAL, SUM(QUANTIDADE) qtdForecast, 'maintenance' TIPO
       FROM ${process.env.ENTREGAS_BASE}..MAINTENANCE A
       INNER JOIN ${process.env.ENTREGAS_BASE}..MAINTENANCE_DELIV B ON A.ID = B.ID_MAINT
-      WHERE A.[STATUS] IN ('Em Previsão', 'Em lançamento')
+      WHERE A.[STATUS] IN ('Em Previsão', 'Em lançamento') AND B.DONE = 1
       GROUP BY COD_ORIGINAL) A
       GROUP BY A.COD_ORIGINAL
     ) C ON B.ALTERNATI = C.COD_ORIGINAL
