@@ -2,7 +2,7 @@ module.exports = {
   findSaleProductToForecast({ idSale, idShops }){
     return `
     SELECT A.ID_SALE_ID, A.ID_SALES, C.CODIGO CODPRODUTO, A.COD_ORIGINAL, A.CODLOJA, A.DESCONTO, C.NOME, A.[STATUS],
-    A.QUANTIDADE, ISNULL(D.qtdForecast, 0) qtdForecast, E.EST_LOJA, E.EST_LOJA - ISNULL(D.qtdForecast, 0) availableStock,
+    A.QUANTIDADE, ISNULL(D.qtdForecast, 0) qtdForecast, ISNULL(E.EST_LOJA, 0) EST_LOJA, ISNULL(E.EST_LOJA, 0) - ISNULL(D.qtdForecast, 0) availableStock,
     ISNULL(B.QTD_MOUNTING, 0) QTD_MOUNTING, A.QUANTIDADE - (ISNULL(B.QTD_MOUNTING, 0)) openQuantity
     FROM SALES_PROD A
     LEFT JOIN (	SELECT ID_SALE, COD_ORIGINAL, CODLOJA, SUM(QTD_DELIV) QTD_MOUNTING
@@ -26,8 +26,12 @@ module.exports = {
                 GROUP BY A.COD_ORIGINAL
                 ) D
     ON A.COD_ORIGINAL = D.COD_ORIGINAL
-    LEFT JOIN ${process.env.CD_BASE}..PRODLOJAS E ON E.CODIGO = C.CODIGO
-    WHERE E.CODLOJA = 1 AND A.ID_SALES = ${idSale} AND A.CODLOJA IN (${idShops})`
+    LEFT JOIN
+    ${process.env.STOCK_BEEP 
+      ? `(SELECT productId CODIGO, COUNT(*) EST_LOJA FROM ${process.env.CD_BASE}..PRODLOJAS_SERIES_MOVIMENTOS GROUP BY productId)`
+      : `(SELECT * FROM ${process.env.CD_BASE}..PRODLOJAS WHERE CODLOJA = 1)`
+    } E ON E.CODIGO = C.CODIGO
+    WHERE A.ID_SALES = ${idSale} AND A.CODLOJA IN (${idShops})`
   },
   findSaleProductMaintenanceToForecast({ idSale, idShops }){
     return `
