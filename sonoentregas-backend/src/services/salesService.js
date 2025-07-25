@@ -21,6 +21,7 @@
  * @property {string} D_ENTREGA1
  * @property {number | null} idDelivery
  * @property {boolean} isMaintenance
+ * @property {boolean} isWithdrawal
  * @property {string} ENDERECO
  * @property {IProduct[] | []} products
  * 
@@ -260,7 +261,8 @@ module.exports = {
     FROM FORECAST_SALES A
     INNER JOIN SALES B ON A.idSale = B.ID
     INNER JOIN FORECAST C ON A.idForecast = C.id
-    WHERE A.idForecast in (${forecasts.map(forecast => forecast.id)}) AND B.ID_SALES = ${idSale}`
+    WHERE A.idForecast in (${forecasts.map(forecast => forecast.id)})
+    AND B.ID_SALES = ${idSale}`
 
     /**@type {ISales[]} */
     const forecastSales = await Forecast._query(0, scriptSales, QueryTypes.SELECT)
@@ -274,7 +276,18 @@ module.exports = {
       }
     }
 
-    const validationSales = forecastSales.filter(sale => typeof sale.validationStatus === 'boolean')
+    const saleIsNotWithdrawal = forecastSales.filter(sale => !sale.isWithdrawal)
+
+    if (saleIsNotWithdrawal.length === 0) {
+      throw {
+        status: 409,
+        error: {
+          message: 'Venda para retirada, sem permissão para adicionar na rota!'
+        }
+      }
+    }
+
+    const validationSales = saleIsNotWithdrawal.filter(sale => typeof sale.validationStatus === 'boolean')
 
     if (validationSales.length === 0) {
       throw {
