@@ -43,11 +43,14 @@ module.exports = {
     const script = 
     `SELECT A.CODIGO code, B.ALTERNATI generalCode, B.NOME name, (A.EST_ATUAL - ISNULL(C.qtdForecast, 0)) stock, A.PCO_COMPRA purchasePrice, B.CBARRA barCode
     FROM ${process.env.STOCK_BEEP === '1'
-      ? `(SELECT productId CODIGO, COUNT(*) EST_ATUAL, B.PCO_COMPRA
-      FROM PRODLOJAS_SERIES_MOVIMENTOS A
-      INNER JOIN PRODLOJAS B ON A.productId = B.CODIGO
-      WHERE outputBeepDate IS NULL AND B.CODLOJA = 1
-      GROUP BY A.productId, B.PCO_COMPRA)`
+      ? `(SELECT A.CODIGO, ISNULL(B.STOCK, 0) EST_ATUAL, A.PCO_COMPRA
+          FROM PRODLOJAS A
+          LEFT JOIN (
+            SELECT productId, COUNT(*) STOCK FROM PRODLOJAS_SERIES_MOVIMENTOS
+            WHERE outputBeepDate IS NULL
+            GROUP BY productId
+          ) B ON B.productId = A.CODIGO
+          WHERE A.CODLOJA = 1)`
       : '(SELECT * FROM PRODLOJAS WHERE CODLOJA = 1)'
     } A
     INNER JOIN PRODUTOS B ON A.CODIGO = B.CODIGO
@@ -60,8 +63,7 @@ module.exports = {
         UNION
         SELECT A.COD_ORIGINAL, SUM(QUANTIDADE) qtdForecast, 'maintenance' TIPO
         FROM ${process.env.ENTREGAS_BASE}..MAINTENANCE A
-        INNER JOIN ${process.env.ENTREGAS_BASE}..MAINTENANCE_DELIV B ON A.ID = B.ID_MAINT
-        WHERE A.[STATUS] IN ('Em Previsão', 'Em lançamento') AND B.DONE = 1
+        WHERE A.[STATUS] IN ('Em Previsão', 'Em lançamento')
         GROUP BY COD_ORIGINAL) A
       GROUP BY A.COD_ORIGINAL
     ) C ON B.ALTERNATI = C.COD_ORIGINAL

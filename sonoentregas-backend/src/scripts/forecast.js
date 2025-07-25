@@ -20,8 +20,7 @@ module.exports = {
                   UNION
                   SELECT A.COD_ORIGINAL, SUM(QUANTIDADE) qtdForecast, 'maintenance' TIPO
                   FROM MAINTENANCE A
-                  INNER JOIN MAINTENANCE_DELIV B ON A.ID = B.ID_MAINT
-                  WHERE A.[STATUS] IN ('Em Previsão', 'Em lançamento') AND B.DONE = 1
+                  WHERE A.[STATUS] IN ('Em Previsão', 'Em lançamento')
                   GROUP BY COD_ORIGINAL) A
                 GROUP BY A.COD_ORIGINAL
                 ) D
