@@ -7,6 +7,12 @@ module.exports = {
   async findToBeep(request, response) {
     const { id } = request.params
 
+    if (isNaN(Number(id)) || Number(id) <= 0) {
+      return response.status(400).json({
+        error: 'Invalid transfer id!'
+      })
+    }
+
     try {
       const products = await TransferOfProductsServices.findToBeep(id)
 

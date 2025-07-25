@@ -1,155 +1,180 @@
-import React, { useEffect, useState } from 'react'
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  FormControl,
-  FormControlLabel,
-  Radio,
-  RadioGroup,
-  TextField
-} from '@material-ui/core'
+import React, {useState} from 'react'
+import {Typography} from '@material-ui/core'
 
-import { useAlertSnackbar } from '../../../context/alertSnackbarContext' 
+import {useAlertSnackbar} from '../../../context/alertSnackbarContext'
+import {useBackdrop} from '../../../context/backdropContext'
 
-import { BeepReading } from '../../../components/BeepReading'
-import { ButtonSuccess } from '../../../components/Buttons'
+import {EntryNoteSearch} from './EntryNoteSearch'
+import {Beep} from '../../../components/Beep'
+import {ButtonSuccess, ButtonCancel} from '../../../components/Buttons'
 import api from '../../../services/api'
 
 export default function EntryNote({handleRenderBox}) {
   const [openSearch, setOpenSearch] = useState(true)
-  const [search, setSearch] = useState('')
-  const [loading, setLoading] = useState(false)
   const [beepById, setBeepById] = useState(true)
+  const [loading, setLoading] = useState(false)
+  const [beepLoading, setBeeLoading] = useState('')
   const [productSelected, setProductSelected] = useState(null)
   const [products, setProducts] = useState([])
-  const { setAlertSnackbar } = useAlertSnackbar()
+  const [entryNoteNumber, setEntryNoteNumber] = useState('')
+  const {setAlertSnackbar} = useAlertSnackbar()
+  const {setOpenBackDrop} = useBackdrop()
 
-  useEffect(() => {
-    setTimeout(() => {
-      document.getElementById('searchId').focus()
-    }, 500)
-  }, [])
-
-  const handleCloseSearch = () => {
-    setOpenSearch(false)
-    handleRenderBox()
+  const handleResetProperties = () => {
+    setLoading(false)
+    setBeeLoading('')
+    setOpenBackDrop(false)
+    document.getElementById('beep').focus()
   }
 
-  const handleSearch = async () => {
+  const handleBeepById = async () => {
     try {
-      if (search === '') {
-        setAlertSnackbar('Pesquisa vazia!')
-        document.getElementById('searchId').focus()
+      const [id, serieString] = beepLoading.split(' ')
+
+      if (serieString === '' || beepLoading.split(' ').length === 1) {
+        setAlertSnackbar('Número inválido!')
+        handleResetProperties()
         return
       }
 
-      setLoading(true)
-      const { data } = await api.get(`purchase/note/${search}/beep`)
+      let productSelectedToSend, productFound = null
+
+      products.forEach(group => {
+        group.products.forEach(product => {
+          if(productFound && productSelectedToSend?.quantityPedding > 0) return
+          if (product.originalId === id) {
+            productFound = true
+            if (product.quantityPedding === 0) {
+              return
+            }
+            productSelectedToSend = product
+            setProductSelected(product)
+          }
+        })
+      })
+
+      if (!productFound) {
+        setAlertSnackbar('Produto não encontrado! Verifique ID vinculado no cadastro do produto!')
+        handleResetProperties()
+        return
+      }
+
+      if (!productSelectedToSend) {
+        setAlertSnackbar('Produto já todo bipado')
+        handleResetProperties()
+        return
+      }
+
+      setOpenBackDrop(true)
+      await api.post('serial/first', {
+        serialNumber: serieString,
+        productId: productSelectedToSend.id,
+        module: 'purchaseNote',
+        moduleId: productSelectedToSend.moduleId
+      })
+
+      const {data} = await api.get(`purchase/note/${entryNoteNumber}/beep`)
       setProducts(data.products)
 
-      setOpenSearch(false)
-      setLoading(false)
+      setAlertSnackbar('Bipe realizado com sucesso!', 'success')
+      handleResetProperties()
     } catch (error) {
+      handleResetProperties()
       console.log(error)
-      setSearch('')
-      document.getElementById('searchId').focus()
-      setLoading(false)
-
-      if (error.response.data === 'not found purchase note!') {
-        setAlertSnackbar('Transferência não encontrada!')
-      } else {
-        setAlertSnackbar('Erro interno!')
+      if (error.response.data === 'the serial number already exists and is not finalized!') {
+        setAlertSnackbar('Número de série já foi dado entrada em outro produto!')
       }
     }
   }
 
-  const handleChangeRadioTypeBeep = e => {
-    setBeepById(e.target.value === '1' ? true : false)
-    document.getElementById('searchId').focus()
+  const handleBeepBySelect = async () => {
+    if (!productSelected) {
+      setAlertSnackbar('Selecione um produto!')
+      handleResetProperties()
+      return
+    }
+
+    try {
+      setOpenBackDrop(true)
+      await api.post('serial/first', {
+        serialNumber: beepLoading,
+        productId: productSelected.id,
+        module: 'purchaseNote',
+        moduleId: productSelected.moduleId
+      })
+
+      const {data} = await api.get(`purchase/note/${entryNoteNumber}/beep`)
+      setProducts(data.products)
+      data.products.forEach(group => {
+        group.products.forEach(product => {
+          if (product.id === productSelected.id && product.moduleId === productSelected.moduleId) {
+            product.quantityPedding === 0 ? setProductSelected(null) : setProductSelected(product)
+          }
+        })
+      })
+
+      setAlertSnackbar('Bipe realizado com sucesso!', 'success')
+      handleResetProperties()
+    } catch (error) {
+      handleResetProperties()
+      console.log(error)
+      if (error.response.data === 'the serial number already exists and is not finalized!') {
+        setAlertSnackbar('Número de série já foi dado entrada em outro produto!')
+      } else if (error.response.data === 'serial number invalid') {
+        setAlertSnackbar('Número de série inválido!')
+      }
+    }
+  }
+
+  const handleSerialNumberLoading = () => {
+    setLoading(true)
+    beepById
+      ? handleBeepById()
+      : handleBeepBySelect()
+  }
+
+  if (openSearch === true) {
+    return (
+      <EntryNoteSearch
+        openSearch={openSearch}
+        setOpenSearch={setOpenSearch}
+        setProducts={setProducts}
+        handleRenderBox={handleRenderBox}
+        setBeepById={setBeepById}
+        beepById={beepById}
+        entryNoteNumber={entryNoteNumber}
+        setEntryNoteNumber={setEntryNoteNumber}
+      />
+    )
   }
 
   return (
-    <React.Fragment>
-      {
-        !openSearch &&
-        <BeepReading.Root>
-          <BeepReading.Header
-            title={`BIP DA NOTA DE ENTRADA Nº: ${search}`}
-            productSelected={productSelected}
-            setProductSelected={setProductSelected}
-            module={{
-              name: 'purchaseNote',
-              type: 'C',
-              beepById
-            }}
-            setProducts={setProducts}
-            products={products}
-          />
+    <Beep.Root>
+      <Beep.Header
+        value={beepLoading}
+        onChange={(e) => setBeeLoading(e.target.value)}
+        disabled={loading}
+        onKeyEnter={handleSerialNumberLoading}
+      >
+        <Typography>
+          Bipe da(s) Nota(s) de Entrada nº <strong>{entryNoteNumber}</strong>
+        </Typography>
+        {beepById 
+          ? (<Typography>{productSelected?.nameFull ?? ''}</Typography>)
+          : (<Typography>{productSelected ? productSelected.nameFull : 'Selecione um produto...'}</Typography>)
+        }
+      </Beep.Header>
+      <Beep.Products
+        data={products}
+        productSelected={productSelected}
+        setProductSelected={setProductSelected}
+        beepById={beepById}
+      />
 
-          <BeepReading.Products
-            data={products}
-            productSelected={productSelected}
-            setProductSelected={setProductSelected}
-            beepById={beepById}
-          />
-
-          <BeepReading.Footer handleRenderBox={handleRenderBox} />
-        </BeepReading.Root>
-      }
-
-      <Dialog open={openSearch} onClose={handleCloseSearch}>
-        <DialogTitle>Digite o número da nota</DialogTitle>
-        <DialogContent>
-          <FormControl component='fieldset' fullWidth>
-            <RadioGroup
-              style={{
-                flexDirection: 'row',
-                width: '100%',
-                justifyContent: 'space-between',
-                marginBottom: 20,
-                border: 'solid 1px var(--gray-bold)',
-                borderRadius: 5,
-                padding: 10
-              }}
-              value={beepById ? '1' : '0'}
-              onChange={handleChangeRadioTypeBeep}
-            >
-              <FormControlLabel
-                value='1'
-                control={<Radio id='type1'/>}
-                label='Novo'
-                style={{
-                  marginLeft: 0
-                }}
-              />
-              <FormControlLabel
-                value='0'
-                control={<Radio id='type1'/>}
-                label='Antigo'
-                style={{
-                  marginLeft: 0
-                }}
-              />
-            </RadioGroup>
-          </FormControl>
-          <TextField
-            id='searchId'
-            placeholder='Digite aqui...'
-            autoComplete='off'
-            onChange={e => setSearch(e.target.value)}
-            onKeyDown={e =>  e.key === 'Enter' && handleSearch()}
-            fullWidth
-          />
-        </DialogContent>
-        <DialogActions>
-          <ButtonSuccess
-            onClick={handleSearch}
-            loading={loading}
-          >Pesquisar</ButtonSuccess>
-        </DialogActions>
-      </Dialog>
-    </React.Fragment>
+      <Beep.Footer>
+        <ButtonSuccess>SALVAR</ButtonSuccess>
+        <ButtonCancel onClick={() => handleRenderBox()}>CANCELAR</ButtonCancel>
+      </Beep.Footer>
+    </Beep.Root>
   )
 }

@@ -55,19 +55,19 @@ class PurchaseNoteService {
     const script = `
     SELECT B.CODIGO id, B.ORIGINAL originalId, B.APLICACAO mask, B.NOME [nameFull], A.QUANTIDADE quantity,
     ISNULL(C.quantityBeep, 0) quantityBeep, A.NUM_DOC moduleId, B.SUBG subGroupId, 
-    A.QUANTIDADE - ISNULL(C.quantityBeep, 0) quantityPedding
+    A.QUANTIDADE - ISNULL(C.quantityBeep, 0) quantityPedding, A.NUM_DOC moduleId
     FROM (
       SELECT A.PRODUTO, SUM(A.QUANTIDADE) QUANTIDADE, B.NUM_DOC FROM NFITENS A
       INNER JOIN NFISCAL B ON A.NNF = B.NF
-      WHERE B.CODFOR = 1 AND B.NUM_DOC = ${id}
+      WHERE B.CODFOR = 1 AND B.NUM_DOC in (${id})
       GROUP BY B.NUM_DOC, A.PRODUTO
     ) A
     INNER JOIN PRODUTOS B ON A.PRODUTO = B.CODIGO
-    LEFT JOIN ( SELECT productId, COUNT(id) quantityBeep
+    LEFT JOIN ( SELECT productId, COUNT(id) quantityBeep, inputModuleId
             FROM PRODLOJAS_SERIES_MOVIMENTOS
             WHERE inputModule = 'purchaseNote'
-            AND inputModuleId = ${id}
-            GROUP BY productId) C ON C.productId = B.CODIGO`
+            AND inputModuleId in (${id})
+            GROUP BY productId, inputModuleId) C ON C.productId = B.CODIGO AND C.inputModuleId = A.NUM_DOC`
     /**@type {ProductsToBeep[]} */
     const purchaseNoteProducts = await PurchaseNoteModel._query(1, script, QueryTypes.SELECT)
 
