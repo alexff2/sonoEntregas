@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { useParams } from 'react-router'
 import {
   Paper,
   Box,
@@ -17,7 +16,6 @@ import BoxInfo from '../../../components/BoxInfo'
 import { ButtonCancel, ButtonSuccess } from '../../../components/Buttons'
 
 import { useAlert } from '../../../context/alertContext'
-import { useForecasts } from '../../../context/forecastsContext'
 import { useDelivery } from '../../../context/deliveryContext'
 import api from '../../../services/api'
 import { getDateBr } from '../../../functions/getDates'
@@ -75,7 +73,7 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-export default function ModalAddSale({ setOpen, typeModal }){
+export default function ModalAddSale({setOpen}){
   const [ openModalSelectSalesWithSameNumber, setOpenModalSelectSalesWithSameNumber ] = useState(false)
   const [ slideInputs, setSlideInputs ] = useState(true)
   const [ slideTable, setSlideTable ] = useState(false)
@@ -89,9 +87,7 @@ export default function ModalAddSale({ setOpen, typeModal }){
   const [ availableStocks, setAvailableStocks ] = useState([])
 
   const { setAlert } = useAlert()
-  const { setForecasts } = useForecasts()
   const { setDelivery } = useDelivery()
-  const { type, id } = useParams()
   const classes = useStyles()
 
   const onChangeInputIdSale = e => {
@@ -112,93 +108,45 @@ export default function ModalAddSale({ setOpen, typeModal }){
         return
       }
 
-      let router
+      let {data}  = await api.get(`sales/${idSale}/withdrawal/create`)
 
-      if (typeModal === 'withdrawal') {
-        router = 'forecast'
-      } else {
-        router = type === 'forecast' ? 'forecast':'routes'
-      }
-
-      let { data }  = await api.get(`sales/${idSale}/${router}/create`)
-
-      if (data === '') {
-        setErrorMsg('Venda não enviada a base do CD!')
-
+      if (data.length > 1) {
+        setSalesWithSameNumber(data)
+        setOpenModalSelectSalesWithSameNumber(true)
         return
       }
 
-      if (typeModal === 'withdrawal') {
-        if (!data[0].isWithdrawal) {
-          setErrorMsg('Venda sem solicitação de retirada!')
+      setAvailableStocks([ ...availableStocks, ...data[0].products.filter( product => {
+        const availableStock = availableStocks.find(availableStock => availableStock.COD_ORIGINAL === product.COD_ORIGINAL)
 
-          return
-        }
-      } else {
-        if (data[0].isWithdrawal) {
-          setErrorMsg('Venda para retirada, sem permissão para adicionar na previsão!')
-
-          return
-        }
-      }
-
-      if (data.notFound) {
-        setErrorMsg(data.notFound.message)
-        
-        return
-      } else if (data.length === 0) {
-        setErrorMsg('Venda FECHADA já lançada em rota ou em previsão, consultar no menu VENDAS para saber STATUS')
-        
-        return
-      } else {
-        if (data.length > 1) {
-          setSalesWithSameNumber(data)
-          setOpenModalSelectSalesWithSameNumber(true)
-          return
+        if (!!availableStock) {
+          return false
         }
 
-        if (data[0].validationStatus === null) {
-          setErrorMsg('Venda não validada, solicite que a loja entre em contato com cliente!')
-          setIdSale('')
-          return
-        }
+        return true
+      }).map(product => ({
+        COD_ORIGINAL: product.COD_ORIGINAL,
+        NOME: product.NOME,
+        QUANTIDADE: product.QUANTIDADE,
+        qtdFullForecast: product.qtdFullForecast,
+        availableStock: product.availableStock
+      }))])
 
-        if (data[0].validationStatus === false) {
-          setErrorMsg('A entrega desta venda foi recusada pelo cliente, acesse a previsão para ver o motivo!')
-          setIdSale('')
-          return
-        }
-
-        setAvailableStocks([ ...availableStocks, ...data[0].products.filter( product => {
-          const availableStock = availableStocks.find(availableStock => availableStock.COD_ORIGINAL === product.COD_ORIGINAL)
-
-          if (!!availableStock) {
-            return false
-          }
-
-          return true
-        }).map(product => ({
-          COD_ORIGINAL: product.COD_ORIGINAL,
-          NOME: product.NOME,
-          QUANTIDADE: product.QUANTIDADE,
-          qtdFullForecast: product.qtdFullForecast,
-          availableStock: product.availableStock
-        }))])
-
-        setSaleSelected([...saleSelected, ...data])
-        setSlideInputs(false)
-        setSlideTable(true)
-      }
-
+      setSaleSelected([...saleSelected, ...data])
+      setSlideInputs(false)
+      setSlideTable(true)
       setIsLoading(false)
     } catch (e) {
       setIsLoading(false)
       if (!e.response) {
         console.log(e)
         setAlert('Rede')
-      } else if (e.response.status === 404) {
+      } else if (e.response.status === 500) {
         console.log(e.response)
-        setAlert('Not Found, entre em contato com Alexandre!')
+        setAlert('Erro de servidor, entre em contato com Alexandre!')
+      } else if (e.response.status === 400 || e.response.status === 404 || e.response.status === 409) {
+        console.log(e.response)
+        setErrorMsg(e.response.data.message)
       } else {
         console.log(e.response)
         setAlert('Servidor')
@@ -229,69 +177,6 @@ export default function ModalAddSale({ setOpen, typeModal }){
       setSlideTable(true)
       setOpenModalSelectSalesWithSameNumber(false)
       setIdSale('')
-    }
-  }
-
-  const addSalesInData = async () => {
-    try {
-      setIsLoading(true)
-
-      let saleFiltered
-
-      if (type === 'forecast') {
-        saleFiltered = saleSelected.filter( sale => {
-          sale.products = sale.products.filter( prod => prod.check)
-  
-          if (sale.products.length > 0) {
-            return true
-          }
-  
-          return false
-        })
-      } else {
-        saleFiltered = saleSelected
-      }
-
-      if(saleFiltered.length === 0) {
-        setErrorMsg('Selecione ao menos um produto das vendas inseridas!')
-        setIsLoading(false)
-        return
-      }
-
-      if (type === 'forecast') {
-        await api.post(`/forecast/${id}/sales/add`, { sales: saleFiltered })
-
-        const { data } = await api.get('forecast/open')
-
-        setForecasts(data)
-      } else {
-        let salesProd = []
-
-        saleFiltered.forEach(sale => {
-          salesProd = [...salesProd, ...sale.products]
-        })
-
-        await api.post(`/delivery/${id}/sales/add`, { salesProd })
-
-        const { data } = await api.get('delivery/open')
-
-        setDelivery(data)
-      }
-
-      setOpen(false)
-    } catch (e) {
-      if (!e.response){
-        console.log(e)
-        setAlert('Rede')
-      } else if (e.response.status === 400){
-        console.log(e.response.data)
-        setAlert('Servidor')
-      } else {
-        console.log(e.response.data)
-        if (e.response.data.message === 'outdated forecast!') {
-          setAlert('Previsão fora do prazo!')
-        } else setAlert(e.response.data)
-      }
     }
   }
 
@@ -343,6 +228,10 @@ export default function ModalAddSale({ setOpen, typeModal }){
     }
   }
 
+  React.useEffect(() => {
+    document.getElementById('idSale').focus()
+  }, [])
+
   return(
     <Box component={Paper} width={'1100px'} height="600px" p={4}>
       <Typography
@@ -350,7 +239,7 @@ export default function ModalAddSale({ setOpen, typeModal }){
         style={{ marginBottom: 12 }}
         component='h2'
       >
-        {typeModal === 'withdrawal' ? 'Registrar retirada de venda' : 'Adicionar venda'}
+        Registrar retirada de venda
       </Typography>
 
       <Slide direction="right" in={slideInputs} mountOnEnter unmountOnExit>
@@ -425,32 +314,30 @@ export default function ModalAddSale({ setOpen, typeModal }){
 
       <Slide direction="left" in={slideTable} mountOnEnter unmountOnExit>
         <Paper style={{padding: 8}}>
-          {typeModal === 'withdrawal' &&
-            <Box display={'flex'}>
-              <TextField
-                label="Quem retirou"
-                type="text"
-                variant="outlined"
-                className={classes.formControl}
-                style={{ width: 300, marginLeft: 8}}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                onChange={e => setWhoWithdrew(e.target.value)}
-              />
-              <TextField
-                label="Data"
-                type="date"
-                variant="outlined"
-                className={classes.formControl}
-                style={{ width: 171, marginLeft: 8}}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                onChange={e => setDate(e.target.value)}
-              />
-            </Box>
-          }
+          <Box display={'flex'}>
+            <TextField
+              label="Quem retirou"
+              type="text"
+              variant="outlined"
+              className={classes.formControl}
+              style={{ width: 300, marginLeft: 8}}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              onChange={e => setWhoWithdrew(e.target.value)}
+            />
+            <TextField
+              label="Data"
+              type="date"
+              variant="outlined"
+              className={classes.formControl}
+              style={{ width: 171, marginLeft: 8}}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              onChange={e => setDate(e.target.value)}
+            />
+          </Box>
           {errorMsg !== '' && 
             <Box 
               bgcolor='#e57373'
@@ -465,7 +352,7 @@ export default function ModalAddSale({ setOpen, typeModal }){
             <TableSales 
               sales={saleSelected} 
               setSales={setSaleSelected}
-              type={typeModal === 'withdrawal' ? 'forecast' : type}
+              type={'forecast'}
               availableStocks={availableStocks}
             />
 
@@ -477,7 +364,7 @@ export default function ModalAddSale({ setOpen, typeModal }){
           <div className={classes.btnActions}>
             <ButtonSuccess 
               children={"Lançar"}
-              onClick={typeModal === 'withdrawal' ? handleWithdrawal : addSalesInData}
+              onClick={handleWithdrawal}
               disabled={isLoading}
               loading={isLoading}
             />

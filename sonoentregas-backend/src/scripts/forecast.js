@@ -1,5 +1,5 @@
 module.exports = {
-  findSaleProductToForecast({ idSale, idShops }){
+  findSaleProductToForecast({idSale, idShops}){
     return `
     SELECT A.ID_SALE_ID, A.ID_SALES, C.CODIGO CODPRODUTO, A.COD_ORIGINAL, A.CODLOJA, A.DESCONTO, C.NOME, A.[STATUS],
     A.QUANTIDADE, ISNULL(D.qtdForecast, 0) qtdForecast, ISNULL(E.EST_LOJA, 0) EST_LOJA, ISNULL(E.EST_LOJA, 0) - ISNULL(D.qtdForecast, 0) availableStock,
@@ -35,7 +35,7 @@ module.exports = {
     } E ON E.CODIGO = C.CODIGO
     WHERE A.ID_SALES = ${idSale} AND A.CODLOJA IN (${idShops})`
   },
-  findSaleProductMaintenanceToForecast({ idSale, idShops }){
+  findSaleProductMaintenanceToForecast({idSale, idShops}){
     return `
     SELECT A.ID_SALE_ID, A.ID_SALES, C.CODIGO CODPRODUTO, A.COD_ORIGINAL, A.CODLOJA, A.DESCONTO, C.NOME, 'Enviado' STATUS,
     F.QUANTIDADE, ISNULL(D.qtdForecast, 0) qtdForecast, E.EST_LOJA, E.EST_LOJA - ISNULL(D.qtdForecast, 0) availableStock,
@@ -59,7 +59,7 @@ module.exports = {
     INNER JOIN MAINTENANCE F ON F.CODLOJA = A.CODLOJA AND F.ID_SALE = A.ID_SALES AND F.COD_ORIGINAL = A.COD_ORIGINAL
     WHERE E.CODLOJA = 1 AND F.STATUS = 'No CD' AND A.ID_SALES = ${idSale} AND A.CODLOJA IN (${idShops})`
   },
-  findSaleMaintenance({ idSale }) {
+  findSaleMaintenance({idSale}) {
     return `
     SELECT B.ID, B.ID_SALES, B.NOMECLI, B.CODLOJA, B.D_ENTREGA1, B.BAIRRO, 1 isMaintenance, A.STATUS
     FROM MAINTENANCE A

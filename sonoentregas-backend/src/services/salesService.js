@@ -198,15 +198,15 @@ module.exports = {
    */
   async findToCreateForecast(idSale){
     /**@type {ISales[] | []} */
-    let sales = await Sales.findAny(0, { ID_SALES: idSale })
-    let maintenance = await Sales._query(0, scriptForecast.findSaleMaintenance({ idSale }), QueryTypes.SELECT)
+    let sales = await Sales.findAny(0, {ID_SALES: idSale})
+    let maintenance = await Sales._query(0, scriptForecast.findSaleMaintenance({idSale}), QueryTypes.SELECT)
 
     if (sales.length === 0 && maintenance.length === 0) {
       return ''
     }
 
-    sales = sales.filter( sale => sale.STATUS === 'Aberta' )
-    maintenance = maintenance.filter( sale => sale.STATUS === 'No CD' )
+    sales = sales.filter(sale => sale.STATUS === 'Aberta')
+    maintenance = maintenance.filter(sale => sale.STATUS === 'No CD')
 
     if (sales.length === 0 && maintenance.length === 0) {
       return []
@@ -215,13 +215,13 @@ module.exports = {
     let products = []
 
     if (sales.length !== 0) {
-      const scriptFindSaleProductToForecast = scriptForecast.findSaleProductToForecast({ idSale, idShops: sales.map(sale => sale.CODLOJA) })
+      const scriptFindSaleProductToForecast = scriptForecast.findSaleProductToForecast({idSale, idShops: sales.map(sale => sale.CODLOJA)})
       const saleProducts = await SalesProd._query(0, scriptFindSaleProductToForecast, QueryTypes.SELECT)
       products = [...products, ...saleProducts]
     }
 
     if (maintenance.length !== 0) {
-      const scriptFindSaleProductMaintenance = scriptForecast.findSaleProductMaintenanceToForecast({ idSale, idShops: maintenance.map(sale => sale.CODLOJA) })
+      const scriptFindSaleProductMaintenance = scriptForecast.findSaleProductMaintenanceToForecast({idSale, idShops: maintenance.map(sale => sale.CODLOJA)})
       const productsMaintenance = await SalesProd._query(0, scriptFindSaleProductMaintenance, QueryTypes.SELECT)
       products = [...products, ...productsMaintenance]
     }
@@ -231,7 +231,43 @@ module.exports = {
       products
     })
   },
-  async findToCreateRoutes({ idSale }){
+  async findToWithdrawal({idSale}){
+    /**@type {ISales[] | []} */
+    const sales = await Sales.findAny(0, {ID_SALES: idSale})
+
+    if (sales.length === 0) {
+      throw {
+        status: 409,
+        error: {
+          message: 'Venda não enviada ao CD!'
+        }
+      }
+    }
+
+    const saleIsWithdrawal = sales.filter(sale => sale.isWithdrawal)
+
+    if (saleIsWithdrawal.length === 0) {
+      throw {
+        status: 409,
+        error: {
+          message: 'Venda não é retirada, sem permissão para finalizar!'
+        }
+      }
+    }
+
+    const scriptFindSaleProductToForecast = scriptForecast.findSaleProductToForecast({idSale, idShops: sales.map(sale => sale.CODLOJA)})
+    const saleProducts = await SalesProd._query(0, scriptFindSaleProductToForecast, QueryTypes.SELECT)
+
+    saleProducts.forEach(product => {
+      product.STATUS = 'Enviado'
+    })
+
+    return addProductInSale({
+      sales: saleIsWithdrawal,
+      products: saleProducts
+    })
+  },
+  async findToCreateRoutes({idSale}){
     /**@type {IForecast[]} */
     const forecasts = await Forecast.findAny(0, { STATUS: 1 })
 
