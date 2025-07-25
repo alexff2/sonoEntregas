@@ -139,15 +139,6 @@ class ForecastRules {
         },
       }
     }
-
-    if (sales[0].isWithdrawal) {
-      throw {
-        status: 400,
-        error: {
-          message: 'Sales with STATUS isWithdrawal',
-        },
-      }
-    }
   }
 
   /** @param {Sale} sale */

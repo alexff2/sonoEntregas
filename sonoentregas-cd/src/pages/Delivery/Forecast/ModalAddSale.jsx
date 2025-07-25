@@ -130,12 +130,6 @@ export default function ModalAddSale({ setOpen, forecast, getForecastSales }) {
         return
       }
 
-      if (data[0].isWithdrawal) {
-        setErrorMsg('Venda para retirada, sem permissão para adicionar na previsão!')
-
-        return
-      }
-
       if (data[0].validationStatus === null) {
         setErrorMsg('Venda não validada, solicite que a loja entre em contato com cliente!')
         setIdSale('')
