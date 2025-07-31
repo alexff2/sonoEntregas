@@ -284,14 +284,24 @@ module.exports = {
 
     const scriptFindSaleProductToForecast = scriptForecast.findSaleProductToForecast({idSale, idShops: sales.map(sale => sale.CODLOJA)})
     const saleProducts = await SalesProd._query(0, scriptFindSaleProductToForecast, QueryTypes.SELECT)
-
-    saleProducts.forEach(product => {
-      product.STATUS = 'Enviado'
-    })
+    const productsStock = await SalesProd._query(
+      1,
+      process.env.STOCK_BEEP === '0'
+        ? scriptProducts.stockNotBeep({COD_ORIGINAL: saleProducts.map(saleProduct => `'${saleProduct.COD_ORIGINAL}'`)})
+        : scriptProducts.stockBeep({COD_ORIGINAL: saleProducts.map(saleProduct => `'${saleProduct.COD_ORIGINAL}'`)}),
+      QueryTypes.SELECT
+    )
 
     return addProductInSale({
       sales: saleIsWithdrawal,
-      products: saleProducts
+      products: saleProducts.map(saleProduct => {
+        const stock = productsStock.find(productStock => productStock.COD_ORIGINAL === saleProduct.COD_ORIGINAL)
+        saleProduct.STATUS = saleProduct.STATUS === 'Em Previsão' ? 'Enviado' : saleProduct.STATUS
+        return {
+          ...saleProduct,
+          ...stock
+        }
+      })
     })
   },
   async findToCreateRoutes({idSale}){
