@@ -39,6 +39,7 @@ const Empresas = require('../models/ShopsSce')
 const Forecast = require('../models/tables/Forecast')
 const scriptForecast = require('../scripts/forecast')
 const scriptSales = require('../scripts/sales')
+const scriptProducts = require('../scripts/products')
 const { difDate } = require('../functions/getDate')
 
 /**
@@ -217,13 +218,39 @@ module.exports = {
     if (sales.length !== 0) {
       const scriptFindSaleProductToForecast = scriptForecast.findSaleProductToForecast({idSale, idShops: sales.map(sale => sale.CODLOJA)})
       const saleProducts = await SalesProd._query(0, scriptFindSaleProductToForecast, QueryTypes.SELECT)
-      products = [...products, ...saleProducts]
+      const productsStock = await SalesProd._query(
+        1,
+        process.env.STOCK_BEEP === '0'
+          ? scriptProducts.stockNotBeep({COD_ORIGINAL: saleProducts.map(saleProduct => `'${saleProduct.COD_ORIGINAL}'`)})
+          : scriptProducts.stockBeep({COD_ORIGINAL: saleProducts.map(saleProduct => `'${saleProduct.COD_ORIGINAL}'`)}),
+        QueryTypes.SELECT
+      )
+      products = saleProducts.map(saleProduct => {
+        const stock = productsStock.find(productStock => productStock.COD_ORIGINAL === saleProduct.COD_ORIGINAL)
+        return {
+          ...saleProduct,
+          ...stock
+        }
+      })
     }
 
     if (maintenance.length !== 0) {
       const scriptFindSaleProductMaintenance = scriptForecast.findSaleProductMaintenanceToForecast({idSale, idShops: maintenance.map(sale => sale.CODLOJA)})
       const productsMaintenance = await SalesProd._query(0, scriptFindSaleProductMaintenance, QueryTypes.SELECT)
-      products = [...products, ...productsMaintenance]
+      const productsStock = await SalesProd._query(
+        1,
+        process.env.STOCK_BEEP === '0'
+          ? scriptProducts.stockNotBeep({COD_ORIGINAL: productsMaintenance.map(saleProduct => `'${saleProduct.COD_ORIGINAL}'`)})
+          : scriptProducts.stockBeep({COD_ORIGINAL: productsMaintenance.map(saleProduct => `'${saleProduct.COD_ORIGINAL}'`)}),
+        QueryTypes.SELECT
+      )
+      products = [...products, ...productsMaintenance.map(saleProduct => {
+        const stock = productsStock.find(productStock => productStock.COD_ORIGINAL === saleProduct.COD_ORIGINAL)
+        return {
+          ...saleProduct,
+          ...stock
+        }
+      })]
     }
 
     return addProductInSale({

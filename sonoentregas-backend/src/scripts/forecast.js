@@ -1,63 +1,24 @@
 module.exports = {
   findSaleProductToForecast({idSale, idShops}){
     return `
-    SELECT A.ID_SALE_ID, A.ID_SALES, C.CODIGO CODPRODUTO, A.COD_ORIGINAL, A.CODLOJA, A.DESCONTO, C.NOME, A.[STATUS],
-    A.QUANTIDADE, ISNULL(D.qtdForecast, 0) qtdForecast, ISNULL(E.EST_LOJA, 0) EST_LOJA, ISNULL(E.EST_LOJA, 0) - ISNULL(D.qtdForecast, 0) availableStock,
-    ISNULL(B.QTD_MOUNTING, 0) QTD_MOUNTING, A.QUANTIDADE - (ISNULL(B.QTD_MOUNTING, 0)) openQuantity
+    SELECT A.ID_SALE_ID, A.ID_SALES, A.COD_ORIGINAL, A.CODLOJA, A.DESCONTO, A.[STATUS],
+    A.QUANTIDADE, ISNULL(B.QTD_MOUNTING, 0) QTD_MOUNTING, A.QUANTIDADE - (ISNULL(B.QTD_MOUNTING, 0)) openQuantity
     FROM SALES_PROD A
-    LEFT JOIN (	SELECT ID_SALE, COD_ORIGINAL, CODLOJA, SUM(QTD_DELIV) QTD_MOUNTING
-          FROM DELIVERYS_PROD A
-          INNER JOIN DELIVERYS B ON A.ID_DELIVERY = B.ID
-          WHERE DELIVERED = 0
-          GROUP BY ID_SALE, COD_ORIGINAL, CODLOJA) B
-    ON A.CODLOJA = B.CODLOJA AND A.ID_SALES = B.ID_SALE AND A.COD_ORIGINAL = B.COD_ORIGINAL
-    INNER JOIN ${process.env.CD_BASE}..PRODUTOS C ON A.COD_ORIGINAL = C.ALTERNATI
-    LEFT JOIN ( SELECT A.COD_ORIGINAL, SUM(A.qtdForecast) qtdForecast FROM (
-                  SELECT COD_ORIGINAL, SUM(QUANTIDADE) qtdForecast, 'sales' TIPO
-                  FROM SALES_PROD
-                  WHERE [STATUS] IN ('Em Previsão', 'Em lançamento')
-                  GROUP BY COD_ORIGINAL
-                  UNION
-                  SELECT A.COD_ORIGINAL, SUM(QUANTIDADE) qtdForecast, 'maintenance' TIPO
-                  FROM MAINTENANCE A
-                  WHERE A.[STATUS] IN ('Em Previsão', 'Em lançamento')
-                  GROUP BY COD_ORIGINAL) A
-                GROUP BY A.COD_ORIGINAL
-                ) D
-    ON A.COD_ORIGINAL = D.COD_ORIGINAL
-    LEFT JOIN
-    ${process.env.STOCK_BEEP === '1'
-      ? `(SELECT productId CODIGO, COUNT(*) EST_LOJA
-      FROM ${process.env.CD_BASE}..PRODLOJAS_SERIES_MOVIMENTOS
-      WHERE outputBeepDate IS NULL
-      GROUP BY productId)`
-      : `(SELECT * FROM ${process.env.CD_BASE}..PRODLOJAS WHERE CODLOJA = 1)`
-    } E ON E.CODIGO = C.CODIGO
+    LEFT JOIN (
+      SELECT ID_SALE, COD_ORIGINAL, CODLOJA, SUM(QTD_DELIV) QTD_MOUNTING
+        FROM DELIVERYS_PROD A
+        WHERE DELIVERED = 0
+        GROUP BY ID_SALE, COD_ORIGINAL, CODLOJA
+    ) B ON A.CODLOJA = B.CODLOJA AND A.ID_SALES = B.ID_SALE AND A.COD_ORIGINAL = B.COD_ORIGINAL
     WHERE A.ID_SALES = ${idSale} AND A.CODLOJA IN (${idShops})`
   },
   findSaleProductMaintenanceToForecast({idSale, idShops}){
     return `
-    SELECT A.ID_SALE_ID, A.ID_SALES, C.CODIGO CODPRODUTO, A.COD_ORIGINAL, A.CODLOJA, A.DESCONTO, C.NOME, 'Enviado' STATUS,
-    F.QUANTIDADE, ISNULL(D.qtdForecast, 0) qtdForecast, E.EST_LOJA, E.EST_LOJA - ISNULL(D.qtdForecast, 0) availableStock,
-    0 QTD_MOUNTING, F.QUANTIDADE openQuantity, F.ID ID_MAINTENANCE
+    SELECT A.ID_SALE_ID, A.ID_SALES, A.COD_ORIGINAL, A.CODLOJA, A.DESCONTO, 'Enviado' STATUS,
+    B.QUANTIDADE, 0 QTD_MOUNTING, B.QUANTIDADE openQuantity, B.ID ID_MAINTENANCE
     FROM SALES_PROD A
-    INNER JOIN ${process.env.CD_BASE}..PRODUTOS C ON A.COD_ORIGINAL = C.ALTERNATI
-    LEFT JOIN ( SELECT A.COD_ORIGINAL, SUM(A.qtdForecast) qtdForecast FROM (
-                  SELECT COD_ORIGINAL, SUM(QUANTIDADE) qtdForecast, 'sales' TIPO
-                  FROM SALES_PROD
-                  WHERE [STATUS] IN ('Em Previsão', 'Em lançamento')
-                  GROUP BY COD_ORIGINAL
-                  UNION
-                  SELECT A.COD_ORIGINAL, SUM(QUANTIDADE) qtdForecast, 'maintenance' TIPO
-                  FROM MAINTENANCE A
-                  WHERE A.[STATUS] IN ('Em Previsão', 'Em lançamento')
-                  GROUP BY COD_ORIGINAL) A
-                GROUP BY A.COD_ORIGINAL
-                ) D
-    ON A.COD_ORIGINAL = D.COD_ORIGINAL
-    LEFT JOIN ${process.env.CD_BASE}..PRODLOJAS E ON E.CODIGO = C.CODIGO
-    INNER JOIN MAINTENANCE F ON F.CODLOJA = A.CODLOJA AND F.ID_SALE = A.ID_SALES AND F.COD_ORIGINAL = A.COD_ORIGINAL
-    WHERE E.CODLOJA = 1 AND F.STATUS = 'No CD' AND A.ID_SALES = ${idSale} AND A.CODLOJA IN (${idShops})`
+    INNER JOIN MAINTENANCE B ON B.CODLOJA = A.CODLOJA AND B.ID_SALE = A.ID_SALES AND B.COD_ORIGINAL = A.COD_ORIGINAL
+    WHERE B.STATUS = 'No CD' AND A.ID_SALES = ${idSale} AND A.CODLOJA IN (${idShops})`
   },
   findSaleMaintenance({idSale}) {
     return `

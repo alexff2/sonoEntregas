@@ -29,7 +29,7 @@ module.exports = {
     ) A WHERE A.EST_ATUAL < A.QTD`
   },
   stockBeep(condition, type = 'IN'){
-    const where = Object.keys(condition) === 'COD_ORIGINAL' 
+    const where = Object.keys(condition)[0] === 'COD_ORIGINAL' 
       ? `A.ALTERNATI IN (${Object.values(condition)})`
       : `A.${Object.keys(condition)} ${type === 'IN' ? `IN (${Object.values(condition)})` : `LIKE '${Object.values(condition)}%'`}`
 
@@ -82,7 +82,7 @@ module.exports = {
     WHERE ${where}`
   },
   stockNotBeep(condition, type = 'IN'){
-    const where = Object.keys(condition) === 'COD_ORIGINAL' 
+    const where = Object.keys(condition)[0] === 'COD_ORIGINAL' 
       ? `A.ALTERNATI IN (${Object.values(condition)})`
       : `A.${Object.keys(condition)} ${type === 'IN' ? `IN (${Object.values(condition)})` : `LIKE '${Object.values(condition)}%'`}`
 
