@@ -100,4 +100,8 @@ module.exports = {
     WHERE C.CODLOJA = 1
     AND ${where}`
   },
+  values(id){
+    return `SELECT CODIGO, PCO_COMPRA, PCO_AREMAR, PCO_VENDA
+    FROM PRODLOJAS WHERE CODLOJA = 1 AND CODIGO IN (${id})`
+  }
 }

@@ -13,6 +13,7 @@
  */
 const { QueryTypes } = require('sequelize')
 const ProductModel = require('../models/ViewProdutos')
+const productScripts = require('../scripts/products')
 
 module.exports = {
   async findProductsSceCd(wheres){
@@ -40,38 +41,29 @@ module.exports = {
     await ProductModel._query(1, `UPDATE PRODUTOS SET CBARRA = '${barCode}' WHERE CODIGO = ${code}`)
   },
   async findProduct(type, search) {
-    const script = 
-    `SELECT A.CODIGO code, B.ALTERNATI generalCode, B.NOME name, (A.EST_ATUAL - ISNULL(C.qtdForecast, 0)) stock, A.PCO_COMPRA purchasePrice, B.CBARRA barCode
-    FROM ${process.env.STOCK_BEEP === '1'
-      ? `(SELECT A.CODIGO, ISNULL(B.STOCK, 0) EST_ATUAL, A.PCO_COMPRA
-          FROM PRODLOJAS A
-          LEFT JOIN (
-            SELECT productId, COUNT(*) STOCK FROM PRODLOJAS_SERIES_MOVIMENTOS
-            WHERE outputBeepDate IS NULL
-            GROUP BY productId
-          ) B ON B.productId = A.CODIGO
-          WHERE A.CODLOJA = 1)`
-      : '(SELECT * FROM PRODLOJAS WHERE CODLOJA = 1)'
-    } A
-    INNER JOIN PRODUTOS B ON A.CODIGO = B.CODIGO
-    LEFT JOIN (
-      SELECT A.COD_ORIGINAL, SUM(A.qtdForecast) qtdForecast FROM (
-        SELECT COD_ORIGINAL, SUM(QUANTIDADE) qtdForecast, 'sales' TIPO
-        FROM ${process.env.ENTREGAS_BASE}..SALES_PROD
-        WHERE [STATUS] IN ('Em Previsão', 'Em lançamento')
-        GROUP BY COD_ORIGINAL
-        UNION
-        SELECT A.COD_ORIGINAL, SUM(QUANTIDADE) qtdForecast, 'maintenance' TIPO
-        FROM ${process.env.ENTREGAS_BASE}..MAINTENANCE A
-        WHERE A.[STATUS] IN ('Em Previsão', 'Em lançamento')
-        GROUP BY COD_ORIGINAL) A
-      GROUP BY A.COD_ORIGINAL
-    ) C ON B.ALTERNATI = C.COD_ORIGINAL
-    WHERE ${type === 'code' ? 'B.ALTERNATI' : 'B.NOME'} LIKE '${search}%'AND B.ATIVO = 'S'`
+    const condition = type === 'code'
+      ? {COD_ORIGINAL: `${search}%`}
+      : {NOME: `${search}%`}
+
+      const script = process.env.STOCK_BEEP === '1'
+      ? productScripts.stockBeep(condition, 'LIKE')
+      : productScripts.stockNotBeep(condition, 'LIKE')
 
     const products = await ProductModel._query(1, script, QueryTypes.SELECT)
+    const productsValueScript = productScripts.values(products.map(product => product.CODIGO))
+    const productsValues = await ProductModel._query(1, productsValueScript, QueryTypes.SELECT)
 
-    return products
+    return products.map(product => {
+      const productValue = productsValues.find(productValue => productValue.CODIGO = product.CODIGO)
+
+      return {
+      ...product,
+      code: product.CODIGO,
+      generalCode: product.COD_ORIGINAL,
+      name: product.NOME,
+      stock: product.availableStock,
+      purchasePrice: productValue.PCO_COMPRA
+    }})
   },
   /**@param {number[]} ids*/
   async findGrouped(ids) {
