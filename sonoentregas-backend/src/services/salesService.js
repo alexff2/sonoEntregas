@@ -271,6 +271,15 @@ module.exports = {
       }
     }
 
+    if(sales.filter(sale => sale.STATUS === 'Aberta').length === 0){
+      throw {
+        status: 409,
+        error: {
+          message: 'Venda já finalizada ou retirada em previsão!'
+        }
+      }
+    }
+
     const saleIsWithdrawal = sales.filter(sale => sale.isWithdrawal)
 
     if (saleIsWithdrawal.length === 0) {
@@ -283,7 +292,9 @@ module.exports = {
     }
 
     const scriptFindSaleProductToForecast = scriptForecast.findSaleProductToForecast({idSale, idShops: sales.map(sale => sale.CODLOJA)})
-    const saleProducts = await SalesProd._query(0, scriptFindSaleProductToForecast, QueryTypes.SELECT)
+    let saleProducts = await SalesProd._query(0, scriptFindSaleProductToForecast, QueryTypes.SELECT)
+    saleProducts = saleProducts.filter(product => product.STATUS === 'Enviado')
+
     const productsStock = await SalesProd._query(
       1,
       process.env.STOCK_BEEP === '0'
@@ -296,7 +307,6 @@ module.exports = {
       sales: saleIsWithdrawal,
       products: saleProducts.map(saleProduct => {
         const stock = productsStock.find(productStock => productStock.COD_ORIGINAL === saleProduct.COD_ORIGINAL)
-        saleProduct.STATUS = saleProduct.STATUS === 'Em Previsão' ? 'Enviado' : saleProduct.STATUS
         return {
           ...saleProduct,
           ...stock
