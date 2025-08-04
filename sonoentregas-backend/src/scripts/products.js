@@ -28,7 +28,7 @@ module.exports = {
       GROUP BY  A.DESCRICAO, A.PEDIDO, B.FACTORY_DATA, C.EST_ATUAL
     ) A WHERE A.EST_ATUAL < A.QTD`
   },
-  stockBeep(condition, type = 'IN'){
+  stockBeep(condition, type = 'IN', active = false){
     const where = Object.keys(condition)[0] === 'COD_ORIGINAL' 
       ? `A.ALTERNATI IN (${Object.values(condition)})`
       : `A.${Object.keys(condition)} ${type === 'IN' ? `IN (${Object.values(condition)})` : `LIKE '${Object.values(condition)}%'`}`
@@ -79,9 +79,9 @@ module.exports = {
       ) B ON A.CODPRODUTO = B.productId
       WHERE (A.QUANTIDADE - ISNULL(B.qtd_beep, 0)) <> 0
     ) D ON D.CODPRODUTO = A.CODIGO
-    WHERE ${where}`
+    WHERE ${where}${active && ` AND A.ATIVO = 'S'`}`
   },
-  stockNotBeep(condition, type = 'IN'){
+  stockNotBeep(condition, type = 'IN', active = false){
     const where = Object.keys(condition)[0] === 'COD_ORIGINAL' 
       ? `A.ALTERNATI IN (${Object.values(condition)})`
       : `A.${Object.keys(condition)} ${type === 'IN' ? `IN (${Object.values(condition)})` : `LIKE '${Object.values(condition)}%'`}`
@@ -98,7 +98,7 @@ module.exports = {
     ) B ON A.ALTERNATI = B.COD_ORIGINAL
     LEFT JOIN PRODLOJAS C ON C.CODIGO = A.CODIGO
     WHERE C.CODLOJA = 1
-    AND ${where}`
+    AND ${where}${active && ` AND A.ATIVO = 'S'`}`
   },
   values(id){
     return `SELECT CODIGO, PCO_COMPRA, PCO_AREMAR, PCO_VENDA

@@ -31,7 +31,7 @@ module.exports = {
         return response.status(200).json([])
       }
 
-      const products = await ProductsService.findProduct(type, search)
+      const products = await ProductsService.findProduct(type, search, true)
 
       return response.status(200).json(products)
     } catch (error) {

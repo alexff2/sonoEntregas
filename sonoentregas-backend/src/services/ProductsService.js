@@ -40,16 +40,16 @@ module.exports = {
 
     await ProductModel._query(1, `UPDATE PRODUTOS SET CBARRA = '${barCode}' WHERE CODIGO = ${code}`)
   },
-  async findProduct(type, search) {
+  async findProduct(type, search, active = false) {
     const condition = type === 'code'
       ? {COD_ORIGINAL: `${search}%`}
       : {NOME: `${search}%`}
 
-      const script = process.env.STOCK_BEEP === '1'
-      ? productScripts.stockBeep(condition, 'LIKE')
-      : productScripts.stockNotBeep(condition, 'LIKE')
+      const scriptProductsStock = process.env.STOCK_BEEP === '1'
+      ? productScripts.stockBeep(condition, 'LIKE', active)
+      : productScripts.stockNotBeep(condition, 'LIKE', active)
 
-    const products = await ProductModel._query(1, script, QueryTypes.SELECT)
+    const products = await ProductModel._query(1, scriptProductsStock, QueryTypes.SELECT)
     const productsValueScript = productScripts.values(products.map(product => product.CODIGO))
     const productsValues = await ProductModel._query(1, productsValueScript, QueryTypes.SELECT)
 
