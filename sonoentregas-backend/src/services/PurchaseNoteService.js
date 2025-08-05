@@ -92,6 +92,35 @@ class PurchaseNoteService {
     return products
   }
 
+  async findProductToBeep(id, idProduct) {
+    const script = `
+    SELECT B.CODIGO id, B.ORIGINAL originalId, B.APLICACAO mask, B.NOME [nameFull], A.QUANTIDADE quantity,
+    ISNULL(C.quantityBeep, 0) quantityBeep, A.NUM_DOC moduleId, B.SUBG subGroupId, 
+    A.QUANTIDADE - ISNULL(C.quantityBeep, 0) quantityPedding, A.NUM_DOC moduleId
+    FROM (
+      SELECT A.PRODUTO, SUM(A.QUANTIDADE) QUANTIDADE, B.NUM_DOC FROM NFITENS A
+      INNER JOIN NFISCAL B ON A.NNF = B.NF
+      WHERE B.CODFOR = 1 AND B.NUM_DOC = ${id} AND A.PRODUTO = ${idProduct}
+      GROUP BY B.NUM_DOC, A.PRODUTO
+    ) A
+    INNER JOIN PRODUTOS B ON A.PRODUTO = B.CODIGO
+    LEFT JOIN ( SELECT productId, COUNT(id) quantityBeep, inputModuleId
+            FROM PRODLOJAS_SERIES_MOVIMENTOS
+            WHERE inputModule = 'purchaseNote'
+            AND inputModuleId = ${id} AND productId = ${idProduct}
+            GROUP BY productId, inputModuleId) C ON C.productId = B.CODIGO AND C.inputModuleId = A.NUM_DOC`
+    /**@type {ProductsToBeep[]} */
+    const purchaseNoteProduct = await PurchaseNoteModel._query(1, script, QueryTypes.SELECT)
+
+    if (purchaseNoteProduct.length === 0) {
+      throw {
+        error: 'not found purchase note!'
+      }
+    }
+
+    return purchaseNoteProduct[0]
+  }
+
   async updateId({ newId, oldId, t }) {
     const note = await PurchaseNoteModel.find({
       loja: 1,

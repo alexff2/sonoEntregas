@@ -53,6 +53,17 @@ module.exports = {
       errorCath(error, response)
     }
   },
+  async findProductToBeep(request, response) {
+    try {
+      const {id, idProduct} = request.params
+
+      const product = await PurchaseNoteService.findProductToBeep(id, idProduct)
+
+      return response.json({product})
+    } catch (error) {
+      errorCath(error, response)
+    }
+  },
   async updateId(request, response) {
     const { sequelize, transaction } = await PurchaseNoteModel._query(1)
     try {
