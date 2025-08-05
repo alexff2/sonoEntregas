@@ -73,8 +73,19 @@ export default function EntryNote({handleRenderBox}) {
         moduleId: productSelectedToSend.moduleId
       })
 
-      const {data} = await api.get(`purchase/note/${entryNoteNumber}/beep`)
-      setProducts(data.products)
+      const {data} = await api.get(`purchase-note-beep/${productSelectedToSend.moduleId}/product/${productSelectedToSend.id}`)
+
+      setProducts(products.map(group => ({
+        ...group,
+        products: group.products.map(product => {
+          if (product.id === data.product.id && product.moduleId === data.product.moduleId) {
+            return data.product
+          }
+          return product
+        })
+      })))
+      /*const {data} = await api.get(`purchase-note-beep/${entryNoteNumber}`)
+      setProducts(data.products)*/
 
       setAlertSnackbar('Bipe realizado com sucesso!', 'success')
       handleResetProperties()
@@ -103,15 +114,18 @@ export default function EntryNote({handleRenderBox}) {
         moduleId: productSelected.moduleId
       })
 
-      const {data} = await api.get(`purchase/note/${entryNoteNumber}/beep`)
-      setProducts(data.products)
-      data.products.forEach(group => {
-        group.products.forEach(product => {
-          if (product.id === productSelected.id && product.moduleId === productSelected.moduleId) {
+      const {data} = await api.get(`purchase-note-beep/${productSelected.moduleId}/product/${productSelected.id}`)
+
+      setProducts(products.map(group => ({
+        ...group,
+        products: group.products.map(product => {
+          if (product.id === data.product.id && product.moduleId === data.product.moduleId) {
             product.quantityPedding === 0 ? setProductSelected(null) : setProductSelected(product)
+            return data.product
           }
+          return product
         })
-      })
+      })))
 
       setAlertSnackbar('Bipe realizado com sucesso!', 'success')
       handleResetProperties()

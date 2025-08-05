@@ -41,7 +41,7 @@ export const EntryNoteSearch = ({
       }
 
       setLoading(true)
-      const {data} = await api.get(`purchase/note/${entryNoteNumber}/beep`)
+      const {data} = await api.get(`purchase-note-beep/${entryNoteNumber}`)
       setProducts(data.products)
 
       setOpenSearch(false)
