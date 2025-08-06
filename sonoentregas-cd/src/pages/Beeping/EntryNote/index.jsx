@@ -174,8 +174,8 @@ export default function EntryNote({handleRenderBox}) {
           Bipe da(s) Nota(s) de Entrada nº <strong>{entryNoteNumber}</strong>
         </Typography>
         {beepById 
-          ? (<Typography>{productSelected?.nameFull ?? ''}</Typography>)
-          : (<Typography>{productSelected ? productSelected.nameFull : 'Selecione um produto...'}</Typography>)
+          ? (<Typography>{productSelected?.nameFull}</Typography>)
+          : (<Typography>{productSelected?.nameFull ?? 'Selecione um produto...'}</Typography>)
         }
       </Beep.Header>
       <Beep.Products
