@@ -110,7 +110,7 @@ export default function ModalMain({ maint, clickReport }) {
             <label>Endereço: </label>
             {maint.ENDERECO+', '+maint.BAIRRO+', '+maint.CIDADE+'-'+maint.ESTADO}
           </div>
-          <div className="info"><label>Obs: </label>{maint.OBS}</div>
+          <div className="info"><label>Obs: </label>{maint.OBS}{maint.OBS_VISIT && <span>/ {maint.OBS_VISIT}</span>}</div>
           <div className="info">
             <label>Defeito reclamado: </label>{maint.CAT_DEFECT}
           </div>
