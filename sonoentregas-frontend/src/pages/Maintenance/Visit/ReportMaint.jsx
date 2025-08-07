@@ -149,6 +149,10 @@ export default function ReportMaint({maint, openModal, setOpenModal}){
               <span style={{color: 'red'}}>{maint.OTHER_DEF}</span>
             </div>
           }
+          <div className='flexCenter'>
+            <label>Observação: </label>
+            <span>{maint.OBS}</span>
+          </div>
         </div>
         <p>4.DISPOSIÇÃO: (ação imediata para resolver o problema apresentado pelo consumidor)</p>
         <div className='divSetor'>
