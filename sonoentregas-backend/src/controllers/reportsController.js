@@ -54,12 +54,14 @@ module.exports = {
       SELECT A.ALTERNATI AS COD_ORIGINAL, A.NOME, ISNULL(E.QTD_MAINTENANCE, 0) + ISNULL(B.QTD, 0) PENDENTE,
       ISNULL(C.PEDIDO, 0) PEDIDO, D.EST_LOJA
       FROM PRODUTOS A
-      INNER JOIN (
-        SELECT productId, COUNT(*) EST_LOJA
-        FROM PRODLOJAS_SERIES_MOVIMENTOS
-        WHERE outputBeepDate IS NULL
-        GROUP BY productId
-      ) D ON D.productId = A.CODIGO
+      ${process.env.STOCK_BEEP === '1'
+        ? `INNER JOIN (
+          SELECT productId, COUNT(*) EST_LOJA
+          FROM PRODLOJAS_SERIES_MOVIMENTOS
+          WHERE outputBeepDate IS NULL
+          GROUP BY productId
+        ) D ON D.productId = A.CODIGO`
+        : 'INNER JOIN PRODLOJAS D ON D.CODIGO = A.CODIGO'}
       LEFT JOIN (
       SELECT COD_ORIGINAL, SUM(QUANTIDADE) QTD
       FROM ${connections[0].database}..SALES_PROD where STATUS IN ('Enviado', 'Em Previsão', 'Em Lançamento')
@@ -76,7 +78,7 @@ module.exports = {
           FROM VIEW_SALDO_PEDIDO_PRODUTO
           GROUP BY CODPRODUTO
       ) C ON A.CODIGO = C.CODPRODUTO
-      WHERE A.ATIVO = 'S'
+      WHERE A.ATIVO = 'S' ${process.env.STOCK_BEEP === '1' ? '' : 'AND D.CODLOJA = 1'}
       ORDER BY A.NOME
       `, QueryTypes.SELECT)
 
