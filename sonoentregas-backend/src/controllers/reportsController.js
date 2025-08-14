@@ -52,7 +52,7 @@ module.exports = {
       /** @type{IProduct[]} */
       const products = await Products._query(1, `
       SELECT A.ALTERNATI AS COD_ORIGINAL, A.NOME, ISNULL(E.QTD_MAINTENANCE, 0) + ISNULL(B.QTD, 0) PENDENTE,
-      ISNULL(C.PEDIDO, 0) PEDIDO, D.EST_LOJA
+      ISNULL(C.PEDIDO, 0) PEDIDO, ISNULL(D.EST_LOJA, 0) EST_LOJA
       FROM PRODUTOS A
       ${process.env.STOCK_BEEP === '1'
         ? `LEFT JOIN (
