@@ -54,7 +54,7 @@ module.exports = {
     const productsValues = await ProductModel._query(1, productsValueScript, QueryTypes.SELECT)
 
     return products.map(product => {
-      const productValue = productsValues.find(productValue => productValue.CODIGO = product.CODIGO)
+      const productValue = productsValues.find(productValue => productValue.CODIGO === product.CODIGO)
 
       return {
       ...product,
