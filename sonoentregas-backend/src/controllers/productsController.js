@@ -1,4 +1,5 @@
 const ProductsService = require('../services/ProductsService')
+const ProductDetailsService = require('../services/ProductDetailsService')
 const errorCath = require('../functions/error')
 
 module.exports = {
@@ -58,6 +59,17 @@ module.exports = {
       const products = await ProductsService.findStock(typeSearch, search)
 
       return response.json({ products })
+    } catch (error) {
+      return errorCath(error, response)
+    }
+  },
+  async details(request, response) {
+    try {
+      const {id} = request.params
+
+      const productDetails = await ProductDetailsService.getProductDetails(id)
+
+      return response.json({productDetails})
     } catch (error) {
       return errorCath(error, response)
     }

@@ -13,25 +13,27 @@ import {
   Select, 
   MenuItem, 
   FormControl, 
-  InputLabel 
+  InputLabel, 
 } from "@material-ui/core"
 import SearchIcon from '@material-ui/icons/Search'
 
-import { useAlertSnackbar } from '../../../context/alertSnackbarContext'
-
+import Modal from '../../../components/Modal'
 import useStyles from '../style'
 
 import api from '../../../services/api'
-import { useBackdrop } from "../../../context/backdropContext"
+import {useBackdrop} from "../../../context/backdropContext"
+import {useAlertSnackbar} from '../../../context/alertSnackbarContext'
+
+import Details from "./Details"
 
 export default function SearchProducts() {
-  const [ products, setProducts ] = useState([])
-  const [ serialNumbersProduct, setSerialNumbersProduct ] = useState([])
-  const [ search, setSearch ] = useState()
-  const [ typeSearch, setTypeSearch ] = useState('NOME')
+  const [typeSearch, setTypeSearch] = useState('NOME')
+  const [search, setSearch] = useState()
+  const [products, setProducts] = useState([])
+  const [productSelect, setProductSelect] = useState(null)
   const classes = useStyles()
-  const { setAlertSnackbar } = useAlertSnackbar()
-  const { setOpenBackDrop } = useBackdrop()
+  const {setAlertSnackbar} = useAlertSnackbar()
+  const {setOpenBackDrop} = useBackdrop()
   
   const searchProduct = async () => {
     try {
@@ -42,10 +44,10 @@ export default function SearchProducts() {
 
       setOpenBackDrop(true)
 
-      const { data } = await api.get('products', {
+      const {data} = await api.get('product', {
         params: {
           search,
-          typeSearch
+          type: typeSearch
         }
       })
 
@@ -54,31 +56,6 @@ export default function SearchProducts() {
     } catch (e) {
       setAlertSnackbar(e)
       setProducts([])
-      setOpenBackDrop(false)
-    }
-  }
-
-  const searchSerialNumber = async (product) => {
-    try {
-      if (product.COD_ORIGINAL === serialNumbersProduct.COD_ORIGINAL) {
-        setSerialNumbersProduct({})
-        return
-      }
-
-      setOpenBackDrop(true)
-
-      const { data } = await api.get('serial/product', {
-        params: { code: product.CODIGO }
-      })
-
-      setOpenBackDrop(false)
-      setSerialNumbersProduct({
-        COD_ORIGINAL: product.COD_ORIGINAL,
-        serials: data
-      })
-    } catch (e) {
-      setAlertSnackbar("Erro interno, entre em contato com Adm")
-      setSerialNumbersProduct({})
       setOpenBackDrop(false)
     }
   }
@@ -130,53 +107,36 @@ export default function SearchProducts() {
               <TableCell>Código</TableCell>
               <TableCell>Cod Alterna</TableCell>
               <TableCell>Descrição</TableCell>
-              <TableCell align="right">Qtd Kardex</TableCell>
-              {process.env.REACT_APP_STOCK_BEEP === '1' && <TableCell align="right">Qtd Bipada</TableCell>}
-              <TableCell align="right">Qtd DAV</TableCell>
-              <TableCell align="right">Qtd Ass.</TableCell>
-              <TableCell align="right">Qtd Disp. Loja</TableCell>
+              <TableCell align="right">Estoque</TableCell>
+              <TableCell align="right">Qtd Disp.</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-          {products.map((product) => (
-            <React.Fragment key={product.COD_ORIGINAL}>
-              <TableRow
-                hover
-                onClick={() => searchSerialNumber(product)}
-                className={classes.row}
-              >
-                <TableCell>{product.CODIGO}</TableCell>
-                <TableCell>{product.COD_ORIGINAL}</TableCell>
-                <TableCell>{product.NOME}</TableCell>
-                <TableCell align="right">{product.EST_KARDEX}</TableCell>
-                {process.env.REACT_APP_STOCK_BEEP === '1' &&  <TableCell align="right">{product.EST_BEEP}</TableCell>}
-                <TableCell align="right">{product.EST_RESERVA}</TableCell>
-                <TableCell align="right">{product.QTD_MAINTENANCE}</TableCell>
-                {process.env.REACT_APP_STOCK_BEEP === '1' 
-                  ? <TableCell align="right">{product.EST_DISPONIVEL}</TableCell>
-                  : <TableCell align="right">{product.EST_KARDEX + product.EST_DISPONIVEL}</TableCell>
-                }
-              </TableRow>
-              {serialNumbersProduct.COD_ORIGINAL === product.COD_ORIGINAL && (
-                <TableRow>
-                  <TableCell colSpan={6}>
-                    <strong>Número de séries</strong>
-                    <Box className={classes.boxSerialNumber}>
-                      {serialNumbersProduct.serials.map((serial, index) => (
-                        <Box key={index}>
-                          <strong>{index + 1}:</strong> {serial}
-                        </Box>
-                      ))}
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              )}
-            </React.Fragment>
+          {products.map(product => (
+            <TableRow
+              key={product.COD_ORIGINAL}
+              hover
+              onClick={() => setProductSelect(product)}
+              className={classes.row}
+            >
+              <TableCell>{product.CODIGO}</TableCell>
+              <TableCell>{product.COD_ORIGINAL}</TableCell>
+              <TableCell>{product.NOME}</TableCell>
+              <TableCell align="right">{product.EST_LOJA}</TableCell>
+              <TableCell align="right">{product.availableStock}</TableCell>
+            </TableRow>
           ))}
           </TableBody>
         </Table>
       </TableContainer>
+
+      <Modal
+        open={Boolean(productSelect)}
+        setOpen={setProductSelect}
+      >
+        <Details product={productSelect}/>
+      </Modal>
     </Box>
-  );
+  )
 }
 
