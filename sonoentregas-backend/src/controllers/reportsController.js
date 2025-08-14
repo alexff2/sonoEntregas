@@ -55,7 +55,7 @@ module.exports = {
       ISNULL(C.PEDIDO, 0) PEDIDO, D.EST_LOJA
       FROM PRODUTOS A
       ${process.env.STOCK_BEEP === '1'
-        ? `INNER JOIN (
+        ? `LEFT JOIN (
           SELECT productId, COUNT(*) EST_LOJA
           FROM PRODLOJAS_SERIES_MOVIMENTOS
           WHERE outputBeepDate IS NULL
