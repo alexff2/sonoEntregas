@@ -90,9 +90,9 @@ module.exports = {
     FROM PRODUTOS A
     LEFT JOIN (
       SELECT B.COD_ORIGINAL, SUM(B.quantityForecast) qtdForecast
-      FROM SONOENTREGAS..FORECAST_SALES A
-      INNER JOIN SONOENTREGAS..FORECAST_PRODUCT B ON A.id = B.idForecastSale
-      INNER JOIN SONOENTREGAS..FORECAST C ON C.id = A.idForecast
+      FROM ${process.env.ENTREGAS_BASE}FORECAST_SALES A
+      INNER JOIN ${process.env.ENTREGAS_BASE}FORECAST_PRODUCT B ON A.id = B.idForecastSale
+      INNER JOIN ${process.env.ENTREGAS_BASE}FORECAST C ON C.id = A.idForecast
       WHERE (C.status IS NULL OR C.status = 1)
       GROUP BY B.COD_ORIGINAL
     ) B ON A.ALTERNATI = B.COD_ORIGINAL
