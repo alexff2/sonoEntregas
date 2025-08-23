@@ -11,7 +11,7 @@ module.exports = {
         GROUP BY productId, outputModuleId
       ) C ON B.CODPRODUTO = C.productId AND A.CODIGO = C.outputModuleId
 	  INNER JOIN EMPRESA D ON D.CODIGO = A.LOJAORIGEM
-      WHERE A.EMISSAO >= '2025-05-01'
+      WHERE A.EMISSAO >= '${process.env.DATE_START}'
       AND A.TIPODC = 'D'
     ) A WHERE A.QTD_BEEP <> A.QUANTIDADE AND A.CODPRODUTO = ${productId}`
   },
@@ -45,6 +45,6 @@ module.exports = {
       INNER JOIN NFITENS B ON A.NF = B.NNF
       GROUP BY A.PEDIDO, B.PRODUTO
     ) C ON C.PRODUTO = B.CODPRODUTO AND C.PEDIDO = A.CODIGOPEDIDO
-    WHERE B.QUANTIDADE - ISNULL(C.QUANTIDADE, 0) <> 0 AND A.EMISSAO >= '2025-01-01' AND B.CODPRODUTO = ${productId}`
+    WHERE B.QUANTIDADE - ISNULL(C.QUANTIDADE, 0) <> 0 AND A.EMISSAO >= '${process.env.DATE_PURCHASE}' AND B.CODPRODUTO = ${productId}`
   }
 }

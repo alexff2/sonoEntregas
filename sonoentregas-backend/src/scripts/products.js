@@ -33,7 +33,7 @@ module.exports = {
       ? `A.ALTERNATI IN (${Object.values(condition)})`
       : `A.${Object.keys(condition)} ${type === 'IN' ? `IN (${Object.values(condition)})` : `LIKE '${Object.values(condition)}%'`}`
 
-      return`SELECT A.CODIGO, A.ALTERNATI COD_ORIGINAL, A.NOME, ISNULL(C.EST_LOJA, 0) EST_LOJA, ISNULL(B.qtdForecast, 0) qtdForecast, ISNULL(D.qtdTransfer, 0) qtdTransfer, ISNULL(C.EST_LOJA, 0) - ISNULL(B.qtdForecast, 0) - ISNULL(D.qtdTransfer, 0) availableStock
+    return`SELECT A.CODIGO, A.ALTERNATI COD_ORIGINAL, A.NOME, A.CBARRA barCode, ISNULL(C.EST_LOJA, 0) EST_LOJA, ISNULL(B.qtdForecast, 0) qtdForecast, ISNULL(D.qtdTransfer, 0) qtdTransfer, ISNULL(C.EST_LOJA, 0) - ISNULL(B.qtdForecast, 0) - ISNULL(D.qtdTransfer, 0) availableStock
     FROM PRODUTOS A
     LEFT JOIN (
       SELECT A.COD_ORIGINAL, A.qtdForecast - ISNULL(B.qtdBeep, 0) qtdForecast FROM (
@@ -69,7 +69,7 @@ module.exports = {
         SELECT B.CODPRODUTO, SUM(B.QUANTIDADE) QUANTIDADE
         FROM TRANSPRODLOJA A
         INNER JOIN TRANSPRODLOJAI B ON A.CODIGO = B.REGISTRO
-        WHERE A.EMISSAO >= '2025-04-08' AND A.LOJAORIGEM = 1
+        WHERE A.EMISSAO >= '${process.env.DATE_START}' AND A.LOJAORIGEM = 1
         GROUP BY B.CODPRODUTO
       ) A LEFT JOIN (
         SELECT productId, COUNT(*) qtd_beep
