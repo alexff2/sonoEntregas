@@ -144,7 +144,7 @@ module.exports = {
     }
   },
   findBeepPendantModules: async(request, response) => {
-    if(process.env.CD_BASE !== 'SONO') {
+    if(process.env.STOCK_BEEP !== '1') {
       return response.json([])
     }
 

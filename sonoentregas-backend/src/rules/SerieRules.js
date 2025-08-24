@@ -87,7 +87,7 @@ class SerieRules {
         1,
         {
           NUM_DOC: moduleId,
-          CODFOR: 1
+          CODFOR: process.env.COD_FOR
         },
         '*',
         sce

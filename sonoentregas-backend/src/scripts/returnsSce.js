@@ -52,11 +52,11 @@ module.exports = {
     return `
     SELECT A.id, A.returnsSalesId, A.alternativeCode, E.NOME name, a.quantity, COUNT(D.id) quantityBeep FROM RETURNS_SALES_PRODUCTS A
     LEFT JOIN (
-      SELECT B.*, C.ALTERNATI FROM SONO..PRODLOJAS_SERIES_MOVIMENTOS B
-      INNER JOIN SONO..PRODUTOS C
+      SELECT B.*, C.ALTERNATI FROM ${process.env.CD_BASE}..PRODLOJAS_SERIES_MOVIMENTOS B
+      INNER JOIN ${process.env.CD_BASE}..PRODUTOS C
       ON B.productId = C.CODIGO) D
     ON D.ALTERNATI = A.alternativeCode AND A.returnsSalesId = D.inputModuleId
-    INNER JOIN SONO..PRODUTOS E ON E.ALTERNATI = A.alternativeCode
+    INNER JOIN ${process.env.CD_BASE}..PRODUTOS E ON E.ALTERNATI = A.alternativeCode
     WHERE A.returnsSalesId IN (${returnsSalesIds})
     GROUP BY A.id, A.returnsSalesId, A.alternativeCode, E.NOME, a.quantity`
   },
