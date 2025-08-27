@@ -180,6 +180,77 @@ class SerieService {
 
     return modules
   }
+
+  async unbeepEntryNote({serialNumber, connection}){
+    const productSerial = await ProdLojaSeriesMovimentosModel.findAny(1, {
+      serialNumber,
+      isNull: 'outputBeepDate'
+    }, '*', connection)
+
+    if (productSerial.length === 0) {
+      throw {
+        error: 'Número de série não encontrado ou não pode ser desbipado',
+        status: 409
+      }
+    }
+
+    if (productSerial[0].inputModule !== 'purchaseNote') {
+      throw {
+        error: 'Número de série não encontrado ou não pode ser desbipado',
+        status: 409
+      }
+    }
+
+    if (productSerial[0].inputBeepDate.setHours(0,0,0,0) < new Date().setHours(0,0,0,0)) {
+      throw {
+        error: 'Produto não bipado hoje!',
+        status: 409
+      }
+    }
+
+    await ProdLojaSeriesMovimentosModel.deleteAny(1,{id: productSerial[0].id},connection)
+  }
+
+  async unbeepDeliveryRoute({serialNumber, connection}){
+    const productSerials = await ProdLojaSeriesMovimentosModel.findAny(1, {serialNumber}, '*', connection, false, 'id')
+
+    if (productSerials.length === 0) {
+      throw {
+        error: 'Número de série não encontrado!',
+        status: 409
+      }
+    }
+
+    const productSerial = productSerials[productSerials.length - 1]
+
+    if (productSerial.outputBeepDate === null) {
+      throw {
+        error: 'Número de série não foi bipado saída!',
+        status: 409
+      }
+    }
+
+    if (productSerial.outputModule !== 'delivery' && productSerial.outputModule !== 'maintenance') {
+      throw {
+        error: 'Número de série não foi bipado em rota de entrega!',
+        status: 409
+      }
+    }
+
+    if (productSerial.outputBeepDate.setHours(0,0,0,0) < new Date().setHours(0,0,0,0)) {
+      throw {
+        error: 'Produto não bipado hoje!',
+        status: 409
+      }
+    }
+
+    await ProdLojaSeriesMovimentosModel.updateAny(1,{
+      outputModule: 'NULL',
+      outputModuleId: 'NULL',
+      outputBeepDate: 'NULL',
+      outputUserId: 'NULL'
+    },{id: productSerial.id},connection)
+  }
 }
 
 module.exports = new SerieService()

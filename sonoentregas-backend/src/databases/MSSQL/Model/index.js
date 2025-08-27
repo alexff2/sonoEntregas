@@ -35,12 +35,12 @@ class Model {
 
     return data
   }
-  async findAny(loja, where = {}, columns = this.columns, t, log=false){
+  async findAny(loja, where = {}, columns = this.columns, t, log=false, order){
     where = Object.keys(where).length === 0 
       ? '' 
       : `WHERE ${getObj(where, ' AND ')}`
 
-    const script = `SELECT ${columns} FROM ${this.tab} ${where}`
+    const script = `SELECT ${columns} FROM ${this.tab} ${where}${order ? ` ORDER BY ${order}` : ''}`
 
     const data = await this._query(loja, script, QueryTypes.SELECT, t, log)
 

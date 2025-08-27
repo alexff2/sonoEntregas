@@ -65,6 +65,8 @@ routes.put('/users/:userId', usersController.update)
   routes.post('/serial/first', ensureAuthenticated, serieController.createFirst)
   routes.put('/serial/finished', ensureAuthenticated, serieController.finishesIfOpened)
   routes.put('/serial/change/product', ensureAuthenticated, serieController.changeSerialNumberOfProduct)
+  routes.put('/serial/unbeep-delivery-route',  serieController.unbeepDeliveryRoute)
+  routes.delete('/serial/unbeep-entry-note',  serieController.unbeepEntryNote)
   // Balance by beep
   routes.get('/balance-by-beep', balanceByBeepController.find)
   routes.get('/balance-by-beep/open', ensureAuthenticated, balanceByBeepController.open)

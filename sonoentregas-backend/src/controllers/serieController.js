@@ -164,5 +164,55 @@ module.exports = {
     const result = await SerieService.beepPendantModules(where)
 
     return response.json(result)
-  }
+  },
+  unbeepEntryNote: async (request, response) => {
+    const sce = await ProdLojaSeriesMovimentosModel._query(1)
+
+    try {
+      const {serialNumber} = request.body
+
+      if (isNaN(Number(serialNumber))) {
+        throw {
+          error: 'serial number invalid',
+        }
+      }
+
+      await SerieService.unbeepEntryNote({
+        serialNumber,
+        connection: sce
+      })
+
+      await sce.transaction.commit()
+
+      return response.status(200).json('ok')
+    } catch (erro) {
+      await sce.transaction.rollback()
+      errorCath(erro, response)
+    }
+  },
+  unbeepDeliveryRoute: async (request, response) => {
+    const sce = await ProdLojaSeriesMovimentosModel._query(1)
+
+    try {
+      const {serialNumber} = request.body
+
+      if (isNaN(Number(serialNumber))) {
+        throw {
+          error: 'serial number invalid'
+        }
+      }
+
+      await SerieService.unbeepDeliveryRoute({
+        serialNumber,
+        connection: sce
+      })
+
+      await sce.transaction.commit()
+
+      return response.status(200).json('ok')
+    } catch (erro) {
+      await sce.transaction.rollback()
+      errorCath(erro, response)
+    }
+  },
 }
