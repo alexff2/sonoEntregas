@@ -107,6 +107,12 @@ const itens = [
     fullWidth: false
   },
   {
+    title: 'Desbipar',
+    href: '/app/unbeep',
+    icon: ViewWeek,
+    fullWidth: true
+  },
+  {
     title: 'Usuários',
     href: '/app/users',
     icon: People,
@@ -128,6 +134,24 @@ const useStyle = makeStyles(theme => ({
     width: '100%'
   }
 }))
+
+const filterUsers = (item, mobileOpen, userAuth) => {
+  if (!mobileOpen) {
+    if (!item.fullWidth) {
+      return false
+    }
+  }
+
+  if (item.title === 'Usuários' && userAuth.OFFICE !== 'Dev') {
+    return false
+  }
+
+  if (item.title === 'Desbipar' && (userAuth.DESCRIPTION !== 'RAYANA' && userAuth.DESCRIPTION !== 'ALEXANDRE' && userAuth.DESCRIPTION !== 'ANDRESSA')) {
+    return false
+  }
+
+  return true
+}
 
 function Nav({
   handleDrawerToggle,
@@ -155,10 +179,7 @@ function Nav({
       <Box p={2}>
         <List>
           {itens
-            .filter(item => 
-              (mobileOpen ? true : item.fullWidth) &&
-              (userAuth.OFFICE === 'Dev' || item.title !== 'Usuários')
-            )
+            .filter(item => filterUsers(item, mobileOpen, userAuth))
             .map(item => {
               if (item.subs) {
                 return (

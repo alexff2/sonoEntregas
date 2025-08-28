@@ -34,6 +34,7 @@ import PendingProductsOutOfStockReport from '../pages/Reports/PendingProductsOut
 
 import Maintenance from '../pages/Maintenance'
 import Beeping from '../pages/Beeping'
+import UnBeep from '../pages/Unbeep'
 
 export default function PrivateRoutes(){
   return(
@@ -61,6 +62,7 @@ export default function PrivateRoutes(){
 
         <Route path="/app/maintenance" element={<Maintenance />} />
         <Route path="/app/beeping" element={<Beeping />} />
+        <Route path="/app/unbeep" element={<UnBeep />} />
         <Route path="/app/users" element={<Users />} />
 
         <Route path="/app/reports" element={<Reports />} />
