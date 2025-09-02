@@ -27,7 +27,7 @@ import {useAlertSnackbar} from '../../../context/alertSnackbarContext'
 import Details from "./Details"
 
 export default function SearchProducts() {
-  const [typeSearch, setTypeSearch] = useState('NOME')
+  const [typeSearch, setTypeSearch] = useState('name')
   const [search, setSearch] = useState()
   const [products, setProducts] = useState([])
   const [productSelect, setProductSelect] = useState(null)
@@ -72,10 +72,10 @@ export default function SearchProducts() {
             labelId="fieldSearch"
             className={classes.fieldSearch}
             onChange={(e) => setTypeSearch(e.target.value)}
-            defaultValue="NOME"
+            defaultValue="name"
           >
-            <MenuItem value="NOME">Descrição</MenuItem>
-            <MenuItem value="COD_ORIGINAL">Código</MenuItem>
+            <MenuItem value="name">Descrição</MenuItem>
+            <MenuItem value="code">Código</MenuItem>
           </Select>
         </FormControl>
 

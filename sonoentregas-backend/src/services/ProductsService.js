@@ -42,8 +42,8 @@ module.exports = {
   },
   async findProduct(type, search, active = false) {
     const condition = type === 'code'
-      ? {COD_ORIGINAL: `${search}%`}
-      : {NOME: `${search}%`}
+      ? {ALTERNATI: `${search}`}
+      : {NOME: `${search}`}
 
       const scriptProductsStock = process.env.STOCK_BEEP === '1'
       ? productScripts.stockBeep(condition, 'LIKE', active)
