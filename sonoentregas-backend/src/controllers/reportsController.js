@@ -25,6 +25,7 @@
 const { QueryTypes } = require('sequelize')
 const Products = require('../models/Produtos')
 const SalesService = require('../services/salesService')
+const SalesReportService = require('../services/SalesReportServices')
 const PurchaseOrderService = require('../services/PurchaseOrderService')
 const DreService = require('../services/DreService')
 const DeliveryService = require('../services/DeliveryService')
@@ -421,6 +422,26 @@ module.exports = {
       const pendingProductsOutOfStock = await Products._query(1, scriptProducts.getPendingProductsOutOfStock({date: req.query.date}), QueryTypes.SELECT)
 
       return res.json(pendingProductsOutOfStock)
+    } catch (e) {
+      console.log(e)
+
+      let status = e.status ? e.status : 400
+      let error = e.error ? e.error : e
+
+      return res.status(status).json(error)
+    }
+  },
+  /**
+   * @param {any} req
+   * @param {any} res
+   */
+  async salesCommissions(req, res) {
+    const { shopId, startDate, endDate } = req.query
+
+    try {
+      const salesCommissions = await SalesReportService.getSalesCommissions({ shopId, startDate, endDate })
+
+      return res.json(salesCommissions)
     } catch (e) {
       console.log(e)
 

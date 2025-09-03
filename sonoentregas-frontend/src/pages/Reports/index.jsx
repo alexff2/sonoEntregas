@@ -42,6 +42,11 @@ export default function Reports() {
           <p>Relatório de Demonstração de Resultados do Exercício</p>
           <Link to={`/report/dre`} target='_blank'>Acessar</Link>
         </div>
+        <div className='box'>
+          <h2>Relatório de comissões</h2>
+          <p>Relatório de comissões de vendas por faturamento</p>
+          <Link to={`/report/sales-commissions`} target='_blank'>Acessar</Link>
+        </div>
       </div>
     </div>
   )

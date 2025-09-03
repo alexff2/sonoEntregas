@@ -14,6 +14,7 @@ import Product from '../pages/Product'
 import Goals from '../pages/Goals'
 import Reports from '../pages/Reports'
 import ReportsDre from '../pages/Reports/Dre'
+import SalesCommissions from '../pages/Reports/SalesCommissions'
 import DevelopHome from '../pages/Develop/home'
 import DeleteSerial from '../pages/Develop/products/DeleteSerial'
 
@@ -34,6 +35,7 @@ export default function DevelopRoutes(){
       </Route>
       <Route path="/report" element={<AppExternal />}>
         <Route path="/report/dre" element={<ReportsDre />}/>
+        <Route path="/report/sales-commissions" element={<SalesCommissions />}/>
       </Route>
       <Route path="/developer" element={<AppExternal />}>
         <Route path="/developer" element={<Navigate to="/developer/home"/>}/>

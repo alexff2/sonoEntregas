@@ -199,6 +199,7 @@ routes.get('/reports/purchase/requests', reportsController.purchaseRequest)
 routes.get('/reports/dre', reportsController.dre)
 routes.get('/reports/deliveries', reportsController.deliveries)
 routes.get('/reports/extra-routes', reportsController.extraRoutes)
+routes.get('/reports/sales-commissions', reportsController.salesCommissions)
 // Goals
 routes.get('/goals', goalsController.index)
 routes.post('/goals', ensureAuthenticated, goalsController.create)

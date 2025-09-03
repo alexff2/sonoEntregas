@@ -14,6 +14,7 @@ import Product from '../pages/Product'
 import Goals from '../pages/Goals'
 import Reports from '../pages/Reports'
 import ReportsDre from '../pages/Reports/Dre'
+import SalesCommissions from '../pages/Reports/SalesCommissions'
 
 export default function PrivateRoutes(){
   return(
@@ -32,6 +33,7 @@ export default function PrivateRoutes(){
       </Route>
       <Route path="/report" element={<AppExternal />}>
         <Route path="/report/dre" element={<ReportsDre />}/>
+        <Route path="/report/sales-commissions" element={<SalesCommissions />}/>
       </Route>
     </Routes>
   )
