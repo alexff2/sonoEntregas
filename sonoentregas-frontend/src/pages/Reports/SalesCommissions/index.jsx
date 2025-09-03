@@ -13,7 +13,7 @@ export default function SalesCommissionsReport() {
   const [isLoading, setIsLoading] = useState(false)
   const [selectShopId, setSelectShopId] = useState()
   const [shops, setShops] = useState([])
-  const [dates, setDates] = useState({ start: '2024-01-01', end: '2024-01-31' })
+  const [dates, setDates] = useState({ start: '', end: '' })
   const [dataReport, setDataReport] = useState([])
 
   const { shopAuth, userAuth } = useAuthenticate()
@@ -28,6 +28,10 @@ export default function SalesCommissionsReport() {
   })
 
   const submitFilter = async e => {
+    if (!dates.start || !dates.end) {
+      return setAlert('Por favor, preencha as datas de início e fim.')
+    }
+
     e.preventDefault()
     setIsLoading(true)
 
