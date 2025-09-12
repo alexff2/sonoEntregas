@@ -12,6 +12,7 @@ import Maintenance from '../pages/Maintenance'
 import Returns from '../pages/Returns'
 import Product from '../pages/Product'
 import Goals from '../pages/Goals'
+import Others from '../pages/Others'
 import Reports from '../pages/Reports'
 import ReportsDre from '../pages/Reports/Dre'
 import SalesCommissions from '../pages/Reports/SalesCommissions'
@@ -29,6 +30,7 @@ export default function PrivateRoutes(){
         <Route path="/goals" element={<Goals />}/>
         <Route path="/returns" element={<Returns />}/>
         <Route path="/reports" element={<Reports />}/>
+        <Route path="/others" element={<Others />}/>
         <Route path="*" element={<Navigate to="/"/>} />
       </Route>
       <Route path="/report" element={<AppExternal />}>

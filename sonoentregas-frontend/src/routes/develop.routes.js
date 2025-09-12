@@ -13,6 +13,7 @@ import Returns from '../pages/Returns'
 import Product from '../pages/Product'
 import Goals from '../pages/Goals'
 import Reports from '../pages/Reports'
+import Others from '../pages/Others'
 import ReportsDre from '../pages/Reports/Dre'
 import SalesCommissions from '../pages/Reports/SalesCommissions'
 import DevelopHome from '../pages/Develop/home'
@@ -31,6 +32,7 @@ export default function DevelopRoutes(){
         <Route path="/goals" element={<Goals />}/>
         <Route path="/returns" element={<Returns />}/>
         <Route path="/reports" element={<Reports />}/>
+        <Route path="/others" element={<Others />}/>
         <Route path="*" element={<Navigate to="/"/>} />
       </Route>
       <Route path="/report" element={<AppExternal />}>
