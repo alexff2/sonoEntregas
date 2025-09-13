@@ -1,24 +1,19 @@
 const Goals = require('../models/tables/Goals')
-const Shops = require('../models/tables/Shops')
 
 const GoalService = require('../services/GoalService')
 
 module.exports = {
-  async index(req, res) {
+  async findByYear(req, res) {
+    const { year, storeId } = req.params
+
     try {
-      const goals = await Goals.findAll(0)
+      const goals = await Goals.findAny(0, { year, store_id: storeId })
 
       if (goals.length === 0) {
-        return res.status(200).json([])
+        throw { status: 404, error: 'Nenhuma meta encontrada' }
       }
 
-      const shops = await Shops.findAny(0, { in: {CODLOJA: goals.map(goal => goal.idShop)} })
-
-      shops.forEach(shop => {
-        shop['goals'] = goals.filter(goal => shop.CODLOJA === goal.idShop)
-      })
-      
-      return res.status(200).json(shops)
+      return res.status(200).json(goals)
     } catch (e) {
       console.log(e)
 
@@ -30,14 +25,16 @@ module.exports = {
   },
   async create(req, res) {
     try {
-      const { idShop, monthYear, value } = req.body
+      const { storeId, month, year, value } = req.body
       const { id: user_id } = req.user
 
-      if (!idShop) throw { status: 400, error: 'idShop não informado' }
-      if (!monthYear) throw { status: 400, error: 'monthYear não informado' }
+      if (!storeId) throw { status: 400, error: 'storeId não informado' }
+      if (!month) throw { status: 400, error: 'month não informado' }
+      if (!year) throw { status: 400, error: 'year não informado' }
       if (!value) throw { status: 400, error: 'value não informado' }
+      if (isNaN(value)) throw { status: 400, error: 'value inválido' }
 
-      const goals = await Goals.create(0, [{ idShop, monthYear, value, idUserCreate: user_id, idUserUpdate: user_id }])
+      const goals = await GoalService.createGoalsIfNotExists(storeId, month, year, value, user_id)
 
       return res.status(200).json(goals)
     } catch (e) {
@@ -57,8 +54,7 @@ module.exports = {
 
       if (!value) throw { status: 400, error: 'value não informado' }
 
-      //Faltando updatedAt
-      const goals = await Goals.updateAny(0, { value, idUserUpdate: user_id }, { id })
+      const goals = await GoalService.valueUpdate(id, value, user_id)
 
       return res.status(200).json(goals)
     } catch (e) {
@@ -70,25 +66,4 @@ module.exports = {
       return res.status(status).json(error)
     }
   },
-  async getAmountReached(req, res) {
-    try {
-      const { idShop, monthYear } = req.query
-
-      if (!idShop) throw { status: 400, error: 'idShop não informado' }
-      if (!monthYear) throw { status: 400, error: 'monthYear não informado' }
-
-      const amountReached = await GoalService.getAmountReached(idShop, monthYear)
-
-      GoalService.updateAmounts(amountReached.amountReached, amountReached.amountReturns, idShop, monthYear)
-
-      return res.status(200).json(amountReached)
-    } catch (e) {
-      console.log(e)
-
-      let status = e.status ? e.status : 400
-      let error = e.error ? e.error : e
-
-      return res.status(status).json(error)
-    }
-  }
 }

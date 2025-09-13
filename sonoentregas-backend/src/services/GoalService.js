@@ -1,5 +1,6 @@
 const { QueryTypes } = require('sequelize')
 const Goals = require('../models/tables/Goals')
+const ShopsModel = require('../models/tables/Shops')
 
 class GoalService {
   async getAmountReached(shop, monthYear) {
@@ -42,6 +43,22 @@ class GoalService {
 
   async updateAmounts(amountReached, amountReturns, idShop, monthYear) {
     await Goals.updateAny(0, { amountReached, amountReturns }, { idShop, monthYear })
+  }
+
+  async createGoalsIfNotExists(storeId, month, year, value, user_id) {
+    const shop = await ShopsModel.findAny(0, { CODLOJA: storeId })
+    if (shop.length === 0) throw { status: 400, error: 'Loja não encontrada' }
+    const existingGoal = await Goals.findAny(0, { store_id: storeId, month, year })
+    if (existingGoal.length > 0) throw { status: 400, error: 'Meta já cadastrada para essa loja nesse mês/ano' }
+    const goals = await Goals.create(0, [{ store_id: storeId, month, year, value, created_by: user_id }])
+
+    return goals
+  }
+
+  async valueUpdate(id, value, user_id) {
+    await Goals.updateAny(0, { value, updated_by: user_id, updated_at: new Date().toISOString() }, { id })
+    const goals = await Goals.findAny(0, { id })
+    return goals
   }
 }
 

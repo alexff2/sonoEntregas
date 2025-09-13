@@ -201,10 +201,9 @@ routes.get('/reports/deliveries', reportsController.deliveries)
 routes.get('/reports/extra-routes', reportsController.extraRoutes)
 routes.get('/reports/sales-commissions', reportsController.salesCommissions)
 // Goals
-routes.get('/goals', goalsController.index)
+routes.get('/goals/:year/:storeId', goalsController.findByYear)
 routes.post('/goals', ensureAuthenticated, goalsController.create)
 routes.put('/goals/:id', ensureAuthenticated, goalsController.update)
-routes.get('/goals/getAmount', goalsController.getAmountReached)
 // Promotion
 routes.get('/promotion/open', ensureAuthenticated, promotionController.promotionOpen)
 routes.post('/promotion', ensureAuthenticated, promotionController.create)
