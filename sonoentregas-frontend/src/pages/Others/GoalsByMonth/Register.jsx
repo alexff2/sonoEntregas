@@ -1,27 +1,51 @@
-import React, { useState } from 'react'
+import React from 'react'
+import api from '../../../services/api'
+import { useAuthenticate } from '../../../context/authContext'
 
 const Register = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = React.useState({
     month: '',
     year: new Date().getFullYear().toString(),
-    goal: '',
+    value: '',
   })
+  const { shopAuth } = useAuthenticate()
+  const storeId = shopAuth.cod
 
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData({ ...formData, [name]: value })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log('Form Data:', formData)
-    // Aqui você pode adicionar a lógica para enviar os dados para o backend
+
+    if (!formData.month || !formData.year || !formData.value) {
+      alert('Por favor, preencha todos os campos.')
+      return
+    }
+
+    try {
+      await api.post('/goals', {
+        ...formData,
+        storeId,
+      })
+      alert('Meta cadastrada com sucesso!')
+      setFormData({ month: '', year: new Date().getFullYear().toString(), value: '' })
+    } catch (error) {
+      console.error('Erro ao cadastrar meta:', error)
+
+      if (error.response.data) {
+        alert(`Erro: ${error.response.data}`)
+      } else {
+        alert('Erro ao cadastrar meta. Tente novamente.')
+      }
+    }
   }
 
   return (
     <div className="register-gols">
       <h2>Cadastro de Meta por Mês</h2>
-      <form className='form-gols' onSubmit={handleSubmit}>
+      <form className='form-gols'>
         <div>
           <label htmlFor="month">Mês:</label>
           <select
@@ -64,15 +88,15 @@ const Register = () => {
           <input
             type="number"
             id="goals"
-            name="goal"
-            value={formData.goal}
+            name="value"
+            value={formData.value}
             onChange={handleChange}
             required
             min="0"
           />
         </div>
       </form>
-      <button>Cadastrar</button>
+      <button onClick={handleSubmit}>Cadastrar</button>
     </div>
   )
 }

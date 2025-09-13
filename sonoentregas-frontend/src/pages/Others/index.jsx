@@ -3,7 +3,7 @@ import GoalsByMonth from './GoalsByMonth'
 import './styles.css'
 
 const modalStates = {
-  modalGoalsByMonth: true,
+  modalGoalsByMonth: false,
 }
 
 const Others = () => {
