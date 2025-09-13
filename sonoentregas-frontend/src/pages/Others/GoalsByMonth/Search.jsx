@@ -1,35 +1,41 @@
 import React from 'react'
 
+import api from '../../../services/api'
+
+import { useAuthenticate } from '../../../context/authContext'
+
+const months = [
+  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+]
+
 const SearchCommissions = () => {
   const [year, setYear] = React.useState('')
   const [month, setMonth] = React.useState('')
   const [results, setResults] = React.useState([])
+  const { shopAuth } = useAuthenticate()
+  const { cod } = shopAuth
 
-  const handleSearch = () => {
-    // Simulação de dados para demonstração
-    const mockData = [
-      { month: 'Janeiro', year: '2023', goal: 1000 },
-      { month: 'Fevereiro', year: '2023', goal: 1200 },
-      { month: 'Março', year: '2023', goal: 1100 },
-      { month: 'Abril', year: '2023', goal: 1300 },
-      { month: 'Maio', year: '2023', goal: 1400 },
-      { month: 'Junho', year: '2023', goal: 1500 },
-      { month: 'Julho', year: '2023', goal: 1600 },
-      { month: 'Agosto', year: '2023', goal: 1700 },
-      { month: 'Setembro', year: '2023', goal: 1800 },
-      { month: 'Outubro', year: '2023', goal: 1900 },
-      { month: 'Novembro', year: '2023', goal: 2000 },
-      { month: 'Dezembro', year: '2023', goal: 2100 },
-    ]
+  const handleSearch = async () => {
+    try {
+      const { data } = await api.get(`/goals/${year}/${cod}`)
 
-    const filteredResults = mockData.filter((data) => {
-      return (
-        (year ? data.year === year : true) &&
-        (month ? data.month.toLowerCase() === month.toLowerCase() : true)
-      )
-    })
+      const filteredResults = data.filter((result) => {
+        return (
+          (year ? result.year === Number(year) : true) &&
+          (month ? result.month === Number(month) : true)
+        )
+      })
 
-    setResults(filteredResults)
+      setResults(filteredResults)
+    } catch (error) {
+      if (error.response.data) {
+        alert(`Erro: ${error.response.data}`)
+      } else {
+        alert('Erro ao buscar metas. Tente novamente mais tarde.')
+      }
+      console.log('Erro ao buscar metas:', error.response)
+    }
   }
 
   return (
@@ -39,7 +45,7 @@ const SearchCommissions = () => {
         <label>
           Ano: &nbsp;
           <input
-            type="text"
+            type="number"
             value={year}
             onChange={(e) => setYear(e.target.value)}
             onKeyUp={(e) => { if (e.key === 'Enter') handleSearch() }}
@@ -49,7 +55,7 @@ const SearchCommissions = () => {
         <label>
           Mês: &nbsp;
           <input
-            type="text"
+            type="number"
             value={month}
             onChange={(e) => setMonth(e.target.value)}
             onKeyUp={(e) => { if (e.key === 'Enter') handleSearch() }}
@@ -63,8 +69,8 @@ const SearchCommissions = () => {
         <table className='table-gols'>
           <thead>
             <tr>
-              <th>Mês</th>
               <th>Ano</th>
+              <th>Mês</th>
               <th>Meta</th>
             </tr>
           </thead>
@@ -72,10 +78,10 @@ const SearchCommissions = () => {
             {results.length > 0 ? (
               results.map((result, index) => (
                 <tr key={index}>
-                  <td>{result.month}</td>
                   <td>{result.year}</td>
+                  <td>{result.month} - {months[result.month - 1]}</td>
                   <td>
-                    {result.goal.toLocaleString('pt-BR', {
+                    {result.value.toLocaleString('pt-BR', {
                       style: 'currency',
                       currency: 'BRL',
                     })}
