@@ -1,5 +1,5 @@
 import React from 'react'
-import GolsByMonth from './GolsByMonth'
+import GoalsByMonth from './GoalsByMonth'
 import './styles.css'
 
 const modalStates = {
@@ -17,7 +17,7 @@ const Others = () => {
         <li onClick={() => setModals({ ...modals, modalGoalsByMonth: true })}>Configurar metas mensais</li>
       </ul>
 
-      <GolsByMonth isOpen={modals.modalGoalsByMonth} onClose={() => setModals({ ...modals, modalGoalsByMonth: false })} />
+      <GoalsByMonth isOpen={modals.modalGoalsByMonth} onClose={() => setModals({ ...modals, modalGoalsByMonth: false })} />
     </div>
   )
 }
