@@ -4,7 +4,7 @@ const GoalService = require('../services/GoalService')
 
 module.exports = {
   async findByYear(req, res) {
-    const { year, storeId } = req.params
+    const { year, storeId } = req.query
 
     try {
       const goals = await Goals.findAny(0, { year, store_id: storeId })

@@ -19,7 +19,9 @@ const SearchCommissions = ({ setRegisterSelected }) => {
 
   const handleSearch = async () => {
     try {
-      const { data } = await api.get(`/goals/${year}/${cod}`)
+      const { data } = await api.get('/goals', {
+        params: { year, storeId: cod }
+      })
 
       const filteredResults = data.filter((result) => {
         return (
