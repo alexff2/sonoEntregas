@@ -1,4 +1,5 @@
 import React from 'react'
+import { FiEdit } from 'react-icons/fi'
 
 import api from '../../../services/api'
 
@@ -9,8 +10,8 @@ const months = [
   'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
 ]
 
-const SearchCommissions = () => {
-  const [year, setYear] = React.useState('')
+const SearchCommissions = ({ setRegisterSelected }) => {
+  const [year, setYear] = React.useState(new Date().getFullYear().toString())
   const [month, setMonth] = React.useState('')
   const [results, setResults] = React.useState([])
   const { shopAuth } = useAuthenticate()
@@ -72,6 +73,7 @@ const SearchCommissions = () => {
               <th>Ano</th>
               <th>Mês</th>
               <th>Meta</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -85,6 +87,9 @@ const SearchCommissions = () => {
                       style: 'currency',
                       currency: 'BRL',
                     })}
+                  </td>
+                  <td>
+                    <FiEdit onClick={() => setRegisterSelected(result)} />
                   </td>
                 </tr>
               ))

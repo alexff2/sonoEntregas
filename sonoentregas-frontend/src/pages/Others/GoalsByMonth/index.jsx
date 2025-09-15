@@ -6,10 +6,18 @@ import RegisterGols from './Register'
 
 const GoalsByMonth = ({ isOpen, onClose }) => {
   const [active, setActive] = React.useState(0)
+  const [registerSelected, setRegisterSelected] = React.useState(null)
+
   const tabs = [
-    { label: 'Cadastrar', content: <RegisterGols /> },
-    { label: 'Consultar', content: <SearchGols /> },
+    { label: 'Cadastrar', content: <RegisterGols goal={registerSelected} setGol={setRegisterSelected}/> },
+    { label: 'Consultar', content: <SearchGols setRegisterSelected={setRegisterSelected} /> },
   ]
+
+  React.useEffect(() => {
+    if (registerSelected) {
+      setActive(0)
+    }
+  }, [registerSelected])
 
   return (
     <React.Fragment>

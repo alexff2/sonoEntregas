@@ -2,12 +2,14 @@ import React from 'react'
 import api from '../../../services/api'
 import { useAuthenticate } from '../../../context/authContext'
 
-const Register = () => {
-  const [formData, setFormData] = React.useState({
-    month: '',
-    year: new Date().getFullYear().toString(),
-    value: '',
-  })
+const initialFormState = {
+  month: '',
+  year: new Date().getFullYear().toString(),
+  value: '',
+}
+
+const Register = ({goal, setGol}) => {
+  const [formData, setFormData] = React.useState(goal ? goal : initialFormState)
   const { shopAuth } = useAuthenticate()
   const storeId = shopAuth.cod
 
@@ -16,7 +18,7 @@ const Register = () => {
     setFormData({ ...formData, [name]: value })
   }
 
-  const handleSubmit = async (e) => {
+  const handleCreate = async (e) => {
     e.preventDefault()
 
     if (!formData.month || !formData.year || !formData.value) {
@@ -42,6 +44,32 @@ const Register = () => {
     }
   }
 
+  const handleUpdate = async (e) => {
+    e.preventDefault()
+
+    if (!formData.month || !formData.year || !formData.value) {
+      alert('Por favor, preencha todos os campos.')
+      return
+    }
+
+    try {
+      await api.put(`/goals/${goal.id}`, {
+        value: formData.value,
+      })
+      alert('Meta atualizada com sucesso!')
+      setFormData({ month: '', year: new Date().getFullYear().toString(), value: '' })
+      setGol(null)
+    } catch (error) {
+      console.error('Erro ao cadastrar meta:', error)
+
+      if (error.response.data) {
+        alert(`Erro: ${error.response.data}`)
+      } else {
+        alert('Erro ao cadastrar meta. Tente novamente.')
+      }
+    }
+  }
+
   return (
     <div className="register-gols">
       <h2>Cadastro de Meta por Mês</h2>
@@ -51,8 +79,9 @@ const Register = () => {
           <select
             id="month"
             name="month"
-            value={formData.month}
+            value={formData.month.toString().padStart(2, '0')}
             onChange={handleChange}
+            disabled={!!goal}
             required
           >
             <option value="">Selecione o mês</option>
@@ -78,6 +107,7 @@ const Register = () => {
             name="year"
             value={formData.year}
             onChange={handleChange}
+            disabled={!!goal}
             required
             min="2000"
             max="2100"
@@ -96,7 +126,9 @@ const Register = () => {
           />
         </div>
       </form>
-      <button onClick={handleSubmit}>Cadastrar</button>
+      <button
+        onClick={!!goal ? handleUpdate : handleCreate}
+      >{!!goal ? 'Atualizar' : 'Cadastrar'}</button>
     </div>
   )
 }
