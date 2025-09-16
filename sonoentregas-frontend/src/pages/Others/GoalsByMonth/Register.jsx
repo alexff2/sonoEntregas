@@ -5,7 +5,9 @@ import { useAuthenticate } from '../../../context/authContext'
 const initialFormState = {
   month: '',
   year: new Date().getFullYear().toString(),
-  value: '',
+  value_1: '',
+  value_2: '',
+  value_3: '',
 }
 
 const Register = ({goal, setGol}) => {
@@ -21,7 +23,7 @@ const Register = ({goal, setGol}) => {
   const handleCreate = async (e) => {
     e.preventDefault()
 
-    if (!formData.month || !formData.year || !formData.value) {
+    if (!formData.month || !formData.year || !formData.value_1 || !formData.value_2 || !formData.value_3) {
       alert('Por favor, preencha todos os campos.')
       return
     }
@@ -47,14 +49,16 @@ const Register = ({goal, setGol}) => {
   const handleUpdate = async (e) => {
     e.preventDefault()
 
-    if (!formData.month || !formData.year || !formData.value) {
+    if (!formData.month || !formData.year || !formData.value_1 || !formData.value_2 || !formData.value_3) {
       alert('Por favor, preencha todos os campos.')
       return
     }
 
     try {
       await api.put(`/goals/${goal.id}`, {
-        value: formData.value,
+        value_1: formData.value_1,
+        value_2: formData.value_2,
+        value_3: formData.value_3,
       })
       alert('Meta atualizada com sucesso!')
       setFormData({ month: '', year: new Date().getFullYear().toString(), value: '' })
@@ -114,12 +118,36 @@ const Register = ({goal, setGol}) => {
           />
         </div>
         <div>
-          <label htmlFor="goals">Meta:</label>
+          <label htmlFor="goals">Meta 1:</label>
           <input
             type="number"
             id="goals"
-            name="value"
-            value={formData.value}
+            name="value_1"
+            value={formData.value_1}
+            onChange={handleChange}
+            required
+            min="0"
+          />
+        </div>
+        <div>
+          <label htmlFor="goals">Meta 2:</label>
+          <input
+            type="number"
+            id="goals"
+            name="value_2"
+            value={formData.value_2}
+            onChange={handleChange}
+            required
+            min="0"
+          />
+        </div>
+        <div>
+          <label htmlFor="goals">Meta 3:</label>
+          <input
+            type="number"
+            id="goals"
+            name="value_3"
+            value={formData.value_3}
             onChange={handleChange}
             required
             min="0"

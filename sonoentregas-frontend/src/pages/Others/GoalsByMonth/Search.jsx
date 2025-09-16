@@ -74,7 +74,9 @@ const SearchCommissions = ({ setRegisterSelected }) => {
             <tr>
               <th>Ano</th>
               <th>Mês</th>
-              <th>Meta</th>
+              <th>Meta 1</th>
+              <th>Meta 2</th>
+              <th>Meta 3</th>
               <th></th>
             </tr>
           </thead>
@@ -85,7 +87,19 @@ const SearchCommissions = ({ setRegisterSelected }) => {
                   <td>{result.year}</td>
                   <td>{result.month} - {months[result.month - 1]}</td>
                   <td>
-                    {result.value.toLocaleString('pt-BR', {
+                    {result.value_1.toLocaleString('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL',
+                    })}
+                  </td>
+                  <td>
+                    {result.value_2.toLocaleString('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL',
+                    })}
+                  </td>
+                  <td>
+                    {result.value_3.toLocaleString('pt-BR', {
                       style: 'currency',
                       currency: 'BRL',
                     })}

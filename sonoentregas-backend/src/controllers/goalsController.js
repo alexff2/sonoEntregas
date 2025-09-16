@@ -25,16 +25,20 @@ module.exports = {
   },
   async create(req, res) {
     try {
-      const { storeId, month, year, value } = req.body
+      const { storeId, month, year, value_1, value_2, value_3 } = req.body
       const { id: user_id } = req.user
 
       if (!storeId) throw { status: 400, error: 'storeId não informado' }
       if (!month) throw { status: 400, error: 'month não informado' }
       if (!year) throw { status: 400, error: 'year não informado' }
-      if (!value) throw { status: 400, error: 'value não informado' }
-      if (isNaN(value)) throw { status: 400, error: 'value inválido' }
+      if (!value_1) throw { status: 400, error: 'value_1 não informado' }
+      if (isNaN(value_1)) throw { status: 400, error: 'value_1 inválido' }
+      if (!value_2) throw { status: 400, error: 'value_2 não informado' }
+      if (isNaN(value_2)) throw { status: 400, error: 'value_2 inválido' }
+      if (!value_3) throw { status: 400, error: 'value_3 não informado' }
+      if (isNaN(value_3)) throw { status: 400, error: 'value_3 inválido' }
 
-      const goals = await GoalService.createGoalsIfNotExists(storeId, month, year, value, user_id)
+      const goals = await GoalService.createGoalsIfNotExists(storeId, month, year, { value_1, value_2, value_3 }, user_id)
 
       return res.status(200).json(goals)
     } catch (e) {
@@ -48,13 +52,15 @@ module.exports = {
   },
   async update(req, res) {
     try {
-      const { value } = req.body
+      const { value_1, value_2, value_3 } = req.body
       const { id: user_id } = req.user
       const { id } = req.params
 
-      if (!value) throw { status: 400, error: 'value não informado' }
+      if (!value_1) throw { status: 400, error: 'value_1 não informado' }
+      if (!value_2) throw { status: 400, error: 'value_2 não informado' }
+      if (!value_3) throw { status: 400, error: 'value_3 não informado' }
 
-      const goals = await GoalService.valueUpdate(id, value, user_id)
+      const goals = await GoalService.valueUpdate(id, { value_1, value_2, value_3 }, user_id)
 
       return res.status(200).json(goals)
     } catch (e) {
