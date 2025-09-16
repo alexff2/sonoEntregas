@@ -7,7 +7,7 @@ module.exports = {
     const { year, storeId } = req.query
 
     try {
-      const goals = await Goals.findAny(0, { year, store_id: storeId })
+      const goals = await Goals.findAny(0, { year, store_id: storeId }, '*', null, false, 'month ASC')
 
       if (goals.length === 0) {
         throw { status: 404, error: 'Nenhuma meta encontrada' }

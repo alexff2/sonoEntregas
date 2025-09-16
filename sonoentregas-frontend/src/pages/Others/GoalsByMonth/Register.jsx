@@ -34,7 +34,7 @@ const Register = ({goal, setGol}) => {
         storeId,
       })
       alert('Meta cadastrada com sucesso!')
-      setFormData({ month: '', year: new Date().getFullYear().toString(), value: '' })
+      setFormData(initialFormState)
     } catch (error) {
       console.error('Erro ao cadastrar meta:', error)
 
@@ -61,7 +61,7 @@ const Register = ({goal, setGol}) => {
         value_3: formData.value_3,
       })
       alert('Meta atualizada com sucesso!')
-      setFormData({ month: '', year: new Date().getFullYear().toString(), value: '' })
+      setFormData(initialFormState)
       setGol(null)
     } catch (error) {
       console.error('Erro ao cadastrar meta:', error)
