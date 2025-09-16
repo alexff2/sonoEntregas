@@ -13,7 +13,7 @@ export default function SalesCommissionsReport() {
   const [isLoading, setIsLoading] = useState(false)
   const [selectShopId, setSelectShopId] = useState()
   const [shops, setShops] = useState([])
-  const [dates, setDates] = useState({ start: '', end: '' })
+  const [dates, setDates] = useState({ month: new Date().getMonth() + 1, year: new Date().getFullYear() })
   const [dataReport, setDataReport] = useState([])
 
   const { shopAuth, userAuth } = useAuthenticate()
@@ -28,8 +28,8 @@ export default function SalesCommissionsReport() {
   })
 
   const submitFilter = async e => {
-    if (!dates.start || !dates.end) {
-      return setAlert('Por favor, preencha as datas de início e fim.')
+    if (!dates.year || !dates.month) {
+      return setAlert('Por favor, preencha o mês e o ano.')
     }
 
     e.preventDefault()
@@ -39,8 +39,8 @@ export default function SalesCommissionsReport() {
       const response = await api.get('reports/sales-commissions', {
         params: {
           shopId: selectShopId,
-          startDate: dates.start,
-          endDate: dates.end
+          month: dates.month.toString().padStart(2, '0'),
+          year: dates.year
         }
       })
       setDataReport(response.data)
@@ -161,7 +161,7 @@ export default function SalesCommissionsReport() {
 
         <Modal openModal={isOpenFilter} setOpenModal={setIsOpenFilter} closeOnOverLaw={false}>
           <form className="filterContainer" onSubmit={submitFilter}>
-            <h2>Filtro Demonstrativo de Resultados</h2>
+            <h2>Filtro Relatório de comissões</h2>
             <hr />
             {(userAuth.OFFICE === 'Dev' | userAuth.OFFICE === 'Master') && (
               <div className="filterDate">
@@ -177,25 +177,25 @@ export default function SalesCommissionsReport() {
                 </select>
               </div>
             )}
-            <div className="filterDate">
-              <label htmlFor="dateStart">Data Inicial: </label>
+            <div className="filterDate filterCommissionYear">
+              <label htmlFor="dateYear">Ano: </label>
               <input
-                type="date"
-                id="dateStart"
-                value={dates.start}
-                onChange={e => setDates({ ...dates, start: e.target.value })}
+                type="number"
+                id="dateYear"
+                value={dates.year}
+                onChange={e => setDates({ ...dates, year: e.target.value })}
                 required
               />
             </div>
-            <div className="filterDate">
-              <label htmlFor="dateEnd">Data Final: </label>
-              <input
-                type="date"
-                id="dateEnd"
-                value={dates.end}
-                onChange={e => setDates({ ...dates, end: e.target.value })}
-                required
-              />
+            <div className="filterDate filterCommissionMonth">
+              <label htmlFor="dateMonth">Mês: </label>
+              <select name="dateMonth" id="dateMonth" value={dates.month} onChange={e => setDates({ ...dates, month: e.target.value })}>
+                {Array.from({ length: 12 }, (_, i) => (
+                  <option key={i} value={i + 1}>
+                    {new Date(0, i).toLocaleString("pt-BR", { month: "long" })}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <hr />

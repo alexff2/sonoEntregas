@@ -67,3 +67,25 @@
 .payment-details-table th {
   background: #e3f2fd;
 }
+
+.filterDate.filterCommissionYear input {
+  border: none;
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 18px;
+  text-transform: capitalize;
+  text-align: end;
+  width: 150px;
+}
+
+  .filterDate.filterCommissionMonth select {
+  background-color: var(--blue-dark);
+  width: 150px;
+  border: none;
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 18px;
+  text-transform: capitalize;
+}

@@ -5,10 +5,10 @@ const salesQueries = require('../scripts/sales')
 const db = new connections()
 
 class SalesReportService {
-  async getSalesCommissions({ shopId, startDate, endDate }) {
+  async getSalesCommissions({ shopId, month, year }) {
     const salesCommissions = await db._query(
       shopId,
-      salesQueries.salesCommissions({ startDate, endDate }),
+      salesQueries.salesCommissions({ month, year }),
       QueryTypes.SELECT
     )
     if (salesCommissions.length === 0) return []
@@ -22,7 +22,7 @@ class SalesReportService {
 
     const returnsSales = await db._query(
       shopId,
-      salesQueries.returnSales({ startDate, endDate }),
+      salesQueries.returnSales({ month, year }),
       QueryTypes.SELECT
     )
 

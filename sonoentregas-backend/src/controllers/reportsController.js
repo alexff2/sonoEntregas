@@ -436,10 +436,10 @@ module.exports = {
    * @param {any} res
    */
   async salesCommissions(req, res) {
-    const { shopId, startDate, endDate } = req.query
+    const { shopId, month, year } = req.query
 
     try {
-      const salesCommissions = await SalesReportService.getSalesCommissions({ shopId, startDate, endDate })
+      const salesCommissions = await SalesReportService.getSalesCommissions({ shopId, month, year })
 
       return res.json(salesCommissions)
     } catch (e) {
