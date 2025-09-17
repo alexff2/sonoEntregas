@@ -5,6 +5,7 @@ import Modal from '../../../components/Modal'
 import { useAuthenticate } from '../../../context/authContext'
 import { useModalAlert } from '../../../context/modalAlertContext'
 import { dateSqlToReact } from "../../../functions/getDate"
+import { MONTHS } from "../../../constants"
 import api from '../../../services/api'
 import "./SalesCommissionsReport.css"
 
@@ -95,7 +96,7 @@ export default function SalesCommissionsReport() {
         { !isOpenFilter && (
           <>
             <h2>Relatório de Comissões de Vendas</h2>
-            <p>Período: {dateSqlToReact(dates.start)} a {dateSqlToReact(dates.end)}</p>
+            <p>Período: {MONTHS[dates.month - 1]} de {dates.year}</p>
             <p>Loja: {shop}</p>
             <table className="sales-table">
               <thead>
