@@ -18,8 +18,8 @@ module.exports = {
     AND NOMECLI LIKE '${client}%'
     AND STATUS = '${status}'`
   },
-  salesCommissions: ({ month, year }) => {
-    return `SELECT N.CODVENDEDOR, P.NOME type, SUM(O.VALOR) amount
+  salesBySellerAndPaymentType: ({ month, year }) => {
+    return `SELECT N.CODVENDEDOR sellerId, P.NOME type, SUM(O.VALOR) amount
       FROM NVENDA2 N with(nolock), ORCPARC O with(nolock), PAGTO P with(nolock)
       WHERE  (N.CODIGOVENDA  = O.TITULO)
       AND  (O.FORMPAGTO = P.CODIGO)
@@ -29,12 +29,12 @@ module.exports = {
       GROUP BY P.NOME, N.CODVENDEDOR
       ORDER BY N.CODVENDEDOR, P.NOME`
   },
-  findSalesPerson: (salesPersonId) => {
+  findVendor: (sellersIds) => {
     return `SELECT CODIGO id, NOME seller FROM FUNCIONARIO
-    WHERE CODIGO IN (${salesPersonId})`
+    WHERE CODIGO IN (${sellersIds})`
   },
   returnSales: ({ month, year }) => {
-    return `SELECT C.CODVENDEDOR, SUM(C.NVTOTAL) value
+    return `SELECT C.CODVENDEDOR sellerId, SUM(C.NVTOTAL) value
       FROM ITENS_DEVOLUCAO A
       INNER JOIN DEVOLUCAO B ON A.CODDEVOLUCAO = B.CODIGO
       INNER JOIN NVENDI2 C ON C.NUMVENDA = A.CODVENDA AND C.CODPRODUTO = A.CODPRODUTO

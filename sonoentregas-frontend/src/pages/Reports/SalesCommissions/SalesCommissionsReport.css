@@ -5,7 +5,7 @@
 .sales-commissions-report {
   max-width: 900px;
   margin: 40px auto;
-  padding: 24px;
+  padding: 40px;
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 8px #eee;
@@ -79,13 +79,14 @@
   width: 150px;
 }
 
-  .filterDate.filterCommissionMonth select {
-  background-color: var(--blue-dark);
+.filterDate.filterCommissionMonth select {
+  background-image: url('https://www.transparenttextures.com/patterns/cloth-alike.png'), linear-gradient(135deg, #0f172a, #1e293b);
+  background-size: auto, cover;
   width: 150px;
   border: none;
   padding: 6px 8px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 16px;
   text-transform: capitalize;
 }

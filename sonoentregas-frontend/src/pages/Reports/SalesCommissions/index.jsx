@@ -8,6 +8,15 @@ import { dateSqlToReact } from "../../../functions/getDate"
 import api from '../../../services/api'
 import "./SalesCommissionsReport.css"
 
+const initialDataTotals = {
+  grossRevenue: 0,
+  returns: 0,
+  netRevenue: 0,
+  commissionPercent: 0,
+  commissionValue: 0,
+  payments: []
+}
+
 export default function SalesCommissionsReport() {
   const [isOpenFilter, setIsOpenFilter] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
@@ -15,6 +24,7 @@ export default function SalesCommissionsReport() {
   const [shops, setShops] = useState([])
   const [dates, setDates] = useState({ month: new Date().getMonth() + 1, year: new Date().getFullYear() })
   const [dataReport, setDataReport] = useState([])
+  const [totals, setTotals] = useState(initialDataTotals)
 
   const { shopAuth, userAuth } = useAuthenticate()
   const { setAlert } = useModalAlert()
@@ -36,18 +46,21 @@ export default function SalesCommissionsReport() {
     setIsLoading(true)
 
     try {
-      const response = await api.get('reports/sales-commissions', {
+      const { data } = await api.get('reports/sales-commissions', {
         params: {
           shopId: selectShopId,
           month: dates.month.toString().padStart(2, '0'),
           year: dates.year
         }
       })
-      setDataReport(response.data)
+      setDataReport(data.salesCommissionsBy)
+      setTotals(data.totals)
       setIsOpenFilter(false)
     } catch (error) {
       console.log(error)
-      setAlert('Erro ao gerar relatório, tente novamente!')
+      if (error.response.data.message) {
+        setAlert(error.response.data.message)
+      } else setAlert('Erro ao gerar relatório, tente novamente!')
     } finally {
       setIsLoading(false)
     }
@@ -154,6 +167,74 @@ export default function SalesCommissionsReport() {
                     </tr>
                   </React.Fragment>
                 ))}
+              </tbody>
+            </table>
+
+            <h3 className="totals-title">Totais</h3>
+            <table className="sales-table">
+              <thead>
+                <tr>
+                  <th>Receita Bruta</th>
+                  <th>Devoluções</th>
+                  <th>Receita Líquida</th>
+                  <th>Comissão</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    {totals.grossRevenue.toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })}
+                  </td>
+                  <td>
+                    {totals.returns.toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })}
+                  </td>
+                  <td>
+                    {totals.netRevenue.toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })}
+                  </td>
+                  <td>
+                    {totals.commissionPercent.toFixed(2)}% <br />
+                    <span className="commission-value">
+                      {totals.commissionValue.toLocaleString("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                      })}
+                    </span>
+                  </td>
+                </tr>
+                <tr className="payment-details-row">
+                  <td colSpan={6}>
+                    <table className="payment-details-table">
+                      <thead>
+                        <tr>
+                          <th>Tipo de Pagamento</th>
+                          <th>Valor</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {totals.payments.map((p) => (
+                          <tr key={p.type}>
+                            <td>{p.type}</td>
+                            <td>
+                              {p.amount.toLocaleString("pt-BR", {
+                                style: "currency",
+                                currency: "BRL",
+                              })}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
               </tbody>
             </table>
           </>
