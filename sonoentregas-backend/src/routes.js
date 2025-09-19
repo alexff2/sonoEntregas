@@ -175,7 +175,7 @@ routes.get('/home', homeController.index)
 routes.get('/dashboard/:dateSearch', dashboardController.index)
 //Maintenance
 routes.get('/maintenance/:codloja', maintenanceController.index)
-routes.get('/maintenance/:idSale/:codloja', maintenanceController.searchSaleToMaint)
+routes.get('/sale-to-maintenance', maintenanceController.saleToMaintenance)
 routes.post('/maintenance', maintenanceController.create)
 routes.delete('/maintenance/:id', maintenanceController.delete)
 routes.get('/maintenance/:typeSeach/:search/:codloja', maintenanceController.findMain)

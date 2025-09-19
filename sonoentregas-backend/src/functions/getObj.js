@@ -2,7 +2,33 @@ function getObj(obj, separate=', ', toCompare = '='){
   let values = ''
 
   Object.entries(obj).forEach(([key,value], i, vet) => {
-    if (key === 'in') {
+    if (key === 'notIn') {
+      Object.entries(obj.notIn).forEach(([keyIn,arrayValueNotIn], indexIn) => {
+        let valueNotIn
+
+        if (indexIn === 0) {
+          arrayValueNotIn.forEach((el, ind) => {
+            ind === 0
+              ? valueNotIn = `'${el}'`
+              : valueNotIn += `, '${el}'`
+          })
+
+          vet.length === i + 1
+            ? values += `${keyIn} NOT IN (${valueNotIn.toString()})`
+            : values += `${keyIn} NOT IN (${valueNotIn.toString()})${separate} `
+        } else {
+          arrayValueNotIn.forEach((el, ind) => {
+            ind === 0
+              ? valueNotIn = `'${el}'`
+              : valueNotIn += `, '${el}'`
+          })
+
+          vet.length === i + 1
+            ? values += `AND ${keyIn} NOT IN (${valueNotIn.toString()})`
+            : values += `AND ${keyIn} NOT IN (${valueNotIn.toString()})${separate} `
+        }
+      })
+    } else if (key === 'in') {
       Object.entries(obj.in).forEach(([keyIn,arrayValueIn], indexIn) => {
         let valueIn
 

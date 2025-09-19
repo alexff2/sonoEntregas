@@ -5,15 +5,13 @@
  * @property {number} idMainAtt
  */
 
-const Sales = require('../models/Sales')
 const Maintenance = require('../models/tables/Maintenance')
-const ViewDeliveryProdMaint = require('../models/views/ViewDeliveryProdMaint')
 const ViewMaintenance = require('../models/views/ViewMaintenance')
-const ViewCatDef = require('../models/views/ViewCatDefect')
 
 const MainService = require('../services/MainService')
 
 const ObjDate = require('../functions/getDate')
+const errCatch = require('../functions/error')
 
 module.exports = {
   /**
@@ -109,23 +107,16 @@ module.exports = {
    * @param {*} res 
    * @returns 
    */
-  async searchSaleToMaint(req, res) {
+  async saleToMaintenance(req, res) {
     try {
-      const { idSale, codloja } = req.params
+      const { saleId, storeId } = req.query
+      if(!saleId) throw new Error('saleId is required')
+      if(!storeId) throw new Error('storeId is required')
 
-      const sale = await Sales.findSome(0, ` STATUS = 'Fechada' AND ID_SALES = ${idSale} AND CODLOJA = ${codloja}`, 'ID_SALES, NOMECLI, ID_CLIENT, Convert(varchar(10), EMISSAO, 103) EMISSAO, TOTAL_PROD')
-
-      const products = await ViewDeliveryProdMaint.findSome(0, `ID_SALES = ${idSale} AND CODLOJA = ${codloja} AND DELIVERED = 0`)
-
-      if (products.length === 0) return res.json([])
-
-      sale[0]["products"] = products
-      sale[0]["catDef"] = await ViewCatDef.findAll(0)
-
+      const sale = await MainService.findSaleToMaintenance({saleId, storeId})
       return res.json(sale)
     } catch (error) {
-      console.log(error)
-      return res.status(400).json(error)
+      errCatch(error, res)
     }
   }
 }

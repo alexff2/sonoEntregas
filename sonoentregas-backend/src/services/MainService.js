@@ -2,6 +2,8 @@
 const MaintenanceDeliv = require('../models/tables/MaintenanceDeliv')
 const MaintenanceVisit = require('../models/tables/MaintenanceVisit')
 const Maintenance = require('../models/tables/Maintenance')
+const SalesModel = require('../models/Sales')
+const SalesProdModel = require('../models/SalesProd')
 const ViewMaintenance = require('../models/views/ViewMaintenance')
 
 const ProdLojaService = require('../services/ProdLojaService')
@@ -15,6 +17,43 @@ const ObjDate = require('../functions/getDate')
  */
 
 module.exports = {
+  async findSaleToMaintenance({ saleId, storeId}) {
+    const [sale] = await SalesModel.findAny(0, { ID_SALES: saleId, CODLOJA: storeId })
+    if (!sale) {
+      throw {
+        status: 400,
+        message: 'Venda não encontrada para o código informado!'
+      }
+    }
+
+    const saleProds = await SalesProdModel.findAny(0, { ID_SALES: saleId, CODLOJA: storeId })
+
+    const pendingDeliveryProduct = saleProds.find(p => p.STATUS !== 'Finalizada')
+    if (pendingDeliveryProduct) {
+      throw {
+        status: 400,
+        message: 'A venda possui produtos com entrega pendente, não é possível abrir uma solicitação de assistência!'
+      }
+    }
+
+    const maintenanceOpen = await Maintenance.findAny(0, {
+      ID_SALE: saleId,
+      CODLOJA: storeId,
+      notIn: { STATUS: ['Finalizada'] }
+    })
+
+    saleProds.forEach(p => {
+      const prodMaintenanceOpen = maintenanceOpen.filter(m => m.COD_ORIGINAL === p.COD_ORIGINAL)
+
+      p.QTD_MAINTENANCE = prodMaintenanceOpen.length
+      p.canOpenMaintenanceRequest = prodMaintenanceOpen.length < p.QUANTIDADE
+    })
+
+    sale.products = saleProds
+    sale.issue = sale.EMISSAO.toLocaleDateString('pt-BR')
+
+    return sale
+  },
   /**
    * @param {number} deliveryId
    * @returns {Promise<Object[]>}
