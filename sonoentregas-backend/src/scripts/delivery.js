@@ -1,57 +1,52 @@
 module.exports = {
   findToBeepDelivery(id) {
     return `
-      SELECT B.CODIGO id, B.APLICACAO mask, B.NOME [nameFull], SUM(A.QTD_DELIV) quantity,
-      ISNULL(C.quantityBeep, 0) quantityBeep, A.ID_DELIVERY moduleId, B.SUBG subGroupId, 
-      (SUM(A.QTD_DELIV) - ISNULL(C.quantityBeep, 0)) quantityPedding, 'delivery' module
-      FROM ${process.env.ENTREGAS_BASE}..DELIVERYS_PROD A
+      SELECT B.CODIGO id, B.APLICACAO mask, B.NOME [nameFull], A.quantity, ISNULL(C.quantityBeep, 0) quantityBeep, 
+      ${id} moduleId, B.SUBG subGroupId, A.quantity - ISNULL(C.quantityBeep, 0) quantityPedding, 'delivery' module
+      FROM (
+        SELECT ID_DELIVERY, COD_ORIGINAL, SUM(QTD_DELIV) quantity, 'DELIVERY_PROD' TIPO
+        FROM ${process.env.ENTREGAS_BASE}..DELIVERYS_PROD
+        WHERE ID_DELIVERY = ${id}
+        GROUP BY ID_DELIVERY, COD_ORIGINAL
+        UNION
+        SELECT A.ID_DELIV_MAIN, B.COD_ORIGINAL, SUM(B.QUANTIDADE) quantity, 'MAINTENANCE' TIPO
+        FROM ${process.env.ENTREGAS_BASE}..MAINTENANCE_DELIV A
+        INNER JOIN ${process.env.ENTREGAS_BASE}..MAINTENANCE B ON A.ID_MAINT = B.ID
+        WHERE A.ID_DELIV_MAIN = ${id}
+        GROUP BY A.ID_DELIV_MAIN, B.COD_ORIGINAL
+      ) A
       INNER JOIN PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
-      LEFT JOIN ( SELECT productId, COUNT(id) quantityBeep
+      LEFT JOIN (
+        SELECT productId, COUNT(id) quantityBeep
           FROM PRODLOJAS_SERIES_MOVIMENTOS
           WHERE outputModule = 'delivery'
           AND outputModuleId = ${id}
-          GROUP BY productId) C ON C.productId = B.CODIGO
-      WHERE A.ID_DELIVERY = ${id}
-      GROUP BY A.ID_DELIVERY, B.CODIGO,  B.APLICACAO, B.NOME, C.quantityBeep, B.SUBG
-      UNION
-      SELECT C.CODIGO id, C.APLICACAO mask, C.NOME nameFull, A.QUANTIDADE quantity,
-      ISNULL(D.quantityBeep, 0) quantityBeep, B.ID moduleId, C.SUBG subGroupId,
-      A.QUANTIDADE - ISNULL(D.quantityBeep, 0) quantityBeep, 'maintenance' module
-      FROM ${process.env.ENTREGAS_BASE}..MAINTENANCE A
-      INNER JOIN ${process.env.ENTREGAS_BASE}..MAINTENANCE_DELIV B ON A.ID = B.ID_MAINT
-      INNER JOIN PRODUTOS C ON C.ALTERNATI = A.COD_ORIGINAL
-      LEFT JOIN ( SELECT productId, COUNT(id) quantityBeep, outputModuleId
-          FROM PRODLOJAS_SERIES_MOVIMENTOS
-          WHERE outputModule = 'maintenance'
-          GROUP BY productId, outputModuleId) D ON D.productId = C.CODIGO AND D.outputModuleId = B.ID
-      WHERE B.ID_DELIV_MAIN = ${id}`
+          GROUP BY productId
+      ) C ON C.productId = B.CODIGO`
   },
   findToBeepDeliveryReturn(id) {
     return `
-      SELECT B.CODIGO id, B.APLICACAO mask, B.NOME [nameFull], SUM(A.QTD_DELIV) quantity,
-      ISNULL(C.quantityBeep, 0) quantityBeep, A.ID_DELIVERY moduleId, B.SUBG subGroupId, 
-      (SUM(A.QTD_DELIV) - ISNULL(C.quantityBeep, 0)) quantityPedding, 'delivery' module
-      FROM ${process.env.ENTREGAS_BASE}..DELIVERYS_PROD A
+      SELECT B.CODIGO id, B.APLICACAO mask, B.NOME [nameFull], A.quantity, ISNULL(C.quantityBeep, 0) quantityBeep, ${id} moduleId, B.SUBG subGroupId, A.quantity - ISNULL(C.quantityBeep, 0) quantityPedding, 'delivery' module
+      FROM (
+        SELECT ID_DELIVERY, COD_ORIGINAL, SUM(QTD_DELIV) quantity, 'DELIVERY_PROD' TIPO
+        FROM ${process.env.ENTREGAS_BASE}..DELIVERYS_PROD
+        WHERE ID_DELIVERY = ${id} AND DELIVERED = 1
+        GROUP BY ID_DELIVERY, COD_ORIGINAL
+        UNION
+        SELECT A.ID_DELIV_MAIN, B.COD_ORIGINAL, SUM(B.QUANTIDADE) quantity, 'MAINTENANCE' TIPO
+        FROM ${process.env.ENTREGAS_BASE}..MAINTENANCE_DELIV A
+        INNER JOIN ${process.env.ENTREGAS_BASE}..MAINTENANCE B ON A.ID_MAINT = B.ID
+        WHERE A.ID_DELIV_MAIN = ${id} AND A.DONE = 0
+        GROUP BY A.ID_DELIV_MAIN, B.COD_ORIGINAL
+      ) A
       INNER JOIN PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
-      LEFT JOIN ( SELECT productId, COUNT(id) quantityBeep
-            FROM PRODLOJAS_SERIES_MOVIMENTOS
-            WHERE inputModule = 'delivery'
-            AND inputModuleId = ${id}
-            GROUP BY productId) C ON C.productId = B.CODIGO
-      WHERE A.ID_DELIVERY = ${id} AND A.DELIVERED = 1
-      GROUP BY A.ID_DELIVERY, B.CODIGO,  B.APLICACAO, B.NOME, C.quantityBeep, B.SUBG
-      UNION
-      SELECT C.CODIGO id, C.APLICACAO mask, C.NOME nameFull, A.QUANTIDADE quantity,
-      ISNULL(D.quantityBeep, 0) quantityBeep, B.ID moduleId, C.SUBG subGroupId,
-      A.QUANTIDADE - ISNULL(D.quantityBeep, 0) quantityBeep, 'maintenance' module
-      FROM ${process.env.ENTREGAS_BASE}..MAINTENANCE A
-      INNER JOIN ${process.env.ENTREGAS_BASE}..MAINTENANCE_DELIV B ON A.ID = B.ID_MAINT
-      INNER JOIN PRODUTOS C ON C.ALTERNATI = A.COD_ORIGINAL
-      LEFT JOIN ( SELECT productId, COUNT(id) quantityBeep, inputModuleId
+      LEFT JOIN (
+        SELECT productId, COUNT(id) quantityBeep
           FROM PRODLOJAS_SERIES_MOVIMENTOS
-          WHERE inputModule = 'maintenance'
-          GROUP BY productId, inputModuleId) D ON D.productId = C.CODIGO AND D.inputModuleId = B.ID
-      WHERE B.DONE = 0 AND B.ID_DELIV_MAIN = ${id}
+          WHERE outputModule = 'delivery'
+          AND outputModuleId = ${id}
+          GROUP BY productId
+      ) C ON C.productId = B.CODIGO
       UNION
       SELECT C.CODIGO id, C.APLICACAO mask, C.NOME nameFull, B.quantity,
       ISNULL(D.quantityBeep, 0) quntityBeep, A.id moduleId, C.SUBG subGroupId,
