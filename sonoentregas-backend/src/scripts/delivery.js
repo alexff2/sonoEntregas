@@ -6,7 +6,6 @@ module.exports = {
       FROM (
         SELECT ID_DELIVERY, COD_ORIGINAL, SUM(quantity) quantity
         FROM (
-          WHERE ID_DELIVERY = ${id} AND DELIVERED = 0
           SELECT ID_DELIVERY, COD_ORIGINAL, SUM(QTD_DELIV) quantity, 'DELIVERY_PROD' TIPO
           FROM ${process.env.ENTREGAS_BASE}..DELIVERYS_PROD
           WHERE ID_DELIVERY = ${id}
