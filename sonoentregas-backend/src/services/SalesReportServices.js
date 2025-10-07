@@ -7,7 +7,7 @@ const salesQueries = require('../scripts/sales')
 
 class SalesReportService {
   async getSalesCommissions({ shopId, month, year }) {
-    const [monthlyGoals] = await GoalsModel.findAny(0, { month: Number(month), year })
+    const [monthlyGoals] = await GoalsModel.findAny(0, { month: Number(month), year, store_id: shopId })
     if (!monthlyGoals) {
       throw {
         status: 400,
