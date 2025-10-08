@@ -32,23 +32,27 @@ module.exports = {
     return `
       SELECT B.CODIGO id, B.APLICACAO mask, B.NOME [nameFull], A.quantity, ISNULL(C.quantityBeep, 0) quantityBeep, ${id} moduleId, B.SUBG subGroupId, A.quantity - ISNULL(C.quantityBeep, 0) quantityPedding, 'delivery' module
       FROM (
-        SELECT ID_DELIVERY, COD_ORIGINAL, SUM(QTD_DELIV) quantity, 'DELIVERY_PROD' TIPO
-        FROM ${process.env.ENTREGAS_BASE}..DELIVERYS_PROD
-        WHERE ID_DELIVERY = ${id} AND DELIVERED = 1
+        SELECT ID_DELIVERY, COD_ORIGINAL, SUM(quantity) quantity
+        FROM (
+          SELECT ID_DELIVERY, COD_ORIGINAL, SUM(QTD_DELIV) quantity, 'DELIVERY_PROD' TIPO
+          FROM ${process.env.ENTREGAS_BASE}..DELIVERYS_PROD
+          WHERE ID_DELIVERY = ${id} AND DELIVERED = 1
+          GROUP BY ID_DELIVERY, COD_ORIGINAL
+          UNION
+          SELECT A.ID_DELIV_MAIN, B.COD_ORIGINAL, SUM(B.QUANTIDADE) quantity, 'MAINTENANCE' TIPO
+          FROM ${process.env.ENTREGAS_BASE}..MAINTENANCE_DELIV A
+          INNER JOIN ${process.env.ENTREGAS_BASE}..MAINTENANCE B ON A.ID_MAINT = B.ID
+          WHERE A.ID_DELIV_MAIN = ${id} AND A.DONE = 0
+          GROUP BY A.ID_DELIV_MAIN, B.COD_ORIGINAL
+        ) A
         GROUP BY ID_DELIVERY, COD_ORIGINAL
-        UNION
-        SELECT A.ID_DELIV_MAIN, B.COD_ORIGINAL, SUM(B.QUANTIDADE) quantity, 'MAINTENANCE' TIPO
-        FROM ${process.env.ENTREGAS_BASE}..MAINTENANCE_DELIV A
-        INNER JOIN ${process.env.ENTREGAS_BASE}..MAINTENANCE B ON A.ID_MAINT = B.ID
-        WHERE A.ID_DELIV_MAIN = ${id} AND A.DONE = 0
-        GROUP BY A.ID_DELIV_MAIN, B.COD_ORIGINAL
       ) A
       INNER JOIN PRODUTOS B ON A.COD_ORIGINAL = B.ALTERNATI
       LEFT JOIN (
         SELECT productId, COUNT(id) quantityBeep
           FROM PRODLOJAS_SERIES_MOVIMENTOS
-          WHERE outputModule = 'delivery'
-          AND outputModuleId = ${id}
+          WHERE inputModule = 'delivery'
+          AND inputModuleId = ${id}
           GROUP BY productId
       ) C ON C.productId = B.CODIGO
       UNION
