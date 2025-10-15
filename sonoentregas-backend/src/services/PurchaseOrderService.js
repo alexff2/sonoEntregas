@@ -44,7 +44,7 @@ class PurchaseOrderService {
       .map(prod => ({
         item: prod.ITEM,
         code: prod.CODPRODUTO,
-        originalCode: prod.ALTERNATI,
+        originalCode: prod.ORIGINAL,
         name: prod.NOME,
         quantity: prod.QTE_PEDIDO,
         quantityArrived: prod.QTE_CHEGADA,

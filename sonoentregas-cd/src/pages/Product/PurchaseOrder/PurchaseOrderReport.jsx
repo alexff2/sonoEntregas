@@ -136,7 +136,7 @@ const PurchaseOrderReport = ({ purchaseOrder }) => {
               <TableHead className={classes.rowHeader}>
                 <TableRow>
                   <TableCell className={classes.cell}>ITEM</TableCell>
-                  <TableCell className={classes.cell}>CÓDIGO</TableCell>
+                  <TableCell className={classes.cell}>COD MASC</TableCell>
                   <TableCell className={classes.cell} width={320}>DESCRIÇÃO DO PRODUTO</TableCell>
                   <TableCell className={classes.cell}>UN</TableCell>
                   <TableCell className={classes.cell} align='center'>QUANTIDADE</TableCell>
@@ -148,7 +148,7 @@ const PurchaseOrderReport = ({ purchaseOrder }) => {
                 {products?.map((product, i) => (
                   <TableRow hover key={i}>
                     <TableCell className={classes.cell}>{product.item}</TableCell>
-                    <TableCell className={classes.cell}>{product.code}</TableCell>
+                    <TableCell className={classes.cell}>{product.originalCode}</TableCell>
                     <TableCell className={classes.cell}>{product.name}</TableCell>
                     <TableCell className={classes.cell}>UN</TableCell>
                     <TableCell className={classes.cell} align='center'>{product.quantity}</TableCell>

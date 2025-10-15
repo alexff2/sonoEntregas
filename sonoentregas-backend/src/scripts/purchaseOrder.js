@@ -50,7 +50,7 @@ module.exports = {
   },
   purchaseOrderProduct(idsPurchase, order){
     return `
-    SELECT A.*, B.NOME, B.ALTERNATI
+    SELECT A.*, B.NOME, B.ALTERNATI, B.ORIGINAL
     FROM VIEW_SALDO_PEDIDO_PRODUTO_VALOR A
     INNER JOIN PRODUTOS B ON A.CODPRODUTO = B.CODIGO
     WHERE A.NUMPEDIDO IN (${idsPurchase})
