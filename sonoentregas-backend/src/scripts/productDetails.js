@@ -8,6 +8,7 @@ module.exports = {
       LEFT JOIN (
         SELECT productId, COUNT(productId) QTD_BEEP, outputModuleId
         FROM PRODLOJAS_SERIES_MOVIMENTOS
+        WHERE outputModule = 'transfer'
         GROUP BY productId, outputModuleId
       ) C ON B.CODPRODUTO = C.productId AND A.CODIGO = C.outputModuleId
 	  INNER JOIN EMPRESA D ON D.CODIGO = A.LOJAORIGEM
