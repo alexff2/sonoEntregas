@@ -138,7 +138,7 @@ export default function Delivery() {
     return timezoneForecast < timezoneNow
   }
 
-  const forecastsAvailable = forecasts.filter( forecast => forecast.status && !checkDataForecast(forecast.date) )
+  const forecastsAvailable = forecasts.filter(forecast => forecast.status)
 
   //Functions
   const deleteDelivery = async cod => {
