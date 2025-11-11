@@ -201,13 +201,6 @@ class SerieService {
       }
     }
 
-    if (productSerial[0].inputBeepDate.setHours(0,0,0,0) < new Date().setHours(0,0,0,0)) {
-      throw {
-        error: 'Produto não bipado hoje!',
-        status: 409
-      }
-    }
-
     await ProdLojaSeriesMovimentosModel.deleteAny(1,{id: productSerial[0].id},connection)
   }
 
@@ -233,13 +226,6 @@ class SerieService {
     if (productSerial.outputModule !== 'delivery' && productSerial.outputModule !== 'maintenance') {
       throw {
         error: 'Número de série não foi bipado em rota de entrega!',
-        status: 409
-      }
-    }
-
-    if (productSerial.outputBeepDate.setHours(0,0,0,0) < new Date().setHours(0,0,0,0)) {
-      throw {
-        error: 'Produto não bipado hoje!',
         status: 409
       }
     }
