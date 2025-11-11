@@ -26,7 +26,7 @@ import { useForecasts } from '../../context/forecastsContext'
 import { useAlert } from '../../context/alertContext'
 import { useBackdrop } from '../../context/backdropContext'
 
-import { getDateSql, getObjDate } from '../../functions/getDates'
+import { getDateSql } from '../../functions/getDates'
 import api from '../../services/api'
 
 const useStyle = makeStyles(theme => ({
