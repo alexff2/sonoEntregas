@@ -85,10 +85,7 @@ class SerieRules {
     if(modele === 'purchaseNote') {
       const purchaseNote = await PurchaseNoteModel.findAny(
         1,
-        {
-          NUM_DOC: moduleId,
-          CODFOR: process.env.COD_FOR
-        },
+        { NUM_DOC: moduleId },
         '*',
         sce
       )

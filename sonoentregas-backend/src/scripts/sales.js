@@ -34,7 +34,7 @@ module.exports = {
     WHERE CODIGO IN (${sellersIds})`
   },
   returnSales: ({ month, year }) => {
-    return `SELECT C.CODVENDEDOR sellerId, SUM(C.NVTOTAL) value
+    return `SELECT C.CODVENDEDOR sellerId, SUM(A.VALOR_TOTAL_DEVOLVIDA) value
       FROM ITENS_DEVOLUCAO A
       INNER JOIN DEVOLUCAO B ON A.CODDEVOLUCAO = B.CODIGO
       INNER JOIN NVENDI2 C ON C.NUMVENDA = A.CODVENDA AND C.CODPRODUTO = A.CODPRODUTO
