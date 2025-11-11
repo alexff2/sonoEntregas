@@ -131,13 +131,6 @@ export default function Delivery() {
     setOpenBackDrop
   ])
 
-  const checkDataForecast = (date) => {
-    const timezoneForecast = getObjDate(date).setHours(0,0,0,0)
-    const timezoneNow = new Date().setHours(0,0,0,0)
-
-    return timezoneForecast < timezoneNow
-  }
-
   const forecastsAvailable = forecasts.filter(forecast => forecast.status)
 
   //Functions
