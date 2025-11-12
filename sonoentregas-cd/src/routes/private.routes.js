@@ -31,6 +31,7 @@ import ProductsMovements from '../pages/Reports/ProductsMovements'
 import DeliveriesReport from '../pages/Reports/Deliveries'
 import ExtraRoutesReport from '../pages/Reports/ExtraRoutes'
 import PendingProductsOutOfStockReport from '../pages/Reports/PendingProductsOutOfStockReport'
+import AvailableProductsForStores from '../pages/Reports/AvailableProductsForStores'
 
 import Maintenance from '../pages/Maintenance'
 import Beeping from '../pages/Beeping'
@@ -73,6 +74,7 @@ export default function PrivateRoutes(){
         <Route path="/app/reports/deliveries" element={<DeliveriesReport />} />
         <Route path="/app/reports/extra-routes" element={<ExtraRoutesReport />} />
         <Route path="/app/reports/pending-products-out-of-stock" element={<PendingProductsOutOfStockReport />} />
+        <Route path="/app/reports/available-products-for-stores" element={<AvailableProductsForStores />} />
         <Route path="*" element={<Navigate to="/"/>} />
       </Route>
     </Routes>

@@ -49,6 +49,9 @@ export default function Reports(){
         <Link className={classe.link} onClick={() => navigate('/app/reports/pending-products-out-of-stock')}>
           <Assessment /> &nbsp; &nbsp; <Typography>Produtos pendentes sem estoque/data</Typography>
         </Link>
+        <Link className={classe.link} onClick={() => navigate('/app/reports/available-products-for-stores')}>
+          <Assessment /> &nbsp; &nbsp; <Typography>Produtos disponíveis para lojas</Typography>
+        </Link>
         {isAuth && 
           <Link className={classe.link} href='http://174.200.200.41:3335'>
             <Assessment /> &nbsp; &nbsp; <Typography>Dashboard CD</Typography>

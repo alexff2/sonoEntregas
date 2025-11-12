@@ -193,6 +193,7 @@ routes.get('/catdef', catDefController.index)
 //Reports
 routes.get('/reports/order-suggestion', reportsController.listProducts)
 routes.get('/reports/pending-products-out-of-stock', reportsController.getPendingProductsOutOfStock)
+routes.get('/reports/available-products-for-stores', reportsController.availableProductsForStores)
 routes.get('/reports/sales/open', reportsController.salesOpen)
 routes.get('/reports/products/movement', reportsController.productsMovement)
 routes.get('/reports/purchase/requests', reportsController.purchaseRequest)

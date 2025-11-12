@@ -30,6 +30,7 @@ const PurchaseOrderService = require('../services/PurchaseOrderService')
 const DreService = require('../services/DreService')
 const DeliveryService = require('../services/DeliveryService')
 const ShopSceService = require('../services/ShopSceService')
+const AvailableProductsForStoresService = require('../services/Products/AvailableProductsForStores')
 const connections = require('../databases/MSSQL/connections')
 const scriptProducts = require('../scripts/products')
 
@@ -450,5 +451,18 @@ module.exports = {
 
       return res.status(status).json(error)
     }
-  }
+  },
+  /**
+   * @param {any} _req
+   * @param {any} res
+   */
+  async availableProductsForStores(_req, res) {
+    try {
+      const availableProducts = await AvailableProductsForStoresService.execute()
+
+      return res.json(availableProducts)
+    } catch (e) {
+      console.log(e)
+    }
+  },
 }
