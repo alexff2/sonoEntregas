@@ -33,6 +33,7 @@ const ShopSceService = require('../services/ShopSceService')
 const AvailableProductsForStoresService = require('../services/Products/AvailableProductsForStores')
 const connections = require('../databases/MSSQL/connections')
 const scriptProducts = require('../scripts/products')
+const BeepStock = require('../services/Products/BeepStock')
 
 module.exports = {
   /**
@@ -461,6 +462,19 @@ module.exports = {
       const availableProducts = await AvailableProductsForStoresService.execute()
 
       return res.json(availableProducts)
+    } catch (e) {
+      console.log(e)
+    }
+  },
+  /**
+   * @param {any} _req
+   * @param {any} res
+   */
+  async beepStock(_req, res) {
+    try {
+      const beepStock = await BeepStock.execute()
+
+      return res.json(beepStock)
     } catch (e) {
       console.log(e)
     }
