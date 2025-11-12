@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import {
   Box,
   Typography,
@@ -10,40 +10,40 @@ import {
   TableBody,
   Paper,
   Button,
-} from '@material-ui/core';
-import { Print } from '@material-ui/icons';
-import { useReactToPrint } from 'react-to-print';
-import api from '../../../services/api';
+} from '@material-ui/core'
+import { Print } from '@material-ui/icons'
+import { useReactToPrint } from 'react-to-print'
+import api from '../../../services/api'
 import { useBackdrop } from '../../../context/backdropContext'
 
 const BeepStock = () => {
-  const [products, setProducts] = React.useState([]);
-  const [error, setError] = React.useState(null);
-  const { setOpenBackDrop } = useBackdrop();
-  const documentReport = React.useRef(null);
+  const [products, setProducts] = React.useState([])
+  const [error, setError] = React.useState(null)
+  const { setOpenBackDrop } = useBackdrop()
+  const documentReport = React.useRef(null)
 
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        setOpenBackDrop(true);
-        const { data } = await api.get('/reports/available-products-for-stores');
-        setProducts(data);
+        setOpenBackDrop(true)
+        const { data } = await api.get('/reports/available-products-for-stores')
+        setProducts(data)
       } catch (e) {
-        setError('Falha ao carregar dados');
+        setError('Falha ao carregar dados')
       } finally {
-        setOpenBackDrop(false);
+        setOpenBackDrop(false)
       }
-    };
-    fetchData();
-  }, [setOpenBackDrop]);
+    }
+    fetchData()
+  }, [setOpenBackDrop])
 
   const handlePrint = useReactToPrint({
     content: () => documentReport.current,
-    documentTitle: 'Produtos Disponíveis para as lojas',
-  });
+    documentTitle: 'Estoque por beep',
+  })
 
-  if (error) return <div>{error}</div>;
-  if (!products.length) return <div>Nenhum dado disponível.</div>;
+  if (error) return <div>{error}</div>
+  if (!products.length) return <div>Nenhum dado disponível.</div>
 
   return (
     <Box component={Paper}>
@@ -86,7 +86,7 @@ const BeepStock = () => {
         </Table>
       </TableContainer>
     </Box>
-  );
-};
+  )
+}
 
-export default BeepStock;
+export default BeepStock
