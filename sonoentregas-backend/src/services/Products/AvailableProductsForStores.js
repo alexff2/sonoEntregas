@@ -57,7 +57,7 @@ class AvailableProductsForStores {
     ) t
     ON t.CODPRODUTO = p.CODIGO
     WHERE (ISNULL(pl.EST_BEEP, 0) - ISNULL(sp.QTD_PEND, 0) - ISNULL(m.QTD_MAINTENANCE, 0) - ISNULL(t.QTD_TRANSFER, 0)) > 0
-    `
+    ORDER BY p.NOME`
     const results = await db._query(1, sql, QueryTypes.SELECT);
     return results;
   }
