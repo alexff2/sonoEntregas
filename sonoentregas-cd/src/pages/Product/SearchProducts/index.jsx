@@ -110,9 +110,9 @@ export default function SearchProducts() {
               <TableCell>Código</TableCell>
               <TableCell>Cod Alterna</TableCell>
               <TableCell>Descrição</TableCell>
+              <TableCell align="right">Custo</TableCell>
               <TableCell align="right">Estoque</TableCell>
               <TableCell align="right">Disp. CD</TableCell>
-              <TableCell align="right">Custo</TableCell>
               <TableCell></TableCell>
             </TableRow>
           </TableHead>
