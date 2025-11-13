@@ -22,7 +22,7 @@ class AvailableProductsForStores {
       SELECT
         COD_ORIGINAL,
         SUM(QUANTIDADE) QTD_PEND
-      FROM SONOENTREGAS..SALES_PROD
+      FROM ${process.env.ENTREGAS_BASE}..SALES_PROD
       WHERE STATUS IN ('Enviado', 'Em laçamento', 'Em Previsão')
       GROUP BY COD_ORIGINAL
     ) sp
@@ -31,7 +31,7 @@ class AvailableProductsForStores {
       SELECT
         COD_ORIGINAL,
         SUM(QUANTIDADE) QTD_MAINTENANCE
-      FROM SONOENTREGAS..MAINTENANCE
+      FROM ${process.env.ENTREGAS_BASE}..MAINTENANCE
       WHERE STATUS IN ('No CD', 'Em lançamento', 'Em Previsão')
       GROUP BY COD_ORIGINAL
     ) m ON m.COD_ORIGINAL = p.ALTERNATI
