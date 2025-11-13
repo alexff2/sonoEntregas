@@ -499,7 +499,7 @@ export default function CreateUpdatePurchaseOrder({
             <TableContainer
               component={Paper}
               style={{
-                height: '625px',
+                height: window.innerHeight * 0.7,
                 position: 'absolute',
                 zIndex: 1500,
                 width: 'calc(100% - 16px)'
