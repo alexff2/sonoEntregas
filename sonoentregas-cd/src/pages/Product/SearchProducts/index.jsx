@@ -15,7 +15,7 @@ import {
   FormControl, 
   InputLabel, 
 } from "@material-ui/core"
-import SearchIcon from '@material-ui/icons/Search'
+import { Search as SearchIcon, Visibility } from '@material-ui/icons'
 
 import Modal from '../../../components/Modal'
 import useStyles from '../style'
@@ -25,12 +25,15 @@ import {useBackdrop} from "../../../context/backdropContext"
 import {useAlertSnackbar} from '../../../context/alertSnackbarContext'
 
 import Details from "./Details"
+import UpdateCost from "./UpdateCost"
+import BrMonetaryValue from "../../../components/BrMonetaryValue"
 
 export default function SearchProducts() {
   const [typeSearch, setTypeSearch] = useState('name')
   const [search, setSearch] = useState()
   const [products, setProducts] = useState([])
   const [productSelect, setProductSelect] = useState(null)
+  const [productUpdateCost, setProductUpdateCost] = useState(null)
   const classes = useStyles()
   const {setAlertSnackbar} = useAlertSnackbar()
   const {setOpenBackDrop} = useBackdrop()
@@ -108,7 +111,9 @@ export default function SearchProducts() {
               <TableCell>Cod Alterna</TableCell>
               <TableCell>Descrição</TableCell>
               <TableCell align="right">Estoque</TableCell>
-              <TableCell align="right">Qtd Disp.</TableCell>
+              <TableCell align="right">Disp. CD</TableCell>
+              <TableCell align="right">Custo</TableCell>
+              <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -116,20 +121,43 @@ export default function SearchProducts() {
             <TableRow
               key={product.COD_ORIGINAL}
               hover
-              onClick={() => setProductSelect(product)}
               className={classes.row}
             >
               <TableCell>{product.CODIGO}</TableCell>
               <TableCell>{product.COD_ORIGINAL}</TableCell>
               <TableCell>{product.NOME}</TableCell>
+              <TableCell
+                align="right"
+                style={{cursor: 'pointer'}}
+                onClick={() => setProductUpdateCost(product)}
+              >
+                <BrMonetaryValue value={product.purchasePrice} />
+              </TableCell>
               <TableCell align="right">{product.EST_LOJA}</TableCell>
               <TableCell align="right">{product.availableStock}</TableCell>
+              <TableCell align="center">
+                <Visibility
+                  color="secondary"
+                  onClick={() => setProductSelect(product)}
+                  style={{cursor: 'pointer', padding: 0}}
+                />
+              </TableCell>
             </TableRow>
           ))}
           </TableBody>
         </Table>
       </TableContainer>
 
+      <Modal
+        open={Boolean(productUpdateCost)}
+        setOpen={setProductUpdateCost}
+      >
+        <UpdateCost
+          product={productUpdateCost}
+          setProducts={setProducts}
+          setProductUpdateCost={setProductUpdateCost}
+        />
+      </Modal>
       <Modal
         open={Boolean(productSelect)}
         setOpen={setProductSelect}

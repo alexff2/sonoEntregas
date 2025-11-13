@@ -58,6 +58,7 @@ routes.put('/users/:userId', usersController.update)
   routes.get('/product/to-beep', ensureAuthenticated, productsController.findProductToBeepById)
   routes.get('/product/details/:id', ensureAuthenticated, productsController.details)
   routes.put('/product/barcode', ensureAuthenticated, productsController.updateBarCode)
+  routes.put('/product/:id/purchase-cost', ensureAuthenticated, productsController.updatePurchaseCost)
   // Beep
   routes.get('/beep-pendant-modules', serieController.findBeepPendantModules)
   routes.get('/serial/product', serieController.findOpenSeriesByProduct)

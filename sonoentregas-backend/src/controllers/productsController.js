@@ -1,5 +1,6 @@
 const ProductsService = require('../services/ProductsService')
 const ProductDetailsService = require('../services/ProductDetailsService')
+const ProductUpdatePurchaseCost = require('../services/Products/UpdatePurchaseCost')
 const errorCath = require('../functions/error')
 
 module.exports = {
@@ -72,6 +73,16 @@ module.exports = {
       return response.json({productDetails})
     } catch (error) {
       return errorCath(error, response)
+    }
+  },
+  async updatePurchaseCost(request, response) {
+    try {
+      const { id } = request.params
+      const { purchaseCost } = request.body
+      await ProductUpdatePurchaseCost.execute(id, purchaseCost)
+      return response.status(200).json({ message: 'Purchase cost updated successfully' })
+    } catch (error) {
+      errorCath(error, response)
     }
   }
 }
