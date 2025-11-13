@@ -84,6 +84,7 @@ const BalanceByBeep = ({handleRenderBox}) => {
       }
       setProductSelect(data.product)
       setSerialNumberSelect('')
+      setAlertSnackbar('Bipado com sucesso!', 'success')
     } catch (error) {
       setSerialNumberSelect('')
       console.log(error)
@@ -175,7 +176,6 @@ const BalanceByBeep = ({handleRenderBox}) => {
   React.useEffect(() => {
     const balanceLocalStage = async () => {
       const balanceId = localStorage.getItem('balanceId')
-      console.log('balanceId', balanceId)
       if (balanceId) {
         setOpenModalSearch(false)
         setSearchBalanceId(balanceId)
@@ -268,7 +268,6 @@ const BalanceByBeep = ({handleRenderBox}) => {
                   root: classes.inputRoot,
                   input: classes.inputInput,
                 }}
-                inputProps={{ 'aria-label': 'search' }}
                 value={search}
                 onChange={handleSearchProduct}
               />
