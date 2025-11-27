@@ -46,12 +46,6 @@ export function Products({
     }, 100)
   }
 
-  const moduleNames = {
-    delivery: 'Venda',
-    saleReturn: 'Devolução',
-    maintenance: 'Assistência',
-  }
-
   return (
     <Box className={classes.root}>
       {
@@ -80,7 +74,7 @@ export function Products({
                     }
                     <Box width='100%' marginRight={4}>
                       <Box display='flex' width='100%' justifyContent='space-between'>
-                        <Typography>{prod.mask}{prod.module && ` - ${moduleNames[prod.module]}`}</Typography>
+                        <Typography>{prod.mask}</Typography>
                         {prod.moduleId && (
                           <Typography variant="body2" color="textSecondary">Nota: {prod.moduleId}</Typography>
                         )}

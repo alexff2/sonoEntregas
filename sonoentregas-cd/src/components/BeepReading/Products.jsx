@@ -46,12 +46,6 @@ export function Products({
     }, 100)
   }
 
-  const moduleNames = {
-    delivery: 'Venda',
-    saleReturn: 'Devolução',
-    maintenance: 'Assistência',
-  }
-
   return (
     <Box className={classes.root}>
       {
@@ -80,9 +74,7 @@ export function Products({
                         <div style={{marginRight: 10}}></div>
                     }
                     <Box width='100%' marginRight={4}>
-                      <Typography
-                        style={{marginBottom: 8, textAlign: 'left'}}
-                      >{prod.mask} - {moduleNames[prod.module]}</Typography>
+                      <Typography style={{marginBottom: 8, textAlign: 'left'}}>{prod.mask}</Typography>
                       <Box
                         style={{
                           display: 'flex',
