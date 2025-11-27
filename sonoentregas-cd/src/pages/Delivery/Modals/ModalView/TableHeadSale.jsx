@@ -32,6 +32,7 @@ const TableHeadSale = ({type}) => {
       <TableRow className={classes.tableHead}>
         <TableCell className={classes.tableHeadCellStart}>Nº Venda</TableCell>
         <TableCell className={classes.tableHeadCellStart}>Nome do Cliente</TableCell>
+        <TableCell className={classes.tableHeadCellStart}>Bairro</TableCell>
         <TableCell className={classes.tableHeadCell}>Fone</TableCell>
         <TableCell className={classes.tableHeadCell}>Emissão</TableCell>
         <TableCell className={classes.tableHeadCell}>Loja</TableCell>

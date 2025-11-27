@@ -38,6 +38,7 @@ const RowSale = ({ sale, type, status, handleInvalidationSale }) => {
           {sale.ID_SALES}
         </TableCell>
         <TableCell>{sale.NOMECLI}</TableCell>
+        <TableCell>{sale.BAIRRO}</TableCell>
         <TableCell align="right">{sale.FONE}</TableCell>
         <TableCell align="right">{getDateBr(sale.EMISSAO)}</TableCell>
         <TableCell align="right">{sale.SHOP}</TableCell>
