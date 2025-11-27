@@ -7,7 +7,6 @@ import {
 
 import { useAuthenticate } from '../../context/authContext'
 
-import BarCode from './BarCode'
 import BarCodeEndSingleEntered from './BarCodeEndSingleEntered'
 import SingleEnteredById from './SingleEnteredById'
 import EntryNote from './EntryNote'
@@ -63,7 +62,6 @@ export default function Beeping() {
         !renderBeepBox
         ? 
           <>
-            <BoxBeep onClick={() => {handleRenderBox(1)}}>Cadastro de C. Barras</BoxBeep>
             {
               userAuthToSingleEntered(userAuth.DESCRIPTION) &&
               <BoxBeep onClick={() => {handleRenderBox(2)}}>Cadastro de C. Barras e Entrada avulsa</BoxBeep>
@@ -79,7 +77,6 @@ export default function Beeping() {
           </>
         : 
           <>
-            {screenId === 1 && <BarCode handleRenderBox={handleRenderBox} />}
             {
               (screenId === 2 && userAuthToSingleEntered(userAuth.DESCRIPTION))
               && <BarCodeEndSingleEntered handleRenderBox={handleRenderBox} />
