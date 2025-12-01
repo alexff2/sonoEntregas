@@ -11,7 +11,7 @@ import BarCodeEndSingleEntered from './BarCodeEndSingleEntered'
 import SingleEnteredById from './SingleEnteredById'
 import EntryNote from './EntryNote'
 import Deliveries from './Deliveries'
-import Transfers from './Transfers'
+import Transfers from './TransferNew'
 import BalanceByBeep from './BalanceByBeep'
 
 const userAuthToSingleEntered = (userName) => {

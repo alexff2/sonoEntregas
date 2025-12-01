@@ -68,7 +68,7 @@ module.exports = {
   /**@param {number[]} ids*/
   async findGrouped(ids) {
     const script = `
-    SELECT CODIGO id, NOME nameFull, APLICACAO mask, SUBG groupId
+    SELECT CODIGO id, NOME nameFull, APLICACAO mask, SUBG groupId, ORIGINAL originalId
     FROM PRODUTOS
     WHERE CODIGO IN (${ids})`
 
