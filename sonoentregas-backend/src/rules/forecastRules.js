@@ -178,7 +178,7 @@ class ForecastRules {
     const codOriginal = sale.products.map(product => `'${product.COD_ORIGINAL}'`)
 
     const estProducts = await SalesProd._query(1, `
-      SELECT A.ALTERNATI, B.EST_LOJA - ISNULL(C.qtdForecastSales, 0) - ISNULL(D.qtdForecastMaintenance, 0) qtdAvailableStock
+      SELECT A.ALTERNATI, B.EST_LOJA - (ISNULL(C.qtdForecastSales, 0) - ISNULL(E.qtdBeep, 0)) - ISNULL(D.qtdForecastMaintenance, 0) qtdAvailableStock
       FROM PRODUTOS A
       INNER JOIN PRODLOJAS B ON A.CODIGO = B.CODIGO
       LEFT JOIN ( SELECT COD_ORIGINAL, SUM(QUANTIDADE) qtdForecastSales
@@ -191,6 +191,19 @@ class ForecastRules {
           WHERE [STATUS] IN ('Em Previsão', 'Em lançamento')
           GROUP BY COD_ORIGINAL)
       D ON A.ALTERNATI = D.COD_ORIGINAL
+      LEFT JOIN (
+        SELECT B.ALTERNATI, COUNT(*) qtdBeep
+        FROM PRODLOJAS_SERIES_MOVIMENTOS A
+        INNER JOIN PRODUTOS B ON A.productId = B.CODIGO
+        WHERE A.outputBeepDate IS NOT NULL AND outputModule = 'delivery' AND A.outputModuleId IN (
+          SELECT A.idDelivery
+          FROM ${process.env.ENTREGAS_BASE}..FORECAST_SALES A       
+          INNER JOIN ${process.env.ENTREGAS_BASE}..FORECAST_PRODUCT B ON A.id = B.idForecastSale
+          INNER JOIN ${process.env.ENTREGAS_BASE}..FORECAST C ON C.id = A.idForecast
+          WHERE (C.status IS NULL OR C.status = 1)
+        )
+        GROUP BY B.ALTERNATI
+      ) E ON E.ALTERNATI = A.ALTERNATI
       WHERE B.CODLOJA = 1 AND A.ALTERNATI IN (${codOriginal})
     `, QueryTypes.SELECT)
 
