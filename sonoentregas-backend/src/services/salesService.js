@@ -345,7 +345,8 @@ module.exports = {
     INNER JOIN SALES B ON A.idSale = B.ID
     INNER JOIN FORECAST C ON A.idForecast = C.id
     WHERE A.idForecast in (${forecasts.map(forecast => forecast.id)})
-    AND B.ID_SALES = ${idSale}`
+    AND B.ID_SALES = ${idSale}
+    AND A.idDelivery IS NULL`
 
     /**@type {ISales[]} */
     const forecastSales = await Forecast._query(0, scriptSales, QueryTypes.SELECT)
